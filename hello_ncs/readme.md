@@ -1,6 +1,6 @@
 # hello_ncs: A Movidius Neural Compute Stick Hello World example
 
-This directory contains a python code example that shows the Movidius NCS software is installed and is correctly configured in your system such that an application can access the NCS via the NC API.
+This directory contains a python code example that shows the Movidius NC SDK software is installed and is correctly configured on your system such that an application can access the stick via the NC API.
 
 ## Prerequisites
 
