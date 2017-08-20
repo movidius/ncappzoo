@@ -18,8 +18,12 @@ all: profile compile run
 py:
 	@echo ${python_version_minor}
 
+.PHONY: prereqs
+prereqs:
+	(cd ../../data/ilsvrc12; make)
+
 .PHONY: prototxt
-prototxt:
+prototxt: prereqs
 	test -f ${PROTOTXT_FILENAME} || (${GET_PROTOTXT}; awk 'NR <2 {print}' < ${PROTOTXT_FILENAME} > temp; cat input_shape.prototxt >> temp; awk 'NR > 7 {print}' < ${PROTOTXT_FILENAME} >> temp; mv temp ${PROTOTXT_FILENAME})
 
 .PHONY: profile
