@@ -12,7 +12,7 @@ python3 /home/[user]/workspace/mvncsdk/bin/mvNCCompile.pyc $*
 
 "ctrl-d"
 
-sudo cat > /usr/local/bin/ncCProfile
+sudo cat > /usr/local/bin/ncProfile
 
 #! /bin/bash
 
@@ -27,4 +27,9 @@ sudo cat > /usr/local/bin/ncCheck
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCCheck.pyc $*
 
 "ctrl-d"
+
+## Make them executable
+
+sudo chmod +x /usr/local/bin/ncCompile /usr/local/bin/ncProfile /usr/local/bin/ncCheck
+
 
