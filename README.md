@@ -10,16 +10,21 @@ sudo cat > /usr/local/bin/ncCompile
 
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCCompile.pyc $*
 
-<ctrl-d>
+"<ctrl-d>"
 
 sudo cat > /usr/local/bin/ncCProfile
+
 #! /bin/bash
+
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCProfile.pyc $*
 
-<ctrl-d>
+"<ctrl-d>"
 
 sudo cat > /usr/local/bin/ncCheck
+
 #! /bin/bash
+
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCCheck.pyc $*
 
-<ctrl-d>
+"<ctrl-d>"
+
