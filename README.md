@@ -2,7 +2,7 @@
 
 See the LICENSE file for details of reuse and redistribution of repo files.
 
-#Create shell scripts in /usr/local/bin for easy access
+# Create shell scripts in /usr/local/bin for easy access
 
 sudo cat > /usr/local/bin/ncCompile
 
@@ -10,7 +10,7 @@ sudo cat > /usr/local/bin/ncCompile
 
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCCompile.pyc $*
 
-"<ctrl-d>"
+"ctrl-d"
 
 sudo cat > /usr/local/bin/ncCProfile
 
@@ -18,7 +18,7 @@ sudo cat > /usr/local/bin/ncCProfile
 
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCProfile.pyc $*
 
-"<ctrl-d>"
+"ctrl-d"
 
 sudo cat > /usr/local/bin/ncCheck
 
@@ -26,5 +26,5 @@ sudo cat > /usr/local/bin/ncCheck
 
 python3 /home/[user]/workspace/mvncsdk/bin/mvNCCheck.pyc $*
 
-"<ctrl-d>"
+"ctrl-d"
 
