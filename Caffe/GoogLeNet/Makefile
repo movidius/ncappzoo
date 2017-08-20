@@ -5,7 +5,9 @@ NCCOMPILE = /usr/local/bin/ncCompile
 NCPROFILE = /usr/local/bin/ncProfile
 NCCHECK = /usr/local/bin/ncCheck
 
-PROTOTXT_FILENAME= googlenet.prototxt
+PROTOTXT_FILENAME= deploy.prototxt
+GET_PROTOTXT =  wget -P . https://raw.githubusercontent.com/BVLC/caffe/master/models/bvlc_googlenet/deploy.prototxt
+
 CAFFEMODEL_FILENAME = bvlc_googlenet.caffemodel
 GET_CAFFEMODEL = wget -P . -N http://dl.caffe.berkeleyvision.org/${CAFFEMODEL_FILENAME}
 
@@ -16,18 +18,22 @@ all: profile compile run
 py:
 	@echo ${python_version_minor}
 
+.PHONY: prototxt
+prototxt:
+	test -f ${PROTOTXT_FILENAME} || (${GET_PROTOTXT}; awk 'NR <2 {print}' < ${PROTOTXT_FILENAME} > temp; cat input_shape.prototxt >> temp; awk 'NR > 7 {print}' < ${PROTOTXT_FILENAME} >> temp; mv temp ${PROTOTXT_FILENAME})
+
 .PHONY: profile
-profile: 
-	${NCPROFILE} googlenet.prototxt -s 12
+profile: prototxt
+	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
 	firefox output_report.html &
 
 .PHONY: compile
-compile:
+compile: prototxt
 	test -f ${CAFFEMODEL_FILENAME} || ${GET_CAFFEMODEL}
 	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
 
 .PHONY: check
-check:
+check: prototxt
 	test -f ${CAFFEMODEL_FILENAME} || ${GET_CAFFEMODEL}
 	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i images/cat.jpg -s 12 -id 885 ${PROTOTXT_FILENAME}
 
@@ -37,6 +43,7 @@ run:
 
 
 cleancaffemodel:
+	rm -f ${PROTOTXT_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
 clean: cleancaffemodel
