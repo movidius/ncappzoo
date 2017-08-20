@@ -1,0 +1,1 @@
+../../../ilsvrc12/synset_words.txt
