@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # Copyright(c) 2017 Intel Corporation. 
 # License: MIT See LICENSE file in root directory.
 
@@ -22,7 +23,7 @@ if len(argv) != 5:
 img_width  = int(argv[3])
 img_height = int(argv[4])
 
-mvnc.SetGlobalOption(mvnc.GlobalOption.LOGLEVEL, 2)
+#mvnc.SetGlobalOption(mvnc.GlobalOption.LOGLEVEL, 2)
 
 # *****************************************************************
 # Get a list of devices
@@ -31,7 +32,7 @@ devices = mvnc.EnumerateDevices()
 if len(devices) == 0:
 	print('No devices found')
 	quit()
-print("\n\nFound ", len(devices), "devices :", devices, "\n\n")
+#print("\n\nFound ", len(devices), "devices :", devices, "\n\n")
 devHandle   = []
 graphHandle = []
 
@@ -50,7 +51,7 @@ for file in onlyfiles:
     img = cv2.resize(img, (img_width, img_height))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = img.astype(numpy.float16)
-    print(file, img.shape)
+    #print(file, img.shape)
     imgarr.append(img)
 
 # *****************************************************************
@@ -65,23 +66,23 @@ with open(join(argv[1],'graph'), mode='rb') as f:
 # Open the device and load the graph into each of the devices
 # *****************************************************************
 for devnum in range(len(devices)):
-    print("***********************************************")
+    #print("***********************************************")
     
     devHandle.append(mvnc.Device(devices[devnum]))
     devHandle[devnum].OpenDevice()
             
     opt = devHandle[devnum].GetDeviceOption(mvnc.DeviceOption.OPTIMISATIONLIST)
-    print("Optimisations:")
-    print(opt)
+    #print("Optimisations:")
+    #print(opt)
 
     graphHandle.append(devHandle[devnum].AllocateGraph(graph))
     graphHandle[devnum].SetGraphOption(mvnc.GraphOption.ITERATIONS, 1)
     iterations = graphHandle[devnum].GetGraphOption(mvnc.GraphOption.ITERATIONS)
-    print('Iterations:', iterations)
+    #print('Iterations:', iterations)
 
-print("***********************************************")
-print("Loaded Graphs")
-print("***********************************************\n\n\n")
+#print("***********************************************")
+#print("Loaded Graphs")
+#print("***********************************************\n\n\n")
 
 def runparallel(count=100, num=[]):
     numdevices = num
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     for i in range(1, len(devices)+1):
       num = str(list(range(i))) 
       tot_time = timeit("runthreaded(count=100,num="+num+")", setup="from __main__ import runthreaded", number=1)    
-      print("Running on "+str(i)+" sticks threaded      : %0.2f FPS"%(100.0*i/tot_time))
+      print("\n\nRunning " + argv[1] +" on "+str(i)+" sticks threaded      : %0.2f FPS\n\n"%(100.0*i/tot_time))
 
 
 # *****************************************************************
@@ -131,4 +132,4 @@ for devnum in range(len(devices)):
     graphHandle[devnum].DeallocateGraph()
     devHandle[devnum].CloseDevice()
 
-print('\n\nFinished\n\n')
+#print('\n\nFinished\n\n')
