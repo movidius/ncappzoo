@@ -2,7 +2,7 @@
 The Movidius™ Neural Compute SDK and Movidius™ Neural Compute Stick (NCS) enable rapid prototyping, validation and deployment of Deep Neural Networks (DNN).
 The SDK contains parsing program that intelligently converts existing networks, creating an optimal conversion specifically for the Movidius™ architecture.  The SDK also contains a set of C and Python APIs to offload the neural network computation onto the Movidius™ Neural Compute Stick.
 
-* [Architecture Details](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/Architecture/)
+* [Architecture Details](arch.md)
 
 # Typical Neural Network Development flow
 
