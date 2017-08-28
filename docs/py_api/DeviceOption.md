@@ -1,0 +1,1 @@
+# Device Option enumeration class

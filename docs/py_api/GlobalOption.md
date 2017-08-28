@@ -1,0 +1,1 @@
+# GlobalOption enumeration class

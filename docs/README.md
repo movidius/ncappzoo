@@ -16,7 +16,7 @@ The SDK contains a set of software tools to compile, profile, and check validity
 # [Installation and Configuration](install.md)
 # [SDK Tools](tools.md)
 # [C API](c_api/c_api.md)
-# [Python API](python_api.md)
+# [Python API](py_api/python_api.md)
 # [Trouble Shooting](troubleshooting.md)
 # [NCS Forum](forum.md)
 . 
