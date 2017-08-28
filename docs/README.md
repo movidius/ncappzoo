@@ -7,7 +7,7 @@ The NCS in used in two primary scenarios:
 - Prototyping a user application on a development computer (host system) which accesses the hardware of the NCS to accelerate DNN inferences via the API provided with the Movidius™ Neural Compute SDK. In this scenario the host system can be a developer workstation or any developer system that runs an operating system compatible with the API. 
 
 The following diagram shows the typical workflow for development with the NC
-![](ncs_workflow.jpg)
+![](images/ncs_workflow.jpg)
 
 The training phase does not utilize the NCS hardware or SDK, while the subsequent phases of “profiling, tuning and compiling” and “prototyping” do require the NCS hardware and the accompanying Movidius™ Neural Compute SDK
 
@@ -15,7 +15,7 @@ The SDK contains a set of software tools to compile, profile, and check validity
 
 # [Installation and Configuration](install.md)
 # [SDK Tools](tools.md)
-# [C API](c_api.md)
+# [C API](c_api/c_api.md)
 # [Python API](python_api.md)
 # [Trouble Shooting](troubleshooting.md)
 # [NCS Forum](forum.md)

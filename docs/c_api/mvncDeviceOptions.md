@@ -1,0 +1,1 @@
+# mvncDeviceOptions enumeration

@@ -12,7 +12,7 @@ To build and run the examples in this repository you will need to have the follo
 ## Connecting the NCS to a development computer
 The NCS connects to the development computer over a USB 2.0 High Speed interface. Plug the NCS directly to a USB port on your development computer or into a powered USB hub that is plugged into your development computer.
 
-![](ncs_plugged.jpg)
+![](images/ncs_plugged.jpg)
 
 ## Example Installation with SDK
 To install the examples in this repository along with the SDK use the following command on your development computer.  When prompted, select the option to install examples.  If you haven't already installed the SDK on your development computer you should use this command to install.
