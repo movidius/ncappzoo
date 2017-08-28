@@ -1,13 +1,25 @@
 # Introduction
 The Movidius™ Neural Compute SDK and Movidius™ Neural Compute Stick (NCS) enable rapid prototyping, validation and deployment of Deep Neural Networks (DNN).
-The SDK contains parsing program that intelligently converts existing networks, creating an optimal conversion specifically for the Movidius™ architecture.  The SDK also contains a set of C and Python APIs to offload the neural network computation onto the Movidius™ Neural Compute Stick.
 
-* [Architecture Details](arch.md)
+The NCS in used in two primary scenarios:
+- Profiling, tuning, and compiling a DNN on a development computer (host system) with the tools provided in the Movidius™ Neural Compute SDK. In this scenario the host system is typically a desktop or laptop machine running Ubuntu 16.04 Desktop (x86, 64 bit) but you can use any supported platform for these steps.
+
+- Prototyping a user application on a development computer (host system) which accesses the hardware of the NCS to accelerate DNN inferences via the API provided with the Movidius™ Neural Compute SDK. In this scenario the host system can be a developer workstation or any developer system that runs an operating system compatible with the API. 
+
+The following diagram shows the typical workflow for development with the NC
+![](ncs_workflow.jpg)
+
+The training phase does not utilize the NCS hardware or SDK, while the subsequent phases of “profiling, tuning and compiling” and “prototyping” do require the NCS hardware and the accompanying Movidius™ Neural Compute SDK
+
+The SDK contains a set of software tools to compile, profile, and check validity of your DNN as well as an API for both the C and Python programming languages.  The API is provided to allow users to create software which offloads the neural network computation onto the Movidius™ Neural Compute Stick.
+
+* [Installation and Configuration](install.md)
+
 
 # Typical Neural Network Development flow
 
 # Setup
-wget http://whereever.com/ncsdk_setup.sh && chmod +x ncsdk_setup.sh && ./ncsdk_setup.sh
+wget http://whereever.com/ncsdk_setup.sh && chmod +x ncsdk_setup.sh && ./ncsdk_setup.sh [-no_examples]
 
 OR
 
@@ -48,3 +60,5 @@ git clone http://github.com/Movidius/MvNC_Examples && cd MvNC_Examples && make i
       * [mvnc.Device.GetGraphOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_GetGraphOption/)  
 
 # Examples
+
+# Trouble Shooting
