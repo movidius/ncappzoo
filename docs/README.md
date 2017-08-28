@@ -13,19 +13,25 @@ The training phase does not utilize the NCS hardware or SDK, while the subsequen
 
 The SDK contains a set of software tools to compile, profile, and check validity of your DNN as well as an API for both the C and Python programming languages.  The API is provided to allow users to create software which offloads the neural network computation onto the Movidius™ Neural Compute Stick.
 
-* [Installation and Configuration](install.md)
+# [Installation and Configuration](install.md)
+# [SDK Tools](tools.md)
+# [C API](c_api.md)
+# [Python API](python_api.md)
+# [Trouble Shooting](troubleshooting.md)
+# [NCS Forum](forum.md)
+. 
 
+.
+ 
+. 
 
-# Typical Neural Network Development flow
+old links below
+. 
 
-# Setup
-wget http://whereever.com/ncsdk_setup.sh && chmod +x ncsdk_setup.sh && ./ncsdk_setup.sh [-no_examples]
+.
+ 
+. 
 
-OR
-
-git clone http://github.com/Movidius/MvNC_Examples && cd MvNC_Examples && make install
-
-## System Requirements
 
 # ncCompile
 
@@ -61,4 +67,4 @@ git clone http://github.com/Movidius/MvNC_Examples && cd MvNC_Examples && make i
 
 # Examples
 
-# Trouble Shooting
+

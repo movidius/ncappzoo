@@ -1,3 +1,3 @@
-## NCS Architecture 
+## NCS Architecture
 
-arch.md file
+file is arch.md
