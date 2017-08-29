@@ -45,12 +45,14 @@ old links below
 
 ## Global Methods
 
+* [mvnc.GlobalOption](py_api/GlobalOption.md)
+* [mvnc.SetGlobalOption()](py_api/SetGlobalOption.md)
+* [mvnc.GetGlobalOption()](py_api/GetGlobalOption.md)<br><br>
+###
 * [mvnc.EnumerateDevices](py_api/EnumerateDevices.md)
 * [mvnc.Status](py_api/Status.md)<br><br>
 
-* [mvnc.GlobalOption](py_api/GlobalOption.md)
-* [mvnc.SetGlobalOption()](py_api/SetGlobalOption.md)
-* [mvnc.GetGlobalOption()](py_api/GetGlobalOption.md)
+
 <br>
 * [mvnc.Device](py_api/Class_Device.md)
   * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
