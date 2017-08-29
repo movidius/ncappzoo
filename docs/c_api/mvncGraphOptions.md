@@ -1,1 +1,0 @@
-# mvncGraphOptions enumeration

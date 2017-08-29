@@ -1,1 +1,0 @@
-# Graph Option enumeration class
