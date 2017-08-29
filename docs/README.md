@@ -47,27 +47,27 @@ old links below
 
 * [mvnc.EnumerateDevices](py_api/EnumerateDevices.md)
 * [mvnc.Status](py_api/Class_Status.md)
-
+<br>
 * [mvnc.GlobalOption](py_api/Class_GlobalOption.md)
 * [mvnc.SetGlobalOption()](py_api/SetGlobalOption.md)
-* [mvnc.GetGlobalOption()](py_api/Class_GetGlobalOption.md)
-
+* [mvnc.GetGlobalOption()](py_api/GetGlobalOption.md)
+<br>
 * [mvnc.Device](py_api/Class_Device.md)
   * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
   * [mvnc.Device.CloseDevice()](py_api/Device.CloseDevice.md)
-  
-  * [mvnc.Device.DeviceOption](py_api/py_Class_DeviceOption/)
-  * [mvnc.Device.DeviceOption.SetDeviceOption()](py_api/py_SetDeviceOption/)
-  * [mvnc.Device.DeviceOption.GetDeviceOption()](py_api/py_GetDeviceOption/)
-  
-  * [mvnc.Device.Graph](py_api/py_Class_Graph/)
-  * [mvnc.Device.AllocateGraph()](py_api/py_AllocateGraph/)  
-  * [mvnc.Device.DeallocateGraph()](py_api/py_DeallocateGraph/)  
-    * [mvnc.Device.Graph.LoadTensor()](py_api/py_LoadTensor/)  
-    * [mvnc.Device.Graph.GetResult()](py_api/py_GetResult/)  
-    * [mvnc.Device.Graph.GraphOption](py_api/py_Class_GraphOption/)
-    * [mvnc.Device.Graph.SetGraphOption()](py_api/py_SetGraphOption/)  
-    * [mvnc.Device.Graph.GetGraphOption()](py_api/py_GetGraphOption/)  
+<br>
+  * [mvnc.Device.DeviceOption](py_api/Device.DeviceOption.md)
+  * [mvnc.Device.SetDeviceOption()](py_api/Device.SetDeviceOption.md)
+  * [mvnc.Device.GetDeviceOption()](py_api/Device.GetDeviceOption.md)
+<br>  
+  * [mvnc.Device.Graph](py_api/Graph.md)
+  * [mvnc.Device.AllocateGraph()](py_api/Device.AllocateGraph.md)  
+  * [mvnc.Device.DeallocateGraph()](py_api/Device.DeallocateGraph.md)  
+    * [mvnc.Device.Graph.LoadTensor()](py_api/Graph.LoadTensor.md)  
+    * [mvnc.Device.Graph.GetResult()](py_api/Graph.GetResult.md)  
+    * [mvnc.Device.Graph.GraphOption](py_api/Graph.Class_GraphOption.md)
+    * [mvnc.Device.Graph.SetGraphOption()](py_api/Graph.SetGraphOption.md)  
+    * [mvnc.Device.Graph.GetGraphOption()](py_api/Graph.GetGraphOption.md)  
 
 # Examples
 
