@@ -45,30 +45,34 @@ old links below
 
 ## Global Methods
 
-* [mvnc.GlobalOption](py_api/GlobalOption.md)
+* [Class mvnc.GlobalOption](py_api/GlobalOption.md)
 * [mvnc.SetGlobalOption()](py_api/SetGlobalOption.md)
 * [mvnc.GetGlobalOption()](py_api/GetGlobalOption.md)<br><br>
 
-* [mvnc.EnumerateDevices](py_api/EnumerateDevices.md)
-* [mvnc.Status](py_api/Status.md)<br><br>
+* [Class mvnc.Status](py_api/Status.md)<br><br>
 
-* [mvnc.Device](py_api/Class_Device.md)
-  * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
-  * [mvnc.Device.CloseDevice()](py_api/Device.CloseDevice.md)<br><br>
-  
+* [mvnc.EnumerateDevices()](py_api/EnumerateDevices.md)<br><br>
+
+* [Class mvnc.Device](py_api/Class_Device.md)
   * [mvnc.Device.DeviceOption](py_api/Device.DeviceOption.md)
   * [mvnc.Device.SetDeviceOption()](py_api/Device.SetDeviceOption.md)
   * [mvnc.Device.GetDeviceOption()](py_api/Device.GetDeviceOption.md)<br><br>
   
-  * [mvnc.Device.Graph](py_api/Graph.md)
-  * [mvnc.Device.AllocateGraph()](py_api/Device.AllocateGraph.md)  
-  * [mvnc.Device.DeallocateGraph()](py_api/Device.DeallocateGraph.md)  
-    * [mvnc.Device.Graph.LoadTensor()](py_api/Graph.LoadTensor.md)  
-    * [mvnc.Device.Graph.GetResult()](py_api/Graph.GetResult.md)<br><br>
+  * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
+  * [mvnc.Device.CloseDevice()](py_api/Device.CloseDevice.md)<br><br>
+  
+  * [mvnc.AllocateGraph()](py_api/Device.AllocateGraph.md)  
+  * [mvnc.DeallocateGraph()](py_api/Device.DeallocateGraph.md)<br><br>
+  
+* [Class mvnc.Graph](py_api/Graph.md)
+  * [mvnc.Graph.GraphOption](py_api/Graph.Class_GraphOption.md)
+  * [mvnc.Graph.SetGraphOption()](py_api/Graph.SetGraphOption.md)  
+  * [mvnc.Graph.GetGraphOption()](py_api/Graph.GetGraphOption.md)<br><br>
+  
+  * [mvnc.Graph.LoadTensor()](py_api/Graph.LoadTensor.md)  
+  * [mvnc.Graph.GetResult()](py_api/Graph.GetResult.md)<br><br>
     
-    * [mvnc.Device.Graph.GraphOption](py_api/Graph.Class_GraphOption.md)
-    * [mvnc.Device.Graph.SetGraphOption()](py_api/Graph.SetGraphOption.md)  
-    * [mvnc.Device.Graph.GetGraphOption()](py_api/Graph.GetGraphOption.md)  
+
 
 # Examples
 
