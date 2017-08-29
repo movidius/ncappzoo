@@ -45,25 +45,29 @@ old links below
 
 ## Global Methods
 
-* [mvnc.EnumerateDevices](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_EnumerateDevices/)
-* [mvnc.Status](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_Status/)
-* [mvnc.GlobalOption](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_GlobalOption/)
-  * [mvnc.SetGlobalOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_SetGlobalOption/)
-  * [mvnc.GetGlobalOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_GetGlobalOption/)
-* [mvnc.Device](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_Device/)
-  * [mvnc.Device.OpenDevice()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_OpenDevice/)
-  * [mvnc.Device.CloseDevice()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_CloseDevice/)
-  * [mvnc.Device.DeviceOption](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_DeviceOption/)
-    * [mvnc.Device.DeviceOption.SetDeviceOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_SetDeviceOption/)
-    * [mvnc.Device.DeviceOption.GetDeviceOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_GetDeviceOption/)
-  * [mvnc.Device.Graph](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_Graph/)
-    * [mvnc.Device.AllocateGraph()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_AllocateGraph/)  
-    * [mvnc.Device.DeallocateGraph()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_DeallocateGraph/)  
-    * [mvnc.Device.LoadTensor()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_LoadTensor/)  
-    * [mvnc.Device.GetResult()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_GetResult/)  
-    * [mvnc.GraphOption](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_Class_GraphOption/)
-      * [mvnc.Device.SetGraphOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_SetGraphOption/)  
-      * [mvnc.Device.GetGraphOption()](https://github.intel.com/pages/MIG-Internal/MvNC_Examples/API/py_GetGraphOption/)  
+* [mvnc.EnumerateDevices](py_api/EnumerateDevices.md)
+* [mvnc.Status](py_api/Class_Status.md)
+
+* [mvnc.GlobalOption](py_api/Class_GlobalOption.md)
+* [mvnc.SetGlobalOption()](py_api/SetGlobalOption.md)
+* [mvnc.GetGlobalOption()](py_api/Class_GetGlobalOption.md)
+
+* [mvnc.Device](py_api/Class_Device.md)
+  * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
+  * [mvnc.Device.CloseDevice()](py_api/Device.CloseDevice.md)
+  
+  * [mvnc.Device.DeviceOption](py_api/py_Class_DeviceOption/)
+  * [mvnc.Device.DeviceOption.SetDeviceOption()](py_api/py_SetDeviceOption/)
+  * [mvnc.Device.DeviceOption.GetDeviceOption()](py_api/py_GetDeviceOption/)
+  
+  * [mvnc.Device.Graph](py_api/py_Class_Graph/)
+  * [mvnc.Device.AllocateGraph()](py_api/py_AllocateGraph/)  
+  * [mvnc.Device.DeallocateGraph()](py_api/py_DeallocateGraph/)  
+    * [mvnc.Device.Graph.LoadTensor()](py_api/py_LoadTensor/)  
+    * [mvnc.Device.Graph.GetResult()](py_api/py_GetResult/)  
+    * [mvnc.Device.Graph.GraphOption](py_api/py_Class_GraphOption/)
+    * [mvnc.Device.Graph.SetGraphOption()](py_api/py_SetGraphOption/)  
+    * [mvnc.Device.Graph.GetGraphOption()](py_api/py_GetGraphOption/)  
 
 # Examples
 
