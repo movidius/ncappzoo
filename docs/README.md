@@ -61,8 +61,8 @@ old links below
   * [mvnc.Device.OpenDevice()](py_api/Device.OpenDevice.md)
   * [mvnc.Device.CloseDevice()](py_api/Device.CloseDevice.md)<br><br>
   
-  * [mvnc.AllocateGraph()](py_api/Device.AllocateGraph.md)  
-  * [mvnc.DeallocateGraph()](py_api/Device.DeallocateGraph.md)<br><br>
+  * [mvnc.Device.AllocateGraph()](py_api/Device.AllocateGraph.md)  
+  * [mvnc.Device.DeallocateGraph()](py_api/Device.DeallocateGraph.md)<br><br>
   
 * [Class mvnc.Graph](py_api/Graph.md)
   * [mvnc.Graph.GraphOption](py_api/Graph.Class_GraphOption.md)
