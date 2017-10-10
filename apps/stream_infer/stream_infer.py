@@ -1,4 +1,8 @@
-#!/usr/bin/python3
+#! /usr/bin/python3
+
+# Copyright(c) 2017 Intel Corporation. 
+# License: MIT See LICENSE file in root directory. 
+
 # Python script to start a USB camera and feed frames to
 # the Movidius Neural Compute Stick that is loaded with a
 # CNN graph file and report the inferred results

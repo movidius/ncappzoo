@@ -22,6 +22,22 @@ After building the example you can run the example code by doing the following :
 
 When the application runs normally and is able to connect to the NCS device the output will be similar to this:
 
+~~~
+--- NCS 1 inference ---
+Successfully loaded the tensor for image ../../../data/images/nps_electric_guitar.png
+Successfully got the inference result for image ../../../data/images/nps_electric_guitar.png
+Index of top result is: 546
+Probability of top result is: 0.994141
+-----------------------
+
+--- NCS 2 inference ---
+Successfully loaded the tensor for image ../../../data/images/nps_baseball.png
+Successfully got the inference result for image ../../../data/images/nps_baseball.png
+Index of top result is: 429
+Probability of top result is: 1.000000
+-----------------------
+
+~~~
 
 
 
