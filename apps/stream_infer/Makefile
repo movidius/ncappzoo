@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: stream_infer
+all: run
 
 .PHONY: squeezenet
 googlenet: 
