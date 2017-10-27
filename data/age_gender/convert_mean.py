@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import caffe
 import numpy as np
 import sys
