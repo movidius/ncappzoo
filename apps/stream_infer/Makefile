@@ -41,5 +41,6 @@ clean: clean
 	(cd ../../caffe/GenderNet; make clean;);
 	(cd ../../caffe/GoogLeNet; make clean;);
 	(cd ../../caffe/SqueezeNet; make clean;);
+	(cd ../../caffe/AlexNet; make clean;);
 
 
