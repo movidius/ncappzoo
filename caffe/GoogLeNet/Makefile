@@ -122,12 +122,15 @@ help:
 	@echo "  make run_py - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
+clean_prereqs:
+	@(cd ../../data/ilsvrc12; make clean)
+
 clean_caffe_model:
 	@echo "\nmaking clean_caffe_model"
 	rm -f ${PROTOTXT_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
-clean: clean_caffe_model
+clean: clean_prereqs clean_caffe_model
 	@echo "\nmaking clean"
 	rm -f graph
 	rm -f output.gv
