@@ -11,6 +11,7 @@ import time
 
 # Assume running in examples/caffe/TinyYolo and graph file is in current directory.
 input_image_file= '../../data/images/nps_chair.png'
+#input_image_file= './dog.jpg'
 tiny_yolo_graph_file= './yolo_tiny.graph'
 
 # Tiny Yolo assumes input images are these dimensions.
@@ -43,7 +44,7 @@ def filter_objects(inference_result, input_image_width, input_image_height):
                                "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
 
     # only keep boxes with probabilities greater than this
-    probability_threshold = 0.05
+    probability_threshold = 0.07
 
     num_classifications = len(network_classifications) # should be 20
     grid_size = 7 # the image is a 7x7 grid.  Each box in the grid is 64x64 pixels
@@ -110,7 +111,7 @@ def get_duplicate_box_mask(box_list):
     # The intersection-over-union threshold to use when determining duplicates.
     # objects/boxes found that are over this threshold will be
     # considered the same object
-    max_iou = 0.30
+    max_iou = 0.35
 
     box_mask = np.ones(len(box_list))
 
@@ -232,8 +233,9 @@ def display_objects_in_gui(source_image, filtered_objects):
         cv2.rectangle(display_image,(box_left, box_top-20),(box_right,box_top), label_background_color, -1)
         cv2.putText(display_image,filtered_objects[obj_index][0] + ' : %.2f' % filtered_objects[obj_index][5], (box_left+5,box_top-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-        cv2.imshow('TinyYolo (hit key to exit)',display_image)
-        cv2.waitKey(0)
+    cv2.imshow('TinyYolo (hit key to exit)',display_image)
+    cv2.waitKey(0)
+
 
 # This function is called from the entry point to do
 # all the work.
