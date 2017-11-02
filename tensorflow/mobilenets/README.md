@@ -1,5 +1,5 @@
 # Introduction
-The [MobileNet V1](https://github.com/tensorflow/models/tree/master/slim/nets) network can be used for image classification.  The provided Makefile does the following
+The [MobileNet V1](https://github.com/tensorflow/models/tree/master/research/slim/nets) network can be used for image classification.  The provided Makefile does the following
 1. Downloads the TensorFlow checkpoint file
 2. Runs the conversion/save python script to generate network.meta file.
 3. Profiles, Compiles and Checks the network using the Neural Compute SDK.
