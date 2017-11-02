@@ -98,11 +98,11 @@ with open(path_to_networks + 'categories.txt', 'r') as f:
 graph = device.AllocateGraph(graphfile)
 
 img1, img = load_preprocess_image(image_filename, (reqsize, reqsize), mean, std, "RGB", True)
-print(img)
+#print(img)
 print('Start download to NCS...')
 graph.LoadTensor(img, 'user object')
 output, userobj = graph.GetResult()
-print(output)
+#print(output)
 
 top_inds = output.argsort()[::-1][:5]
 
