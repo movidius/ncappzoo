@@ -15,7 +15,7 @@ import os
 # User modifiable input parameters
 NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
 GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/AlexNet/graph'
-IMAGES_PATH             = NCAPPZOO_PATH + '/data/images/cat.jpg'
+IMAGES_PATH             = NCAPPZOO_PATH + '/data/images/nps_backpack.png'
 LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
 IMAGE_MEANS_FILE_PATH = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
 IMAGE_DIM               = ( 227, 227 )
@@ -44,7 +44,7 @@ graph = device.AllocateGraph( blob )
 # ---- Step 3: Offload image onto the NCS to run inference -------------------
 
 # Read & resize image [Image size is defined during training]
-img = cv2.imread( IMAGES_PATH )
+img = print_img = cv2.imread( IMAGES_PATH )
 img = cv2.resize( img, IMAGE_DIM )
 
 # Load the mean file [This file was downloaded from ilsvrc website]
@@ -71,11 +71,20 @@ print('\n------- predictions --------')
 labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
 
 order = output.argsort()[::-1][:6]
+
 for i in range( 0, 5 ):
 	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
 
+# Display inferred image with top pridiction
+cv2.putText( print_img, labels[order[0]], 
+				( 10,30 ), cv2.FONT_HERSHEY_SIMPLEX, 1, ( 0, 255, 0 ), 2 )
+
+cv2.imshow( 'Image Classifier', print_img )
+
+
 # ---- Step 5: Unload the graph and close the device -------------------------
 
+cv2.waitKey( 0 )
 graph.DeallocateGraph()
 device.CloseDevice()
 
