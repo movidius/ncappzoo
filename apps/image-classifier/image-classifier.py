@@ -85,6 +85,7 @@ cv2.imshow( 'Image Classifier', print_img )
 # ---- Step 5: Unload the graph and close the device -------------------------
 
 cv2.waitKey( 0 )
+cv2.destroyAllWindows()
 graph.DeallocateGraph()
 device.CloseDevice()
 
