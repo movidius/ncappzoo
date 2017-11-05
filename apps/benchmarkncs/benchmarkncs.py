@@ -59,7 +59,7 @@ for file in onlyfiles:
 # Read graph file
 # *****************************************************************
 graph_folder=argv[1]
-system("(cd " + graph_folder + "; make compile)")
+system("(cd " + graph_folder + "; test -f graph || make compile)")
 
 #Load graph
 with open(join(argv[1],'graph'), mode='rb') as f:
