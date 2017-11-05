@@ -19,10 +19,11 @@ import timeit
 # User modifiable input parameters
 NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
-LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEANS_FILE_PATH   = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
+LABELS_FILE_PATH        = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
+GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
 IMAGE_DIM               = ( 224, 224 )
+IMAGE_MEAN              = 127.5
+IMAGE_STDDEV            = ( 1/127.5 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -47,11 +48,11 @@ graph = device.AllocateGraph( blob )
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-# Load the labels file corresponsding to ilsvrc12 dataset
+# Load the labels file 
 labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
 
 # Load the mean file [This file was downloaded from ilsvrc website]
-ilsvrc_mean = numpy.load( IMAGE_MEANS_FILE_PATH ).mean( 1 ).mean( 1 )
+# img_mean = numpy.load( IMAGE_MEANS_FILE_PATH ).mean( 1 ).mean( 1 )
 
 # Read & pre-process all images in the folder [Image size is defined during training]
 imgarray = []
@@ -68,10 +69,8 @@ for file in onlyfiles:
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     # Mean subtraction [A common technique used to center the data]
-    img = img.astype( numpy.float32 )
-    img[:,:,0] = (img[:,:,0] - ilsvrc_mean[0])
-    img[:,:,1] = (img[:,:,1] - ilsvrc_mean[1])
-    img[:,:,2] = (img[:,:,2] - ilsvrc_mean[2])
+    img = img - IMAGE_MEAN 
+    img = img * IMAGE_STDDEV
 
     img = img.astype( numpy.float16 )
     imgarray.append( img )
@@ -86,10 +85,10 @@ for index, img in enumerate( imgarray ):
     order = output.argsort()[::-1][:6]
 
     # Print prediction results on the terminal window
-    print( labels[order[0]] )
+    print( labels[order[0] + 1] )
 
     # Display inferred image with top pridiction
-    cv2.putText( print_imgarray[index], labels[order[0]], 
+    cv2.putText( print_imgarray[index], labels[order[0] + 1], 
                  ( 10,30 ), cv2.FONT_HERSHEY_SIMPLEX, 1, ( 0, 255, 0 ), 2 )
 
     cv2.imshow( 'Image Classifier', print_imgarray[index] )
