@@ -7,6 +7,7 @@ apps/stream_infer, Intel Corporation, neal.p.smith@intel.com
 caffe/AlexNet, Intel Corporation, neal.p.smith@intel.com
 caffe/GoogleNet, Intel Corporation, neal.p.smith@intel.com
 caffe/SqueezeNet, Intel Corporation, neal.p.smith@intel.com
+caffe/TinyYolo, Intel Corporation, neal.p.smith@intel.com
 
 tensorflow/inception_v1, Intel Corporation, neal.p.smith@intel.com
 tensorflow/inception_v2, Intel Corporation, neal.p.smith@intel.com
