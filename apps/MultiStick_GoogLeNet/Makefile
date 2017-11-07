@@ -2,7 +2,7 @@
 
 
 .PHONY: all
-all: multistick_googlenet
+all: run
 
 .PHONY: googlenet
 googlenet: 
