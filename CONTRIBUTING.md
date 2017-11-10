@@ -1,71 +1,68 @@
-## Contributing to the Movidius™ Neural Compute App Zoo (NC App Zoo)
+# Contributing to the Neural Compute App Zoo (NC App Zoo)
 
-We are glad you want to contribute with a model and/or software for the NC App Zoo. This is the a great way to help the developer community.  We encourage submissions from any and all developers interested in the Movidius™ Neural Compute Stick (NCS).
+We are glad you want to contribute with a model and/or software for the Intel® Movidius™ NC App Zoo. This is a great way to help the developer community. We encourage submissions from any and all developers interested in the Intel® Movidius™ Neural Compute Stick (Intel® Movidius™ NCS).
 
-
-## Submitting a pull request
-
-To contribute with a new app or neural network for the NC App Zoo, fork the repository and add (commit) any of the following new subdirectories containing your content (your content could contain any or all of the following):
+## Submitting a Pull Request
+To contribute a new app or neural network for the NC App Zoo, fork the repository and add (commit) any of the following new subdirectories containing your content (your content could contain any or all of the following):
 - apps/(new app name)
 - caffe/(new caffe network name)
 - tensorflow/(new tensorflow network name)
 
-Your application code goes under **apps**, any neural network that you have working with the NCS will go under **caffe**, or **tensorflow** as appropriate for the framework used.
+Your application code goes under **apps**, any neural network that you have been working with for the Intel Movidius NCS will go under **caffe** or **tensorflow** as appropriate for the framework used.
 
-After you have committed changes to your fork of the App Zoo (always commit using the --signoff option as described in the Contribution Licensing section below), create a pull request for the new directories to be pulled into this repo (the NC App Zoo repository.)
+After you have committed changes to your fork of the App Zoo (always commit using the --signoff option as described in the Contribution Licensing section below), create a pull request for the new directories to be pulled into this repo (the NC App Zoo repository).
 
-## Content guidelines
+## Content Guidelines
 The guidelines for what each directory should contain are as follows.
 
 ### The **apps** subdirectories
-The following **should** be included apps subdirectories:
+The following **should** be included in the apps subdirectories:
 - README.md : Markdown file that explains everything needed to build and run your application.
-- Makefile : Builds any source code and downloads or copies (from other repo subdirectories) any required files.  If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed.  You can use the apps/stream_infer/Makefile as the pattern to follow.
-- AUTHORS : text file with names, email addresses and organizations for all authors of contribution.
+- Makefile : Builds any source code and downloads or copies (from other repo subdirectories) any required files. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.
+- AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
 
 The following should **not** typically be stored in the apps subdirectories:
-- NCS graph files.  These can be created from your Makefile 
-- Neural network models.  These should originate from the caffe or tensorflow directories.
-- Trained neural networks (weights.) Typically these should be downloaded by a Makefile in the caffe, or tensorflow subdirectories
-- Training data.  This should be downloaded by a Makefile a subdirectory of the data directory
-- Images files.  These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory 
+- NCS graph files : These can be created from your Makefile.
+- Neural network models : These should originate from the caffe or tensorflow directories.
+- Trained neural networks (weights) : Typically these should be downloaded by a Makefile in the caffe or tensorflow subdirectories.
+- Training data : This should be downloaded by a Makefile a subdirectory of the data directory.
+- Images files : These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory.
 
 ### The **caffe** subdirectories
-The following **should** be included in the caffe subdirectories.  Use caffe/GoogLeNet as an example to follow. 
+The following **should** be included in the caffe subdirectories; use caffe/GoogLeNet as an example to follow:
 - README.md : Markdown file that explains how a developer can use the content in the subdirectory.
-- Makefile : Should have targets to download any large files such as the trained network files, compile NCS graph files, build and run a small code example.
-- Small example program (optional): Small C, C++, or Python program that demonstrates how to use the network with the NCS 
-- Network model files (.prototxt) file. Its typically downloaded via the makefile if you don't own the trained network
-- Network mean information.  Its typically downloaded via the make file if you don't own the trained network
-- AUTHORS : text file with names, email addresses and organizations for all authors of contribution.
+- Makefile : Should have targets to download any large files, such as the trained network files, compile NCS graph files, build, and run a small code example.
+- Small example program (optional) : Small C, C++, or Python program that demonstrates how to use the network with the NCS.
+- Network model files (.prototxt) file : It's typically downloaded via the Makefile if you don't own the trained network.
+- Network mean information : It's typically downloaded via the Makefile if you don't own the trained network.
+- AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
 
-The following should **not** typically be stored in the caffe subdirectory
-- NCS graph files.  These should be created via the Makefile which should invoke the SDK compiler to create the graph file.
-- Trained neural network files.  These should be downloaed from their internet home via the Makefile
-- Training data.  If needed training data can be downloaded via the Makefile in a subdirectory of the data directory.
-- Images files.  These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory 
+The following should **not** typically be stored in the caffe subdirectory:
+- NCS graph files : These should be created via the Makefile, which should invoke the SDK compiler to create the graph file.
+- Trained neural network files : These should be downloaded from their Internet home via the Makefile.
+- Training data : If needed, training data can be downloaded via the Makefile in a subdirectory of the data directory.
+- Images files : These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory. 
 
 ### The **tensorflow** subdirectories
-The following **should** be included in the tensorflow subdirectories.  Use tensorflow/inception_v1 as an example to follow. 
+The following **should** be included in the tensorflow subdirectories; use tensorflow/inception_v1 as an example to follow:
 - README.md : Markdown file that explains how a developer can use the content in the subdirectory.
-- Makefile : Should have targets to download any large files such as the trained network files, compile NCS graph files, build and run a small code example.
-- Small example program (optional): Small C, C++, or Python program that demonstrates how to use the network with the NCS 
-- Network mean information.  Its typically downloaded via the make file if you don't own the trained network
-- AUTHORS : text file with names, email addresses and organizations for all authors of contribution.
+- Makefile : Should have targets to download any large files, such as the trained network files, compile NCS graph files, build, and run a small code example.
+- Small example program (optional) : Small C, C++, or Python program that demonstrates how to use the network with the NCS.
+- Network mean information : It's typically downloaded via the Makefile if you don't own the trained network.
+- AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
 
-The following should **not** typically be stored in the tensorflow subdirectory
-- NCS graph files.  These should be created via the Makefile which should invoke the SDK compiler to create the graph file.
-- Trained neural network files.  These should be downloaed from their internet home via the Makefile
-- Training data.  If needed training data can be downloaded via the Makefile in a subdirectory of the data directory.
-- Images files.  These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory 
-
+The following should **not** typically be stored in the tensorflow subdirectory:
+- NCS graph files : These should be created via the Makefile, which should invoke the SDK compiler to create the graph file.
+- Trained neural network files : These should be downloaded from their Internet home via the Makefile.
+- Training data : If needed training data can be downloaded via the Makefile in a subdirectory of the data directory.
+- Images files : These should be downloaded to (if many) or stored in (if not too many) a subdirectory of the data directory.
 
 ## Contribution Licensing
-All contributions must be licensed under the MIT license [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT) unless otherwise stated in a lower level directory for exceptional cases.  The [LICENSE](LICENSE) file in the repository top level directory provides the MIT license details.
+All contributions must be licensed under the MIT license [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT) unless otherwise stated in a lower-level directory for exceptional cases. The [LICENSE](LICENSE) file in the repository top-level directory provides the MIT license details.
 
-Also, for your contribution to be accepted, each commit must be "Signed-off". This is done by commiting using this command: `git commit --signoff`
+Also, for your contribution to be accepted, each commit must be "Signed-off". This is done by committing using the command `git commit --signoff`.
 
-By signing off your commits, you agree to the following agreement, also known as [Developer Certificate of Origin](http://developercertificate.org/): it assures everyone that the code you're submitting is yours or that you have rights to submit it.
+By signing off your commits, you agree to the following agreement, also known as the [Developer Certificate of Origin](http://developercertificate.org/). It assures everyone that the code you're submitting is yours, or that you have rights to submit it.
 
 ```
 Developer Certificate of Origin
