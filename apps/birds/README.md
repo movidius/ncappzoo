@@ -24,7 +24,7 @@ Shows available targets
 builds and/or gathers all the required files needed to run the application
 
 
-## make run-py
+## make run_py
 Runs the provided birds.py python program which does the bird classification
 
 ## make clean
