@@ -13,13 +13,13 @@ GOOGLENET_GRAPH_FILENAME = googlenet.graph
 EAGLES_2_FILENAME = eagles_2.jpg
 DOG_FILENAME = dog.jpg
 
-GET_IMAGES = wget --no-cache -P . -O ${EAGLES_2_FILENAME} https://www.nps.gov/sajh/learn/nature/images/Eagles-2_Rebecca.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_10.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_2.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_8.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_1.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_2.jpg; \
-             wget --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_3.jpg
+GET_IMAGES = wget -c --no-cache -P . -O ${EAGLES_2_FILENAME} https://www.nps.gov/sajh/learn/nature/images/Eagles-2_Rebecca.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_10.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_2.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/jas_birds_8.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_1.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_2.jpg; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/bird_images/master/nps_birds_3.jpg
 
 
 

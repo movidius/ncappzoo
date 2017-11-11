@@ -2,12 +2,12 @@
 
 # Copyright(c) 2017 Intel Corporation. 
 # License: MIT See LICENSE file in root directory.
+# NPS
 
 from mvnc import mvncapi as mvnc
 import sys
 import numpy as np
 import cv2
-import time
 import os
 
 # will execute on all images in this directory
@@ -29,6 +29,8 @@ gn_mean = [0., 0., 0.]
 
 # labels to display along with boxes if googlenet classification is good
 gn_labels = [""]
+
+cv_window_name = 'Birds - Q to quit or any key to advance'
 
 
 # Interpret the output from a single inference of TinyYolo (GetResult)
@@ -210,7 +212,7 @@ def get_intersection_over_union(box_1, box_2):
 
 # Displays a gui window with an image that contains
 # boxes and lables for found objects.  will not return until
-# user presses a key.
+# user presses a key or times out.
 # source_image is on which the inference was run.
 #
 # filtered_objects is a list of lists (as returned from filter_objects()
@@ -226,6 +228,9 @@ def get_intersection_over_union(box_1, box_2):
 #     int value that is the index of the googlenet classification
 #     string value that is the googlenet classification string.
 #     float value that is the googlenet probability
+#
+# Returns true if should go to next image or false if
+# should not.
 def display_objects_in_gui(source_image, filtered_objects):
 
     DISPLAY_BOX_WIDTH_PAD = 0
@@ -272,14 +277,24 @@ def display_objects_in_gui(source_image, filtered_objects):
         label_top = box_top - label_size[1]
         label_right = label_left + label_size[0]
         label_bottom = label_top + label_size[1]
-        #cv2.rectangle(display_image,(box_left, box_top-20),(box_right,box_top), label_background_color, -1)
         cv2.rectangle(display_image,(label_left-1, label_top-1),(label_right+1, label_bottom+1), label_background_color, -1)
 
-        #cv2.putText(display_image, label_text, (box_left+5,box_top-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
+        # label text above the box
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-    cv2.imshow('TinyYolo (hit key to advance)',display_image)
-    cv2.waitKey(0)
+        # display text to let user know how to quit
+        cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
+        cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+        cv2.putText(display_image, "Any key to advance", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+
+    cv2.imshow(cv_window_name, display_image)
+    raw_key = cv2.waitKey(3000)
+    ascii_code = raw_key & 0xFF
+    if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
+        return False
+
+    return True
+
 
 
 # Executes googlenet inferences on all objects defined by filtered_objects
@@ -426,6 +441,10 @@ def main():
         gn_labels[label_index] = temp
 
 
+    print('Q to quit, or any key to advance to next image')
+
+    cv2.namedWindow(cv_window_name)
+
     for input_image_file in input_image_filename_list :
         # Read image from file, resize it to network width and height
         # save a copy in img_cv for display, then convert to float32, normalize (divide by 255),
@@ -445,9 +464,16 @@ def main():
 
         get_googlenet_classifications(gn_graph, display_image, filtered_objs)
 
-        print('Displaying image in GUI')
-        print('Click in the GUI window and hit any key to advance')
-        display_objects_in_gui(display_image, filtered_objs)
+        # check if the window is visible, this means the user hasn't closed
+        # the window via the X button
+        prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_VISIBLE)
+        if (prop_val != 1):
+            break
+
+        ret_val = display_objects_in_gui(display_image, filtered_objs)
+        if (not ret_val):
+            break
+
 
     # clean up tiny yolo
     ty_graph.DeallocateGraph()
