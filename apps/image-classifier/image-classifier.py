@@ -8,17 +8,19 @@
 # How to classify images using DNNs on Intel Neural Compute Stick (NCS)
 
 import mvnc.mvncapi as mvnc
+import skimage
+from skimage import io, transform
 import numpy
-import cv2
 import os
+import sys
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/AlexNet/graph'
-IMAGES_PATH             = NCAPPZOO_PATH + '/data/images/nps_backpack.png'
+GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/GoogLeNet.graph'
+IMAGES_PATH             = sys.argv[1] 
 LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEANS_FILE_PATH = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
-IMAGE_DIM               = ( 227, 227 )
+IMAGE_MEANS_FILE_PATH   = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
+IMAGE_DIM               = ( 224, 224 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -43,12 +45,17 @@ graph = device.AllocateGraph( blob )
 
 # ---- Step 3: Offload image onto the NCS to run inference -------------------
 
-# Read & resize image [Image size is defined during training]
-img = print_img = cv2.imread( IMAGES_PATH )
-img = cv2.resize( img, IMAGE_DIM )
-
 # Load the mean file [This file was downloaded from ilsvrc website]
 ilsvrc_mean = numpy.load( IMAGE_MEANS_FILE_PATH ).mean( 1 ).mean( 1 )
+
+# Read image into an ndarray
+img = print_img = skimage.io.imread( IMAGES_PATH )
+
+# Resize the image [ Image size if defined during training ]
+img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
+
+# Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
+img = img[:, :, ::-1]
 
 # Mean subtraction [A common technique used to center the data]
 img = img.astype( numpy.float32 )
@@ -75,17 +82,11 @@ order = output.argsort()[::-1][:6]
 for i in range( 0, 5 ):
 	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
 
-# Display inferred image with top pridiction
-cv2.putText( print_img, labels[order[0]], 
-				( 10,30 ), cv2.FONT_HERSHEY_SIMPLEX, 1, ( 0, 255, 0 ), 2 )
-
-cv2.imshow( 'Image Classifier', print_img )
-
+skimage.io.imshow( IMAGES_PATH )
+skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
-cv2.waitKey( 0 )
-cv2.destroyAllWindows()
 graph.DeallocateGraph()
 device.CloseDevice()
 
