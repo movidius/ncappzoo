@@ -36,6 +36,8 @@ if [[ "$CONTINUE" == "y" || "$CONTINUE" == "Y" ]]; then
 	      -D CMAKE_INSTALL_PREFIX=/usr/local \
 	      -D INSTALL_PYTHON_EXAMPLES=OFF \
 	      -D WITH_V4L=ON \
+	      -D BUILD_opencv_cnn_3dobj=OFF \
+	      -D BUILD_opencv_dnn_modern=OFF \
 	      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.3.0/modules \
 	      -D BUILD_EXAMPLES=OFF ..
 	make -j4

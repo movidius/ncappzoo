@@ -59,7 +59,7 @@ def filter_objects(inference_result, input_image_width, input_image_height):
 
     # which types of objects do we want to include.
     network_classifications_mask = [0, 0, 1, 0, 0, 0, 0,
-                                    0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 1, 0, 0,
                                     0, 0, 0, 0, 0,0]
 
 
@@ -282,13 +282,12 @@ def display_objects_in_gui(source_image, filtered_objects):
         # label text above the box
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-        # display text to let user know how to quit
-        cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
-        cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
-        cv2.putText(display_image, "Any key to advance", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+    # display text to let user know how to quit
+    cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
+    cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
 
     cv2.imshow(cv_window_name, display_image)
-    raw_key = cv2.waitKey(0)
+    raw_key = cv2.waitKey(1)
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -400,7 +399,7 @@ def googlenet_inference(gn_graph, input_image):
 def main():
     global gn_mean, gn_labels
 
-    print('Running NCS stream_ty_gn')
+    print('Running stream_ty_gn')
 
 
     # Set logging level and initialize/open the first NCS we find
@@ -418,14 +417,26 @@ def main():
 
 
     #Load tiny yolo graph from disk and allocate graph via API
-    with open(tiny_yolo_graph_file, mode='rb') as ty_file:
-        ty_graph_from_disk = ty_file.read()
-    ty_graph = ty_device.AllocateGraph(ty_graph_from_disk)
+    try:
+        with open(tiny_yolo_graph_file, mode='rb') as ty_file:
+            ty_graph_from_disk = ty_file.read()
+        ty_graph = ty_device.AllocateGraph(ty_graph_from_disk)
+    except:
+        print ('Error - could not load tiny yolo graph file')
+        ty_device.CloseDevice()
+        gn_device.CloseDevice()
+        return 1
 
     #Load googlenet graph from disk and allocate graph via API
-    with open(googlenet_graph_file, mode='rb') as gn_file:
-        gn_graph_from_disk = gn_file.read()
-    gn_graph = gn_device.AllocateGraph(gn_graph_from_disk)
+    try:
+        with open(googlenet_graph_file, mode='rb') as gn_file:
+            gn_graph_from_disk = gn_file.read()
+        gn_graph = gn_device.AllocateGraph(gn_graph_from_disk)
+    except:
+        print ('Error - could not load googlenet graph file')
+        ty_device.CloseDevice()
+        gn_device.CloseDevice()
+        return 1
 
     # GoogLenet initialization
     EXAMPLES_BASE_DIR = '../../'
@@ -438,20 +449,27 @@ def main():
         gn_labels[label_index] = temp
 
 
-    print('Q to quit, or any key to advance to next image')
+    print('Q to quit')
 
     cv2.namedWindow(cv_window_name)
+    cv2.waitKey(1)
 
     camera_device = cv2.VideoCapture(CAMERA_INDEX)
-    while (not camera_device.isOpened()):
-        print("waiting for camera...")
+    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+    if ((camera_device == None) or (not camera_device.isOpened())):
+        print ('Could not open camera.  Make sure it is plugged in.')
+        print ('Also, if you installed python opencv via pip or pip3 you')
+        print ('need to uninstall it and install from source with -D WITH_V4L=ON')
+        print ('Use the provided script: install-opencv-from_source.sh')
 
     while True :
         # Read image from camera,
         ret_val, input_image = camera_device.read()
         if (not ret_val):
             print("no image from camera")
-            continue
+            break
 
 
         # resize image to network width and height
@@ -474,8 +492,8 @@ def main():
 
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button
-        prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_VISIBLE)
-        if (prop_val != 1):
+        prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
+        if (prop_val < 0.0):
             break
 
         ret_val = display_objects_in_gui(display_image, filtered_objs)
