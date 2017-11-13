@@ -282,10 +282,10 @@ def display_objects_in_gui(source_image, filtered_objects):
         # label text above the box
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-        # display text to let user know how to quit
-        cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
-        cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
-        cv2.putText(display_image, "Any key to advance", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+    # display text to let user know how to quit
+    cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
+    cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+    cv2.putText(display_image, "Any key to advance", (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
 
     cv2.imshow(cv_window_name, display_image)
     raw_key = cv2.waitKey(3000)
@@ -406,6 +406,11 @@ def main():
     input_image_filename_list = os.listdir(input_image_path)
     input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
 
+    if (len(input_image_filename_list) < 1):
+        # no images to show
+        print('No .jpg files found')
+        return 1
+
     # Set logging level and initialize/open the first NCS we find
     mvnc.SetGlobalOption(mvnc.GlobalOption.LOG_LEVEL, 0)
     devices = mvnc.EnumerateDevices()
@@ -464,11 +469,18 @@ def main():
 
         get_googlenet_classifications(gn_graph, display_image, filtered_objs)
 
-        # check if the window is visible, this means the user hasn't closed
-        # the window via the X button
-        prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_VISIBLE)
-        if (prop_val != 1):
-            break
+        # check if the window has been closed.  all properties will return -1.0
+        # for windows that are closed. If the user has closed the window via the
+        # x on the title bar then we will break out of the loop.  we are
+        # getting property aspect ratio but it could probably be any property
+        try:
+            prop_asp = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
+        except:
+            break;
+        prop_asp = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
+        if (prop_asp < 0.0):
+            # the property returned was < 0 so assume window was closed by user
+            break;
 
         ret_val = display_objects_in_gui(display_image, filtered_objs)
         if (not ret_val):
