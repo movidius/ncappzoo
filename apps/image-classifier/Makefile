@@ -1,5 +1,10 @@
 .PHONY: all
-all: gendernet googlenet squeezenet alexnet
+all: data gendernet googlenet squeezenet alexnet
+
+.PHONY: data
+data:
+	@echo "\nmaking data"
+	(cd ../../data; make;)
 
 .PHONY: gendernet
 gendernet: 
