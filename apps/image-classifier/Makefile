@@ -1,5 +1,10 @@
 .PHONY: all
-all: gendernet googlenet squeezenet alexnet
+all: ilsvrc12 gendernet googlenet squeezenet alexnet
+
+.PHONY: ilsvrc12
+ilsvrc12:
+	@echo "\making ilsvrc12"
+	(cd ../../data/ilsvrc12; make;)
 
 .PHONY: gendernet
 gendernet: 
@@ -37,6 +42,7 @@ help:
 
 clean: clean
 	@echo "\nmaking clean";
+	(cd ../../data/ilsvrc12/; make clean;);
 	(cd ../../caffe/GenderNet; make clean;);
 	(cd ../../caffe/GoogLeNet; make clean;);
 	(cd ../../caffe/SqueezeNet; make clean;);
