@@ -1,6 +1,6 @@
-# image-classifier: Image classification using DNNs on Intel Movidius Neural Compute Stick (NCS)
+# image-classifier: Image classification using DNNs on Intel Neural Movidius Compute Stick (NCS)
 
-This directory contains a python3 example that shows how to classify images using deep neural networks on the Intel Movidius Neural Compute Stick
+This directory contains a python3 example that shows show to use classify images using deep neural networks on the Intel Movidius Neural Compute Stick
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ To run the example code do the following :
 1. Open a terminal and change directory to the image-classifier base directory
 2. Type the following command in the terminal: make run 
 
-When the application runs normally and is able to connect to the NCS device, the output will be similar to this:
+When the application runs normally and is able to connect to the NCS device the output will be similar to this:
 
 ~~~
 ------- predictions --------
