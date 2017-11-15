@@ -14,7 +14,7 @@ Two NCS devices are needed to run this application, one executes inferences for 
                                "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
 '''
 
-    Then for each Tiny Yolo object in the image the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
+Then for each Tiny Yolo object in the image the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
 
 There are a few thresholds in the code you may want to tweek if you aren't getting results that you expect:
 - <strong>TY_BOX_PROBABILITY_THRESHOLD</strong>: This is the minimum probability allowed for boxes returned from tiny yolo.  This should be between 0.0 and 1.0.  A lower value will allow more boxes to be displayed.
