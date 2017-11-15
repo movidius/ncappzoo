@@ -8,13 +8,14 @@ from mvnc import mvncapi as mvnc
 import sys
 import numpy as np
 import cv2
-import os
+import time
 
+# the networks compiled for NCS via ncsdk tools
 tiny_yolo_graph_file= './yolo_tiny.graph'
 googlenet_graph_file= './googlenet.graph'
 
 # Specifies which camera to use.  If only one it will likely be index 0
-CAMERA_INDEX = 0
+CAMERA_INDEX = 1
 
 # Tiny Yolo assumes input images are these dimensions.
 TY_NETWORK_IMAGE_WIDTH = 448
@@ -28,10 +29,36 @@ GN_NETWORK_IMAGE_HEIGHT = 224
 gn_mean = [0., 0., 0.]
 
 # labels to display along with boxes if googlenet classification is good
+# these will be read in from the synset_words.txt file for ilsvrc12
 gn_labels = [""]
 
+# for title bar of GUI window
 cv_window_name = 'stream_ty_gn - Q to quit'
 
+# Requested and actual camera dimensions
+REQUEST_CAMERA_WIDTH = 640 #TY_NETWORK_IMAGE_WIDTH
+REQUEST_CAMERA_HEIGHT = 480 #TY_NETWORK_IMAGE_HEIGHT
+actual_camera_width = 0
+actual_camera_height = 0
+
+############################################################
+# Tuning variables
+
+# only keep boxes with probabilities greater than this
+# when doing the tiny yolo filtering.
+TY_BOX_PROBABILITY_THRESHOLD = 0.10  # 0.07
+
+# if googlenet returns a probablity less than this then
+# just use the tiny yolo more general classification ie 'bird'
+GN_PROBABILITY_MIN = 0.5
+
+# The intersection-over-union threshold to use when determining duplicates.
+# objects/boxes found that are over this threshold will be considered the
+# same object when filtering the Tiny Yolo output.
+TY_MAX_IOU = 0.35
+
+# end of tuning variables
+#######################################################
 
 # Interpret the output from a single inference of TinyYolo (GetResult)
 # and filter out objects/boxes with low probabilities.
@@ -58,13 +85,9 @@ def filter_objects(inference_result, input_image_width, input_image_height):
                                "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
 
     # which types of objects do we want to include.
-    network_classifications_mask = [0, 0, 1, 0, 0, 0, 0,
-                                    0, 0, 0, 0, 1, 0, 0,
-                                    0, 0, 0, 0, 0,0]
-
-
-    # only keep boxes with probabilities greater than this
-    probability_threshold = 0.10 # 0.07
+    network_classifications_mask = [1, 1, 1, 1, 1, 1, 1,
+                                    1, 1, 1, 1, 1, 1, 1,
+                                    1, 1, 1, 1, 1,1]
 
     num_classifications = len(network_classifications) # should be 20
     grid_size = 7 # the image is a 7x7 grid.  Each box in the grid is 64x64 pixels
@@ -95,7 +118,7 @@ def filter_objects(inference_result, input_image_width, input_image_height):
             all_probabilities[:,:,box_index,class_index] = np.multiply(classification_probabilities[:,:,class_index],box_prob_scale_factor[:,:,box_index])
 
 
-    probability_threshold_mask = np.array(all_probabilities>=probability_threshold, dtype='bool')
+    probability_threshold_mask = np.array(all_probabilities >= TY_BOX_PROBABILITY_THRESHOLD, dtype='bool')
     box_threshold_mask = np.nonzero(probability_threshold_mask)
     boxes_above_threshold = all_boxes[box_threshold_mask[0],box_threshold_mask[1],box_threshold_mask[2]]
     classifications_for_boxes_above = np.argmax(all_probabilities,axis=3)[box_threshold_mask[0],box_threshold_mask[1],box_threshold_mask[2]]
@@ -129,17 +152,13 @@ def filter_objects(inference_result, input_image_width, input_image_height):
 # based on the intersection-over-union metric.
 # box_list is as list of boxes (4 floats for centerX, centerY and Length and Width)
 def get_duplicate_box_mask(box_list):
-    # The intersection-over-union threshold to use when determining duplicates.
-    # objects/boxes found that are over this threshold will be
-    # considered the same object
-    max_iou = 0.35
 
     box_mask = np.ones(len(box_list))
 
     for i in range(len(box_list)):
         if box_mask[i] == 0: continue
         for j in range(i + 1, len(box_list)):
-            if get_intersection_over_union(box_list[i], box_list[j]) > max_iou:
+            if get_intersection_over_union(box_list[i], box_list[j]) > TY_MAX_IOU:
                 box_mask[j] = 0.0
 
     filter_iou_mask = np.array(box_mask > 0.0, dtype='bool')
@@ -211,39 +230,39 @@ def get_intersection_over_union(box_1, box_2):
 
 
 # Displays a gui window with an image that contains
-# boxes and lables for found objects.  will not return until
-# user presses a key or times out.
-# source_image is on which the inference was run.
+# boxes and lables for found objects.  The
+# source_image is the image on which the inference was run.
 #
 # filtered_objects is a list of lists (as returned from filter_objects()
 #   and then added to by get_googlenet_classifications()
 #   each of the inner lists represent one found object and contain
 #   the following values:
-#     string that is yolo network classification ie 'bird'
-#     float value for box center X pixel location within source image
-#     float value for box center Y pixel location within source image
-#     float value for box width in pixels within source image
-#     float value for box height in pixels within source image
-#     float value that is the probability for the yolo classification.
-#     int value that is the index of the googlenet classification
-#     string value that is the googlenet classification string.
-#     float value that is the googlenet probability
+#     [0]:string that is yolo network classification ie 'bird'
+#     [1]:float value for box center X pixel location within source image
+#     [2]:float value for box center Y pixel location within source image
+#     [3]:float value for box width in pixels within source image
+#     [4]:float value for box height in pixels within source image
+#     [5]:float value that is the probability for the yolo classification.
+#     [6]:int value that is the index of the googlenet classification
+#     [7]:string value that is the googlenet classification string.
+#     [8]:float value that is the googlenet probability
 #
-# Returns true if should go to next image or false if
+# Returns True if should go to next image or False if
 # should not.
-def display_objects_in_gui(source_image, filtered_objects):
+def overlay_on_image(display_image, filtered_objects):
 
     DISPLAY_BOX_WIDTH_PAD = 0
     DISPLAY_BOX_HEIGHT_PAD = 20
 
-    # if googlenet returns a probablity less than this then
-    # just use the tiny yolo more general classification ie 'bird'
-    GOOGLE_PROB_MIN = 0.5
-
 	# copy image so we can draw on it.
-    display_image = source_image.copy()
-    source_image_width = source_image.shape[1]
-    source_image_height = source_image.shape[0]
+    #display_image = source_image.copy()
+    source_image_width = display_image.shape[1]
+    source_image_height = display_image.shape[0]
+
+    #source_image_width = source_image.shape[1]
+    #source_image_height = source_image.shape[0]
+
+
 
     # loop through each box and draw it on the image along with a classification label
     for obj_index in range(len(filtered_objects)):
@@ -267,7 +286,7 @@ def display_objects_in_gui(source_image, filtered_objects):
         label_background_color = (70, 120, 70) # greyish green background for text
         label_text_color = (255, 255, 255)   # white text
 
-        if (filtered_objects[obj_index][8] > GOOGLE_PROB_MIN):
+        if (filtered_objects[obj_index][8] > GN_PROBABILITY_MIN):
             label_text = filtered_objects[obj_index][7] + ' : %.2f' % filtered_objects[obj_index][8]
         else:
             label_text = filtered_objects[obj_index][0] + ' : %.2f' % filtered_objects[obj_index][5]
@@ -283,16 +302,11 @@ def display_objects_in_gui(source_image, filtered_objects):
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
     # display text to let user know how to quit
-    cv2.rectangle(display_image,(0, 0),(140, 30), (128, 128, 128), -1)
+    cv2.rectangle(display_image,(0, 0),(100, 15), (128, 128, 128), -1)
     cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
 
-    cv2.imshow(cv_window_name, display_image)
-    raw_key = cv2.waitKey(1)
-    ascii_code = raw_key & 0xFF
-    if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
-        return False
-
-    return True
+    # resize back to original camera size so image doesn't look squashed
+    display_image = cv2.resize(display_image, (int(actual_camera_width), int(actual_camera_height)), cv2.INTER_LINEAR)
 
 
 
@@ -347,9 +361,12 @@ def get_googlenet_classifications(gn_graph, source_image, filtered_objects):
         box_right = min(center_x + half_width, source_image_width)
         box_bottom = min(center_y + half_height, source_image_height)
 
+        # get one image by clipping a box out of source image
         one_image = source_image[box_top:box_bottom, box_left:box_right]
+
+        # Get a googlenet inference on that one image and add the information
+        # to the filtered objects list
         filtered_objects[obj_index] += googlenet_inference(gn_graph, one_image)
-        #print (googlenet_inference(gn_graph, one_image))
 
     return
 
@@ -393,14 +410,38 @@ def googlenet_inference(gn_graph, input_image):
     return order[0], gn_labels[order[0]], output[order[0]]
 
 
+def handle_keys(raw_key):
+    global GN_PROBABILITY_MIN, TY_MAX_IOU, TY_BOX_PROBABILITY_THRESHOLD
+    ascii_code = raw_key & 0xFF
+    if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
+        return False
+    elif (ascii_code == ord('B')):
+        TY_BOX_PROBABILITY_THRESHOLD = TY_BOX_PROBABILITY_THRESHOLD + 0.05
+        print("New TY_BOX_PROBABILITY_THRESHOLD is " + str(TY_BOX_PROBABILITY_THRESHOLD))
+    elif (ascii_code == ord('b')):
+        TY_BOX_PROBABILITY_THRESHOLD = TY_BOX_PROBABILITY_THRESHOLD - 0.05
+        print("New TY_BOX_PROBABILITY_THRESHOLD is " + str(TY_BOX_PROBABILITY_THRESHOLD))
+    elif (ascii_code == ord('G')):
+        GN_PROBABILITY_MIN = GN_PROBABILITY_MIN + 0.05
+        print("New GN_PROBABILITY_MIN is " + str(GN_PROBABILITY_MIN))
+    elif (ascii_code == ord('g')):
+        GN_PROBABILITY_MIN = GN_PROBABILITY_MIN - 0.05
+        print("New GN_PROBABILITY_MIN is " + str(GN_PROBABILITY_MIN))
+    elif (ascii_code == ord('I')):
+        TY_MAX_IOU = TY_MAX_IOU + 0.05
+        print("New TY_MAX_IOU is " + str(TY_MAX_IOU))
+    elif (ascii_code == ord('i')):
+        TY_MAX_IOU = TY_MAX_IOU - 0.05
+        print("New TY_MAX_IOU is " + str(TY_MAX_IOU))
+
+    return True
 
 # This function is called from the entry point to do
 # all the work.
 def main():
-    global gn_mean, gn_labels
+    global gn_mean, gn_labels, actual_camera_height, actual_camera_width
 
     print('Running stream_ty_gn')
-
 
     # Set logging level and initialize/open the first NCS we find
     mvnc.SetGlobalOption(mvnc.GlobalOption.LOG_LEVEL, 0)
@@ -449,14 +490,18 @@ def main():
         gn_labels[label_index] = temp
 
 
-    print('Q to quit')
+    print('Starting GUI, press Q to quit')
 
     cv2.namedWindow(cv_window_name)
     cv2.waitKey(1)
 
     camera_device = cv2.VideoCapture(CAMERA_INDEX)
-    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, REQUEST_CAMERA_WIDTH)
+    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, REQUEST_CAMERA_HEIGHT)
+
+    actual_camera_width = camera_device.get(cv2.CAP_PROP_FRAME_WIDTH)
+    actual_camera_height = camera_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    print ('actual camera resolution: ' + str(actual_camera_width) + ' x ' + str(actual_camera_height))
 
     if ((camera_device == None) or (not camera_device.isOpened())):
         print ('Could not open camera.  Make sure it is plugged in.')
@@ -464,11 +509,14 @@ def main():
         print ('need to uninstall it and install from source with -D WITH_V4L=ON')
         print ('Use the provided script: install-opencv-from_source.sh')
 
+    frame_count = 0
+    start_time = time.time()
+
     while True :
         # Read image from camera,
         ret_val, input_image = camera_device.read()
         if (not ret_val):
-            print("no image from camera")
+            print("No image from camera, exiting")
             break
 
 
@@ -477,7 +525,11 @@ def main():
         # and finally convert to float16 to pass to LoadTensor as input
         # for an inference
         input_image = cv2.resize(input_image, (TY_NETWORK_IMAGE_WIDTH, TY_NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
-        display_image = input_image
+
+        # save a display image as read from camera.
+        display_image = input_image.copy()
+
+        # modify input_image for TinyYolo input
         input_image = input_image.astype(np.float32)
         input_image = np.divide(input_image, 255.0)
 
@@ -486,7 +538,7 @@ def main():
         output, userobj = ty_graph.GetResult()
 
         # filter out all the objects/boxes that don't meet thresholds
-        filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0]) # fc27 instead of fc12 for yolo_small
+        filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
 
         get_googlenet_classifications(gn_graph, display_image, filtered_objs)
 
@@ -494,12 +546,23 @@ def main():
         # the window via the X button
         prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
         if (prop_val < 0.0):
+            end_time = time.time()
             break
 
-        ret_val = display_objects_in_gui(display_image, filtered_objs)
-        if (not ret_val):
-            break
+        overlay_on_image(display_image, filtered_objs)
 
+        cv2.imshow(cv_window_name, display_image)
+
+        raw_key = cv2.waitKey(1)
+        if (raw_key != -1):
+            if (handle_keys(raw_key) == False):
+                end_time = time.time()
+                break
+
+        frame_count = frame_count + 1
+
+    frames_per_second = frame_count / (end_time - start_time)
+    print ('Frames per Second: ' + str(frames_per_second))
 
     # close camera
     camera_device.release()
