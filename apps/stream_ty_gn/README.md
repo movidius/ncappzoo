@@ -16,10 +16,19 @@ Two NCS devices are needed to run this application, one executes inferences for 
 
 Then for each Tiny Yolo object in the image, the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
 
+# Algorithm Thresholds
 There are a few thresholds in the code you may want to tweek if you aren't getting results that you expect:
 - <strong>TY_BOX_PROBABILITY_THRESHOLD</strong>: This is the minimum probability allowed for boxes returned from tiny yolo.  This should be between 0.0 and 1.0.  A lower value will allow more boxes to be displayed.
 - <strong>TY_MAX_IOU</strong>: Determines which boxes from Tiny Yolo should be separate objects vs identifying the same object.  This is based on the intersection-over-union calculation.  The closer this is to 1.0 the more similar the boxes need to be in order to be considered around the same object.
 - <strong>GN_PROBABILITY_MIN</strong>:  This is the minimum probability from googlenet that will be used to override the general tiny yolo classification with a more specific googlenet classification.  It should be between 0.0 and 1.0.  A value of 0.0 will override every tiny yolo classification with the googlenet classification. 
+
+You can modify these thresholds at runtime with hotkeys to see the changes to the values affect the object identification.  The following hotkeys are mapped to make these adjustments.
+* 'B' increase TY_BOX_PROBABILITY_THRESHOLD
+* 'b' decrease TY_BOX_PROBABILITY_THRESHOLD
+* 'I' increase TY_MAX_IOU
+* 'i' decrease TY_MAX_IOU
+* 'G' increase GN_PROBABILITY_MIN
+* 'g' decrease GN_PROBABILITY_MIN
 
 # Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
