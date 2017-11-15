@@ -47,6 +47,11 @@ run_py: prereqs ilsvrc12 compile
 	@echo "\nmaking run_py"
 	python3 ./stream_ty_gn.py
 
+.PHONY: opencv
+opencv: 
+	@echo "\nmaking opencv"
+	./install-opencv-from_source.sh
+
 .PHONY: help
 help:
 	@echo "possible make targets: ";
@@ -54,6 +59,7 @@ help:
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
 	@echo "  make run_py - runs the stream_ty_gn.py python example program";
+	@cho  "  make opencv - removes pip3 opencv and builds from source then installs a new version" ;
 	@echo "  make clean - removes all created content"
 
 .PHONY: clean
