@@ -15,7 +15,7 @@ tiny_yolo_graph_file= './yolo_tiny.graph'
 googlenet_graph_file= './googlenet.graph'
 
 # Specifies which camera to use.  If only one it will likely be index 0
-CAMERA_INDEX = 1
+CAMERA_INDEX = 0
 
 # Tiny Yolo assumes input images are these dimensions.
 TY_NETWORK_IMAGE_WIDTH = 448
@@ -259,11 +259,6 @@ def overlay_on_image(display_image, filtered_objects):
     source_image_width = display_image.shape[1]
     source_image_height = display_image.shape[0]
 
-    #source_image_width = source_image.shape[1]
-    #source_image_height = source_image.shape[0]
-
-
-
     # loop through each box and draw it on the image along with a classification label
     for obj_index in range(len(filtered_objects)):
         center_x = int(filtered_objects[obj_index][1])
@@ -304,10 +299,6 @@ def overlay_on_image(display_image, filtered_objects):
     # display text to let user know how to quit
     cv2.rectangle(display_image,(0, 0),(100, 15), (128, 128, 128), -1)
     cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
-
-    # resize back to original camera size so image doesn't look squashed
-    display_image = cv2.resize(display_image, (int(actual_camera_width), int(actual_camera_height)), cv2.INTER_LINEAR)
-
 
 
 # Executes googlenet inferences on all objects defined by filtered_objects
@@ -410,6 +401,9 @@ def googlenet_inference(gn_graph, input_image):
     return order[0], gn_labels[order[0]], output[order[0]]
 
 
+# handles key presses by adjusting global thresholds etc.
+# raw_key is the return value from cv2.waitkey
+# returns False if program should end, or True if should continue
 def handle_keys(raw_key):
     global GN_PROBABILITY_MIN, TY_MAX_IOU, TY_BOX_PROBABILITY_THRESHOLD
     ascii_code = raw_key & 0xFF
@@ -436,12 +430,23 @@ def handle_keys(raw_key):
 
     return True
 
+# prints information for the user when program starts.
+def print_info():
+    print('Running stream_ty_gn')
+    print('Keys:')
+    print("  'Q'/'q' to Quit")
+    print("  'B'/'b' to inc/dec the Tiny Yolo box probability threshold")
+    print("  'I'/'i' to inc/dec the Tiny Yolo box intersection-over-union threshold")
+    print("  'G'/'g' to inc/dec the GoogLeNet probability threshold")
+    print('')
+
+
 # This function is called from the entry point to do
 # all the work.
 def main():
     global gn_mean, gn_labels, actual_camera_height, actual_camera_width
 
-    print('Running stream_ty_gn')
+    print_info()
 
     # Set logging level and initialize/open the first NCS we find
     mvnc.SetGlobalOption(mvnc.GlobalOption.LOG_LEVEL, 0)
@@ -551,6 +556,13 @@ def main():
 
         overlay_on_image(display_image, filtered_objs)
 
+        # resize back to original camera size so image doesn't look squashed
+        # It might be better to resize the boxes to match camera dimensions
+        # and overlay them directly on the camera size image.
+        display_image = cv2.resize(display_image, (int(actual_camera_width), int(actual_camera_height)),
+                                   cv2.INTER_LINEAR)
+
+        # update the GUI window with new image
         cv2.imshow(cv_window_name, display_image)
 
         raw_key = cv2.waitKey(1)
