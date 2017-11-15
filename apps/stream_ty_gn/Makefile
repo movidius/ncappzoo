@@ -59,7 +59,7 @@ help:
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
 	@echo "  make run_py - runs the stream_ty_gn.py python example program";
-	@cho  "  make opencv - removes pip3 opencv and builds from source then installs a new version" ;
+	@echo "  make opencv - removes pip3 opencv and builds from source then installs a new version" ;
 	@echo "  make clean - removes all created content"
 
 .PHONY: clean
