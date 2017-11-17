@@ -71,8 +71,15 @@ def pre_process_image():
     cv2.rectangle( frame, ( x1, y1 ) , ( x2, y2 ), ( 0, 255, 0 ), 2 )
     cv2.imshow( 'Age/Gender', frame )
     
-    croped_frame = frame#[ y1 : y2, x1 : x2 ]
+    croped_frame = frame[ y1 : y2, x1 : x2 ]
+    cv2.imshow( 'Croped face', croped_frame )
+
+    # Uncomment this line if you want to use a static image instead
+    # croped_frame = cv2.imread( "./image.jpg" )
     croped_frame = cv2.resize( croped_frame, IMAGE_DIM )
+
+    # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
+    # croped_frame = croped_frame[:, :, ::-1] 
 
     # Mean subtraction & scaling [A common technique used to center the data]
     croped_frame = croped_frame.astype( numpy.float16 )
@@ -82,21 +89,19 @@ def pre_process_image():
 
 # ---- Step 4: Offload image onto the NCS for inference ----------------------
 
-def infer_image( graph ):
+def infer_image( graph, img ):
     # Load the image as a half-precision floating point array
-    graph.LoadTensor( pre_process_image() , 'user object' )
+    graph.LoadTensor( img , 'user object' )
 
     # Get the results from NCS
     output, userobj = graph.GetResult()
 
     # Print the results
-    order = output.argsort()[::-1][:7]
-    last = len(order) - 1
-    order = int( order[last] )
+    top_prediction = output.argmax()
 
     # Display inferred image with top pridiction
-    print( "Age: " + LABELS_AGE[order] + 
-            " with %3.1f%% confidence" % (100.0 * output[order] ) )
+    print( "Age: " + LABELS_AGE[top_prediction] + 
+            " with %3.1f%% confidence" % (100.0 * output[top_prediction] ) )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
@@ -111,8 +116,8 @@ def main():
     graph = load_graph( device )
 
     while( True ):
-        pre_process_image()
-        infer_image( graph )
+        img = pre_process_image()
+        infer_image( graph, img )
 
         if cv2.waitKey( 1 ) & 0xFF == ord( 'q' ):
             break
