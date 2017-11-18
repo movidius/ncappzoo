@@ -16,12 +16,11 @@ import sys
 
 # User modifiable input parameters for NCS
 NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/AgeNet/graph'
-IMAGE_MEAN_PATH         = NCAPPZOO_PATH + '/data/age_gender/age_gender_mean.npy'
-LABELS_AGE              = [ '0-2','4-6','8-12','15-20','25-32','38-43','48-53','60-100' ]
-LABELS_GENDER           = [ 'Male', 'Female' ]
+GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
+IMAGE_MEAN_PATH         = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
+LABELS_PATH             = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
 IMAGE_STDDEV            = 1
-IMAGE_DIM               = ( 227, 227 )
+IMAGE_DIM               = ( 224, 224 )
 
 VIDEO_INDEX             = 0
 cam                     = cv2.VideoCapture( VIDEO_INDEX )
@@ -39,6 +38,7 @@ def open_ncs_device():
     # Get a handle to the first enumerated device and open it
     device = mvnc.Device( devices[0] )
     device.OpenDevice()
+
     return device
 
 # ---- Step 2: Load a graph file onto the NCS device -------------------------
@@ -62,7 +62,7 @@ def pre_process_image():
     height, width, channels = frame.shape
     image_mean = numpy.float16( numpy.load( IMAGE_MEAN_PATH ).mean( 1 ).mean( 1 ) )
 
-    # Extract/crop face and resize it [A common technique used to center the data]
+    # Extract/crop face and resize it
     x1 = int( width / 3 )
     y1 = int( height / 4 )
     x2 = int( width * 2 / 3 )
@@ -74,12 +74,8 @@ def pre_process_image():
     croped_frame = frame[ y1 : y2, x1 : x2 ]
     cv2.imshow( 'Croped face', croped_frame )
 
-    # Uncomment this line if you want to use a static image instead
-    # croped_frame = cv2.imread( "./image.jpg" )
+    # resize image [Image size if defined by choosen network, during training]
     croped_frame = cv2.resize( croped_frame, IMAGE_DIM )
-
-    # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
-    # croped_frame = croped_frame[:, :, ::-1] 
 
     # Mean subtraction & scaling [A common technique used to center the data]
     croped_frame = croped_frame.astype( numpy.float16 )
@@ -90,17 +86,22 @@ def pre_process_image():
 # ---- Step 4: Offload image onto the NCS for inference ----------------------
 
 def infer_image( graph, img ):
+
     # Load the image as a half-precision floating point array
     graph.LoadTensor( img , 'user object' )
 
-    # Get the results from NCS
+    # Get results from the NCS
     output, userobj = graph.GetResult()
 
-    # Print the results
+    # Find the index of highest confidence 
     top_prediction = output.argmax()
 
-    # Display inferred image with top pridiction
-    print( "Age: " + LABELS_AGE[top_prediction] + 
+    # Read all categories into a list
+    categories = [line.rstrip('\n') for line in 
+                   open( LABELS_PATH ) if line != 'classes\n']
+
+    # Print top prediction
+    print( "Prediction: " + categories[top_prediction] + 
             " with %3.1f%% confidence" % (100.0 * output[top_prediction] ) )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
@@ -110,6 +111,8 @@ def close_ncs_device( device, graph ):
     cv2.destroyAllWindows()
     graph.DeallocateGraph()
     device.CloseDevice()
+
+# ---- Main function (entry point for this script ) --------------------------
 
 def main():
     device = open_ncs_device()
@@ -123,6 +126,8 @@ def main():
             break
 
     close_ncs_device( device, graph )
+
+# ---- Define 'main' function as the entry point for this script -------------
 
 if __name__ == '__main__':
     main()
