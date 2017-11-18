@@ -87,6 +87,10 @@ def pre_process_image():
 
 def infer_image( graph, img ):
 
+    # Read all categories into a list
+    categories = [line.rstrip('\n') for line in 
+                   open( LABELS_PATH ) if line != 'classes\n']
+
     # Load the image as a half-precision floating point array
     graph.LoadTensor( img , 'user object' )
 
@@ -95,10 +99,6 @@ def infer_image( graph, img ):
 
     # Find the index of highest confidence 
     top_prediction = output.argmax()
-
-    # Read all categories into a list
-    categories = [line.rstrip('\n') for line in 
-                   open( LABELS_PATH ) if line != 'classes\n']
 
     # Print top prediction
     print( "Prediction: " + categories[top_prediction] + 
