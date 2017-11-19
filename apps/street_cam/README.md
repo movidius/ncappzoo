@@ -1,9 +1,10 @@
 # Introduction
-The street_cam application is an object recognition and classification program.  It uses two the NCS devices along with TinyYolo and GoogLeNet to take a video stream and for each frame of video first it will get bounding boxes for objects via TinyYolo then it will use GoogLeNet to further classify the objects found.  It depends on the caffe/TinyYolo and caffe/GoogLeNet appzoo examples.
+The street_cam application is an object recognition and classification program.  It uses two the NCS devices along with TinyYolo and GoogLeNet to take a video stream and for each frame of video first it will get bounding boxes for objects via TinyYolo then it will use GoogLeNet to further classify the objects found.  It depends on the caffe/TinyYolo and caffe/GoogLeNet appzoo examples.  Only objects that would be found in the street are considered.
 The provided Makefile does the following:
 1. Builds both TinyYolo and GoogLeNet from their respective directories within the repo.
 2. Copies the built NCS graph files from TinyYolo and GoogLeNet to the current directory.
-3. Runs the provided street_cam.py program which creates a GUI window that shows the camera stream along with labels and boxes around the identified objects. 
+3. Downloads some sample traffic video files.
+3. Runs the provided street_cam.py program which creates a GUI window that shows the video stream along with labels and boxes around the identified objects. 
 
 # Prerequisites
 This program requires:
@@ -28,6 +29,8 @@ Two NCS devices are needed to run this application, one executes inferences for 
 ```
 
 Then for each Tiny Yolo object in the image, the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
+
+The program will play each video file (.mp4) that it finds in the current directory. When all files have been played it will loop back to the first video until the 'Q' is pressed or the window's x button on the title bar is clicked.
 
 # Algorithm 
 There are a few thresholds in the code you may want to tweek if you aren't getting results that you expect:
