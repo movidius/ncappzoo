@@ -17,9 +17,6 @@ googlenet_graph_file= './googlenet.graph'
 
 input_video_path = '.'
 
-# Specifies which camera to use.  If only one it will likely be index 0
-CAMERA_INDEX = 0
-
 # Tiny Yolo assumes input images are these dimensions.
 TY_NETWORK_IMAGE_WIDTH = 448
 TY_NETWORK_IMAGE_HEIGHT = 448
@@ -38,9 +35,6 @@ gn_labels = [""]
 # for title bar of GUI window
 cv_window_name = 'stream_ty_gn - Q to quit'
 
-# Requested and actual camera dimensions
-REQUEST_CAMERA_WIDTH = 640 #TY_NETWORK_IMAGE_WIDTH
-REQUEST_CAMERA_HEIGHT = 480 #TY_NETWORK_IMAGE_HEIGHT
 actual_frame_width = 0
 actual_frame_height = 0
 
@@ -456,6 +450,7 @@ def print_info():
     print("  'B'/'b' to inc/dec the Tiny Yolo box probability threshold")
     print("  'I'/'i' to inc/dec the Tiny Yolo box intersection-over-union threshold")
     print("  'G'/'g' to inc/dec the GoogLeNet probability threshold")
+    print("  '2'     to toggle GoogLeNet classification")
     print('')
 
 
@@ -534,75 +529,15 @@ def main():
 
     while (True):
         for input_video_file in input_video_filename_list :
-
-            #TY_MAX_IOU = 0.15
-            #TY_BOX_PROBABILITY_THRESHOLD = 0.1
-            video_device = cv2.VideoCapture("./"+input_video_file)
-
-            # not great
-            # video_device = cv2.VideoCapture("./nps_prairie_city_448x448.mp4")
-
-            # possibilities
-            #video_device = cv2.VideoCapture("./pedestrian_crossing_448x448.mp4")
-
-            #video_device = cv2.VideoCapture("./nps_corner_448x448.mp4")
-            #video_device = cv2.VideoCapture("./brazil_street_living_statue.mp4")
-            #video_device = cv2.VideoCapture("./traffic_in_cincinnati.mp4")
-
-            # BEST so far may need to start after motorbikes
-            #TY_MAX_IOU = 0.15
-            #TY_BOX_PROBABILITY_THRESHOLD = 0.15
-            #video_device = cv2.VideoCapture("./contrapicado_traffic_960x540.mp4")
-
-
-            # not many cars but good until the end, may need to end it early
-            #TY_MAX_IOU = 0.15
-            #TY_BOX_PROBABILITY_THRESHOLD = 0.1
-            #video_device = cv2.VideoCapture("./traffic_square_spain448x448.mp4")
-
-
-            #video_device = cv2.VideoCapture("./nps_rain_traffic2_448x448.mp4")
-
-            #not too good
-            ##video_device = cv2.VideoCapture("./west_broadway_crosswalk_448x448.mp4")
-
-            # decent
-            #video_device = cv2.VideoCapture("./walkers_statue_cars_448x448.mp4")
-
-            # decent person tracking
-            #video_device = cv2.VideoCapture("./walkers_crossing_448x448.mp4")
-
-            # OK person detection
-            #video_device = cv2.VideoCapture("./walkers_car_truck_umbrellas_448x448.mp4")
-
-            # only detects the one person
-            #video_device = cv2.VideoCapture("./person_texting_448x448.mp4")
-
-            # too much gets cut off
-            #video_device = cv2.VideoCapture("./ground_level_cars_walkers_448x448.mp4")
-
-            # no good
-            #video_device = cv2.VideoCapture("./drone_streets_448x448.mp4")
-
-            # not bad
-            #video_device = cv2.VideoCapture("./cars_walkers_bike_fire_hydrant_448x448.mp4")
-
-            # not too good
-            #video_device = cv2.VideoCapture("./cars_narrow_fov_448x448.mp4")
-
-            # not too interesting
-            #video_device = cv2.VideoCapture("./brick_street_960x540.mp4")
-
-            # not good
-            #video_device = cv2.VideoCapture("./bikes_walkers_cars_448x448.mp4")
-
+            video_device = cv2.VideoCapture("./" + input_video_file)
 
             actual_frame_width = video_device.get(cv2.CAP_PROP_FRAME_WIDTH)
             actual_frame_height = video_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
             print ('actual video resolution: ' + str(actual_frame_width) + ' x ' + str(actual_frame_height))
 
             if ((video_device == None) or (not video_device.isOpened())):
-                print ('Could not open camera.  Make sure it is plugged in.')
+                print ('Could not open video device.  Make sure file exists:')
+                print ('file name:' + input_video_file)
                 print ('Also, if you installed python opencv via pip or pip3 you')
                 print ('need to uninstall it and install from source with -D WITH_V4L=ON')
                 print ('Use the provided script: install-opencv-from_source.sh')
@@ -611,11 +546,11 @@ def main():
             start_time = time.time()
 
             while True :
-                # Read image from camera,
+                # Read image from video device,
                 ret_val, input_image = video_device.read()
                 if (not ret_val):
                     end_time = time.time()
-                    print("No image from camera, exiting")
+                    print("No image from from video device, exiting")
                     break
 
 
@@ -625,7 +560,7 @@ def main():
                 # for an inference
                 input_image = cv2.resize(input_image, (TY_NETWORK_IMAGE_WIDTH, TY_NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
 
-                # save a display image as read from camera.
+                # save a display image as read from video device.
                 display_image = input_image.copy()
 
                 # modify input_image for TinyYolo input
@@ -651,11 +586,9 @@ def main():
 
                 overlay_on_image(display_image, filtered_objs)
 
-                # resize back to original camera size so image doesn't look squashed
-                # It might be better to resize the boxes to match camera dimensions
-                # and overlay them directly on the camera size image.
-                #display_image = cv2.resize(display_image, (int(DISPLAY_WIDTH), int(DISPLAY_HEIGHT)),
-                #                           cv2.INTER_LINEAR)
+                # resize back to original size so image doesn't look squashed
+                # It might be better to resize the boxes to match video dimensions
+                # and overlay them directly on the video image returned from video device.
                 display_image = cv2.resize(display_image, (int(actual_frame_width), int(actual_frame_height)),
                                            cv2.INTER_LINEAR)
                 # update the GUI window with new image
@@ -671,9 +604,10 @@ def main():
                 frame_count = frame_count + 1
 
             frames_per_second = frame_count / (end_time - start_time)
+            print ('File: ' + input_video_file)
             print ('Frames per Second: ' + str(frames_per_second))
 
-            # close camera
+            # close video device
             video_device.release()
 
             if (exit_app):
