@@ -28,7 +28,7 @@ Two NCS devices are needed to run this application, one executes inferences for 
                                "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
 ```
 
-Then for each Tiny Yolo object in the image, the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
+Then, if google inferences are turned on via the do_googlenet flag in the code, for each Tiny Yolo object in the image, the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
 
 The program will play each video file (.mp4) that it finds in the current directory. When all files have been played it will loop back to the first video until the 'Q' is pressed or the window's x button on the title bar is clicked.
 
@@ -45,7 +45,7 @@ You can modify the algorithm at runtime with hotkeys to see the changes to the v
 * 'i' decrease TY_MAX_IOU
 * 'G' increase GN_PROBABILITY_MIN
 * 'g' decrease GN_PROBABILITY_MIN
-* '2' toggles GoogLeNet inferences. When this is false only the TinyYolo results will be shown in the GUI.
+* '2' toggles GoogLeNet inferences. When this is false only the TinyYolo network will be used and shown in the GUI.
 
 
 # Makefile
