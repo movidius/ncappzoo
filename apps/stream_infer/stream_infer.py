@@ -43,7 +43,6 @@ NETWORK_DIRECTORY = "../../caffe/GenderNet/" # directory of the network this dir
 NETWORK_STAT_TXT = "./gendernet_stat.txt"    # stat.txt for networ
 NETWORK_CATEGORIES_TXT = "./gendernet_categories.txt" # categories.txt for network
 
-
 NETWORK_IMAGE_WIDTH = 224           # the width of images the network requires
 NETWORK_IMAGE_HEIGHT = 224          # the height of images the network requires
 NETWORK_IMAGE_FORMAT = "BGR"        # the format of the images the network requires
@@ -51,8 +50,8 @@ NETWORK_DIRECTORY = "../../caffe/GoogLeNet/"  # directory of the network this di
                                     # have 3 files: "graph", "stat.txt" and "categories.txt"
 NETWORK_STAT_TXT = "./googlenet_stat.txt"    # stat.txt for networ
 NETWORK_CATEGORIES_TXT = "./googlenet_categories.txt" # categories.txt for network
-
 '''
+
 NETWORK_IMAGE_WIDTH = 227                     # the width of images the network requires
 NETWORK_IMAGE_HEIGHT = 227                    # the height of images the network requires
 NETWORK_IMAGE_FORMAT = "BGR"                  # the format of the images the network requires
@@ -68,7 +67,6 @@ NETWORK_DIRECTORY = "../../caffe/AlexNet/"    # directory of the network this di
                                     # have 3 files: "graph", "stat.txt" and "categories.txt
 NETWORK_STAT_TXT = "./alexnet_stat.txt"    # stat.txt for networ
 NETWORK_CATEGORIES_TXT = "./alexnet_categories.txt" # categories.txt for network
-
 '''
 
 # The capture dimensions of the image need to be a multiple of 4 (the image will be cropped back down for inferences)

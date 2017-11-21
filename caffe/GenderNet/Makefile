@@ -15,6 +15,7 @@ all: profile compile run
 .PHONY: prereqs
 prereqs:
 	@(cd ../../data/age_gender; make)
+	@chmod a+x run.py
 
 .PHONY: prototxt
 prototxt: prereqs
@@ -39,12 +40,14 @@ check: prototxt
 run:
 	./run.py
 
+clean_prereqs:
+	@(cd ../../data/age_gender; make clean)
 
 cleancaffemodel:
 	@rm -f ${PROTOTXT_FILENAME}
 	@rm -f ${CAFFEMODEL_FILENAME}
 
-clean: cleancaffemodel
+clean: clean_prereqs cleancaffemodel
 	@rm -f graph
 	@rm -f output.gv
 	@rm -f output.gv.svg
