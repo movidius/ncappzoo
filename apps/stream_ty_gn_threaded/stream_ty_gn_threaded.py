@@ -23,19 +23,21 @@ CAMERA_INDEX = 0
 CAMERA_REQUEST_VID_WIDTH = 640
 CAMERA_REQUEST_VID_HEIGHT = 480
 
-CAMERA_QUEUE_PUT_WAIT_MAX = 0.01
-CAMERA_QUEUE_FULL_SLEEP_SECONDS = 0.0
+CAMERA_QUEUE_PUT_WAIT_MAX = 0.001
+CAMERA_QUEUE_FULL_SLEEP_SECONDS = 0.01
 # for title bar of GUI window
-cv_window_name = 'stream_ty_gn - Q to quit'
+cv_window_name = 'stream_ty_gn_threaded - Q to quit'
 
 CAMERA_QUEUE_SIZE = 1
 GN_INPUT_QUEUE_SIZE = 10
 GN_OUTPUT_QUEUE_SIZE = 10
 TY_OUTPUT_QUEUE_SIZE = 2
 
+# number of seconds to wait when putting or getting from queue's
+# besides the camera output queue.
 QUEUE_WAIT_MAX = 4
 
-
+# input and output queueu for the googlenet processor.
 gn_input_queue = queue.Queue(GN_INPUT_QUEUE_SIZE)
 gn_output_queue = queue.Queue(GN_OUTPUT_QUEUE_SIZE)
 

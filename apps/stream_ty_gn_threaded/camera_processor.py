@@ -58,25 +58,31 @@ class camera_processor:
         print('actual camera resolution: ' + str(self._actual_camera_width) + ' x ' + str(self._actual_camera_height))
 
         self._output_queue = output_queue
-        self._worker_thread = threading.Thread(target=self.do_work, args=())
+        self._worker_thread = threading.Thread(target=self._do_work, args=())
 
 
+    # the width of the images that will be put in the queue
     def get_actual_camera_width(self):
         return self._actual_camera_width
 
+    # the height of the images that will be put in the queue
     def get_actual_camera_height(self):
         return self._actual_camera_height
 
-
+    # start reading from the camera and placing images in the output queue
     def start_processing(self):
         self._end_flag = False
         self._worker_thread.start()
 
+    # stop reading from camera and placing images in the output queue
     def stop_processing(self):
         self._end_flag = True
         self._worker_thread.join()
 
-    def do_work(self):
+    # thread target.  when call start_processing this function will be called
+    # in its own thread.  it will keep working until stop_processing is called.
+    # or an error is encountered.
+    def _do_work(self):
         print('in camera_processor worker thread')
         skip_number = 0
         if (self._camera_device == None):
@@ -97,6 +103,7 @@ class camera_processor:
 
         print('exiting camera_processor worker thread')
 
+    # should be called once for each class instance when finished with it.
     def cleanup(self):
         # close camera
         self._camera_device.release()
