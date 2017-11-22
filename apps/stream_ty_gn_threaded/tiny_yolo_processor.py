@@ -60,12 +60,16 @@ class tiny_yolo_processor:
         self._end_flag = True
         # remove one item off output queue to allow the current put to finish
         # if the worker thread is blocked waiting to put
+        '''
+        NPS TODO: remove commented code
         try:
-            self._output_queue.get(False)
-            self._output_queue.task_done()
+            while (self._output_queue.not_empty()):
+                self._output_queue.get(False)
+                self._output_queue.task_done()
         except:
             print('handling exception')
             pass
+        '''
         self._worker_thread.join()
 
 
@@ -73,34 +77,39 @@ class tiny_yolo_processor:
         print('in tiny_yolo_processor worker thread')
 
         while (not self._end_flag):
-            input_image = self._input_queue.get()
-            print('tiny_yolo_processor got image')
+            try:
+                input_image = self._input_queue.get(True, 4)
+                #print('tiny_yolo_processor got image')
 
-            # resize image to network width and height
-            # then convert to float32, normalize (divide by 255),
-            # and finally convert to float16 to pass to LoadTensor as input
-            # for an inference
-            input_image = cv2.resize(input_image,
-                                     (tiny_yolo_processor.TY_NETWORK_IMAGE_WIDTH, tiny_yolo_processor.TY_NETWORK_IMAGE_HEIGHT),
-                                     cv2.INTER_LINEAR)
+                # resize image to network width and height
+                # then convert to float32, normalize (divide by 255),
+                # and finally convert to float16 to pass to LoadTensor as input
+                # for an inference
+                input_image = cv2.resize(input_image,
+                                         (tiny_yolo_processor.TY_NETWORK_IMAGE_WIDTH, tiny_yolo_processor.TY_NETWORK_IMAGE_HEIGHT),
+                                         cv2.INTER_LINEAR)
 
-            # save a display image as read from camera.
-            display_image = input_image.copy()
+                # save a display image as read from camera.
+                display_image = input_image.copy()
 
-            # modify input_image for TinyYolo input
-            input_image = input_image.astype(np.float32)
-            input_image = np.divide(input_image, 255.0)
+                # modify input_image for TinyYolo input
+                input_image = input_image.astype(np.float32)
+                input_image = np.divide(input_image, 255.0)
 
-            # Load tensor and get result.  This executes the inference on the NCS
-            self._ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')
-            output, userobj = self._ty_graph.GetResult()
+                # Load tensor and get result.  This executes the inference on the NCS
+                self._ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')
+                output, userobj = self._ty_graph.GetResult()
 
-            # filter out all the objects/boxes that don't meet thresholds
-            filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
+                # filter out all the objects/boxes that don't meet thresholds
+                filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
 
-            self._output_queue.put((display_image, filtered_objs), True, 4)
+                self._output_queue.put((display_image, filtered_objs), True, 4)
 
-            print('tiny_yolo_processor queued image')
+                #print('tiny_yolo_processor queued image')
+            except queue.Empty:
+                print('ty_proc, input queue empty')
+            except queue.Full:
+                print('ty_proc, output queue full')
 
         print('exiting tiny_yolo_processor worker thread')
 

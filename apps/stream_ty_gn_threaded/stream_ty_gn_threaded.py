@@ -22,7 +22,8 @@ GOOGLENET_GRAPH_FILE = './googlenet.graph'
 # for title bar of GUI window
 cv_window_name = 'stream_ty_gn - Q to quit'
 
-
+gn_input_queue = queue.Queue(10)
+gn_output_queue = queue.Queue(10)
 
 ############################################################
 # Tuning variables
@@ -136,7 +137,81 @@ def overlay_on_image(display_image, filtered_objects):
 #     float value that is the googlenet probability
 #
 # returns None
-def get_googlenet_classifications(googlenet_processor, source_image, filtered_objects):
+def get_googlenet_classifications(source_image, filtered_objects):
+    global gn_input_queue, gn_output_queue
+
+    # pad the height and width of the image boxes by this amount
+    # to make sure we get the whole object in the image that
+    # we pass to googlenet
+    WIDTH_PAD = 20
+    HEIGHT_PAD = 30
+
+    source_image_width = source_image.shape[1]
+    source_image_height = source_image.shape[0]
+
+    # id for all sub images within the larger image
+    image_id = datetime.datetime.now().timestamp()
+
+
+    # loop through each box and crop the image in that rectangle
+    # from the source image and then use it as input for googlenet
+    for obj_index in range(len(filtered_objects)):
+        center_x = int(filtered_objects[obj_index][1])
+        center_y = int(filtered_objects[obj_index][2])
+        half_width = int(filtered_objects[obj_index][3])//2 + WIDTH_PAD
+        half_height = int(filtered_objects[obj_index][4])//2 + HEIGHT_PAD
+
+        # calculate box (left, top) and (right, bottom) coordinates
+        box_left = max(center_x - half_width, 0)
+        box_top = max(center_y - half_height, 0)
+        box_right = min(center_x + half_width, source_image_width)
+        box_bottom = min(center_y + half_height, source_image_height)
+
+        # get one image by clipping a box out of source image
+        one_image = source_image[box_top:box_bottom, box_left:box_right]
+
+        gn_input_queue.put(one_image, True, 4)
+
+    for obj_index in range(len(filtered_objects)):
+        result_list = gn_output_queue.get(True, 4)
+        filtered_objects[obj_index] += result_list
+
+        # Get a googlenet inference on that one image and add the information
+        # to the filtered objects list
+        #filtered_objects[obj_index] += googlenet_processor.googlenet_inference(one_image, image_id)
+
+
+    return filtered_objects
+
+
+# Executes googlenet inferences on all objects defined by filtered_objects
+# To run the inferences will crop an image out of source image based on the
+# boxes defined in filtered_objects and use that as input for googlenet.
+#
+# gn_graph is the googlenet graph object on which the inference should be executed.
+#
+# source_image the original image on which the inference was run.  The boxes
+#   defined by filtered_objects are rectangles within this image and will be
+#   used as input for googlenet
+#
+# filtered_objects [IN/OUT] upon input is a list of lists (as returned from filter_objects()
+#   each of the inner lists represent one found object and contain
+#   the following 6 values:
+#     string that is network classification ie 'cat', or 'chair' etc
+#     float value for box center X pixel location within source image
+#     float value for box center Y pixel location within source image
+#     float value for box width in pixels within source image
+#     float value for box height in pixels within source image
+#     float value that is the probability for the network classification.
+#   upon output the following 3 values from the googlenet inference will
+#   be added to each inner list of filtered_objects
+#     int value that is the index of the googlenet classification
+#     string value that is the googlenet classification string.
+#     float value that is the googlenet probability
+#
+# returns None
+def get_googlenet_classifications_no_queue(gn_proc, source_image, filtered_objects):
+    global gn_input_queue, gn_output_queue
 
     # pad the height and width of the image boxes by this amount
     # to make sure we get the whole object in the image that
@@ -170,9 +245,10 @@ def get_googlenet_classifications(googlenet_processor, source_image, filtered_ob
 
         # Get a googlenet inference on that one image and add the information
         # to the filtered objects list
-        filtered_objects[obj_index] += googlenet_processor.googlenet_inference(one_image, image_id)
+        filtered_objects[obj_index] += gn_proc.googlenet_inference(one_image, image_id)
 
-    return
+
+    return filtered_objects
 
 
 
@@ -219,7 +295,7 @@ def print_info():
 # This function is called from the entry point to do
 # all the work.
 def main():
-    global gn_mean, gn_labels, actual_camera_height, actual_camera_width
+    global gn_input_queue, gn_output_queue
 
     print_info()
 
@@ -236,7 +312,7 @@ def main():
     gn_device = mvnc.Device(devices[1])
     gn_device.OpenDevice()
 
-    gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device)
+    gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device, gn_input_queue, gn_output_queue)
 
 
     print('Starting GUI, press Q to quit')
@@ -253,21 +329,23 @@ def main():
     camera_queue = queue.Queue(2)
 
     # camera processor that will put camera images on the camera_queue
-    my_camera_processor = camera_processor(camera_queue, )
-    actual_camera_width = my_camera_processor.get_actual_camera_width()
-    actual_camera_height = my_camera_processor.get_actual_camera_height()
+    camera_proc = camera_processor(camera_queue, )
+    actual_camera_width = camera_proc.get_actual_camera_width()
+    actual_camera_height = camera_proc.get_actual_camera_height()
 
-    gn_input_queue = queue.Queue(50)
-    ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, gn_input_queue)
+    ty_output_queue = queue.Queue(50)
+    ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, ty_output_queue)
 
-    my_camera_processor.start_processing()
+    gn_proc.start_processing()
+    camera_proc.start_processing()
     ty_proc.start_processing()
 
     while True :
 
-        (display_image, filtered_objs) = gn_input_queue.get(True, 4)
+        (display_image, filtered_objs) = ty_output_queue.get(True, 4)
 
-        get_googlenet_classifications(gn_proc, display_image, filtered_objs)
+        #get_googlenet_classifications(display_image, filtered_objs)
+        get_googlenet_classifications_no_queue(gn_proc, display_image, filtered_objs)
 
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button
@@ -301,8 +379,12 @@ def main():
     print ('Frames per Second: ' + str(frames_per_second))
 
 
-    my_camera_processor.stop_processing()
+
+    camera_proc.stop_processing()
     ty_proc.stop_processing()
+    gn_proc.stop_processing()
+
+    camera_proc.cleanup()
 
     # clean up tiny yolo
     ty_proc.cleanup()

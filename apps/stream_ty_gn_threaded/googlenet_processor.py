@@ -10,10 +10,8 @@ from mvnc import mvncapi as mvnc
 import numpy as np
 import cv2
 import queue
+import threading
 
-class queue_item:
-    def __init__(self, input_image, user_obj):
-        self.list = (input_image, user_obj)
 
 class googlenet_processor:
     # GoogLeNet assumes input images are these dimensions
@@ -27,7 +25,7 @@ class googlenet_processor:
 
     LABELS_FILE_NAME = ILSVRC_2012_dir + 'synset_words.txt'
 
-    def __init__(self, googlenet_graph_file, ncs_device):
+    def __init__(self, googlenet_graph_file, ncs_device, input_queue, output_queue):
 
         # GoogLenet initialization
 
@@ -71,21 +69,59 @@ class googlenet_processor:
             print('\n\n')
             raise
 
-        self._input_queue = queue.Queue()
+        self._input_queue = input_queue
+        self._output_queue = output_queue
+        self._worker_thread = threading.Thread(target=self.do_work, args=())
 
 
     def cleanup(self):
         self._gn_graph.DeallocateGraph()
 
 
-    def queue_inference(self, input_image, user_obj):
-        self._input_queue.put_nowait(queue_item(input_image, user_obj))
+    def start_processing(self):
+        self._end_flag = False
+        self._worker_thread.start()
 
-    def dequeque_result(self):
-        work_item = self._input_queue.get(True, 5)
-        index, label, probability = self.googlenet_inference(work_item[0], work_item[1])
-        self._input_queue.task_done()
-        return index, label, probability
+
+    def stop_processing(self):
+        self._end_flag = True
+        '''
+        NPS TODO: remove commented code
+        # remove empty the input queue
+        try:
+            while (self._input_queue.not_empty()):
+                self._input_queue.get(False)
+                self._input_queue.task_done()
+        except:
+            print('gn_proc input, handling exception')
+            pass
+
+        try:
+            while (self._output_queue.not_empty()):
+                self._output_queue.get(False)
+                self._output_queue.task_done()
+        except:
+            print('gn_proc output, handling exception')
+            pass
+        '''
+        self._worker_thread.join()
+
+
+    def do_work(self):
+        print('in googlenet_processor worker thread')
+        while (not self._end_flag):
+            try:
+                input_image = self._input_queue.get(True, 4)
+                index, label, probability = self.googlenet_inference(input_image, "NPS")
+                self._output_queue.put((index, label, probability), True, 4)
+                self._input_queue.task_done()
+            except queue.Empty:
+                print('googlenet processor: No more images in queue.')
+            except queue.Full:
+                print('googlenet processor: queue full')
+
+        print('exiting googlenet_processor worker thread')
+
 
     # Executes an inference using the googlenet graph and image passed
     # gn_graph is the googlenet graph object to use for the inference

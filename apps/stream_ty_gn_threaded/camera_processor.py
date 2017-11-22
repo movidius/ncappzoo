@@ -56,6 +56,9 @@ class camera_processor:
 
     def stop_processing(self):
         self._end_flag = True
+
+        '''
+        NPS TODO: remove commented out code
         # remove one item off queue to allow the current put to finish
         # if the worker thread is blocked waiting to put
         try:
@@ -64,6 +67,7 @@ class camera_processor:
         except:
             print('handling exception')
             pass
+        '''
         self._worker_thread.join()
 
     def do_work(self):
@@ -71,15 +75,16 @@ class camera_processor:
         if (self._camera_device == None):
             print('camera_processor camera_device is None, returning.')
             return
-
         while (not self._end_flag):
-            ret_val, input_image = self._camera_device.read()
-            if (not ret_val):
-                print("No image from camera, exiting")
-                break
-            print('camera_processor got image')
-            self._output_queue.put(input_image, True, 4)
-            print('camera_processor queued image')
+            try:
+                ret_val, input_image = self._camera_device.read()
+                if (not ret_val):
+                    print("No image from camera, exiting")
+                    break
+                #print('camera_processor got image')
+                self._output_queue.put(input_image, True, 4)
+            except queue.Full:
+                print('camera_proc output queue full.')
 
         print('exiting camera_processor worker thread')
 
