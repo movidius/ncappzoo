@@ -104,6 +104,7 @@ class tiny_yolo_processor:
                 filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
 
                 self._output_queue.put((display_image, filtered_objs), True, 4)
+                self._input_queue.task_done()
 
                 #print('tiny_yolo_processor queued image')
             except queue.Empty:

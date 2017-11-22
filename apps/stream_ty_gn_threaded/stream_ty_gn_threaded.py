@@ -19,11 +19,25 @@ from camera_processor import camera_processor
 TINY_YOLO_GRAPH_FILE = './yolo_tiny.graph'
 GOOGLENET_GRAPH_FILE = './googlenet.graph'
 
+CAMERA_INDEX = 0
+CAMERA_REQUEST_VID_WIDTH = 640
+CAMERA_REQUEST_VID_HEIGHT = 480
+
+CAMERA_QUEUE_PUT_WAIT_MAX = 0.01
+CAMERA_QUEUE_FULL_SLEEP_SECONDS = 0.0
 # for title bar of GUI window
 cv_window_name = 'stream_ty_gn - Q to quit'
 
-gn_input_queue = queue.Queue(10)
-gn_output_queue = queue.Queue(10)
+CAMERA_QUEUE_SIZE = 1
+GN_INPUT_QUEUE_SIZE = 10
+GN_OUTPUT_QUEUE_SIZE = 10
+TY_OUTPUT_QUEUE_SIZE = 2
+
+QUEUE_WAIT_MAX = 4
+
+
+gn_input_queue = queue.Queue(GN_INPUT_QUEUE_SIZE)
+gn_output_queue = queue.Queue(GN_OUTPUT_QUEUE_SIZE)
 
 ############################################################
 # Tuning variables
@@ -170,10 +184,10 @@ def get_googlenet_classifications(source_image, filtered_objects):
         # get one image by clipping a box out of source image
         one_image = source_image[box_top:box_bottom, box_left:box_right]
 
-        gn_input_queue.put(one_image, True, 4)
+        gn_input_queue.put(one_image, True, QUEUE_WAIT_MAX)
 
     for obj_index in range(len(filtered_objects)):
-        result_list = gn_output_queue.get(True, 4)
+        result_list = gn_output_queue.get(True, QUEUE_WAIT_MAX)
         filtered_objects[obj_index] += result_list
 
         # Get a googlenet inference on that one image and add the information
@@ -326,14 +340,16 @@ def main():
     end_time = start_time
 
     # Queue of camera images.  Only need two spots
-    camera_queue = queue.Queue(2)
+    camera_queue = queue.Queue(CAMERA_QUEUE_SIZE)
 
     # camera processor that will put camera images on the camera_queue
-    camera_proc = camera_processor(camera_queue, )
+    camera_proc = camera_processor(camera_queue, CAMERA_QUEUE_PUT_WAIT_MAX, CAMERA_INDEX,
+                                   CAMERA_REQUEST_VID_WIDTH, CAMERA_REQUEST_VID_HEIGHT,
+                                   CAMERA_QUEUE_FULL_SLEEP_SECONDS)
     actual_camera_width = camera_proc.get_actual_camera_width()
     actual_camera_height = camera_proc.get_actual_camera_height()
 
-    ty_output_queue = queue.Queue(50)
+    ty_output_queue = queue.Queue(TY_OUTPUT_QUEUE_SIZE)
     ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, ty_output_queue)
 
     gn_proc.start_processing()
@@ -342,16 +358,17 @@ def main():
 
     while True :
 
-        (display_image, filtered_objs) = ty_output_queue.get(True, 4)
+        (display_image, filtered_objs) = ty_output_queue.get(True, QUEUE_WAIT_MAX)
 
-        #get_googlenet_classifications(display_image, filtered_objs)
-        get_googlenet_classifications_no_queue(gn_proc, display_image, filtered_objs)
+        get_googlenet_classifications(display_image, filtered_objs)
+        #get_googlenet_classifications_no_queue(gn_proc, display_image, filtered_objs)
 
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button
         prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
         if (prop_val < 0.0):
             end_time = time.time()
+            ty_output_queue.task_done()
             break
 
         overlay_on_image(display_image, filtered_objs)
@@ -369,11 +386,12 @@ def main():
         if (raw_key != -1):
             if (handle_keys(raw_key) == False):
                 end_time = time.time()
+                ty_output_queue.task_done()
                 break
 
         frame_count = frame_count + 1
 
-        camera_queue.task_done()
+        ty_output_queue.task_done()
 
     frames_per_second = frame_count / (end_time - start_time)
     print ('Frames per Second: ' + str(frames_per_second))

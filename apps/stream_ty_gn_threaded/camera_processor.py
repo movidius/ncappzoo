@@ -5,23 +5,39 @@
 # NPS
 
 # pulls images from camera device and places them in a Queue
+# if the queue is full will start to skip camera frames.
 
 #import numpy as np
 import cv2
 import queue
 import threading
+import time
 
 class camera_processor:
 
-    # Requested and actual camera dimensions
-    REQUEST_CAMERA_WIDTH = 640  # TY_NETWORK_IMAGE_WIDTH
-    REQUEST_CAMERA_HEIGHT = 480  # TY_NETWORK_IMAGE_HEIGHT
+    # initializer for the class
+    # Parameters:
+    #   output_queue is an instance of queue.Queue in which the camera
+    #       images will be placed
+    #   queue_put_wait_max is the max number of seconds to wait when putting
+    #       images into the output queue.
+    #   camera_index is the index of the camera in the system.  if only one camera
+    #       it will typically be index 0
+    #   request_video_width is the width to request for the camera stream
+    #   request_video_height is the height to request for the camera stream
+    #   queue_full_sleep_seconds is the number of seconds to sleep when the
+    #       output queue is full.
+    def __init__(self, output_queue, queue_put_wait_max = 0.01, camera_index = 0,
+                 request_video_width=640, request_video_height = 480,
+                 queue_full_sleep_seconds = 0.1):
+        self._queue_full_sleep_seconds = queue_full_sleep_seconds
+        self._queue_put_wait_max = queue_put_wait_max
+        self._camera_index = camera_index
+        self._request_video_width = request_video_width
+        self._request_video_height = request_video_height
 
-    # Specifies which camera to use.  If only one it will likely be index 0
-    CAMERA_INDEX = 0
-
-    def __init__(self, output_queue):
-        self._camera_device = cv2.VideoCapture(camera_processor.CAMERA_INDEX)
+        # create the camera device
+        self._camera_device = cv2.VideoCapture(self._camera_index)
 
         if ((self._camera_device == None) or (not self._camera_device.isOpened())):
             print('\n\n')
@@ -32,9 +48,11 @@ class camera_processor:
             print('\n\n')
             return
 
-        self._camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, camera_processor.REQUEST_CAMERA_WIDTH)
-        self._camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, camera_processor.REQUEST_CAMERA_HEIGHT)
+        # Request the dimensions
+        self._camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, self._request_video_width)
+        self._camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, self._request_video_height)
 
+        # save the actual dimensions
         self._actual_camera_width = self._camera_device.get(cv2.CAP_PROP_FRAME_WIDTH)
         self._actual_camera_height = self._camera_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
         print('actual camera resolution: ' + str(self._actual_camera_width) + ' x ' + str(self._actual_camera_height))
@@ -56,22 +74,11 @@ class camera_processor:
 
     def stop_processing(self):
         self._end_flag = True
-
-        '''
-        NPS TODO: remove commented out code
-        # remove one item off queue to allow the current put to finish
-        # if the worker thread is blocked waiting to put
-        try:
-            input_image = self._output_queue.get(False)
-            self._output_queue.task_done()
-        except:
-            print('handling exception')
-            pass
-        '''
         self._worker_thread.join()
 
     def do_work(self):
         print('in camera_processor worker thread')
+        skip_number = 0
         if (self._camera_device == None):
             print('camera_processor camera_device is None, returning.')
             return
@@ -81,10 +88,12 @@ class camera_processor:
                 if (not ret_val):
                     print("No image from camera, exiting")
                     break
-                #print('camera_processor got image')
-                self._output_queue.put(input_image, True, 4)
+                self._output_queue.put(input_image, True, self._queue_put_wait_max)
             except queue.Full:
-                print('camera_proc output queue full.')
+                # the camera is probably way faster than the processing
+                # so if our output queue is full sleep a little while before
+                # trying the next image from the camera.
+                time.sleep(self._queue_full_sleep_seconds)
 
         print('exiting camera_processor worker thread')
 
