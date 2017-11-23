@@ -8,3 +8,8 @@ CMakeLists.txt.user
 #ignore pycharm ide files
 .idea
 
+#ignore python cache
+__pycache__
+
+
+
