@@ -40,7 +40,10 @@ class tiny_yolo_processor:
     # initial_max_iou is the inital value for the max iou which determines duplicate
     #     boxes
     def __init__(self, tiny_yolo_graph_file, ncs_device, input_queue, output_queue,
-                 inital_box_prob_thresh, initial_max_iou):
+                 inital_box_prob_thresh, initial_max_iou, queue_wait_input, queue_wait_output):
+
+        self._queue_wait_input = queue_wait_input
+        self._queue_wait_output = queue_wait_output
 
         # Load googlenet graph from disk and allocate graph via API
         try:
@@ -78,42 +81,46 @@ class tiny_yolo_processor:
         self._end_flag = True
         self._worker_thread.join()
 
+
     # do a single inference
     # input_image is the image on which to run the inference.
     #     it can be any size
-    # returns a resized version of the input image, and
-    # the result from _filter_objects() which is
-    # a list of lists. Each of the inner lists represent one found object and contain
-    # the following 6 values:
-    #    string that is network classification ie 'cat', or 'chair' etc
-    #    float value for box center X pixel location within source image
-    #    float value for box center Y pixel location within source image
-    #    float value for box width in pixels within source image
-    #    float value for box height in pixels within source image
-    #    float value that is the probability for the network classification.
+    # returns:
+    # result from _filter_objects() which is a list of lists.
+    #     Each of the inner lists represent one found object and contain
+    #     the following 6 values:
+    #        string that is network classification ie 'cat', or 'chair' etc
+    #        float value for box center X pixel location within input_image
+    #        float value for box center Y pixel location within input_image
+    #        float value for box width in pixels within input_image
+    #        float value for box height in pixels within input_image
+    #        float value that is the probability for the network classification.
     def do_inference(self, input_image):
+
+        # save original width and height
+        input_image_width = input_image.shape[1]
+        input_image_height = input_image.shape[0]
+
         # resize image to network width and height
         # then convert to float32, normalize (divide by 255),
         # and finally convert to float16 to pass to LoadTensor as input
         # for an inference
-        input_image = cv2.resize(input_image,
+        # this returns a new image so the input_image is unchanged
+        inference_image = cv2.resize(input_image,
                                  (tiny_yolo_processor.TY_NETWORK_IMAGE_WIDTH,
                                   tiny_yolo_processor.TY_NETWORK_IMAGE_HEIGHT),
                                  cv2.INTER_LINEAR)
 
-        # save a display image as read from camera.
-        display_image = input_image.copy()
-
-        # modify input_image for TinyYolo input
-        input_image = input_image.astype(np.float32)
-        input_image = np.divide(input_image, 255.0)
+        # modify inference_image for TinyYolo input
+        inference_image = inference_image.astype(np.float32)
+        inference_image = np.divide(inference_image, 255.0)
 
         # Load tensor and get result.  This executes the inference on the NCS
-        self._ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')
+        self._ty_graph.LoadTensor(inference_image.astype(np.float16), 'user object')
         output, userobj = self._ty_graph.GetResult()
 
         # filter out all the objects/boxes that don't meet thresholds
-        return display_image, self._filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
+        return self._filter_objects(output.astype(np.float32), input_image_width, input_image_height)
 
 
     # the worker thread which handles the asynchronous processing of images on the input
@@ -123,15 +130,18 @@ class tiny_yolo_processor:
 
         while (not self._end_flag):
             try:
-                input_image = self._input_queue.get(True, 4)
-                #print('tiny_yolo_processor got image')
+                # get input image from input queue.  This does not copy the image
+                input_image = self._input_queue.get(True, self._queue_wait_input)
 
-                display_image, filtered_objs = self.do_inference(input_image)
+                # get the inference and filter etc.
+                filtered_objs = self.do_inference(input_image)
 
-                self._output_queue.put((display_image, filtered_objs), True, 4)
+                # put the results along with the input image on the output queue
+                self._output_queue.put((input_image, filtered_objs), True, self._queue_wait_output)
+
+                # finished with this input queue work item
                 self._input_queue.task_done()
 
-                #print('tiny_yolo_processor queued image')
             except queue.Empty:
                 print('ty_proc, input queue empty')
             except queue.Full:

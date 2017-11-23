@@ -38,7 +38,11 @@ class googlenet_processor:
     #         index of the most likely classification from the inference.
     #         label for the most likely classification from the inference.
     #         probability the most likely classification from the inference.
-    def __init__(self, googlenet_graph_file, ncs_device, input_queue, output_queue):
+    def __init__(self, googlenet_graph_file, ncs_device, input_queue, output_queue,
+                 queue_wait_input, queue_wait_output):
+
+        self._queue_wait_input = queue_wait_input
+        self._queue_wait_output = queue_wait_output
 
         # GoogLenet initialization
 
@@ -109,9 +113,9 @@ class googlenet_processor:
         print('in googlenet_processor worker thread')
         while (not self._end_flag):
             try:
-                input_image = self._input_queue.get(True, 4)
+                input_image = self._input_queue.get(True, self._queue_wait_input)
                 index, label, probability = self.googlenet_inference(input_image, "NPS")
-                self._output_queue.put((index, label, probability), True, 4)
+                self._output_queue.put((index, label, probability), True, self._queue_wait_output)
                 self._input_queue.task_done()
             except queue.Empty:
                 print('googlenet processor: No more images in queue.')

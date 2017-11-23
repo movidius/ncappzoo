@@ -29,13 +29,13 @@ CAMERA_QUEUE_FULL_SLEEP_SECONDS = 0.01
 cv_window_name = 'stream_ty_gn_threaded - Q to quit'
 
 CAMERA_QUEUE_SIZE = 1
-GN_INPUT_QUEUE_SIZE = 2
-GN_OUTPUT_QUEUE_SIZE = 5
-TY_OUTPUT_QUEUE_SIZE = 5
+GN_INPUT_QUEUE_SIZE = 10
+GN_OUTPUT_QUEUE_SIZE = 10
+TY_OUTPUT_QUEUE_SIZE = 2
 
 # number of seconds to wait when putting or getting from queue's
 # besides the camera output queue.
-QUEUE_WAIT_MAX = 4
+QUEUE_WAIT_MAX = 2
 
 # input and output queueu for the googlenet processor.
 gn_input_queue = queue.Queue(GN_INPUT_QUEUE_SIZE)
@@ -92,8 +92,6 @@ def overlay_on_image(display_image, filtered_objects):
     DISPLAY_BOX_WIDTH_PAD = 0
     DISPLAY_BOX_HEIGHT_PAD = 20
 
-	# copy image so we can draw on it.
-    #display_image = source_image.copy()
     source_image_width = display_image.shape[1]
     source_image_height = display_image.shape[0]
 
@@ -177,12 +175,13 @@ def get_googlenet_classifications(source_image, filtered_objects):
     source_image_width = source_image.shape[1]
     source_image_height = source_image.shape[0]
 
-    # id for all sub images within the larger image
-    image_id = datetime.datetime.now().timestamp()
-
 
     # loop through each box and crop the image in that rectangle
     # from the source image and then use it as input for googlenet
+    # we are basically gathering the googlenet results
+    # serially here on the main thread.  we could have used
+    # a separate thread but probably wouldn't give much improvement
+    # since tiny yolo is already working on another thread
     for obj_index in range(len(filtered_objects)):
         center_x = int(filtered_objects[obj_index][1])
         center_y = int(filtered_objects[obj_index][2])
@@ -203,11 +202,6 @@ def get_googlenet_classifications(source_image, filtered_objects):
     for obj_index in range(len(filtered_objects)):
         result_list = gn_output_queue.get(True, QUEUE_WAIT_MAX)
         filtered_objects[obj_index] += result_list
-
-        # Get a googlenet inference on that one image and add the information
-        # to the filtered objects list
-        #filtered_objects[obj_index] += googlenet_processor.googlenet_inference(one_image, image_id)
-
 
     return filtered_objects
 
@@ -343,7 +337,8 @@ def main():
     gn_device = mvnc.Device(devices[1])
     gn_device.OpenDevice()
 
-    gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device, gn_input_queue, gn_output_queue)
+    gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device, gn_input_queue, gn_output_queue,
+                                  QUEUE_WAIT_MAX, QUEUE_WAIT_MAX)
 
 
     print('Starting GUI, press Q to quit')
@@ -368,7 +363,8 @@ def main():
 
     ty_output_queue = queue.Queue(TY_OUTPUT_QUEUE_SIZE)
     ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, ty_output_queue,
-                                  TY_INITIAL_BOX_PROBABILITY_THRESHOLD, TY_INITIAL_MAX_IOU)
+                                  TY_INITIAL_BOX_PROBABILITY_THRESHOLD, TY_INITIAL_MAX_IOU,
+                                  QUEUE_WAIT_MAX, QUEUE_WAIT_MAX)
 
     gn_proc.start_processing()
     camera_proc.start_processing()

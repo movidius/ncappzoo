@@ -84,7 +84,6 @@ class camera_processor:
     # or an error is encountered.
     def _do_work(self):
         print('in camera_processor worker thread')
-        skip_number = 0
         if (self._camera_device == None):
             print('camera_processor camera_device is None, returning.')
             return
