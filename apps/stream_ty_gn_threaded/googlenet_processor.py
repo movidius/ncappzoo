@@ -25,6 +25,19 @@ class googlenet_processor:
 
     LABELS_FILE_NAME = ILSVRC_2012_dir + 'synset_words.txt'
 
+    # initialize the class instance
+    # googlenet_graph_file is the path and filename of the googlenet graph file
+    #     produced via the ncsdk compiler.
+    # ncs_device is an open Device instance from the ncsdk
+    # input_queue is a queue instance from which images will be pulled that are
+    #     in turn processed (inferences are run on) via the NCS device
+    #     each item on the queue should be an opencv image.  it will be resized
+    #     as needed for the network
+    # output_queue is a queue object on which the results of the inferences will be placed.
+    #     For each inference a list of the following items will be placed on the output_queue:
+    #         index of the most likely classification from the inference.
+    #         label for the most likely classification from the inference.
+    #         probability the most likely classification from the inference.
     def __init__(self, googlenet_graph_file, ncs_device, input_queue, output_queue):
 
         # GoogLenet initialization
@@ -74,39 +87,24 @@ class googlenet_processor:
         self._worker_thread = threading.Thread(target=self.do_work, args=())
 
 
+    # call one time when the instance will no longer be used.
     def cleanup(self):
         self._gn_graph.DeallocateGraph()
 
-
+    # start asynchronous processing on a worker thread that will pull images off the input queue and
+    # placing results on the output queue
     def start_processing(self):
         self._end_flag = False
         self._worker_thread.start()
 
-
+    # stop asynchronous processing of the worker thread.
+    # when returns the worker thread will have terminated.
     def stop_processing(self):
         self._end_flag = True
-        '''
-        NPS TODO: remove commented code
-        # remove empty the input queue
-        try:
-            while (self._input_queue.not_empty()):
-                self._input_queue.get(False)
-                self._input_queue.task_done()
-        except:
-            print('gn_proc input, handling exception')
-            pass
-
-        try:
-            while (self._output_queue.not_empty()):
-                self._output_queue.get(False)
-                self._output_queue.task_done()
-        except:
-            print('gn_proc output, handling exception')
-            pass
-        '''
         self._worker_thread.join()
 
-
+    # the worker thread function. called when start_processing is called and
+    # returns when stop_processing is called.
     def do_work(self):
         print('in googlenet_processor worker thread')
         while (not self._end_flag):

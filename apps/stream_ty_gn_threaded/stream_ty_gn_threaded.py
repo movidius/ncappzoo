@@ -29,9 +29,9 @@ CAMERA_QUEUE_FULL_SLEEP_SECONDS = 0.01
 cv_window_name = 'stream_ty_gn_threaded - Q to quit'
 
 CAMERA_QUEUE_SIZE = 1
-GN_INPUT_QUEUE_SIZE = 10
-GN_OUTPUT_QUEUE_SIZE = 10
-TY_OUTPUT_QUEUE_SIZE = 2
+GN_INPUT_QUEUE_SIZE = 2
+GN_OUTPUT_QUEUE_SIZE = 20
+TY_OUTPUT_QUEUE_SIZE = 20
 
 # number of seconds to wait when putting or getting from queue's
 # besides the camera output queue.
@@ -41,14 +41,26 @@ QUEUE_WAIT_MAX = 4
 gn_input_queue = queue.Queue(GN_INPUT_QUEUE_SIZE)
 gn_output_queue = queue.Queue(GN_OUTPUT_QUEUE_SIZE)
 
+ty_proc = None
+gn_proc = None
+
 ############################################################
 # Tuning variables
-
-
 
 # if googlenet returns a probablity less than this then
 # just use the tiny yolo more general classification ie 'bird'
 GN_PROBABILITY_MIN = 0.5
+
+# only keep boxes with probabilities greater than this
+# when doing the tiny yolo filtering.  This is only an initial value,
+# pressing the B/b keys will adjust up or down respectively
+TY_INITIAL_BOX_PROBABILITY_THRESHOLD = 0.10
+
+# The intersection-over-union threshold to use when determining duplicates.
+# objects/boxes found that are over this threshold will be considered the
+# same object when filtering the Tiny Yolo output.  This is only an initial
+# value.  pressing the I/i key will adjust up or down respectively.
+TY_INITIAL_MAX_IOU = 0.35
 
 
 # end of tuning variables
@@ -272,28 +284,31 @@ def get_googlenet_classifications_no_queue(gn_proc, source_image, filtered_objec
 # raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
 def handle_keys(raw_key):
-    global GN_PROBABILITY_MIN, TY_MAX_IOU, TY_BOX_PROBABILITY_THRESHOLD
+    global GN_PROBABILITY_MIN, ty_proc, gn_proc
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
+
     elif (ascii_code == ord('B')):
-        TY_BOX_PROBABILITY_THRESHOLD = TY_BOX_PROBABILITY_THRESHOLD + 0.05
-        print("New TY_BOX_PROBABILITY_THRESHOLD is " + str(TY_BOX_PROBABILITY_THRESHOLD))
+        ty_proc.set_box_probability_threshold(ty_proc.get_box_probability_threshold() + 0.05)
+        print("New tiny yolo box probability threshold is " + str(ty_proc.get_box_probability_threshold()))
     elif (ascii_code == ord('b')):
-        TY_BOX_PROBABILITY_THRESHOLD = TY_BOX_PROBABILITY_THRESHOLD - 0.05
-        print("New TY_BOX_PROBABILITY_THRESHOLD is " + str(TY_BOX_PROBABILITY_THRESHOLD))
+        ty_proc.set_box_probability_threshold(ty_proc.get_box_probability_threshold() - 0.05)
+        print("New tiny yolo box probability threshold  is " + str(ty_proc.get_box_probability_threshold()))
+
     elif (ascii_code == ord('G')):
         GN_PROBABILITY_MIN = GN_PROBABILITY_MIN + 0.05
         print("New GN_PROBABILITY_MIN is " + str(GN_PROBABILITY_MIN))
     elif (ascii_code == ord('g')):
         GN_PROBABILITY_MIN = GN_PROBABILITY_MIN - 0.05
         print("New GN_PROBABILITY_MIN is " + str(GN_PROBABILITY_MIN))
+
     elif (ascii_code == ord('I')):
-        TY_MAX_IOU = TY_MAX_IOU + 0.05
-        print("New TY_MAX_IOU is " + str(TY_MAX_IOU))
+        ty_proc.set_max_iou(ty_proc.get_max_iou() + 0.05)
+        print("New tiny yolo max IOU is " + str(ty_proc.get_max_iou() ))
     elif (ascii_code == ord('i')):
-        TY_MAX_IOU = TY_MAX_IOU - 0.05
-        print("New TY_MAX_IOU is " + str(TY_MAX_IOU))
+        ty_proc.set_max_iou(ty_proc.get_max_iou() - 0.05)
+        print("New tiny yolo max IOU is " + str(ty_proc.get_max_iou() ))
 
     return True
 
@@ -311,7 +326,7 @@ def print_info():
 # This function is called from the entry point to do
 # all the work.
 def main():
-    global gn_input_queue, gn_output_queue
+    global gn_input_queue, gn_output_queue, ty_proc, gn_proc
 
     print_info()
 
@@ -352,7 +367,8 @@ def main():
     actual_camera_height = camera_proc.get_actual_camera_height()
 
     ty_output_queue = queue.Queue(TY_OUTPUT_QUEUE_SIZE)
-    ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, ty_output_queue)
+    ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, camera_queue, ty_output_queue,
+                                  TY_INITIAL_BOX_PROBABILITY_THRESHOLD, TY_INITIAL_MAX_IOU)
 
     gn_proc.start_processing()
     camera_proc.start_processing()
