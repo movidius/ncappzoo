@@ -60,7 +60,7 @@ class tiny_yolo_processor:
         self._input_queue = input_queue
         self._output_queue = output_queue
 
-        self._worker_thread = threading.Thread(target=self.do_work, args=())
+        self._worker_thread = threading.Thread(target=self._do_work, args=())
 
     # call once when done with the instance of the class
     def cleanup(self):
@@ -78,9 +78,47 @@ class tiny_yolo_processor:
         self._end_flag = True
         self._worker_thread.join()
 
+    # do a single inference
+    # input_image is the image on which to run the inference.
+    #     it can be any size
+    # returns a resized version of the input image, and
+    # the result from _filter_objects() which is
+    # a list of lists. Each of the inner lists represent one found object and contain
+    # the following 6 values:
+    #    string that is network classification ie 'cat', or 'chair' etc
+    #    float value for box center X pixel location within source image
+    #    float value for box center Y pixel location within source image
+    #    float value for box width in pixels within source image
+    #    float value for box height in pixels within source image
+    #    float value that is the probability for the network classification.
+    def do_inference(self, input_image):
+        # resize image to network width and height
+        # then convert to float32, normalize (divide by 255),
+        # and finally convert to float16 to pass to LoadTensor as input
+        # for an inference
+        input_image = cv2.resize(input_image,
+                                 (tiny_yolo_processor.TY_NETWORK_IMAGE_WIDTH,
+                                  tiny_yolo_processor.TY_NETWORK_IMAGE_HEIGHT),
+                                 cv2.INTER_LINEAR)
+
+        # save a display image as read from camera.
+        display_image = input_image.copy()
+
+        # modify input_image for TinyYolo input
+        input_image = input_image.astype(np.float32)
+        input_image = np.divide(input_image, 255.0)
+
+        # Load tensor and get result.  This executes the inference on the NCS
+        self._ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')
+        output, userobj = self._ty_graph.GetResult()
+
+        # filter out all the objects/boxes that don't meet thresholds
+        return display_image, self._filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
+
+
     # the worker thread which handles the asynchronous processing of images on the input
     # queue, running inferences on the NCS and placing results on the output queue
-    def do_work(self):
+    def _do_work(self):
         print('in tiny_yolo_processor worker thread')
 
         while (not self._end_flag):
@@ -88,27 +126,7 @@ class tiny_yolo_processor:
                 input_image = self._input_queue.get(True, 4)
                 #print('tiny_yolo_processor got image')
 
-                # resize image to network width and height
-                # then convert to float32, normalize (divide by 255),
-                # and finally convert to float16 to pass to LoadTensor as input
-                # for an inference
-                input_image = cv2.resize(input_image,
-                                         (tiny_yolo_processor.TY_NETWORK_IMAGE_WIDTH, tiny_yolo_processor.TY_NETWORK_IMAGE_HEIGHT),
-                                         cv2.INTER_LINEAR)
-
-                # save a display image as read from camera.
-                display_image = input_image.copy()
-
-                # modify input_image for TinyYolo input
-                input_image = input_image.astype(np.float32)
-                input_image = np.divide(input_image, 255.0)
-
-                # Load tensor and get result.  This executes the inference on the NCS
-                self._ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')
-                output, userobj = self._ty_graph.GetResult()
-
-                # filter out all the objects/boxes that don't meet thresholds
-                filtered_objs = self.filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[0])
+                display_image, filtered_objs = self.do_inference(input_image)
 
                 self._output_queue.put((display_image, filtered_objs), True, 4)
                 self._input_queue.task_done()
@@ -169,7 +187,7 @@ class tiny_yolo_processor:
     #    float value for box width in pixels within source image
     #    float value for box height in pixels within source image
     #    float value that is the probability for the network classification.
-    def filter_objects(self, inference_result, input_image_width, input_image_height):
+    def _filter_objects(self, inference_result, input_image_width, input_image_height):
 
         # the raw number of floats returned from the inference (GetResult())
         num_inference_results = len(inference_result)
@@ -205,7 +223,7 @@ class tiny_yolo_processor:
 
         # get the boxes from the results and adjust to be pixel units
         all_boxes = np.reshape(inference_result[1078:], (grid_size, grid_size, boxes_per_grid_cell, 4))
-        self.boxes_to_pixel_units(all_boxes, input_image_width, input_image_height, grid_size)
+        self._boxes_to_pixel_units(all_boxes, input_image_width, input_image_height, grid_size)
 
         # adjust the probabilities with the scaling factor
         for box_index in range(boxes_per_grid_cell): # loop over boxes
@@ -228,7 +246,7 @@ class tiny_yolo_processor:
 
 
         # get mask for boxes that seem to be the same object
-        duplicate_box_mask = self.get_duplicate_box_mask(boxes_above_threshold)
+        duplicate_box_mask = self._get_duplicate_box_mask(boxes_above_threshold)
 
         # update the boxes, probabilities and classifications removing duplicates.
         boxes_above_threshold = boxes_above_threshold[duplicate_box_mask]
@@ -246,14 +264,14 @@ class tiny_yolo_processor:
     # that should be considered the same object.  This is determined by how similar the boxes are
     # based on the intersection-over-union metric.
     # box_list is as list of boxes (4 floats for centerX, centerY and Length and Width)
-    def get_duplicate_box_mask(self, box_list):
+    def _get_duplicate_box_mask(self, box_list):
 
         box_mask = np.ones(len(box_list))
 
         for i in range(len(box_list)):
             if box_mask[i] == 0: continue
             for j in range(i + 1, len(box_list)):
-                if self.get_intersection_over_union(box_list[i], box_list[j]) > self._max_iou:
+                if self._get_intersection_over_union(box_list[i], box_list[j]) > self._max_iou:
                     box_mask[j] = 0.0
 
         filter_iou_mask = np.array(box_mask > 0.0, dtype='bool')
@@ -262,7 +280,7 @@ class tiny_yolo_processor:
     # Converts the boxes in box list to pixel units
     # assumes box_list is the output from the box output from
     # the tiny yolo network and is [grid_size x grid_size x 2 x 4].
-    def boxes_to_pixel_units(self, box_list, image_width, image_height, grid_size):
+    def _boxes_to_pixel_units(self, box_list, image_width, image_height, grid_size):
 
         # number of boxes per grid cell
         boxes_per_cell = 2
@@ -296,7 +314,7 @@ class tiny_yolo_processor:
     # the box.
     # Returns the intersection-over-union (between 0.0 and 1.0)
     # for the two boxes specified.
-    def get_intersection_over_union(self, box_1, box_2):
+    def _get_intersection_over_union(self, box_1, box_2):
 
         # one diminsion of the intersecting box
         intersection_dim_1 = min(box_1[0]+0.5*box_1[2],box_2[0]+0.5*box_2[2])-\

@@ -30,8 +30,8 @@ cv_window_name = 'stream_ty_gn_threaded - Q to quit'
 
 CAMERA_QUEUE_SIZE = 1
 GN_INPUT_QUEUE_SIZE = 2
-GN_OUTPUT_QUEUE_SIZE = 20
-TY_OUTPUT_QUEUE_SIZE = 20
+GN_OUTPUT_QUEUE_SIZE = 5
+TY_OUTPUT_QUEUE_SIZE = 5
 
 # number of seconds to wait when putting or getting from queue's
 # besides the camera output queue.
