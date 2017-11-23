@@ -2,7 +2,7 @@
 
 
 .PHONY: all
-all: run
+all: googlenet
 
 .PHONY: googlenet
 googlenet: 
