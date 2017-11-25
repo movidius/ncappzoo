@@ -387,12 +387,6 @@ def main():
 
         overlay_on_image(display_image, filtered_objs)
 
-        # resize back to original camera size so image doesn't look squashed
-        # It might be better to resize the boxes to match camera dimensions
-        # and overlay them directly on the camera size image.
-        display_image = cv2.resize(display_image, (int(actual_camera_width), int(actual_camera_height)),
-                                   cv2.INTER_LINEAR)
-
         # update the GUI window with new image
         cv2.imshow(cv_window_name, display_image)
 
