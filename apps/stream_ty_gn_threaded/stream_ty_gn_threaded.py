@@ -203,7 +203,7 @@ def get_googlenet_classifications(source_image, filtered_objects):
         result_list = gn_output_queue.get(True, QUEUE_WAIT_MAX)
         filtered_objects[obj_index] += result_list
 
-    return filtered_objects
+    return
 
 
 # Executes googlenet inferences on all objects defined by filtered_objects
@@ -269,8 +269,7 @@ def get_googlenet_classifications_no_queue(gn_proc, source_image, filtered_objec
         # to the filtered objects list
         filtered_objects[obj_index] += gn_proc.googlenet_inference(one_image, image_id)
 
-
-    return filtered_objects
+    return
 
 
 
