@@ -20,7 +20,7 @@ Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 mac
 
 
 # How it Works
-Two NCS devices are needed to run this application, one executes inferences for the Tiny Yolo network and one executes inferences for the googlenet network.  OpenCV is used to open a USB camera which is assumed to be attached to the host computer.  For each frame of video that the camera returns the program first runs a Tiny Yolo inference to find all objects in the image.  This will be limited to the 20 categories that Tiny Yolo recognizes.  Those categories can be seen in the code in this line:
+Two NCS devices are needed to run this application, one executes inferences for the Tiny Yolo network and one executes inferences for the googlenet network.  OpenCV is used to open a stored video (or easily modifiable to use a camera stream.) For each frame of video that is processed, the program first runs a Tiny Yolo inference to find all objects in the image. This will be limited to the 20 categories that Tiny Yolo recognizes. Those categories can be seen in the code in this line:
 
 ```python
    network_classifications = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car",
@@ -30,7 +30,7 @@ Two NCS devices are needed to run this application, one executes inferences for 
 
 Then, if google inferences are turned on via the do_googlenet flag in the code, for each Tiny Yolo object in the image, the program crops out the bounding rectangle and passes that smaller image to googlenet for a more detailed classification. The program will then display the original frame along with boxes around each detected object and its detailed classification if one was provided by googlenet with sufficient probability.  If GoogLeNet doesn't provide a high enough probability classification then the original Tiny Yolo classification will be used.
 
-The program will play each video file (.mp4) that it finds in the current directory. When all files have been played it will loop back to the first video until the 'Q' is pressed or the window's x button on the title bar is clicked.
+The program will process each video file (.mp4) that it finds in the current directory. When all files have been played it will loop back to the first video until the 'Q' is pressed or the window's x button on the title bar is clicked.
 
 # Algorithm 
 There are a few thresholds in the code you may want to tweek if you aren't getting results that you expect:
