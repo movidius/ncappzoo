@@ -7,6 +7,7 @@
 from mvnc import mvncapi as mvnc
 import sys
 import numpy as np
+from sys import argv
 import os
 import cv2
 import time
@@ -47,6 +48,10 @@ do_gn = False
 
 # read video files from this directory
 input_video_path = '.'
+
+resize_output = False
+resize_output_width = 0
+resize_output_height = 0
 
 ############################################################
 # Tuning variables
@@ -325,9 +330,22 @@ def handle_keys(raw_key):
 
     return True
 
+# prints usage information
+def print_usage():
+    print('\nusage: ')
+    print('python3 street_cam_threaded.py [help][resize_window=<width>x<height>]')
+    print('')
+    print('options:')
+    print('  help - prints this message')
+    print('  resize_window - resizes the GUI window to specified dimensions')
+    print('                  must be formated similar to resize_window=1280x720')
+    print('')
+    print('Example: ')
+    print('python3 street_cam_threaded.py resize_window=1920x1080')
+
 # prints information for the user when program starts.
 def print_info():
-    print('Running stream_ty_gn')
+    print('Running street_cam_threaded')
     print('Keys:')
     print("  'Q'/'q' to Quit")
     print("  'B'/'b' to inc/dec the Tiny Yolo box probability threshold")
@@ -337,10 +355,43 @@ def print_info():
     print('')
 
 
+#return False if found invalid args or True if processed ok
+def handle_args():
+    global resize_output, resize_output_width, resize_output_height
+    for an_arg in argv:
+        if (an_arg == argv[0]):
+            continue
+
+        elif (str(an_arg).lower() == 'help'):
+            return False
+
+        elif (str(an_arg).startswith('resize_window=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                width_height = str(val).split('x', 1)
+                resize_output_width = int(width_height[0])
+                resize_output_height = int(width_height[1])
+                resize_output = True
+                print ('GUI window resize now on: \n  width = ' +
+                       str(resize_output_width) +
+                       '\n  height = ' + str(resize_output_height))
+            except:
+                print('Error with resize_window argument: "' + an_arg + '"')
+                return False
+        else:
+            return False
+
+    return True
+
 # This function is called from the entry point to do
 # all the work.
 def main():
-    global gn_input_queue, gn_output_queue, ty_proc, gn_proc
+    global gn_input_queue, gn_output_queue, ty_proc, gn_proc,\
+    resize_output, resize_output_width, resize_output_height
+
+    if (not handle_args()):
+        print_usage()
+        return 1
 
     # get list of all the .mp4 files in the image directory
     input_video_filename_list = os.listdir(input_video_path)
@@ -425,6 +476,11 @@ def main():
                     break
 
                 overlay_on_image(display_image, filtered_objs)
+
+                if (resize_output):
+                    display_image = cv2.resize(display_image,
+                                               (resize_output_width, resize_output_height),
+                                               cv2.INTER_LINEAR)
 
                 # update the GUI window with new image
                 cv2.imshow(cv_window_name, display_image)
