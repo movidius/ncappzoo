@@ -40,12 +40,12 @@ prereqs:
 .PHONY: googlenet
 googlenet: 
 	@echo "\nmaking googlenet"
-	(cd ../../caffe/GoogLeNet; make compile; cd ../../apps/street_cam_threaded; cp ../../caffe/GoogLeNet/graph ./googlenet.graph;) 
+	(cd ../../caffe/GoogLeNet; make compile; cd ../../apps/street_cam_threaded; cp ../../caffe/GoogLeNet/graph ./${GOOGLENET_GRAPH_FILENAME};) 
 
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo "\nmaking tiny_yolo"
-	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/street_cam_threaded; cp ../../caffe/TinyYolo/yolo_tiny.graph ./yolo_tiny.graph;)
+	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/street_cam_threaded; cp ../../caffe/TinyYolo/graph ./${YOLO_TINY_GRAPH_FILENAME};)
 
 
 .PHONY: compile

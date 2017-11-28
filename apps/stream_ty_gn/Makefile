@@ -29,12 +29,12 @@ prereqs:
 .PHONY: googlenet
 googlenet: 
 	@echo "\nmaking googlenet"
-	(cd ../../caffe/GoogLeNet; make compile; cd ../../apps/stream_ty_gn; cp ../../caffe/GoogLeNet/graph ./googlenet.graph;) 
+	(cd ../../caffe/GoogLeNet; make compile; cd ../../apps/stream_ty_gn; cp ../../caffe/GoogLeNet/graph ./${GOOGLENET_GRAPH_FILENAME};) 
 
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo "\nmaking tiny_yolo"
-	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/stream_ty_gn; cp ../../caffe/TinyYolo/yolo_tiny.graph ./yolo_tiny.graph;)
+	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/stream_ty_gn; cp ../../caffe/TinyYolo/graph ./${YOLO_TINY_GRAPH_FILENAME};)
 
 
 .PHONY: compile
@@ -60,6 +60,7 @@ help:
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
 	@echo "  make run_py - runs the stream_ty_gn.py python example program";
 	@echo "  make opencv - removes pip3 opencv and builds from source then installs a new version" ;
+	@echo "                Only needed once on your system and only if the its not already installed.";
 	@echo "  make clean - removes all created content"
 
 .PHONY: clean
