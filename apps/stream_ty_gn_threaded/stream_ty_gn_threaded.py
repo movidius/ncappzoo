@@ -307,7 +307,7 @@ def handle_keys(raw_key):
 
 # prints information for the user when program starts.
 def print_info():
-    print('Running stream_ty_gn')
+    print('Running stream_ty_gn_threaded')
     print('Keys:')
     print("  'Q'/'q' to Quit")
     print("  'B'/'b' to inc/dec the Tiny Yolo box probability threshold")

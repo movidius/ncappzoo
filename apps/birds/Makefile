@@ -50,7 +50,7 @@ googlenet:
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo "\nmaking tiny_yolo"
-	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/birds; cp ../../caffe/TinyYolo/yolo_tiny.graph ./yolo_tiny.graph;)
+	(cd ../../caffe/TinyYolo; make compile; cd ../../apps/birds; cp ../../caffe/TinyYolo/graph ./yolo_tiny.graph;)
 
 
 .PHONY: compile
