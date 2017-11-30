@@ -21,10 +21,10 @@ from video_processor import video_processor
 TINY_YOLO_GRAPH_FILE = './yolo_tiny.graph'
 GOOGLENET_GRAPH_FILE = './googlenet.graph'
 
-VIDEO_QUEUE_PUT_WAIT_MAX = 2
+VIDEO_QUEUE_PUT_WAIT_MAX = 4
 VIDEO_QUEUE_FULL_SLEEP_SECONDS = 0.01
 # for title bar of GUI window
-cv_window_name = 'stream_ty_gn_threaded - Q to quit'
+cv_window_name = 'street cam - Q to quit'
 
 VIDEO_QUEUE_SIZE = 2
 GN_INPUT_QUEUE_SIZE = 10
@@ -41,6 +41,8 @@ gn_output_queue = queue.Queue(GN_OUTPUT_QUEUE_SIZE)
 
 ty_proc = None
 gn_proc = None
+video_proc = None
+video_queue = None
 
 # if True will do googlenet inferences for each object returned from
 # tiny yolo, if False will only do the tiny yolo inferences
@@ -52,6 +54,8 @@ input_video_path = '.'
 resize_output = False
 resize_output_width = 0
 resize_output_height = 0
+
+pause_mode = False
 
 ############################################################
 # Tuning variables
@@ -292,13 +296,25 @@ def get_googlenet_classifications_no_queue(gn_proc, source_image, filtered_objec
 
     return
 
+def do_unpause():
+    global video_proc, video_queue, pause_mode
+    print("unpausing")
+    if (not pause_mode):
+        return
+    pause_mode = False
+
+    video_proc.unpause()
+    count = 0
+    while (video_queue.empty() and count < 20):
+        time.sleep(0.1)
+        count += 1
 
 
 # handles key presses by adjusting global thresholds etc.
 # raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
 def handle_keys(raw_key):
-    global GN_PROBABILITY_MIN, ty_proc, gn_proc, do_gn
+    global GN_PROBABILITY_MIN, ty_proc, gn_proc, do_gn, pause_mode, video_proc, video_queue
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -323,6 +339,16 @@ def handle_keys(raw_key):
     elif (ascii_code == ord('i')):
         ty_proc.set_max_iou(ty_proc.get_max_iou() - 0.05)
         print("New tiny yolo max IOU is " + str(ty_proc.get_max_iou() ))
+
+    elif (ascii_code == ord('p')):
+        # pause mode toggle
+        if (not pause_mode):
+            print("pausing")
+            pause_mode = True
+            video_proc.pause()
+
+        else:
+            do_unpause()
 
     elif (ascii_code == ord('2')):
         do_gn = not do_gn
@@ -352,6 +378,7 @@ def print_info():
     print("  'I'/'i' to inc/dec the Tiny Yolo box intersection-over-union threshold")
     print("  'G'/'g' to inc/dec the GoogLeNet probability threshold")
     print("  '2'     to toggle GoogLeNet inferences")
+    print("  'p'     to pause/unpause")
     print('')
 
 
@@ -387,7 +414,7 @@ def handle_args():
 # all the work.
 def main():
     global gn_input_queue, gn_output_queue, ty_proc, gn_proc,\
-    resize_output, resize_output_width, resize_output_height
+    resize_output, resize_output_width, resize_output_height, video_proc, video_queue
 
     if (not handle_args()):
         print_usage()
@@ -461,7 +488,10 @@ def main():
 
             while True :
 
-                (display_image, filtered_objs) = ty_output_queue.get(True, QUEUE_WAIT_MAX)
+                try:
+                    (display_image, filtered_objs) = ty_output_queue.get(True, QUEUE_WAIT_MAX)
+                except :
+                    pass
 
                 get_googlenet_classifications(display_image, filtered_objs)
                 #get_googlenet_classifications_no_queue(gn_proc, display_image, filtered_objs)
@@ -473,6 +503,7 @@ def main():
                     end_time = time.time()
                     ty_output_queue.task_done()
                     exit_app = True
+                    print('window closed')
                     break
 
                 overlay_on_image(display_image, filtered_objs)
@@ -492,12 +523,26 @@ def main():
                     if (handle_keys(raw_key) == False):
                         end_time = time.time()
                         exit_app = True
+                        print('user pressed Q')
                         break
+                    if (pause_mode):
+                        while (pause_mode):
+                            raw_key = cv2.waitKey(1)
+                            if (raw_key != -1):
+                                if (handle_keys(raw_key) == False):
+                                    end_time = time.time()
+                                    do_unpause()
+                                    exit_app = True
+                                    print('user pressed Q during pause')
+                                    break
+                        if (exit_app):
+                            break;
 
                 frame_count = frame_count + 1
 
                 if (video_queue.empty()):
                     end_time = time.time()
+                    print('video queue empty')
                     break
 
             frames_per_second = frame_count / (end_time - start_time)
