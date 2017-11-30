@@ -210,6 +210,7 @@ def display_objects_in_gui(source_image, filtered_objects):
     source_image_height = source_image.shape[0]
 
     # loop through each box and draw it on the image along with a classification label
+    print('Found this many objects in the image: ' + str(len(filtered_objects)))
     for obj_index in range(len(filtered_objects)):
         center_x = int(filtered_objects[obj_index][1])
         center_y = int(filtered_objects[obj_index][2])
@@ -221,6 +222,8 @@ def display_objects_in_gui(source_image, filtered_objects):
         box_top = max(center_y - half_height, 0)
         box_right = min(center_x + half_width, source_image_width)
         box_bottom = min(center_y + half_height, source_image_height)
+
+        print('box at index ' + str(obj_index) + ' is... left: ' + str(box_left) + ', top: ' + str(box_top) + ', right: ' + str(box_right) + ', bottom: ' + str(box_bottom))  
 
         #draw the rectangle on the image.  This is hopefully around the object
         box_color = (0, 255, 0)  # green box
