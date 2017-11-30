@@ -32,6 +32,7 @@ class video_processor:
         self._video_file = video_file
         self._request_video_width = request_video_width
         self._request_video_height = request_video_height
+        self._pause_mode = False
 
         # create the video device
         self._video_device = cv2.VideoCapture(self._video_file)
@@ -76,6 +77,12 @@ class video_processor:
         self._end_flag = True
         self._worker_thread.join()
 
+    def pause(self):
+        self._pause_mode = True
+
+    def unpause(self):
+        self._pause_mode = False
+
     # thread target.  when call start_processing this function will be called
     # in its own thread.  it will keep working until stop_processing is called.
     # or an error is encountered.
@@ -87,6 +94,9 @@ class video_processor:
 
         while (not self._end_flag):
             try:
+                while (self._pause_mode):
+                    time.sleep(0.1)
+
                 ret_val, input_image = self._video_device.read()
 
                 if (not ret_val):
