@@ -75,9 +75,10 @@ order = output.argsort()[::-1][:6]
 for i in range( 0, 4 ):
 	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
 
-# Display the image on which inference was performed
-skimage.io.imshow( IMAGE_PATH )
-skimage.io.show( )
+# If a display is available, show the image on which inference was performed
+if 'DISPLAY' in os.environ:
+    skimage.io.imshow( IMAGE_PATH )
+    skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
