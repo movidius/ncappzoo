@@ -60,6 +60,8 @@ resize_output_height = 0
 
 pause_mode = False
 
+font_scale = 0.75
+
 ############################################################
 # Tuning variables
 
@@ -137,7 +139,7 @@ def overlay_on_image(display_image, filtered_objects):
         else:
             label_text = filtered_objects[obj_index][0] + ' : %.2f' % filtered_objects[obj_index][5]
 
-        label_size = cv2.getTextSize(label_text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0]
+        label_size = cv2.getTextSize(label_text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 1)[0]
         label_left = box_left
         label_top = box_top - label_size[1]
         if (label_top < 1):
@@ -147,7 +149,7 @@ def overlay_on_image(display_image, filtered_objects):
         cv2.rectangle(display_image,(label_left-1, label_top-1),(label_right+1, label_bottom+1), label_background_color, -1)
 
         # label text above the box
-        cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
+        cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, font_scale, label_text_color, 1)
 
     # display text to let user know how to quit
     cv2.rectangle(display_image,(0, 0),(100, 15), (128, 128, 128), -1)
@@ -332,7 +334,7 @@ def do_unpause():
 # raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
 def handle_keys(raw_key):
-    global GN_PROBABILITY_MIN, ty_proc, do_gn, pause_mode, video_proc, video_queue
+    global GN_PROBABILITY_MIN, ty_proc, do_gn, pause_mode, video_proc, video_queue, font_scale
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -357,6 +359,13 @@ def handle_keys(raw_key):
     elif (ascii_code == ord('i')):
         ty_proc.set_max_iou(ty_proc.get_max_iou() - 0.05)
         print("New tiny yolo max IOU is " + str(ty_proc.get_max_iou() ))
+
+    elif (ascii_code == ord('T')):
+        font_scale += 0.1
+        print("New text scale is: " + str(font_scale))
+    elif (ascii_code == ord('t')):
+        font_scale -= 0.1
+        print("New text scale is: " + str(font_scale))
 
     elif (ascii_code == ord('p')):
         # pause mode toggle
@@ -401,6 +410,7 @@ def print_info():
     print("  'B'/'b' to inc/dec the Tiny Yolo box probability threshold")
     print("  'I'/'i' to inc/dec the Tiny Yolo box intersection-over-union threshold")
     print("  'G'/'g' to inc/dec the GoogLeNet probability threshold")
+    print("  'T'/'t' to inc/dec the Text size for the labels")
     print("  '2'     to toggle GoogLeNet inferences")
     print("  'p'     to pause/unpause")
     print('')
@@ -628,10 +638,11 @@ def main():
 
             video_proc.stop_processing()
             video_proc.cleanup()
-
+            cv2.waitKey(1)
             ty_proc.stop_processing()
-
+            cv2.waitKey(1)
             for gn_proc in gn_proc_list:
+                cv2.waitKey(1)
                 gn_proc.stop_processing()
 
             if (exit_app) :
@@ -645,6 +656,7 @@ def main():
 
     # Clean up googlenet
     for gn_index in range(0, len(gn_proc_list)):
+        cv2.waitKey(1)
         gn_proc_list[gn_index].cleanup()
         gn_device_list[gn_index].CloseDevice()
 
