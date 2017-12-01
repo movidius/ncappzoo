@@ -40,7 +40,10 @@ gn_input_queue = queue.Queue(GN_INPUT_QUEUE_SIZE)
 gn_output_queue = queue.Queue(GN_OUTPUT_QUEUE_SIZE)
 
 ty_proc = None
-gn_proc = None
+#gn_proc = None
+gn_proc_list = []
+gn_device_list = []
+
 video_proc = None
 video_queue = None
 
@@ -293,19 +296,34 @@ def get_googlenet_classifications_no_queue(gn_proc, source_image, filtered_objec
         # to the filtered objects list
         filtered_objects[obj_index] += gn_proc.googlenet_inference(one_image, image_id)
 
-
     return
 
+# Unpauses the processing of frames
+# if already in pause mode does nothing After unpausing the video processor will wait
+# for at least one frame to be put in the video output queue or for a few seconds which ever
+# comes first.
+# returns None
 def do_unpause():
     global video_proc, video_queue, pause_mode
+
     print("unpausing")
     if (not pause_mode):
+        # already in pause mode
         return
+
+    # reset our global pause mode flag to indicate no longer in pause mode
     pause_mode = False
 
+    # tell the video processor to unpause itself
+    # when it starts processing frames again the rest of the
+    # program will start picking up the frames and processing them
     video_proc.unpause()
+
+    # now wait until at least one frame has been processed by the
+    # video processor. Or time out after a few tries.
     count = 0
     while (video_queue.empty() and count < 20):
+        # video queue still empty, so short sleep then try again
         time.sleep(0.1)
         count += 1
 
@@ -314,7 +332,7 @@ def do_unpause():
 # raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
 def handle_keys(raw_key):
-    global GN_PROBABILITY_MIN, ty_proc, gn_proc, do_gn, pause_mode, video_proc, video_queue
+    global GN_PROBABILITY_MIN, ty_proc, do_gn, pause_mode, video_proc, video_queue
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -382,7 +400,9 @@ def print_info():
     print('')
 
 
-#return False if found invalid args or True if processed ok
+# Handles the program commandline arguments.
+# Returns False if found invalid args or True if processed ok and program state
+# set accordingly
 def handle_args():
     global resize_output, resize_output_width, resize_output_height
     for an_arg in argv:
@@ -410,13 +430,43 @@ def handle_args():
 
     return True
 
+
+# Initializes the googlenet processors and devices.
+# enumerated_devices is a list of NCS devices to use for googlenet processing
+#     Each device in the list will be used for google net processing.
+# gn_proc_list is a list that will be populated with initialized googlenet_processor
+#     instances which will each be intialized with the same input and output queues
+#     to process googlenet inferences for the program
+# gn_device_list is a list that will be populated with the opened NCS devices
+#     initialized for googlenet processing.  The device at index N corresponds to the
+#     googlenet_processor at index N.  These device will need to be closed via the ncapi
+# return True if worked or False if error
+def init_gn_lists(enumerated_devices, gn_proc_list, gn_device_list):
+
+    try:
+        for one_device in enumerated_devices:
+            gn_device = mvnc.Device(one_device)
+            gn_device.OpenDevice()
+
+            gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device, gn_input_queue, gn_output_queue,
+                                      QUEUE_WAIT_MAX, QUEUE_WAIT_MAX)
+            gn_proc_list.insert(0, gn_proc)
+            gn_device_list.insert(0, gn_device)
+    except:
+        return False
+
+    return True
+
+
+
 # This function is called from the entry point to do
 # all the work.
 def main():
-    global gn_input_queue, gn_output_queue, ty_proc, gn_proc,\
+    global gn_input_queue, gn_output_queue, ty_proc, gn_proc_list,\
     resize_output, resize_output_width, resize_output_height, video_proc, video_queue
 
     if (not handle_args()):
+        # invalid arguments, print usage info and exit program
         print_usage()
         return 1
 
@@ -429,6 +479,7 @@ def main():
         print('No video (.mp4) files found')
         return 1
 
+    # print keyboard mapping to console so user will know what can be adjusted.
     print_info()
 
     # Set logging level and initialize/open the first NCS we find
@@ -438,24 +489,28 @@ def main():
         print('This application requires two NCS devices.')
         print('Insert two devices and try again!')
         return 1
+
+    # use the first NCS device for tiny yolo processing
     ty_device = mvnc.Device(devices[0])
     ty_device.OpenDevice()
 
-    gn_device = mvnc.Device(devices[1])
-    gn_device.OpenDevice()
-
-    gn_proc = googlenet_processor(GOOGLENET_GRAPH_FILE, gn_device, gn_input_queue, gn_output_queue,
-                                  QUEUE_WAIT_MAX, QUEUE_WAIT_MAX)
-
+    # use the rest of the NCS devices for googlenet processing
+    if (not init_gn_lists(devices[1:], gn_proc_list, gn_device_list)):
+        print('Error initializing NCS devices for GoogleNet')
+        return 1
 
     print('Starting GUI, press Q to quit')
 
+    # create the GUI window
     cv2.namedWindow(cv_window_name)
+    cv2.moveWindow(cv_window_name, 10, 10)
     cv2.waitKey(1)
 
-    # Queue of video frames images.
+    # Queue of video frame images which will be the output for the video processor
     video_queue = queue.Queue(VIDEO_QUEUE_SIZE)
 
+    # Setup tiny_yolo_processor that reads from the video queue
+    # and writes to its own ty_output_queue
     ty_output_queue = queue.Queue(TY_OUTPUT_QUEUE_SIZE)
     ty_proc = tiny_yolo_processor(TINY_YOLO_GRAPH_FILE, ty_device, video_queue, ty_output_queue,
                                   TY_INITIAL_BOX_PROBABILITY_THRESHOLD, TY_INITIAL_MAX_IOU,
@@ -478,7 +533,9 @@ def main():
                                         input_video_path + '/' + input_video_file,
                                         VIDEO_QUEUE_PUT_WAIT_MAX,
                                         VIDEO_QUEUE_FULL_SLEEP_SECONDS)
-            gn_proc.start_processing()
+            for gn_proc in gn_proc_list:
+                gn_proc.start_processing()
+
             video_proc.start_processing()
             ty_proc.start_processing()
 
@@ -494,7 +551,7 @@ def main():
                     pass
 
                 get_googlenet_classifications(display_image, filtered_objs)
-                #get_googlenet_classifications_no_queue(gn_proc, display_image, filtered_objs)
+                #get_googlenet_classifications_no_queue(gn_proc_list[0], display_image, filtered_objs)
 
                 # check if the window is visible, this means the user hasn't closed
                 # the window via the X button
@@ -552,7 +609,9 @@ def main():
             video_proc.cleanup()
 
             ty_proc.stop_processing()
-            gn_proc.stop_processing()
+
+            for gn_proc in gn_proc_list:
+                gn_proc.stop_processing()
 
             if (exit_app) :
                 break
@@ -564,8 +623,10 @@ def main():
     ty_device.CloseDevice()
 
     # Clean up googlenet
-    gn_proc.cleanup()
-    gn_device.CloseDevice()
+    for gn_index in range(0, len(gn_proc_list)):
+        gn_proc_list[gn_index].cleanup()
+        gn_device_list[gn_index].CloseDevice()
+
 
     print('Finished')
 
