@@ -404,13 +404,24 @@ def print_info():
 # Returns False if found invalid args or True if processed ok and program state
 # set accordingly
 def handle_args():
-    global resize_output, resize_output_width, resize_output_height
+    global resize_output, resize_output_width, resize_output_height, do_gn
     for an_arg in argv:
         if (an_arg == argv[0]):
             continue
 
         elif (str(an_arg).lower() == 'help'):
             return False
+
+        elif (str(an_arg).startswith('googlenet=')):
+            arg, val = str(an_arg).split('=', 1)
+            if (str(val).lower() == 'on'):
+                print('googlenet processing ON')
+                do_gn = True
+            elif (str(val).lower() == 'off'):
+                print('googlenet processing OFF')
+                do_gn = False
+            else:
+                return False
 
         elif (str(an_arg).startswith('resize_window=')):
             try:
