@@ -60,7 +60,7 @@ resize_output_height = 0
 
 pause_mode = False
 
-font_scale = 0.75
+font_scale = 0.55
 
 ############################################################
 # Tuning variables
@@ -190,15 +190,14 @@ def get_googlenet_classifications(source_image, filtered_objects):
             filtered_objects[obj_index] += (0, '', 0.0)
         return
 
-    # pad the height and width of the image boxes by this amount
-    # to make sure we get the whole object in the image that
-    # we pass to googlenet
-    WIDTH_PAD = 20
-    HEIGHT_PAD = 30
-
     source_image_width = source_image.shape[1]
     source_image_height = source_image.shape[0]
 
+    # pad the height and width of the image boxes by this amount
+    # to make sure we get the whole object in the image that
+    # we pass to googlenet
+    WIDTH_PAD = int(source_image_width * 0.08)  #80 #20
+    HEIGHT_PAD = int(source_image_height* 0.08) #80 #30
 
     # loop through each box and crop the image in that rectangle
     # from the source image and then use it as input for googlenet
@@ -525,6 +524,7 @@ def main():
     if (not init_gn_lists(devices[1:], gn_proc_list, gn_device_list)):
         print('Error initializing NCS devices for GoogleNet')
         return 1
+    print ('Using ' + str(len(gn_proc_list)) + ' NCS devices for GoogLeNet')
 
     print('Starting GUI, press Q to quit')
 
