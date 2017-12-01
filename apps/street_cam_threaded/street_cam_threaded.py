@@ -377,15 +377,21 @@ def handle_keys(raw_key):
 # prints usage information
 def print_usage():
     print('\nusage: ')
-    print('python3 street_cam_threaded.py [help][resize_window=<width>x<height>]')
+    print('python3 street_cam_threaded.py [help][googlenet=on|off][resize_window=<width>x<height>]')
     print('')
     print('options:')
-    print('  help - prints this message')
-    print('  resize_window - resizes the GUI window to specified dimensions')
-    print('                  must be formated similar to resize_window=1280x720')
+    print('  help - Prints this message')
+    print('  resize_window - Resizes the GUI window to specified dimensions')
+    print('                  must be formatted similar to resize_window=1280x720')
+    print('                  default behavior is to use source video frame size')
+    print('  googlenet - Sets initial state for googlenet processing')
+    print('              must be formatted as googlenet=on or googlenet=off')
+    print('              When on all tiny yolo objects will be passed to googlenet')
+    print('              for further classification, when off only tiny yolo will be used')
+    print('              Default behavior is off')
     print('')
     print('Example: ')
-    print('python3 street_cam_threaded.py resize_window=1920x1080')
+    print('python3 street_cam_threaded.py googlenet=on resize_window=1920x1080')
 
 # prints information for the user when program starts.
 def print_info():
@@ -404,13 +410,24 @@ def print_info():
 # Returns False if found invalid args or True if processed ok and program state
 # set accordingly
 def handle_args():
-    global resize_output, resize_output_width, resize_output_height
+    global resize_output, resize_output_width, resize_output_height, do_gn
     for an_arg in argv:
         if (an_arg == argv[0]):
             continue
 
         elif (str(an_arg).lower() == 'help'):
             return False
+
+        elif (str(an_arg).startswith('googlenet=')):
+            arg, val = str(an_arg).split('=', 1)
+            if (str(val).lower() == 'on'):
+                print('googlenet processing ON')
+                do_gn = True
+            elif (str(val).lower() == 'off'):
+                print('googlenet processing OFF')
+                do_gn = False
+            else:
+                return False
 
         elif (str(an_arg).startswith('resize_window=')):
             try:
@@ -542,6 +559,7 @@ def main():
             frame_count = 0
             start_time = time.time()
             end_time = start_time
+            total_paused_time = end_time - start_time
 
             while True :
 
@@ -583,6 +601,7 @@ def main():
                         print('user pressed Q')
                         break
                     if (pause_mode):
+                        pause_start = time.time()
                         while (pause_mode):
                             raw_key = cv2.waitKey(1)
                             if (raw_key != -1):
@@ -594,6 +613,8 @@ def main():
                                     break
                         if (exit_app):
                             break;
+                        pause_stop = time.time()
+                        total_paused_time = total_paused_time + (pause_stop - pause_start)
 
                 frame_count = frame_count + 1
 
@@ -602,8 +623,8 @@ def main():
                     print('video queue empty')
                     break
 
-            frames_per_second = frame_count / (end_time - start_time)
-            print ('Frames per Second: ' + str(frames_per_second))
+            frames_per_second = frame_count / ((end_time - start_time) - total_paused_time)
+            print('Frames per Second: ' + str(frames_per_second))
 
             video_proc.stop_processing()
             video_proc.cleanup()
