@@ -542,6 +542,7 @@ def main():
             frame_count = 0
             start_time = time.time()
             end_time = start_time
+            total_paused_time = end_time - start_time
 
             while True :
 
@@ -583,6 +584,7 @@ def main():
                         print('user pressed Q')
                         break
                     if (pause_mode):
+                        pause_start = time.time()
                         while (pause_mode):
                             raw_key = cv2.waitKey(1)
                             if (raw_key != -1):
@@ -594,6 +596,8 @@ def main():
                                     break
                         if (exit_app):
                             break;
+                        pause_stop = time.time()
+                        total_paused_time = total_paused_time + (pause_stop - pause_start)
 
                 frame_count = frame_count + 1
 
@@ -602,8 +606,8 @@ def main():
                     print('video queue empty')
                     break
 
-            frames_per_second = frame_count / (end_time - start_time)
-            print ('Frames per Second: ' + str(frames_per_second))
+            frames_per_second = frame_count / ((end_time - start_time) - total_paused_time)
+            print('Frames per Second: ' + str(frames_per_second))
 
             video_proc.stop_processing()
             video_proc.cleanup()
