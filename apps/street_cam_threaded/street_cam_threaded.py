@@ -377,15 +377,21 @@ def handle_keys(raw_key):
 # prints usage information
 def print_usage():
     print('\nusage: ')
-    print('python3 street_cam_threaded.py [help][resize_window=<width>x<height>]')
+    print('python3 street_cam_threaded.py [help][googlenet=on|off][resize_window=<width>x<height>]')
     print('')
     print('options:')
-    print('  help - prints this message')
-    print('  resize_window - resizes the GUI window to specified dimensions')
-    print('                  must be formated similar to resize_window=1280x720')
+    print('  help - Prints this message')
+    print('  resize_window - Resizes the GUI window to specified dimensions')
+    print('                  must be formatted similar to resize_window=1280x720')
+    print('                  default behavior is to use source video frame size')
+    print('  googlenet - Sets initial state for googlenet processing')
+    print('              must be formatted as googlenet=on or googlenet=off')
+    print('              When on all tiny yolo objects will be passed to googlenet')
+    print('              for further classification, when off only tiny yolo will be used')
+    print('              Default behavior is off')
     print('')
     print('Example: ')
-    print('python3 street_cam_threaded.py resize_window=1920x1080')
+    print('python3 street_cam_threaded.py googlenet=on resize_window=1920x1080')
 
 # prints information for the user when program starts.
 def print_info():
