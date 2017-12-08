@@ -20,7 +20,7 @@ from os.path import expanduser, isfile, join
 NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
 GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
-LABELS_FILE_PATH        = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
+LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
 IMAGE_MEAN              = numpy.float16( 127.5 )
 IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
@@ -65,9 +65,11 @@ def pre_process_image():
     onlyfiles = [ f for f in listdir(IMAGES_PATH) 
                   if isfile( join( IMAGES_PATH, f ) ) ]
 
+    print( "\n\nPre-processing images..." )
+
     for file in onlyfiles:
         fimg = IMAGES_PATH + "/" + file
-        print( "Opening file ", fimg )
+#        print( "Opening file ", fimg )
 
         # Read & resize image [Image size is defined during training]
         img = skimage.io.imread( fimg )
@@ -90,7 +92,9 @@ def pre_process_image():
 def infer_image( graph, imgarray, print_imgarray ):
 
     # Load the labels file 
-    labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
+    labels = numpy.loadtxt( LABELS_PATH, str, delimiter = '\t' )
+
+    print( "\n---- Predictions ----" )
 
     for index, img in enumerate( imgarray ):
         # Load the image as a half-precision floating point array
@@ -104,9 +108,9 @@ def infer_image( graph, imgarray, print_imgarray ):
         print( labels[order[0] + 1] )
 
         # Display the image on which inference was performed
-        #skimage.io.use_plugin( 'gtk' )
-        skimage.io.imshow( print_imgarray[index] )
-        skimage.io.show( )
+#        if 'DISPLAY' in os.environ:
+#            skimage.io.imshow( print_imgarray[index] )
+#            skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
