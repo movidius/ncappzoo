@@ -516,6 +516,7 @@ def main():
 
     frame_count = 0
     start_time = time.time()
+    end_time = time.time()
 
     while True :
         # Read image from camera,
