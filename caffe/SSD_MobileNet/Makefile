@@ -47,8 +47,7 @@ prototxt: prereqs
 		${GET_PROTOTXT}; \
 		if [ -e ${PROTOTXT_FILENAME} ] ; \
 		then \
-			echo "Adding input shape to prototxt file."; \
-			awk 'NR <2 {print}' < ${PROTOTXT_FILENAME} > temp; cat input_shape.prototxt >> temp; awk 'NR > 7 {print}' < ${PROTOTXT_FILENAME} >> temp; mv temp ${PROTOTXT_FILENAME}; \
+			echo "prototxt file downloaded."; \
 		else \
 			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
 			exit 1; \
