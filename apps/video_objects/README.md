@@ -29,7 +29,7 @@ Shows available targets.
 ## make all
 Builds and/or gathers all the required files needed to run the application except building and installing opencv (this must be done as a separate step with 'make opencv'.)
 
-## make video
+## make videos
 Downloads example video files.
 
 ## make opencv
