@@ -27,10 +27,10 @@ Provided Makefile has various targets that help with the above mentioned tasks.
 Shows available targets.
 
 ## make all
-Builds and/or gathers all the required files needed to run the application except building and installing opencv.  This must be done as a separate step with make opencv
+Builds and/or gathers all the required files needed to run the application except building and installing opencv (this must be done as a separate step with 'make opencv'.)
 
-#make video
-Downloads the video files
+## make video
+Downloads example video files.
 
 ## make opencv
 Removes the version of OpenCV that was installed with the NCSDK and builds and installs a compatible version of OpenCV 3.3 for this app. This will take a while to finish. Once you have done this on your system you shouldn't need to do it again.
