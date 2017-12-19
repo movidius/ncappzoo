@@ -7,8 +7,8 @@ NCCOMPILE = mvNCCompile
 NCPROFILE = mvNCProfile
 NCCHECK   = mvNCCheck
 
-GRAPH_FILENAME = yolo_tiny.graph
-GET_GRAPH = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${GRAPH_FILENAME}
+GRAPH_FILENAME = graph
+GET_GRAPH = wget --no-cache -P . -o ${GRAPH_FILENAME} http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/yolo_tiny.graph
 
 PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
 GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${PROTOTXT_FILENAME}
@@ -115,7 +115,6 @@ clean_caffe_model:
 clean: clean_caffe_model
 	@echo "\nmaking clean"
 	rm -f ${GRAPH_FILENAME}
-	rm -f graph
 	rm -f output.gv
 	rm -f output.gv.svg
 	rm -f output_report.html

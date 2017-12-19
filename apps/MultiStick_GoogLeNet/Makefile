@@ -2,7 +2,7 @@
 
 
 .PHONY: all
-all: multistick_googlenet
+all: googlenet
 
 .PHONY: googlenet
 googlenet: 

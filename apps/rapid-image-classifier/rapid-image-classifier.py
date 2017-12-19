@@ -10,95 +10,125 @@
 
 import mvnc.mvncapi as mvnc
 import numpy
-import cv2
+import skimage
+from skimage import io, transform 
 import os
 from os import listdir, path
 from os.path import expanduser, isfile, join
-import timeit
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
-IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
-LABELS_FILE_PATH        = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
 GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
+IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
+LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
+IMAGE_MEAN              = numpy.float16( 127.5 )
+IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
-IMAGE_MEAN              = 127.5
-IMAGE_STDDEV            = ( 1/127.5 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
-# Look for enumerated NCS device(s); quit program if none found.
-devices = mvnc.EnumerateDevices()
-if len( devices ) == 0:
-	print( 'No devices found' )
-	quit()
+def open_ncs_device():
 
-# Get a handle to the first enumerated device and open it
-device = mvnc.Device( devices[0] )
-device.OpenDevice()
+    # Look for enumerated NCS device(s); quit program if none found.
+    devices = mvnc.EnumerateDevices()
+    if len( devices ) == 0:
+        print( 'No devices found' )
+        quit()
+
+    # Get a handle to the first enumerated device and open it
+    device = mvnc.Device( devices[0] )
+    device.OpenDevice()
+
+    return device
 
 # ---- Step 2: Load a graph file onto the NCS device -------------------------
 
-# Read the graph file into a buffer
-with open( GRAPH_PATH, mode='rb' ) as f:
-	blob = f.read()
+def load_graph( device ):
 
-# Load the graph buffer into the NCS
-graph = device.AllocateGraph( blob )
+    # Read the graph file into a buffer
+    with open( GRAPH_PATH, mode='rb' ) as f:
+        blob = f.read()
+
+    # Load the graph buffer into the NCS
+    graph = device.AllocateGraph( blob )
+
+    return graph
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-# Load the labels file 
-labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
+def pre_process_image():
 
-# Load the mean file [This file was downloaded from ilsvrc website]
-# img_mean = numpy.load( IMAGE_MEANS_FILE_PATH ).mean( 1 ).mean( 1 )
+    # Read all images in the folder
+    imgarray = []
+    print_imgarray = []
 
-# Read & pre-process all images in the folder [Image size is defined during training]
-imgarray = []
-print_imgarray = []
+    onlyfiles = [ f for f in listdir(IMAGES_PATH) 
+                  if isfile( join( IMAGES_PATH, f ) ) ]
 
-onlyfiles = [ f for f in listdir(IMAGES_PATH) if isfile( join( IMAGES_PATH, f ) ) ]
+    print( "\n\nPre-processing images..." )
 
-for file in onlyfiles:
-    fimg = IMAGES_PATH + "/" + file
-#    print( "Opening file ", fimg )
-    img = cv2.imread( fimg )
-    print_imgarray.append( cv2.resize( img, ( 700, 700 ) ) )
-    img = cv2.resize( img, IMAGE_DIM )
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    for file in onlyfiles:
+        fimg = IMAGES_PATH + "/" + file
+#        print( "Opening file ", fimg )
 
-    # Mean subtraction [A common technique used to center the data]
-    img = img - IMAGE_MEAN 
-    img = img * IMAGE_STDDEV
+        # Read & resize image [Image size is defined during training]
+        img = skimage.io.imread( fimg )
+        print_imgarray.append( skimage.transform.resize( img, ( 700, 700 ) ) ) 
+        img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 
-    img = img.astype( numpy.float16 )
-    imgarray.append( img )
+        # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
+        img = img[:, :, ::-1]
 
-# ---- Step 4: Read & print inference results from the NCS -------------------
-for index, img in enumerate( imgarray ):
-    # Load the image as a half-precision floating point array
-    graph.LoadTensor( img , 'user object' )
+        # Mean subtraction & scaling [A common technique used to center the data]
+        img = img.astype( numpy.float16 )
+        img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
 
-    # Get the results from NCS
-    output, userobj = graph.GetResult()
-    order = output.argsort()[::-1][:6]
+        imgarray.append( img )
 
-    # Print prediction results on the terminal window
-    print( labels[order[0] + 1] )
+    return imgarray, print_imgarray
 
-    # Display inferred image with top pridiction
-    cv2.putText( print_imgarray[index], labels[order[0] + 1], 
-                 ( 10,30 ), cv2.FONT_HERSHEY_SIMPLEX, 1, ( 0, 255, 0 ), 2 )
+# ---- Step 4: Offload images, read & print inference results ----------------
 
-    cv2.imshow( 'Image Classifier', print_imgarray[index] )
+def infer_image( graph, imgarray, print_imgarray ):
 
-    cv2.waitKey( 1 )
+    # Load the labels file 
+    labels = numpy.loadtxt( LABELS_PATH, str, delimiter = '\t' )
+
+    print( "\n---- Predictions ----" )
+
+    for index, img in enumerate( imgarray ):
+        # Load the image as a half-precision floating point array
+        graph.LoadTensor( img , 'user object' )
+
+        # Get the results from NCS
+        output, userobj = graph.GetResult()
+        order = output.argsort()[::-1][:6]
+
+        # Print prediction results on the terminal window
+        print( labels[order[0] + 1] )
+
+        # Display the image on which inference was performed
+#        if 'DISPLAY' in os.environ:
+#            skimage.io.imshow( print_imgarray[index] )
+#            skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
-cv2.waitKey( 0 )
-graph.DeallocateGraph()
-device.CloseDevice()
+
+def close_ncs_device( device, graph ):
+    graph.DeallocateGraph()
+    device.CloseDevice()
+
+def main():
+    device = open_ncs_device()
+    graph = load_graph( device )
+
+    imgarray, print_imgarray = pre_process_image()
+    infer_image( graph, imgarray, print_imgarray )
+
+    close_ncs_device( device, graph )
+
+if __name__ == '__main__':
+    main()
 
 # ==== End of file ===========================================================
 

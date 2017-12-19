@@ -2,7 +2,7 @@
 
 
 .PHONY: all
-all: run
+all: tf_inception_v1 tf_inception_v3
 
 .PHONY: tf_inception_v1
 tf_inception_v1: 
