@@ -16,6 +16,7 @@ import os
 from os import listdir, path
 from os.path import expanduser, isfile, join
 from glob import glob
+import ntpath
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
@@ -25,6 +26,9 @@ LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt
 IMAGE_MEAN              = numpy.float16( 127.5 )
 IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
+
+# Max number of images to process
+MAX_IMAGE_COUNT         = 200
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -63,20 +67,22 @@ def pre_process_image():
     imgarray = []
     print_imgarray = []
 
-    print( "Pre-processing images..." )
+    print( "\n\nPre-processing images..." )
 
-    #onlyfiles = [ f for f in listdir(IMAGES_PATH) 
-    #              if isfile( join( IMAGES_PATH, f ) ) ]
-
-    onlyfiles = [ y for x in os.walk( IMAGES_PATH ) 
+    # Create a list of all files in current directory & sub-directories
+    file_list = [ y for x in os.walk( IMAGES_PATH ) 
                   for y in glob( os.path.join( x[0], '*.jpg' ) ) ]
 
-    for file in onlyfiles:
-        # fimg = file
-        print( "Opening file ", file )
+    for file_index, file_name in enumerate( file_list ):
+
+        # Set a limit on the image count, so that it doesn't fill up the memory
+        if file_index >= MAX_IMAGE_COUNT:
+            break
+
+        # print( "Opening file ", file_name )
 
         # Read & resize image [Image size is defined during training]
-        img = skimage.io.imread( file )
+        img = skimage.io.imread( file_name )
         print_imgarray.append( skimage.transform.resize( img, ( 700, 700 ) ) ) 
         img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 
@@ -89,11 +95,11 @@ def pre_process_image():
 
         imgarray.append( img )
 
-    return imgarray, print_imgarray
+    return file_list, imgarray, print_imgarray
 
 # ---- Step 4: Offload images, read & print inference results ----------------
 
-def infer_image( graph, imgarray, print_imgarray ):
+def infer_image( graph, file_list, imgarray, print_imgarray ):
 
     # Load the labels file 
     labels =[ line.rstrip('\n') for line in 
@@ -110,8 +116,11 @@ def infer_image( graph, imgarray, print_imgarray ):
         top_prediction = output.argmax()
 
         # Print top prediction
-        print( "Prediction: " + labels[top_prediction] + 
-                " with %3.1f%% confidence" % (100.0 * output[top_prediction] ) )
+        print( "Prediction for " 
+                + ntpath.basename( file_list[index] ) 
+                + ": " + labels[top_prediction] 
+                + " with %3.1f%% confidence" 
+                % (100.0 * output[top_prediction] ) )
 
         # Display the image on which inference was performed
         # ---------------------------------------------------------
@@ -131,11 +140,12 @@ def close_ncs_device( device, graph ):
 # ---- Main function (entry point for this script ) --------------------------
 
 def main():
+
     device = open_ncs_device()
     graph = load_graph( device )
 
-    imgarray, print_imgarray = pre_process_image()
-    infer_image( graph, imgarray, print_imgarray )
+    file_list, imgarray, print_imgarray = pre_process_image()
+    infer_image( graph, file_list, imgarray, print_imgarray )
 
     close_ncs_device( device, graph )
 
