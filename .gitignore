@@ -5,4 +5,11 @@ build/
 # specific to a user and specific to qt-creator
 CMakeLists.txt.user
 
+#ignore pycharm ide files
+.idea
+
+#ignore python cache
+__pycache__
+
+
 

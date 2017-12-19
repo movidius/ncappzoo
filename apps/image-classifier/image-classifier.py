@@ -8,17 +8,20 @@
 # How to classify images using DNNs on Intel Neural Compute Stick (NCS)
 
 import mvnc.mvncapi as mvnc
+import skimage
+from skimage import io, transform
 import numpy
-import cv2
 import os
+import sys
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/AlexNet/graph'
-IMAGES_PATH             = NCAPPZOO_PATH + '/data/images/nps_backpack.png'
+GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph' 
+IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
 LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEANS_FILE_PATH = NCAPPZOO_PATH + '/data/ilsvrc12/ilsvrc_2012_mean.npy'
-IMAGE_DIM               = ( 227, 227 )
+IMAGE_MEAN              = [ 104.00698793, 116.66876762, 122.67891434]
+IMAGE_STDDEV            = 1
+IMAGE_DIM               = ( 224, 224 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -44,18 +47,15 @@ graph = device.AllocateGraph( blob )
 # ---- Step 3: Offload image onto the NCS to run inference -------------------
 
 # Read & resize image [Image size is defined during training]
-img = print_img = cv2.imread( IMAGES_PATH )
-img = cv2.resize( img, IMAGE_DIM )
+img = print_img = skimage.io.imread( IMAGE_PATH )
+img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 
-# Load the mean file [This file was downloaded from ilsvrc website]
-ilsvrc_mean = numpy.load( IMAGE_MEANS_FILE_PATH ).mean( 1 ).mean( 1 )
+# Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
+img = img[:, :, ::-1]
 
-# Mean subtraction [A common technique used to center the data]
+# Mean subtraction & scaling [A common technique used to center the data]
 img = img.astype( numpy.float32 )
-
-img[:,:,0] = (img[:,:,0] - ilsvrc_mean[0])
-img[:,:,1] = (img[:,:,1] - ilsvrc_mean[1])
-img[:,:,2] = (img[:,:,2] - ilsvrc_mean[2])
+img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
 
 # Load the image as a half-precision floating point array
 graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
@@ -72,20 +72,16 @@ labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
 
 order = output.argsort()[::-1][:6]
 
-for i in range( 0, 5 ):
+for i in range( 0, 4 ):
 	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
 
-# Display inferred image with top pridiction
-cv2.putText( print_img, labels[order[0]], 
-				( 10,30 ), cv2.FONT_HERSHEY_SIMPLEX, 1, ( 0, 255, 0 ), 2 )
-
-cv2.imshow( 'Image Classifier', print_img )
-
+# If a display is available, show the image on which inference was performed
+if 'DISPLAY' in os.environ:
+    skimage.io.imshow( IMAGE_PATH )
+    skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
-cv2.waitKey( 0 )
-cv2.destroyAllWindows()
 graph.DeallocateGraph()
 device.CloseDevice()
 

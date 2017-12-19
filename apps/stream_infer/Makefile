@@ -1,14 +1,14 @@
 
 .PHONY: all
-all: run
+all: squeezenet
 
 .PHONY: squeezenet
-googlenet: 
+squeezenet: 
 	@echo "\nmaking squeezenet"
 	(cd ../../caffe/SqueezeNet; make compile;)
 
 .PHONY: run
-run: googlenet
+run: squeezenet
 	@echo "\nmaking run";
 	python3 stream_infer.py
 

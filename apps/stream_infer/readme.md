@@ -7,6 +7,12 @@ This directory contains a code example that demonstrates how to use the MVNC API
 This code example requires that the following hardware components are available:
 1. Movidius NCS
 2. USB camera that supports video for linux
+3. The following multimedia plugins:
+    - gstreamer1.0-libav
+    - gstreamer1.0-plugins-bad-faad
+    - gstreamer1.0-plugins-bad-videoparsers
+
+Note: without the gstreamer multimedia plugins when the app runs it will just hang with a dark window.
 
 ## Running the sample
 

@@ -12,7 +12,7 @@ import time
 # Assume running in examples/caffe/TinyYolo and graph file is in current directory.
 input_image_file= '../../data/images/nps_chair.png'
 #input_image_file= './dog.jpg'
-tiny_yolo_graph_file= './yolo_tiny.graph'
+tiny_yolo_graph_file= './graph'
 
 # Tiny Yolo assumes input images are these dimensions.
 NETWORK_IMAGE_WIDTH = 448
@@ -210,6 +210,7 @@ def display_objects_in_gui(source_image, filtered_objects):
     source_image_height = source_image.shape[0]
 
     # loop through each box and draw it on the image along with a classification label
+    print('Found this many objects in the image: ' + str(len(filtered_objects)))
     for obj_index in range(len(filtered_objects)):
         center_x = int(filtered_objects[obj_index][1])
         center_y = int(filtered_objects[obj_index][2])
@@ -222,6 +223,8 @@ def display_objects_in_gui(source_image, filtered_objects):
         box_right = min(center_x + half_width, source_image_width)
         box_bottom = min(center_y + half_height, source_image_height)
 
+        print('box at index ' + str(obj_index) + ' is... left: ' + str(box_left) + ', top: ' + str(box_top) + ', right: ' + str(box_right) + ', bottom: ' + str(box_bottom))  
+
         #draw the rectangle on the image.  This is hopefully around the object
         box_color = (0, 255, 0)  # green box
         box_thickness = 2
@@ -233,8 +236,18 @@ def display_objects_in_gui(source_image, filtered_objects):
         cv2.rectangle(display_image,(box_left, box_top-20),(box_right,box_top), label_background_color, -1)
         cv2.putText(display_image,filtered_objects[obj_index][0] + ' : %.2f' % filtered_objects[obj_index][5], (box_left+5,box_top-7), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-    cv2.imshow('TinyYolo (hit key to exit)',display_image)
-    cv2.waitKey(0)
+    window_name = 'TinyYolo (hit key to exit)'
+    cv2.imshow(window_name, display_image)
+
+    while (True):
+        raw_key = cv2.waitKey(1)
+        
+        # check if the window is visible, this means the user hasn't closed
+        # the window via the X button
+        prop_val = cv2.getWindowProperty(window_name, cv2.WND_PROP_ASPECT_RATIO)
+        if ((raw_key != -1) or (prop_val < 0.0)):
+            # the user hit a key or closed the window (in that order)
+            break
 
 
 # This function is called from the entry point to do

@@ -38,7 +38,7 @@ import numpy
 NETWORK_IMAGE_WIDTH = 227       # the width of images the network requires
 NETWORK_IMAGE_HEIGHT = 227      # the height of images the network requires
 NETWORK_IMAGE_FORMAT = "BGR"    # the format of the images the network requires
-NETWORK_DIRECTORY = "../../caffe/Gender/" # directory of the network this directory needs to
+NETWORK_DIRECTORY = "../../caffe/GenderNet/" # directory of the network this directory needs to
                                 # have 3 files: "graph", "stat.txt" and "categories.txt"
 NETWORK_STAT_TXT = "./gendernet_stat.txt"    # stat.txt for networ
 NETWORK_CATEGORIES_TXT = "./gendernet_categories.txt" # categories.txt for network
@@ -46,7 +46,7 @@ NETWORK_CATEGORIES_TXT = "./gendernet_categories.txt" # categories.txt for netwo
 
 NETWORK_IMAGE_WIDTH = 224           # the width of images the network requires
 NETWORK_IMAGE_HEIGHT = 224          # the height of images the network requires
-NETWORK_IMAGE_FORMAT = BGR"        # the format of the images the network requires
+NETWORK_IMAGE_FORMAT = "BGR"        # the format of the images the network requires
 NETWORK_DIRECTORY = "../../caffe/GoogLeNet/"  # directory of the network this directory needs to
                                     # have 3 files: "graph", "stat.txt" and "categories.txt"
 NETWORK_STAT_TXT = "./googlenet_stat.txt"    # stat.txt for networ
