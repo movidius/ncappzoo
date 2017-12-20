@@ -16,10 +16,10 @@ import sys
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
-CATEGORIES_PATH         = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEAN              = numpy.float16( [ 104.00698793, 116.66876762, 122.67891434] )
-IMAGE_STDDEV            = 1
+GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
+CATEGORIES_PATH         = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
+IMAGE_MEAN              = numpy.float16( 127.5 )
+IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
 
 VIDEO_INDEX             = 0 

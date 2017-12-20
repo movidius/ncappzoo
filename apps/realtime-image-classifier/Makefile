@@ -1,5 +1,5 @@
 .PHONY: all
-all: ilsvrc12 agenet gendernet mobilenet googlenet squeezenet alexnet
+all: ilsvrc12 mobilenet agenet gendernet googlenet squeezenet alexnet
 
 .PHONY: ilsvrc12
 ilsvrc12:
@@ -12,7 +12,7 @@ mobilenet:
 	(cd ../../tensorflow/mobilenets; make compile;)
 
 .PHONY: agenet
-mobilenet: 
+agenet: 
 	@echo "\nmaking AgeNet"
 	(cd ../../caffe/AgeNet; make compile;)
 
