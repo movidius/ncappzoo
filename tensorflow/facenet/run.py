@@ -18,7 +18,7 @@ EXAMPLES_BASE_DIR='../../'
 IMAGES_DIR = './'
 
 VALIDATED_IMAGES_DIR = IMAGES_DIR + 'validated_images/'
-validated_image_filename = VALIDATED_IMAGES_DIR + 'neal_pic.jpg'
+validated_image_filename = VALIDATED_IMAGES_DIR + 'valid.jpg'
 
 GRAPH_FILENAME = "facenet_celeb.graph"
 
@@ -29,6 +29,9 @@ CAMERA_INDEX = 1
 REQUEST_CAMERA_WIDTH = 640
 REQUEST_CAMERA_HEIGHT = 480
 
+# the same face will return 0.0
+# different faces return higher numbers
+FACE_MATCH_THRESHOLD = 1.0
 
 # ***************************************************************
 # Labels for the classifications for the network.
@@ -53,7 +56,7 @@ def run_inference(image_to_classify, facenet_graph, image_filename):
     # SSD Mobile net expects
     resized_image = preprocess_image(image_to_classify)
 
-    cv2.imshow("preprocessed", resized_image)
+    #cv2.imshow("preprocessed", resized_image)
 
     # ***************************************************************
     # Send the image to the NCS
@@ -94,38 +97,44 @@ def to_rgb(img):
     ret[:, :, 0] = ret[:, :, 1] = ret[:, :, 2] = img
     return ret
 
-def prewhiten(x):
-    mean = numpy.mean(x)
-    std = numpy.std(x)
-    std_adj = numpy.maximum(std, 1.0/numpy.sqrt(x.size))
-    y = numpy.multiply(numpy.subtract(x, mean), 1/std_adj)
-    return y
+# whiten an image
+def whiten_image(source_image):
+    source_mean = numpy.mean(source_image)
+    source_standard_deviation = numpy.std(source_image)
+    std_adjusted = numpy.maximum(source_standard_deviation, 1.0 / numpy.sqrt(source_image.size))
+    whitened_image = numpy.multiply(numpy.subtract(source_image, source_mean), 1 / std_adjusted)
+    return whitened_image
 
-# create a preprocessed image from the source image that complies to the
+# create a preprocessed image from the source image that matches the
 # network expectations and return it
 def preprocess_image(src):
-
     # scale the image
     NETWORK_WIDTH = 160
     NETWORK_HEIGHT = 160
-    img = cv2.resize(src, (NETWORK_WIDTH, NETWORK_HEIGHT))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = prewhiten(img)
+    preprocessed_image = cv2.resize(src, (NETWORK_WIDTH, NETWORK_HEIGHT))
 
-    return img
+    #convert to RGB
+    preprocessed_image = cv2.cvtColor(preprocessed_image, cv2.COLOR_BGR2RGB)
 
+    #whiten
+    preprocessed_image = whiten_image(preprocessed_image)
 
+    # return the preprocessed image
+    return preprocessed_image
+
+# determine if two images are of matching faces based on the
+# the network output for both images.
 def face_match(face1_output, face2_output):
     if (len(face1_output) != len(face2_output)):
         print('length mismatch in face_match')
         return False
     total_diff = 0
     for output_index in range(0, len(face1_output)):
-        this_diff = abs(face1_output[output_index] - face2_output[output_index])
+        this_diff = numpy.square(face1_output[output_index] - face2_output[output_index])
         total_diff += this_diff
     print('Total Difference is: ' + str(total_diff))
 
-    if (total_diff < 2.0):
+    if (total_diff < FACE_MATCH_THRESHOLD):
         return True
 
     return False
@@ -226,14 +235,6 @@ def run_images(valid_output, validated_image_filename, graph, input_image_filena
 # all the work of the program
 def main():
 
-    # get list of all the .jpg files in the image directory
-    input_image_filename_list = os.listdir(IMAGES_DIR)
-    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
-    if (len(input_image_filename_list) < 1):
-        # no images to show
-        print('No .jpg files found')
-        return 1
-
     # Get a list of ALL the sticks that are plugged in
     # we need at least one
     devices = mvnc.EnumerateDevices()
@@ -260,9 +261,17 @@ def main():
     validated_image = cv2.imread(validated_image_filename)
     valid_output = run_inference(validated_image, graph, validated_image_filename)
 
-    run_camera(valid_output, validated_image_filename, graph)
+    #run with camera
+    #run_camera(valid_output, validated_image_filename, graph)
 
-    #run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
+    # get list of all the .jpg files in the image directory
+    input_image_filename_list = os.listdir(IMAGES_DIR)
+    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
+    if (len(input_image_filename_list) < 1):
+        # no images to show
+        print('No .jpg files found')
+        return 1
+    run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
 
 
     # Clean up the graph and the device
