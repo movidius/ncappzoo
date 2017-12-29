@@ -112,6 +112,9 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
         # Get the results from NCS
         output, userobj = graph.GetResult()
 
+        # Get execution time
+        inference_time = graph.GetGraphOption( mvnc.GraphOption.TIMETAKEN )
+
         # Find the index of highest confidence 
         top_prediction = output.argmax()
 
@@ -120,7 +123,8 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
                 + ntpath.basename( file_list[index] ) 
                 + ": " + labels[top_prediction] 
                 + " with %3.1f%% confidence" 
-                % (100.0 * output[top_prediction] ) )
+                % (100.0 * output[top_prediction] )
+                + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
         # Display the image on which inference was performed
         # ---------------------------------------------------------
