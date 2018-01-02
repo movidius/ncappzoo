@@ -34,8 +34,9 @@ alexnet:
 
 .PHONY: run
 run: all
-	@echo "\nRunning rapid-image-classifier.py";
-	python3 rapid-image-classifier.py
+	@(if [ -f ./inferences.csv ]; then rm inferences.csv; fi )
+	@echo "\nRunning log-image-classifier.py";
+	python3 log-image-classifier.py
 
 .PHONY: help
 help:

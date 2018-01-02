@@ -107,7 +107,7 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
 
     # Load the labels file 
     labels =[ line.rstrip('\n') for line in 
-                   open( LABELS_PATH ) if line != 'classes\n'] 
+                   open( LABELS_PATH ) if line != 'top_predictions\n'] 
 
     print( "\nPerforming inference on a lot of images..." )
 
@@ -119,47 +119,40 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
         output, userobj = graph.GetResult()
 
         # Determine index of top 5 categories
-        classes = output.argsort()[::-1][:5]
+        top_predictions = output.argsort()[::-1][:5]
 
         # Get execution time
         inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
 
-        # Find the index of highest confidence 
-        top_prediction = output.argmax()
-
         # Print top prediction
 #        print( "Prediction for " 
 #                + ntpath.basename( file_list[index] ) 
-#                + ": " + labels[top_prediction] 
+#                + ": " + labels[ top_predictions[0] ] 
 #                + " with %3.1f%% confidence" 
-#                % (100.0 * output[top_prediction] )
+#                % (100.0 * output[ top_predictions[0] ] )
 #                + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
         # Display the image on which inference was performed
-        # ---------------------------------------------------------
-        # Uncomment below line if you get 
-        #  'No suitable plugin registered for imshow' error message
-        #skimage.io.use_plugin( 'matplotlib' )
-        # ---------------------------------------------------------
-        #skimage.io.imshow( print_imgarray[index] )
-        #skimage.io.show( )
+#        skimage.io.imshow( print_imgarray[index] )
+#        skimage.io.show( )
 
-        with open( 'inferences.csv', 'w', newline='' ) as csvfile:
+        with open( 'inferences.csv', 'a', newline='' ) as csvfile:
 
             inference_log = csv.writer( csvfile, delimiter=',', 
                                         quotechar='|', 
                                         quoting=csv.QUOTE_MINIMAL )
 
-            inference_log.writerow( [ classes[0], output[ classes[0] ], 
-                                      classes[1], output[ classes[1] ], 
-                                      classes[2], output[ classes[2] ], 
-                                      classes[3], output[ classes[3] ], 
-                                      classes[4], output[ classes[4] ], 
+            inference_log.writerow( [ top_predictions[0], output[ top_predictions[0] ], 
+                                      top_predictions[1], output[ top_predictions[1] ], 
+                                      top_predictions[2], output[ top_predictions[2] ], 
+                                      top_predictions[3], output[ top_predictions[3] ], 
+                                      top_predictions[4], output[ top_predictions[4] ], 
                                       numpy.sum( inference_time ) ] )
 
     print( "\nInference complete! View results in ./inferences.csv." )
 
     return
+
 # ---- Step 5: Unload the graph and close the device -------------------------
 
 def close_ncs_device( device, graph ):

@@ -1,6 +1,6 @@
-# log-image-classifier: Image classification using DNNs on Intel Movidius Neural Compute Stick (NCS)
+# log-image-classifier: Log results of an image classifier that runs inferences (sequentially) on multiple images, using DNNs on Intel Movidius Neural Compute Stick (NCS).
 
-This directory contains a python3 example that shows how to sequencially classify multiple images using deep neural networks on the Intel Movidius Neural Compute Stick, and log the results into a CSV file.
+This directory contains a python3 example script that shows how to sequencially classify multiple images using deep neural networks on the Intel Movidius Neural Compute Stick, and log the results into a CSV file.
 
 ## Prerequisites
 
