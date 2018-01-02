@@ -38,8 +38,8 @@ alexnet:
 
 .PHONY: run
 run: all
-	@echo "\nRunning realtime-image-classifier.py";
-	python3 realtime-image-classifier.py
+	@echo "\nRunning live-image-classifier.py";
+	python3 live-image-classifier.py
 
 .PHONY: help
 help:

@@ -1,4 +1,4 @@
-# realtime-image-classifier: Real-time image classification using DNNs on Intel® Movidius™ Neural Compute Stick (NCS)
+# live-image-classifier: Live image classification using DNNs on Intel® Movidius™ Neural Compute Stick (NCS)
 
 This directory contains a python3 script that shows how perform inference on a LIVE camera feed using deep neural networks on the Intel Movidius Neural Compute Stick
 
@@ -13,8 +13,8 @@ This code example requires that the following components are available:
 
 ## Running the Example
 To run the example code do the following :
-1. Open a terminal and change directory to the realtime-image-classifier base directory
+1. Open a terminal and change directory to the live-image-classifier base directory
 2. Type the following command in the terminal: make run 
 
-When the application runs normally and is able to connect to the NCS device, you will see a live feed from your camera with a virtual box drawn over the feed. Place an item/object within is box to see inference results.
+When the application runs normally and is able to connect to the NCS device, you will see a live feed from your camera with a virtual box drawn over the feed. Place an item/object within is box to see inference results. You can kit 'Q' or 'q' at any time to quit the app.
 

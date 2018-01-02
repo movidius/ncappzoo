@@ -99,10 +99,14 @@ def infer_image( graph, img ):
     # Find the index of highest confidence 
     top_prediction = output.argmax()
 
+    # Get execution time
+    inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
+
     # Print top prediction
     print( "Prediction: " + str(top_prediction) 
            + " " + categories[top_prediction] 
-           + " with %3.1f%% confidence" % (100.0 * output[top_prediction] ) )
+           + " with %3.1f%% confidence" % (100.0 * output[top_prediction] )
+           + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
     return
 
