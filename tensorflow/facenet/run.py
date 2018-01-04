@@ -11,10 +11,6 @@ import sys
 import os
 
 EXAMPLES_BASE_DIR='../../'
-#IMAGES_DIR = EXAMPLES_BASE_DIR + 'data/images/'
-#IMAGE_FULL_PATH = IMAGES_DIR + 'nps_chair.png'
-#IMAGE_FULL_PATH = './neal_pic.jpg'
-#IMAGE_FULL_PATH = './Priscilla-Presley-Biography.jpg'
 IMAGES_DIR = './'
 
 VALIDATED_IMAGES_DIR = IMAGES_DIR + 'validated_images/'
@@ -31,7 +27,7 @@ REQUEST_CAMERA_HEIGHT = 480
 
 # the same face will return 0.0
 # different faces return higher numbers
-FACE_MATCH_THRESHOLD = 1.0
+FACE_MATCH_THRESHOLD = 1.2
 
 # ***************************************************************
 # Labels for the classifications for the network.
@@ -50,7 +46,7 @@ LABELS = ('background',
 #    and labels identifying the found objects within the image.
 # ssd_mobilenet_graph is the Graph object from the NCAPI which will
 #    be used to peform the inference.
-def run_inference(image_to_classify, facenet_graph, image_filename):
+def run_inference(image_to_classify, facenet_graph):
 
     # get a resized version of the image that is the dimensions
     # SSD Mobile net expects
@@ -71,31 +67,30 @@ def run_inference(image_to_classify, facenet_graph, image_filename):
     #print("Total results: " + str(len(output)))
     #print(output)
 
-    overlay_on_image(image_to_classify, output, image_filename)
-
     return output
 
 
 # overlays the boxes and labels onto the display image.
-# display_image is the image on which to overlay the boxes/labels
-# object_info is a list of 7 values as returned from the network
-#     These 7 values describe the object found and they are:
-#         0: image_id (always 0 for myriad)
-#         1: class_id (this is an index into labels)
-#         2: score (this is the probability for the class)
-#         3: box left location within image as number between 0.0 and 1.0
-#         4: box top location within image as number between 0.0 and 1.0
-#         5: box right location within image as number between 0.0 and 1.0
-#         6: box bottom location within image as number between 0.0 and 1.0
+# display_image is the image on which to overlay to
+# image info is a text string to overlay onto the image.
+# matching is a Boolean specifying if the image was a match.
 # returns None
-def overlay_on_image(display_image, object_info, image_filename):
-    cv2.putText(display_image, image_filename, (0, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 0), 1)
+def overlay_on_image(display_image, image_info, matching):
+    rect_width = 10
+    offset = int(rect_width/2)
+    if (image_info != None):
+        cv2.putText(display_image, image_info, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 0), 1)
+    if (matching):
+        # match, green rectangle
+        cv2.rectangle(display_image, (0+offset, 0+offset),
+                      (display_image.shape[1]-offset-1, display_image.shape[0]-offset-1),
+                      (0, 255, 0), 10)
+    else:
+        # not a match, red rectangle
+        cv2.rectangle(display_image, (0+offset, 0+offset),
+                      (display_image.shape[1]-offset-1, display_image.shape[0]-offset-1),
+                      (0, 0, 255), 10)
 
-def to_rgb(img):
-    w, h = img.shape
-    ret = numpy.empty((w, h, 3), dtype=numpy.uint8)
-    ret[:, :, 0] = ret[:, :, 1] = ret[:, :, 2] = img
-    return ret
 
 # whiten an image
 def whiten_image(source_image):
@@ -135,8 +130,12 @@ def face_match(face1_output, face2_output):
     print('Total Difference is: ' + str(total_diff))
 
     if (total_diff < FACE_MATCH_THRESHOLD):
+        # the total difference between the two is under the threshold so
+        # the faces match.
         return True
 
+    # differences between faces was over the threshold above so
+    # they didn't match.
     return False
 
 # handles key presses
@@ -149,6 +148,16 @@ def handle_keys(raw_key):
 
     return True
 
+
+# start the opencv webcam streaming and pass each frame
+# from the camera to the facenet network for an inference
+# Continue looping until the result of the camera frame inference
+# matches the valid face output and then return.
+# valid_output is inference result for the valid image
+# validated image filename is the name of the valid image file
+# graph is the ncsdk Graph object initialized with the facenet graph file
+#   which we will run the inference on.
+# returns None
 def run_camera(valid_output, validated_image_filename, graph):
     camera_device = cv2.VideoCapture(CAMERA_INDEX)
     camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, REQUEST_CAMERA_WIDTH)
@@ -183,7 +192,7 @@ def run_camera(valid_output, validated_image_filename, graph):
 
         # run a single inference on the image and overwrite the
         # boxes and labels
-        test_output = run_inference(vid_image, graph, frame_name)
+        test_output = run_inference(vid_image, graph)
 
         if (face_match(valid_output, test_output)):
             print('PASS!  File ' + frame_name + ' matches ' + validated_image_filename)
@@ -191,6 +200,8 @@ def run_camera(valid_output, validated_image_filename, graph):
             break
         else:
             print('FAIL!  File ' + frame_name + ' does not match ' + validated_image_filename)
+
+        overlay_on_image(vid_image, frame_name, found_match)
 
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button
@@ -211,20 +222,41 @@ def run_camera(valid_output, validated_image_filename, graph):
         cv2.imshow(CV_WINDOW_NAME, vid_image)
         cv2.waitKey(0)
 
-
+# Test all files in a list for a match against a valided face and display each one.
+# valid_output is inference result for the valid image
+# validated image filename is the name of the valid image file
+# graph is the ncsdk Graph object initialized with the facenet graph file
+#   which we will run the inference on.
+# input_image_filename_list is a list of image files to compare against the
+#   valid face output.
 def run_images(valid_output, validated_image_filename, graph, input_image_filename_list):
+    cv2.namedWindow(CV_WINDOW_NAME)
     for input_image_file in input_image_filename_list :
-        # read the image to run an inference on from the disk
+        # read one of the images to run an inference on from the disk
         infer_image = cv2.imread(input_image_file)
 
         # run a single inference on the image and overwrite the
         # boxes and labels
-        test_output = run_inference(infer_image, graph, input_image_file)
+        test_output = run_inference(infer_image, graph)
 
+        # Test the inference results of this image with the results
+        # from the known valid face.
+        matching = False
         if (face_match(valid_output, test_output)):
+            matching = True
             print('PASS!  File ' + input_image_file + ' matches ' + validated_image_filename)
         else:
+            matching = False
             print('FAIL!  File ' + input_image_file + ' does not match ' + validated_image_filename)
+
+        overlay_on_image(infer_image, input_image_file, matching)
+
+        # check if the window is visible, this means the user hasn't closed
+        # the window via the X button
+        prop_val = cv2.getWindowProperty(CV_WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO)
+        if (prop_val < 0.0):
+            print('window closed')
+            break
 
         # display the results and wait for user to hit a key
         cv2.imshow(CV_WINDOW_NAME, infer_image)
@@ -259,7 +291,7 @@ def main():
     graph = device.AllocateGraph(graph_in_memory)
 
     validated_image = cv2.imread(validated_image_filename)
-    valid_output = run_inference(validated_image, graph, validated_image_filename)
+    valid_output = run_inference(validated_image, graph)
 
     #run with camera
     #run_camera(valid_output, validated_image_filename, graph)
