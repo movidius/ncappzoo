@@ -19,7 +19,7 @@ validated_image_filename = VALIDATED_IMAGES_DIR + 'valid.jpg'
 GRAPH_FILENAME = "facenet_celeb.graph"
 
 # name of the opencv window
-CV_WINDOW_NAME = "Facenet - hit any key to exit"
+CV_WINDOW_NAME = "FaceNet"
 
 CAMERA_INDEX = 1
 REQUEST_CAMERA_WIDTH = 640
@@ -28,16 +28,6 @@ REQUEST_CAMERA_HEIGHT = 480
 # the same face will return 0.0
 # different faces return higher numbers
 FACE_MATCH_THRESHOLD = 1.2
-
-# ***************************************************************
-# Labels for the classifications for the network.
-# ***************************************************************
-LABELS = ('background',
-          'aeroplane', 'bicycle', 'bird', 'boat',
-          'bottle', 'bus', 'car', 'cat', 'chair',
-          'cow', 'diningtable', 'dog', 'horse',
-          'motorbike', 'person', 'pottedplant',
-          'sheep', 'sofa', 'train', 'tvmonitor')
 
 
 # Run an inference on the passed image
