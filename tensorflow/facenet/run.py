@@ -21,7 +21,7 @@ GRAPH_FILENAME = "facenet_celeb.graph"
 # name of the opencv window
 CV_WINDOW_NAME = "FaceNet"
 
-CAMERA_INDEX = 1
+CAMERA_INDEX = 0
 REQUEST_CAMERA_WIDTH = 640
 REQUEST_CAMERA_HEIGHT = 480
 
@@ -187,8 +187,8 @@ def run_camera(valid_output, validated_image_filename, graph):
         if (face_match(valid_output, test_output)):
             print('PASS!  File ' + frame_name + ' matches ' + validated_image_filename)
             found_match = True
-            break
         else:
+            found_match = False
             print('FAIL!  File ' + frame_name + ' does not match ' + validated_image_filename)
 
         overlay_on_image(vid_image, frame_name, found_match)
@@ -257,6 +257,8 @@ def run_images(valid_output, validated_image_filename, graph, input_image_filena
 # all the work of the program
 def main():
 
+    use_camera = False
+
     # Get a list of ALL the sticks that are plugged in
     # we need at least one
     devices = mvnc.EnumerateDevices()
@@ -283,17 +285,18 @@ def main():
     validated_image = cv2.imread(validated_image_filename)
     valid_output = run_inference(validated_image, graph)
 
-    #run with camera
-    #run_camera(valid_output, validated_image_filename, graph)
-
-    # get list of all the .jpg files in the image directory
-    input_image_filename_list = os.listdir(IMAGES_DIR)
-    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
-    if (len(input_image_filename_list) < 1):
-        # no images to show
-        print('No .jpg files found')
-        return 1
-    run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
+    if (use_camera):
+        #run with camera
+        run_camera(valid_output, validated_image_filename, graph)
+    else:
+        # get list of all the .jpg files in the image directory
+        input_image_filename_list = os.listdir(IMAGES_DIR)
+        input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
+        if (len(input_image_filename_list) < 1):
+            # no images to show
+            print('No .jpg files found')
+            return 1
+        run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
 
 
     # Clean up the graph and the device
