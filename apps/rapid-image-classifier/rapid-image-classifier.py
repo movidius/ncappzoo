@@ -19,7 +19,7 @@ from glob import glob
 import ntpath
 
 # User modifiable input parameters
-NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
+NCAPPZOO_PATH           = '../..' 
 GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
 LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
