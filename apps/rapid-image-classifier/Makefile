@@ -1,5 +1,10 @@
 .PHONY: all
-all: ilsvrc12 mobilenet googlenet squeezenet alexnet
+all: dependencies ilsvrc12 mobilenet googlenet squeezenet alexnet
+
+.PHONY: dependencies
+dependencies:
+	@echo "\Installing dependencies"
+	sudo apt-get install python3-tk
 
 .PHONY: ilsvrc12
 ilsvrc12:

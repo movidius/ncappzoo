@@ -15,6 +15,8 @@ from skimage import io, transform
 import os
 from os import listdir, path
 from os.path import expanduser, isfile, join
+from glob import glob
+import ntpath
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
@@ -24,6 +26,9 @@ LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt
 IMAGE_MEAN              = numpy.float16( 127.5 )
 IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
+
+# Max number of images to process
+MAX_IMAGE_COUNT         = 200
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -62,17 +67,22 @@ def pre_process_image():
     imgarray = []
     print_imgarray = []
 
-    onlyfiles = [ f for f in listdir(IMAGES_PATH) 
-                  if isfile( join( IMAGES_PATH, f ) ) ]
-
     print( "\n\nPre-processing images..." )
 
-    for file in onlyfiles:
-        fimg = IMAGES_PATH + "/" + file
-#        print( "Opening file ", fimg )
+    # Create a list of all files in current directory & sub-directories
+    file_list = [ y for x in os.walk( IMAGES_PATH ) 
+                  for y in glob( os.path.join( x[0], '*.jpg' ) ) ]
+
+    for file_index, file_name in enumerate( file_list ):
+
+        # Set a limit on the image count, so that it doesn't fill up the memory
+        if file_index >= MAX_IMAGE_COUNT:
+            break
+
+        # print( "Opening file ", file_name )
 
         # Read & resize image [Image size is defined during training]
-        img = skimage.io.imread( fimg )
+        img = skimage.io.imread( file_name )
         print_imgarray.append( skimage.transform.resize( img, ( 700, 700 ) ) ) 
         img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 
@@ -85,16 +95,15 @@ def pre_process_image():
 
         imgarray.append( img )
 
-    return imgarray, print_imgarray
+    return file_list, imgarray, print_imgarray
 
 # ---- Step 4: Offload images, read & print inference results ----------------
 
-def infer_image( graph, imgarray, print_imgarray ):
+def infer_image( graph, file_list, imgarray, print_imgarray ):
 
     # Load the labels file 
-    labels = numpy.loadtxt( LABELS_PATH, str, delimiter = '\t' )
-
-    print( "\n---- Predictions ----" )
+    labels =[ line.rstrip('\n') for line in 
+                   open( LABELS_PATH ) if line != 'classes\n'] 
 
     for index, img in enumerate( imgarray ):
         # Load the image as a half-precision floating point array
@@ -102,15 +111,29 @@ def infer_image( graph, imgarray, print_imgarray ):
 
         # Get the results from NCS
         output, userobj = graph.GetResult()
-        order = output.argsort()[::-1][:6]
 
-        # Print prediction results on the terminal window
-        print( labels[order[0] + 1] )
+        # Get execution time
+        inference_time = graph.GetGraphOption( mvnc.GraphOption.TIMETAKEN )
+
+        # Find the index of highest confidence 
+        top_prediction = output.argmax()
+
+        # Print top prediction
+        print( "Prediction for " 
+                + ntpath.basename( file_list[index] ) 
+                + ": " + labels[top_prediction] 
+                + " with %3.1f%% confidence" 
+                % (100.0 * output[top_prediction] )
+                + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
         # Display the image on which inference was performed
-#        if 'DISPLAY' in os.environ:
-#            skimage.io.imshow( print_imgarray[index] )
-#            skimage.io.show( )
+        # ---------------------------------------------------------
+        # Uncomment below line if you get 
+        #  'No suitable plugin registered for imshow' error message
+        #skimage.io.use_plugin( 'matplotlib' )
+        # ---------------------------------------------------------
+        #skimage.io.imshow( print_imgarray[index] )
+        #skimage.io.show( )
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
@@ -118,14 +141,19 @@ def close_ncs_device( device, graph ):
     graph.DeallocateGraph()
     device.CloseDevice()
 
+# ---- Main function (entry point for this script ) --------------------------
+
 def main():
+
     device = open_ncs_device()
     graph = load_graph( device )
 
-    imgarray, print_imgarray = pre_process_image()
-    infer_image( graph, imgarray, print_imgarray )
+    file_list, imgarray, print_imgarray = pre_process_image()
+    infer_image( graph, file_list, imgarray, print_imgarray )
 
     close_ncs_device( device, graph )
+
+# ---- Define 'main' function as the entry point for this script -------------
 
 if __name__ == '__main__':
     main()
