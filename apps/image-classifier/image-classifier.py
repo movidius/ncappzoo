@@ -15,7 +15,7 @@ import os
 import sys
 
 # User modifiable input parameters
-NCAPPZOO_PATH           = os.path.expanduser( '~/workspace/ncappzoo' )
+NCAPPZOO_PATH           = '../..'
 GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph' 
 IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
 LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
