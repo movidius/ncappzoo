@@ -18,7 +18,11 @@ The guidelines for what each directory should contain are as follows.
 ### The **apps** subdirectories
 The following **should** be included in the apps subdirectories:
 - README.md : Markdown file that explains everything needed to build and run your application.
-- Makefile : Builds any source code and downloads or copies (from other repo subdirectories) any required files. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.
+- Makefile : Builds any source code and downloads or copies (from other repo subdirectories) any required files. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.  Strongly suggested that Makefiles include the following targets as a guideline:
+  - make help : Display list targets are available
+  - make all : Creates everything needed to run the application including other projects in the repository
+  - make run : Runs the application.
+  - make clean : Removes all the files in this project directory that may get created when making or running this project.  Should not clean other projects in the repository.
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
 
 The following should **not** typically be stored in the apps subdirectories:
