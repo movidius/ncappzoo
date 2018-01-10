@@ -12,7 +12,7 @@ This code example requires that the following components are available:
 
 ## Running the Example
 To run the example code do the following :
-1. Open a terminal and change directory to the image-classifier base directory
+1. Open a terminal and change directory to the classifier-gui base directory
 2. Type the following command in the terminal: make run 
 
 When the application runs normally and is able to connect to the NCS device, the output will be similar to this:
