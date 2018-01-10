@@ -1,0 +1,17 @@
+.PHONY: all
+all: run
+
+.PHONY: run
+run: all
+	python3 classifier-gui.py
+
+.PHONY: help
+help:
+	@echo "possible make targets: ";
+	@echo "  make help - shows this message";
+	@echo "  make all - makes the following: run";
+	@echo "  make run - runs the stream_infer program";
+	@echo "  make clean - removes all created content and temporary files";
+
+clean: clean
+	@echo "\nmaking clean";
