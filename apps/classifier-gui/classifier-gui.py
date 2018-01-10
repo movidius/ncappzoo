@@ -19,6 +19,12 @@ from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
 
+## Import the network library
+sys.path.append('../../caffe/')
+import GoogLeNet.run as GoogLeNet
+import AlexNet.run as AlexNet
+import SqueezeNet.run as SqueezeNet
+
 # User modifiable input parameters
 NCAPPZOO_PATH           = '../..'
 IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
@@ -52,135 +58,16 @@ def buttonCallBack():
 
 lblImage = None
 
-def doGoogLeNet():
-        global lblImage
-        system("(cd ../../caffe/GoogLeNet/;test -f graph || make compile)")
-        GRAPH_PATH = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
-        IMAGE_PATH = filename.get()
-        print(IMAGE_PATH)
-        if IMAGE_PATH:
-                devices = mvnc.EnumerateDevices()
-                if len( devices ) == 0:
-                        print( 'No devices found' )
-                        return
-                device = mvnc.Device( devices[0] )
-                device.OpenDevice()
-                with open( GRAPH_PATH, mode='rb' ) as f:
-                        blob = f.read()
-                graph = device.AllocateGraph( blob )
-                
-                img = skimage.io.imread( IMAGE_PATH )
-                img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
-                img = img[:, :, ::-1]
-                img = img.astype( numpy.float32 )
-                img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
-                graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
-                output, userobj = graph.GetResult()
-                print('\n------- predictions --------')
-                labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
-                order = output.argsort()[::-1][:6]
-                result = ""
-                for i in range( 0, 4 ):
-                    print ('prediction ' + str(i) + ' is ' + labels[order[i]])
-                    label = labels[order[i]]
-                    label = re.search("n[0-9]+\s([^,]+)", label).groups(1)[0]
-                    result = result + "\n%20s %0.2f %%" % (label, output[order[i]]*100)
-                graph.DeallocateGraph()
-                device.CloseDevice()
-                return result,IMAGE_PATH
-        else:
-                print("Image path is not set")
-                messagebox.showinfo("Image feild cannot be empty", "Choose the image you want to inference")
-                        
-def doAlexNet():
-        global lblImage
-        system("(cd ../../caffe/AlexNet/; test -f graph || make compile)")
-        GRAPH_PATH = NCAPPZOO_PATH + '/caffe/AlexNet/graph'
-        IMAGE_PATH = filename.get()
-        print(IMAGE_PATH)
-        if IMAGE_PATH:
-                devices = mvnc.EnumerateDevices()
-                if len( devices ) == 0:
-                        print( 'No devices found' )
-                        return
-                device = mvnc.Device( devices[0] )
-                device.OpenDevice()
-                with open( GRAPH_PATH, mode='rb' ) as f:
-                        blob = f.read()
-                graph = device.AllocateGraph( blob )
-                
-                img = skimage.io.imread( IMAGE_PATH )
-                img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
-                img = img[:, :, ::-1]
-                img = img.astype( numpy.float32 )
-                img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
-                graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
-                output, userobj = graph.GetResult()
-                print('\n------- predictions --------')
-                labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
-                order = output.argsort()[::-1][:6]
-                result = ""
-                for i in range( 0, 4 ):
-                    print ('prediction ' + str(i) + ' is ' + labels[order[i]])
-                    label = labels[order[i]]
-                    label = re.search("n[0-9]+\s([^,]+)", label).groups(1)[0]
-                    result = result + "\n%20s %0.2f %%" % (label, output[order[i]]*100)
-                graph.DeallocateGraph()
-                device.CloseDevice()
-                return result,IMAGE_PATH
-        else:
-                print("Image path is not set")
-                messagebox.showinfo("Image feild cannot be empty", "Choose the image you want to inference")
-                        
-def doSqueezeNet():
-        global lblImage
-        system("(cd ../../caffe/SqueezeNet/; test -f graph || make compile)")
-        GRAPH_PATH = NCAPPZOO_PATH + '/caffe/SqueezeNet/graph'
-        IMAGE_PATH = filename.get()
-        print(IMAGE_PATH)
-        if IMAGE_PATH:
-                devices = mvnc.EnumerateDevices()
-                if len( devices ) == 0:
-                        print( 'No devices found' )
-                        return
-                device = mvnc.Device( devices[0] )
-                device.OpenDevice()
-                with open( GRAPH_PATH, mode='rb' ) as f:
-                        blob = f.read()
-                graph = device.AllocateGraph( blob )
-                
-                img = skimage.io.imread( IMAGE_PATH )
-                img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
-                img = img[:, :, ::-1]
-                img = img.astype( numpy.float32 )
-                img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
-                graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
-                output, userobj = graph.GetResult()
-                print('\n------- predictions --------')
-                labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
-                order = output.argsort()[::-1][:6]
-                result = ""
-                for i in range( 0, 4 ):
-                    print ('prediction ' + str(i) + ' is ' + labels[order[i]])
-                    label = labels[order[i]]
-                    label = re.search("n[0-9]+\s([^,]+)", label).groups(1)[0]
-                    result = result + "\n%20s %0.2f %%" % (label, output[order[i]]*100)
-                graph.DeallocateGraph()
-                device.CloseDevice()
-                return result,IMAGE_PATH
-        else:
-                print("Image path is not set")
-                messagebox.showinfo("Image feild cannot be empty", "Choose the image you want to inference")
-
 def runInfer():
         network = networkname.get()
-        
+        IMAGE_PATH = filename.get()
+
         if network == "GoogLeNet":
-            result,imgpath = doGoogLeNet()
+            result,imgpath = GoogLeNet.infer(IMAGE_PATH)
         elif network == "AlexNet":
-            result,imgpath = doAlexNet()
+            result,imgpath = AlexNet.infer(IMAGE_PATH)
         elif network == "SqueezeNet":
-            result,imgpath = doSqueezeNet()
+            result,imgpath = SqueezeNet.infer(IMAGE_PATH)
         else:
             print("Network Not Supported Yet")
             messagebox.showinfo("Network Not Supported", "Network " + network + " is still WIP")
@@ -197,7 +84,6 @@ def runInfer():
         lblResult.grid(row=2, column=1)
         
         print(result)
-
         
 mEntry = Entry(root, textvariable=filename, width=45)
 #mEntry.pack()
@@ -227,3 +113,46 @@ runInfer()
 
 mainloop()
 
+
+
+
+
+#def doSqueezeNet():
+#        global lblImage
+#        system("(cd ../../caffe/SqueezeNet/; test -f graph || make compile)")
+#        GRAPH_PATH = NCAPPZOO_PATH + '/caffe/SqueezeNet/graph'
+#        IMAGE_PATH = filename.get()
+#        print(IMAGE_PATH)
+#        if IMAGE_PATH:
+#                devices = mvnc.EnumerateDevices()
+#                if len( devices ) == 0:
+#                        print( 'No devices found' )
+#                        return
+#                device = mvnc.Device( devices[0] )
+#                device.OpenDevice()
+#                with open( GRAPH_PATH, mode='rb' ) as f:
+#                        blob = f.read()
+#                graph = device.AllocateGraph( blob )
+#                
+#                img = skimage.io.imread( IMAGE_PATH )
+#                img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
+#                img = img[:, :, ::-1]
+#                img = img.astype( numpy.float32 )
+#                img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
+#                graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
+#                output, userobj = graph.GetResult()
+#                print('\n------- predictions --------')
+#                labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
+#                order = output.argsort()[::-1][:6]
+#                result = ""
+#                for i in range( 0, 4 ):
+#                    print ('prediction ' + str(i) + ' is ' + labels[order[i]])
+#                    label = labels[order[i]]
+#                    label = re.search("n[0-9]+\s([^,]+)", label).groups(1)[0]
+#                    result = result + "\n%20s %0.2f %%" % (label, output[order[i]]*100)
+#                graph.DeallocateGraph()
+#                device.CloseDevice()
+#                return result,IMAGE_PATH
+#        else:
+#                print("Image path is not set")
+#                messagebox.showinfo("Image feild cannot be empty", "Choose the image you want to inference")
