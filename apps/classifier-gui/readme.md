@@ -8,6 +8,8 @@ This code example requires that the following components are available:
 1. Movidius Neural Compute Stick
 2. Movidius Neural Compute SDK
 3. Python3
+4. Install Python Image Library imagetk with this command:
+   sudo apt-get install -y python3-pil.imagetk
 
 
 ## Running the Example
