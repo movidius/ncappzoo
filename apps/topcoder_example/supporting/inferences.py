@@ -254,17 +254,21 @@ def main(args):
     parser = argparse.ArgumentParser(description='TopCoder Movidius MM')
     parser.add_argument(
         "movidius_dir",
-        help="""Directory for the Movidius files, expected folder setup is:
-        ../compiled.graph
+        help="""Directory for the Movidius files (also defined in Makefile MOVIDIUSDIR variable), expected folder setup is:
         movidius_dir/
         movidius_dir/provisional/
-        movidius_dir/provisional/provisional_{00001..02000}.jpg
+        movidius_dir/provisional/provisional_{00001...02000}.jpg
         movidius_dir/training/
-        movidius_dir/training/training_{00001..80000}.jpg
+        movidius_dir/training/training_{00001...80000}.jpg
         movidius_dir/training_ground_truth.csv
         movidius_dir/provisional.csv"""
     )
     args = parser.parse_args()
+    if not os.path.isdir(args.movidius_dir):
+        print("movidius_dir is not a directory: %s" % args.movidius_dir)
+        print("Please use the right path as argument, and/or change the Makefile MOVIDIUSDIR variable")
+        return 0
+    
     print("IMAGE_MEAN", IMAGE_MEAN)
     print("IMAGE_SCALE", IMAGE_SCALE)
     print("IMAGE_DIM", IMAGE_DIM)
