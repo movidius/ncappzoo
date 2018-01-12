@@ -208,7 +208,7 @@ def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200,
         tuple: LogLoss and reference_time float values
     """
     # set renormalize to True to get the same log_loss as sklearn
-    renormalize = False
+    renormalize = True
     min_proba = np.float(min_proba)
     max_proba = 1.0 - min_proba
     n_images = len(images)
@@ -257,9 +257,9 @@ def main(args):
         help="""Directory for the Movidius files (also defined in Makefile MOVIDIUSDIR variable), expected folder setup is:
         movidius_dir/
         movidius_dir/provisional/
-        movidius_dir/provisional/provisional_{00001...02000}.jpg
+        movidius_dir/provisional/provisional_{00001..02000}.jpg
         movidius_dir/training/
-        movidius_dir/training/training_{00001...80000}.jpg
+        movidius_dir/training/training_{00001..80000}.jpg
         movidius_dir/training_ground_truth.csv
         movidius_dir/provisional.csv"""
     )
