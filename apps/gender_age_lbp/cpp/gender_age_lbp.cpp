@@ -9,36 +9,35 @@
 
 #include <iostream>
 #include <vector>
-#include "opencv2/highgui.hpp"
-#include "opencv2/videoio.hpp"
-#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
-
+#include "fp16.h"
 #include <time.h>
 #include <stdint.h>
-
-#include "fp16.h"
 
 extern "C"
 {
 #include <mvnc.h>
+
 }
 
 #define WINDOW_NAME "Ncappzoo Gender Age"
 #define CAM_SOURCE 0
-#define XML_FILE "/usr/share/OpenCV/lbpcascades/lbpcascade_frontalface_improved.xml"
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define XML_FILE "../lbpcascade_frontalface_improved.xml"
+// window height and width
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
 
 // network image resolution
 #define NETWORK_IMAGE_WIDTH 227
 #define NETWORK_IMAGE_HEIGHT 227
 
 // Location of age and gender networks
-#define GENDER_GRAPH_DIR "../networks/Gender/"
-#define AGE_GRAPH_DIR "../networks/Age/"
-#define GENDER_CAT_STAT_DIRECTORY "../networks/Gender/"
-#define AGE_CAT_STAT_DIRECTORY "../networks/Age/"
+#define GENDER_GRAPH_DIR "../gender_graph/"
+#define AGE_GRAPH_DIR "../age_graph/"
+#define GENDER_CAT_STAT_DIRECTORY "../catstat/Gender/"
+#define AGE_CAT_STAT_DIRECTORY "../catstat/Age/"
 
 // time in seconds to perform an inference on the NCS
 #define INFERENCE_INTERVAL 1
@@ -47,8 +46,8 @@ using namespace std;
 using namespace cv;
 
 // enable networks
-const bool enableGenderNetwork = true;
-const bool enableAgeNetwork = true;
+bool enableGenderNetwork = true;
+bool enableAgeNetwork = true;
 
 // text colors and font
 const int FONT = cv::FONT_HERSHEY_PLAIN;
@@ -518,25 +517,44 @@ int main (int argc, char** argv) {
 
     capture.open(CAM_SOURCE);
 
+    // set the window attributes
+    capture.set(CV_CAP_PROP_FRAME_WIDTH, WINDOW_WIDTH);
+    capture.set(CV_CAP_PROP_FRAME_HEIGHT, WINDOW_HEIGHT);
+
     // create a window
     namedWindow(WINDOW_NAME, WINDOW_NORMAL);
-    setWindowProperty(WINDOW_NAME, WND_PROP_ASPECT_RATIO, WINDOW_KEEPRATIO);
-    moveWindow(WINDOW_NAME, 0, 0);
     resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+    setWindowProperty(WINDOW_NAME, CV_WND_PROP_ASPECTRATIO, CV_WINDOW_KEEPRATIO);
+    
+    moveWindow(WINDOW_NAME, 0, 0);
     // set a point of origin for the window text
     winTextOrigin.x = 0;
     winTextOrigin.y = 20;
 
     // Load XML file
     faceCascade.load(XML_FILE);
+
+
+    // initialize dev handle(s)
     for (int i = 0; i < MAX_NCS_CONNECTED; i++){
         dev_handle[i] = nullptr;
     }
-    // initiailze the NCS deivces and age and gender networks
+
+    // if only 1 stick is availble
+    if (argc == 2) {
+        if (strcmp(argv[1], "gender") == 0) {
+            enableAgeNetwork = false;
+        }
+        if (strcmp(argv[1], "age") == 0) {
+            enableGenderNetwork = false;
+        }
+    }
+
+    // initiailze the NCS devices and age and gender networks
     initNCS();
     initGenderNetwork();
     initAgeNetwork();
+
 
     // main loop
     while (true) {
@@ -545,7 +563,7 @@ int main (int argc, char** argv) {
 
         // flip the mat horizontally
         flip(imgIn, imgIn, 1);
-
+	
         key = waitKey(1);
         // if user presses escape then exit the loop
         if (key == 27)
@@ -603,17 +621,23 @@ int main (int argc, char** argv) {
 
                     // process Age network
                     if (enableAgeNetwork) {
-                        // send the cropped opencv mat to the ncs device
-                        currentInferenceResult = getInferenceResults(croppedFaceMat, categories[1], mvncStat[1], graph_handle[1]);
+                        if (enableGenderNetwork){
+                            // send the cropped opencv mat to the ncs device
+                            currentInferenceResult = getInferenceResults(croppedFaceMat, categories[1], mvncStat[1], graph_handle[1]);
+                        } else {
+                            currentInferenceResult = getInferenceResults(croppedFaceMat, categories[0], mvncStat[0], graph_handle[0]);
+                            cout << ageText << endl;
+                            textColor = GREEN;
+                        }
                         ageText = currentInferenceResult.ageCategory;
-                        if (!enableGenderNetwork) textColor = GREEN;
                     }
 
                     // enable starting the timer again
                     start_inference_timer = true;
                 }
                 // prepare the gender and age text to be printed to the window
-                rectangle_text = "id: " + to_string(i) + " " + genderText + " " + ageText;
+                // rectangle_text = "id: " + to_string(i) + " " + genderText + " " + ageText;
+                rectangle_text = genderText + " " + ageText;
             }
             // print the age and gender text to the window
             putText(imgIn, rectangle_text, topLeftRect[i], FONT, 2, textColor, 1);
