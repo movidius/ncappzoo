@@ -6,7 +6,7 @@ This directory contains all supporting files needed to generate `submissions.zip
 
 This code example requires that the following components are available:
 1. <a href="https://developer.movidius.com/buy" target="_blank">Movidius Neural Compute Stick</a>
-2. <a href="https://developer.movidius.com/start" target"_blank">Movidius Neural Compute SDK</a>
+2. <a href="https://developer.movidius.com/start" target="_blank">Movidius Neural Compute SDK</a>
 
 ## Running the Example
 ~~~
