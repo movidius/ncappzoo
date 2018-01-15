@@ -5,16 +5,15 @@ This directory contains all supporting files needed to generate `submissions.zip
 ## Prerequisites
 
 This code example requires that the following components are available:
-1. Movidius Neural Compute Stick
-2. Movidius Neural Compute SDK
-3. Python3
+1. <a href="https://developer.movidius.com/buy" target="_blank">Movidius Neural Compute Stick</a>
+2. <a href="https://developer.movidius.com/start" target"_blank">Movidius Neural Compute SDK</a>
 
 ## Running the Example
 ~~~
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
-cd ~/workspace/ncappzoo/apps/topcoder_challenge
+cd ~/workspace/ncappzoo/apps/topcoder_example
 make run
 ~~~
 
@@ -42,12 +41,12 @@ progess 2000/2000 ...
 Now that you have a working framework, follow these instructions to create `submissions.zip`
 
 1. Compile your custom trained network
-  + For Caffe based networks, rename your weights file as weights.caffemodel, deploy.prototxt as network.prototxt, and then call `make compile`
-  + For Tensorflow based networks, refer https://movidius.github.io/ncsdk/tf_compile_guidance.html
+   For Caffe based networks, rename your weights file as weights.caffemodel, deploy.prototxt as network.prototxt, and then call `make compile`.
+   For Tensorflow based networks, refer https://movidius.github.io/ncsdk/tf_compile_guidance.html.
 2. Run inference on provisional dataset and generate `inferences.csv`
-  + `make infer`
+   `make infer`
 3. Compress all files required to make a valid submission
-  + `make zip`
+   `make zip`
 
 ## Troubleshooting
 
