@@ -26,7 +26,7 @@ import mvnc.mvncapi as mvnc
 import numpy as np
 import os.path
 
-# paths settings (see also movidius_dir argument parameter)
+# paths settings (see also data argument parameter)
 INFERENCE_FILE = "../inferences.csv"
 GRAPH_FILE = "../compiled.graph"
 EXAMPLE_ONLY = False
@@ -253,19 +253,19 @@ def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200,
 def main(args):
     parser = argparse.ArgumentParser(description='TopCoder Movidius MM')
     parser.add_argument(
-        "movidius_dir",
+        "data",
         help="""Directory for the Movidius files (also defined in Makefile MOVIDIUSDIR variable), expected folder setup is:
-        movidius_dir/
-        movidius_dir/provisional/
-        movidius_dir/provisional/provisional_{00001..02000}.jpg
-        movidius_dir/training/
-        movidius_dir/training/training_{00001..80000}.jpg
-        movidius_dir/training_ground_truth.csv
-        movidius_dir/provisional.csv"""
+        data/
+        data/provisional/
+        data/provisional/provisional_{00001..02000}.jpg
+        data/training/
+        data/training/training_{00001..80000}.jpg
+        data/training_ground_truth.csv
+        data/provisional.csv"""
     )
     args = parser.parse_args()
-    if not os.path.isdir(args.movidius_dir):
-        print("movidius_dir is not a directory: %s" % args.movidius_dir)
+    if not os.path.isdir(args.data):
+        print("data is not a directory: %s" % args.data)
         print("Please use the right path as argument, and/or change the Makefile MOVIDIUSDIR variable")
         return 0
     
@@ -276,8 +276,8 @@ def main(args):
     device = open_ncs_device()
     graph = load_graph(device, GRAPH_FILE)
     # prepare images
-    data_dir = os.path.join(args.movidius_dir, DATA_DIR)
-    images_file = os.path.join(args.movidius_dir, IMAGES_FILE)
+    data_dir = os.path.join(args.data, DATA_DIR)
+    images_file = os.path.join(args.data, IMAGES_FILE)
     images = init_images(data_dir, images_file)
     if LAST_IMAGE is not None:
         images = images[:LAST_IMAGE]
