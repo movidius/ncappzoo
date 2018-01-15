@@ -113,7 +113,7 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
         output, userobj = graph.GetResult()
 
         # Get execution time
-        inference_time = graph.GetGraphOption( mvnc.GraphOption.TIMETAKEN )
+        inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
 
         # Find the index of highest confidence 
         top_prediction = output.argmax()
