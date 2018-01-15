@@ -207,8 +207,6 @@ def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200,
     Returns:
         tuple: LogLoss and reference_time float values
     """
-    # set renormalize to True to get the same log_loss as sklearn
-    renormalize = True
     min_proba = np.float(min_proba)
     max_proba = 1.0 - min_proba
     n_images = len(images)
@@ -217,21 +215,18 @@ def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200,
     top_1_accuracy = 0.0
     top_k_accuracy = 0.0
     for i, image in enumerate(images):
-        # clipping
-        class_probas = { class_index : max(min_proba, min(max_proba, proba))
-            for class_index, proba in image.top_k }
+        class_probas = dict(image.top_k)
         if image.class_index == image.top_k[0][0]:
             top_1_accuracy += 1.0            
         if image.class_index in class_probas:
             top_k_accuracy += 1.0
             probas[i] = class_probas[image.class_index]
-        else:
-            probas[i] = min_proba
+        if probas[i] > 0:
+            sum_probas = sum(class_probas.values())
+            probas[i] /= sum_probas
+        probas[i] = max(min_proba, min(max_proba, probas[i]))
         image_time += image.inference_time
-        sum_probas = ( sum(class_probas.values()) + 
-            (n_classes - len(class_probas)) * min_proba )        
-        if renormalize == True or sum_probas >= 1.0 :
-            probas[i] /= sum_probas        
+   
     log_loss = np.mean(-np.log(probas))
     top_1_accuracy /=  n_images
     top_k_accuracy /=  n_images
@@ -254,7 +249,7 @@ def main(args):
     parser = argparse.ArgumentParser(description='TopCoder Movidius MM')
     parser.add_argument(
         "data",
-        help="""Directory for the Movidius files (also defined in Makefile MOVIDIUSDIR variable), expected folder setup is:
+        help="""Data directory for Movidius NCS Challenge (if necessary, see also DATADIR variable and 'data' target in Makefile), expected folder setup is:
         data/
         data/provisional/
         data/provisional/provisional_{00001..02000}.jpg
