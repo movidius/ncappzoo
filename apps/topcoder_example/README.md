@@ -40,13 +40,13 @@ progess 2000/2000 ...
 
 Now that you have a working framework, follow these instructions to create `submissions.zip`
 
-1. Compile your custom trained network
-   For Caffe based networks, rename your weights file as weights.caffemodel, deploy.prototxt as network.prototxt, and then call `make compile`.
-   For Tensorflow based networks, refer https://movidius.github.io/ncsdk/tf_compile_guidance.html.
+1. Compile your custom trained network.
+   + For Caffe based networks, rename your weights file as weights.caffemodel, deploy.prototxt as network.prototxt, and then call `make compile`.
+   + For Tensorflow based networks, refer https://movidius.github.io/ncsdk/tf_compile_guidance.html.
 2. Run inference on provisional dataset and generate `inferences.csv`
-   `make infer`
+   + `make infer`
 3. Compress all files required to make a valid submission
-   `make zip`
+   + `make zip`
 
 ## Troubleshooting
 
