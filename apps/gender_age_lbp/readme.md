@@ -18,7 +18,7 @@ To run the example code do the following :
 1. Open a terminal and change directory to the gender_age_lbp example base directory
 2. Type the following command in the terminal: make all
 
-## Running the Example
+# Running the Example
 
 After building the example you can run the example code by doing the following :
 1. Open a terminal and change directory to the gender_age_lbp base directory
