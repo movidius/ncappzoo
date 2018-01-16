@@ -7,14 +7,16 @@ This app does facial detection and age/gender inference using the Intel Neural C
 This app requires the following components are available:
 1. Movidius Neural Compute Stick
 2. Movidius the Neural Compute SDK
-3. A webcam (laptop, usb)
+3. A webcam (laptop or usb)
+4. OpenCV 
+
+* Note: You can install OpenCV by using the install-opencv-from_source.sh script which is included with the ncappzoo app "street_cam_threaded"
 
 # Building the example
 
 To run the example code do the following :
 1. Open a terminal and change directory to the gender_age_lbp example base directory
 2. Type the following command in the terminal: make all
-
 
 ## Running the Example
 
@@ -34,4 +36,4 @@ Controls while program is running.
 
 # Additional Information
 
-
+At the moment, the program is limited to detecting and making an inference on one person at a time. 
