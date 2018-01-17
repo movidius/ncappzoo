@@ -28,6 +28,7 @@ MODEL_FILENAME_DATA_NCS = ${MODEL_FILENAME_PREFIX_NCS}.data-00000-of-00001
 MODEL_FILENAME_META_NCS = ${MODEL_FILENAME_PREFIX_NCS}.meta
 MODEL_FILENAME_INDEX_NCS = ${MODEL_FILENAME_PREFIX_NCS}.index
 
+COMPILE_FULL_COMMAND = ${NCCOMPILE} ${MODEL_FILENAME_META_NCS} -w ${MODEL_FILENAME_PREFIX_NCS} -s 12 -in input -on output -o ${GRAPH_FILENAME}
 
 
 GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/licenses.txt; \
@@ -52,7 +53,17 @@ prereqs:
 
 
 .PHONY: compile
-compile: 
+compile: model
+	@echo "\nmaking compile" ; \
+	cd ${MODEL_DIR_NCS} ; \
+	echo "Command line: ${COMPILE_FULL_COMMAND}" ; \
+	${COMPILE_FULL_COMMAND} ; \
+	cp ${GRAPH_FILENAME} ../.. ; \
+	cd ../.. ;
+
+
+.PHONY: old_comp
+old_comp: model
 	( echo "\nmaking compile" ; \
 	cd ${MODEL_DIR_NCS} ; \
 	${NCCOMPILE} ${MODEL_FILENAME_META_NCS} -w ${MODEL_FILENAME_PREFIX_NCS} -s 12 -in input -on output -o ${GRAPH_FILENAME} ; \
@@ -63,31 +74,43 @@ compile:
 
 .PHONY: model
 model: 
-	(echo "\nmaking model" ; \
-	unzip ${MODEL_ZIP_FILENAME} ; \
-	cd ${MODEL_UNZIP_DIR} ; \
-	mv ${MODEL_FILENAME_DATA_ORIG} ${MODEL_FILENAME_DATA_TEMP} ; \
-	mv ${MODEL_FILENAME_INDEX_ORIG} ${MODEL_FILENAME_INDEX_TEMP}  ; \
-	mv ${MODEL_FILENAME_META_ORIG} ${MODEL_FILENAME_META_TEMP}  ; \
-	python3 ../convert_facenet.py model_base=${MODEL_FILENAME_PREFIX_TEMP}; \
-	cd .. ; )
-
-
-.PHONY: blahblah
-blahblah:
-	echo "Download "; echo ${MODEL_ZIP_FILENAME}; echo " from here: https://github.com/davidsandberg/facenet" ; \
-	@if [ -e ${MODEL_FILENAME} ] ; \
+	@echo "\nmaking model" ; \
+	if [ -e ${MODEL_ZIP_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
-	else \
-		echo "Downloading caffemodel file"; \
-		${GET_CAFFEMODEL}; \
-		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
+		echo "Zip file exists."; \
+		if [ -d ${MODEL_UNZIP_DIR} ] ; \
 		then \
-			echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
-			exit 1; \
+			 echo "Zip file unzipped." ; \
+		else \
+			echo "Unzipping." ; \
+			unzip ${MODEL_ZIP_FILENAME} ; \
 		fi ; \
-	fi  
+		cd ${MODEL_UNZIP_DIR} ; \
+		if [ ! -e ${MODEL_FILENAME_DATA_TEMP} ] ; then mv ${MODEL_FILENAME_DATA_ORIG} ${MODEL_FILENAME_DATA_TEMP} ; \
+		                                         else echo "data file exists" ; fi ; \
+		if [ ! -e ${MODEL_FILENAME_INDEX_TEMP} ] ; then mv ${MODEL_FILENAME_INDEX_ORIG} ${MODEL_FILENAME_INDEX_TEMP} ; \
+		                                         else echo "index file exists" ; fi ; \
+		if [ ! -e ${MODEL_FILENAME_META_TEMP} ] ; then mv ${MODEL_FILENAME_META_ORIG} ${MODEL_FILENAME_META_TEMP} ; \
+		                                         else echo "meta file exists" ; fi ; \
+		if [ ! -e ${MODEL_FILENAME_PREFIX_NCS} ] ; \
+		then \
+			echo "Converted directory does not exist, doing conversion" ; \
+			python3 ../convert_facenet.py model_base=${MODEL_FILENAME_PREFIX_TEMP}; \
+		else \
+			echo "Converted directory exists, skipping conversion. " ; \
+			echo "    If you want to reconvert remove directory: ${MODEL_FILENAME_PREFIX_NCS}" ; \
+		fi ; \
+		cd .. ; \
+	else \
+		echo "" ; \
+		echo "***********************************************************************" ; \
+		echo "Missing zipped model file.  Please download ${MODEL_ZIP_FILENAME}" ; \
+		echo "from https://github.com/davidsandberg/facenet"; \
+		echo "Then re-run the same make command." ; \
+		echo "***********************************************************************" ; \
+		echo "" ; \
+		exit 1 ; \
+	fi
 
 .PHONY: run_py
 run_py: prereqs compile
