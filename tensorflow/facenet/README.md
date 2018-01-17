@@ -31,6 +31,12 @@ Shows available targets.
 ## make all
 Builds and/or gathers all the required files needed to run the example run.py, except for downloading 20170512-110547.zip, this must be manually downloaded from here: https://github.com/davidsandberg/facenet and placed in the base directory.
 
+## make model
+Unzips the 20170512-110547.zip file, and converts to an NCS-compilable version of the model.  See https://movidius.github.io/ncsdk/tf_compile_guidance.html for general guidance on what changes need to be done to make a TensorFlow model compilable. 
+
+## make compile
+Compiles the converted network creating a graph file (facenet_celeb_ncs.graph) for the NCS device.
+
 ## make run_py
 Runs the provided python program demonstrating the facenet network.
 
