@@ -27,6 +27,7 @@ REQUEST_CAMERA_HEIGHT = 480
 
 # the same face will return 0.0
 # different faces return higher numbers
+# this is NOT between 0.0 and 1.0
 FACE_MATCH_THRESHOLD = 1.2
 
 
@@ -69,7 +70,7 @@ def overlay_on_image(display_image, image_info, matching):
     rect_width = 10
     offset = int(rect_width/2)
     if (image_info != None):
-        cv2.putText(display_image, image_info, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 128, 0), 1)
+        cv2.putText(display_image, image_info, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
     if (matching):
         # match, green rectangle
         cv2.rectangle(display_image, (0+offset, 0+offset),
@@ -234,12 +235,18 @@ def run_images(valid_output, validated_image_filename, graph, input_image_filena
         matching = False
         if (face_match(valid_output, test_output)):
             matching = True
+            text_color = (0, 255, 0)
+            match_text = "MATCH"
             print('PASS!  File ' + input_image_file + ' matches ' + validated_image_filename)
         else:
             matching = False
+            match_text = "NOT A MATCH"
+            text_color = (0, 0, 255)
             print('FAIL!  File ' + input_image_file + ' does not match ' + validated_image_filename)
 
         overlay_on_image(infer_image, input_image_file, matching)
+	
+        cv2.putText(infer_image, match_text + " - Hit key for next.", (30, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 1)
 
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button

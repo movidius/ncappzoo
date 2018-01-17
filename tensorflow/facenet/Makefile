@@ -108,7 +108,7 @@ model:
 		echo "" ; \
 		echo "***********************************************************************" ; \
 		echo "Missing zipped model file.  Please download ${MODEL_ZIP_FILENAME}" ; \
-		echo "from https://github.com/davidsandberg/facenet"; \
+		echo "from https://github.com/davidsandberg/facenet and put it in facenet base dir."; \
 		echo "Then re-run the same make command." ; \
 		echo "***********************************************************************" ; \
 		echo "" ; \
@@ -133,7 +133,7 @@ opencv:
 .PHONY: help
 help:
 	@echo "NCS FaceNet example requires that you download ${MODEL_ZIP_FILENAME}" ;
-	@echo "from https://github.com/davidsandberg/facenet and put it in the facenet directory" ;
+	@echo "from https://github.com/davidsandberg/facenet and put it in the facenet base directory" ;
 	@echo "" ;
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
