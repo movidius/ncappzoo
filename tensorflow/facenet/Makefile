@@ -36,6 +36,8 @@ GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis
              wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/trump.jpg; \
              wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/president-67550_640.jpg
 
+INCEPTION_RESNET_PY = inception_resnet_v1.py
+GET_INCEPTION_RESNET = wget -c --no-cache -P . https://raw.githubusercontent.com/davidsandberg/facenet/361c501c8b45183b9f4ad0171a9b1b20b2690d9f/src/models/inception_resnet_v1.py
 
 .PHONY: all
 all: prereqs pictures compile
@@ -47,9 +49,15 @@ pictures:
 
 .PHONY: prereqs
 prereqs:
-	@echo "\nmaking prereqs"
-	@sed -i 's/\r//' *.py
-	@chmod +x *.py	
+	@echo "\nmaking prereqs" ; \
+	if [ ! -e ${INCEPTION_RESNET_PY} ] ; \
+	then \
+		${GET_INCEPTION_RESNET} ; \
+	else \
+		echo "${INCEPTION_RESNET_PY} exists, not regetting it." ; \
+	fi ; \
+	sed -i 's/\r//' *.py ; \
+	chmod +x *.py ; \
 
 
 .PHONY: compile
@@ -110,7 +118,12 @@ model:
 .PHONY: run_py
 run_py: prereqs compile
 	@echo "\nmaking run_py"
-	python3 ./facenet.py
+	python3 ./run.py
+
+.PHONY: run
+run: prereqs compile
+	@echo "\nmaking run"
+	python3 ./run.py
 
 .PHONY: opencv
 opencv: 
@@ -140,5 +153,6 @@ clean:
 	rm -f licenses.txt
 	rm -rf ${MODEL_UNZIP_DIR}
 	rm -f ${MODEL_ZIP_FILENAME}
+	rm -f ${INCEPTION_RESNET_PY}
 
 
