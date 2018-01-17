@@ -140,79 +140,6 @@ def handle_keys(raw_key):
     return True
 
 
-# start the opencv webcam streaming and pass each frame
-# from the camera to the facenet network for an inference
-# Continue looping until the result of the camera frame inference
-# matches the valid face output and then return.
-# valid_output is inference result for the valid image
-# validated image filename is the name of the valid image file
-# graph is the ncsdk Graph object initialized with the facenet graph file
-#   which we will run the inference on.
-# returns None
-def run_camera(valid_output, validated_image_filename, graph):
-    camera_device = cv2.VideoCapture(CAMERA_INDEX)
-    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, REQUEST_CAMERA_WIDTH)
-    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, REQUEST_CAMERA_HEIGHT)
-
-    actual_camera_width = camera_device.get(cv2.CAP_PROP_FRAME_WIDTH)
-    actual_camera_height = camera_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    print ('actual camera resolution: ' + str(actual_camera_width) + ' x ' + str(actual_camera_height))
-
-    if ((camera_device == None) or (not camera_device.isOpened())):
-        print ('Could not open camera.  Make sure it is plugged in.')
-        print ('Also, if you installed python opencv via pip or pip3 you')
-        print ('need to uninstall it and install from source with -D WITH_V4L=ON')
-        print ('Use the provided script: install-opencv-from_source.sh')
-        return
-
-    frame_count = 0
-
-    cv2.namedWindow(CV_WINDOW_NAME)
-
-    found_match = False
-
-    while True :
-        # Read image from camera,
-        ret_val, vid_image = camera_device.read()
-        if (not ret_val):
-            print("No image from camera, exiting")
-            break
-
-        frame_count += 1
-        frame_name = 'camera frame ' + str(frame_count)
-
-        # run a single inference on the image and overwrite the
-        # boxes and labels
-        test_output = run_inference(vid_image, graph)
-
-        if (face_match(valid_output, test_output)):
-            print('PASS!  File ' + frame_name + ' matches ' + validated_image_filename)
-            found_match = True
-        else:
-            found_match = False
-            print('FAIL!  File ' + frame_name + ' does not match ' + validated_image_filename)
-
-        overlay_on_image(vid_image, frame_name, found_match)
-
-        # check if the window is visible, this means the user hasn't closed
-        # the window via the X button
-        prop_val = cv2.getWindowProperty(CV_WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO)
-        if (prop_val < 0.0):
-            print('window closed')
-            break
-
-        # display the results and wait for user to hit a key
-        cv2.imshow(CV_WINDOW_NAME, vid_image)
-        raw_key = cv2.waitKey(1)
-        if (raw_key != -1):
-            if (handle_keys(raw_key) == False):
-                print('user pressed Q')
-                break
-
-    if (found_match):
-        cv2.imshow(CV_WINDOW_NAME, vid_image)
-        cv2.waitKey(0)
-
 # Test all files in a list for a match against a valided face and display each one.
 # valid_output is inference result for the valid image
 # validated image filename is the name of the valid image file
@@ -264,8 +191,6 @@ def run_images(valid_output, validated_image_filename, graph, input_image_filena
 # all the work of the program
 def main():
 
-    use_camera = False
-
     # Get a list of ALL the sticks that are plugged in
     # we need at least one
     devices = mvnc.EnumerateDevices()
@@ -292,19 +217,14 @@ def main():
     validated_image = cv2.imread(validated_image_filename)
     valid_output = run_inference(validated_image, graph)
 
-    if (use_camera):
-        #run with camera
-        run_camera(valid_output, validated_image_filename, graph)
-    else:
-        # get list of all the .jpg files in the image directory
-        input_image_filename_list = os.listdir(IMAGES_DIR)
-        input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
-        if (len(input_image_filename_list) < 1):
-            # no images to show
-            print('No .jpg files found')
-            return 1
-        run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
-
+    # get list of all the .jpg files in the image directory
+    input_image_filename_list = os.listdir(IMAGES_DIR)
+    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
+    if (len(input_image_filename_list) < 1):
+        # no images to show
+        print('No .jpg files found')
+        return 1
+    run_images(valid_output, validated_image_filename, graph, input_image_filename_list)
 
     # Clean up the graph and the device
     graph.DeallocateGraph()
