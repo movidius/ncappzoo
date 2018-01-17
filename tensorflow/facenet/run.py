@@ -16,7 +16,7 @@ IMAGES_DIR = './'
 VALIDATED_IMAGES_DIR = IMAGES_DIR + 'validated_images/'
 validated_image_filename = VALIDATED_IMAGES_DIR + 'valid.jpg'
 
-GRAPH_FILENAME = "facenet_celeb.graph"
+GRAPH_FILENAME = "facenet_celeb_ncs.graph"
 
 # name of the opencv window
 CV_WINDOW_NAME = "FaceNet"
