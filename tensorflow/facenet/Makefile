@@ -45,10 +45,10 @@ all: prereqs pictures compile
 .PHONY: pictures
 pictures:
 	@echo "\nmaking pictures"
-	MODEL_UNZIP_DIR${GET_PICTURES};
+	${GET_PICTURES};
 
 .PHONY: prereqs
-prereqs:
+prereqs: pictures
 	@echo "\nmaking prereqs" ; \
 	if [ ! -e ${INCEPTION_RESNET_PY} ] ; \
 	then \
