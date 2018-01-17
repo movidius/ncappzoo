@@ -55,22 +55,17 @@ prereqs:
 .PHONY: compile
 compile: model
 	@echo "\nmaking compile" ; \
-	cd ${MODEL_DIR_NCS} ; \
-	echo "Command line: ${COMPILE_FULL_COMMAND}" ; \
-	${COMPILE_FULL_COMMAND} ; \
-	cp ${GRAPH_FILENAME} ../.. ; \
-	cd ../.. ;
-
-
-.PHONY: old_comp
-old_comp: model
-	( echo "\nmaking compile" ; \
-	cd ${MODEL_DIR_NCS} ; \
-	${NCCOMPILE} ${MODEL_FILENAME_META_NCS} -w ${MODEL_FILENAME_PREFIX_NCS} -s 12 -in input -on output -o ${GRAPH_FILENAME} ; \
-	cp ${GRAPH_FILENAME} ../.. ; \
-	cd ../.. )
-
-# mvNCCompile facenet_celeb_ncs.meta -w facenet_celeb_ncs -s 12 -in input -on output -o facenet_celeb_ncs.graph
+	if [ -e ${GRAPH_FILENAME} ] ; \
+	then \
+		echo "graph file exists, skipping compilation." ; \
+		echo "    if you want to re-compile, remove ${GRAPH_FILENAME}, and re-run" ; \
+	else \
+		cd ${MODEL_DIR_NCS} ; \
+		echo "Command line: ${COMPILE_FULL_COMMAND}" ; \
+		${COMPILE_FULL_COMMAND} ; \
+		cp ${GRAPH_FILENAME} ../.. ; \
+		cd ../.. ; \
+	fi
 
 .PHONY: model
 model: 
@@ -98,7 +93,7 @@ model:
 			python3 ../convert_facenet.py model_base=${MODEL_FILENAME_PREFIX_TEMP}; \
 		else \
 			echo "Converted directory exists, skipping conversion. " ; \
-			echo "    If you want to reconvert remove directory: ${MODEL_FILENAME_PREFIX_NCS}" ; \
+			echo "    If you want to reconvert remove directory: ${MODEL_FILENAME_PREFIX_NCS}, and re-run" ; \
 		fi ; \
 		cd .. ; \
 	else \
@@ -124,10 +119,14 @@ opencv:
 
 .PHONY: help
 help:
+	@echo "NCS FaceNet example requires that you download ${MODEL_ZIP_FILENAME}" ;
+	@echo "from https://github.com/davidsandberg/facenet and put it in the facenet directory" ;
+	@echo "" ;
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
+	@echo "  make model - process zip file and converts model for NCS"
 	@echo "  make run_py - runs the street_cam_threaded.py python example program";
 	@echo "  make clean - removes all created content"
 
@@ -139,8 +138,7 @@ clean:
 	rm -f president-67550_640.jpg
 	rm -f elvis-presley-401920_640.jpg
 	rm -f licenses.txt
-	rm -f MODEL_FILENAME_INDEX_NCS
-	rm -f MODEL_FILENAME_DATA_NCS
-	rm -f MODEL_FILENAME_META_NCS
+	rm -rf ${MODEL_UNZIP_DIR}
+	rm -f ${MODEL_ZIP_FILENAME}
 
 
