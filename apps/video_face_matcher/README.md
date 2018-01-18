@@ -14,10 +14,10 @@ This program requires:
 - 1 NCS device
 - A webcam
 - NCSDK 1.12.00 or greater
-- The ncappzoo/tensorflow/facenet must build.  See [the facenet README.md](../../tensorflow/facenet/README.md) for details
+- The ncappzoo/tensorflow/facenet make compile command must work.  See [the facenet README.md](../../tensorflow/facenet/README.md) for details
 - opencv 3.3 with video for linux support
 
-Note: The OpenCV version that installs with the current ncsdk (1.10.00) does <strong>not</strong> provide V4L support.  To run this application you will need to replace the ncsdk version with a version built from source.  To remove the old opencv and build and install a compatible version you can run the following command from the app's base directory:
+Note: The OpenCV version that installs with the some versions of ncsdk does <strong>not</strong> provide V4L support.  To run this application you will need to replace the ncsdk version with a version built from source.  To remove the old opencv and build and install a compatible version you can run the following command from the app's base directory:
 
 ```
    make opencv
