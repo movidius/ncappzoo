@@ -76,7 +76,7 @@ compile: model
 	fi
 
 .PHONY: model
-model: 
+model: prereqs
 	@echo "\nmaking model" ; \
 	if [ -e ${MODEL_ZIP_FILENAME} ] ; \
 	then \
