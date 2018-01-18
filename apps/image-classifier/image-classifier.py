@@ -54,11 +54,11 @@ img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 img = img[:, :, ::-1]
 
 # Mean subtraction & scaling [A common technique used to center the data]
-img = img.astype( numpy.float32 )
+img = img.astype( numpy.float16 )
 img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
 
 # Load the image as a half-precision floating point array
-graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
+graph.LoadTensor( img, 'user object' )
 
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
