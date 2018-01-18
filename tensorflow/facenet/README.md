@@ -18,7 +18,7 @@ The provided Makefile does the following:
 This program requires:
 - 1 NCS device
 - NCSDK 1.12.00 or greater
-- The 20170512-110547.zip file from https://github.com/davidsandberg/facenet must be downloaded and copied to the base facenet directory.
+- The 20170512-110547.zip file from https://github.com/davidsandberg/facenet must be downloaded and copied to the base facenet directory.  Direct google drive link is: https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk .
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 

@@ -110,6 +110,9 @@ model: prereqs
 		echo "Missing zipped model file.  Please download ${MODEL_ZIP_FILENAME}" ; \
 		echo "from https://github.com/davidsandberg/facenet and put it in facenet base dir."; \
 		echo "Then re-run the same make command." ; \
+		echo "" ; \
+		echo "Pro Tip: The direct google drive link to ${MODEL_ZIP_FILENAME} is:" ; \
+		echo "https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk" ; \
 		echo "***********************************************************************" ; \
 		echo "" ; \
 		exit 1 ; \
