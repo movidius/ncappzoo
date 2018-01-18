@@ -1,0 +1,51 @@
+# Dummy Caffe Network: (Convolution + ReLu + Pool + Dense)
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 256
+  dim: 256
+}
+layer {
+  name: "conv"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv"
+  convolution_param {
+    num_output: 16
+    kernel_size: 16
+    stride: 16
+  }
+}
+layer {
+  name: "relu"
+  type: "ReLU"
+  bottom: "conv"
+  top: "conv"
+}
+layer {
+  name: "pool"
+  type: "Pooling"
+  bottom: "conv"
+  top: "pool"
+  pooling_param {
+    pool: MAX
+    kernel_size: 16
+    stride: 16
+  }
+}
+layer {
+  name: "fc"
+  type: "InnerProduct"
+  bottom: "pool"
+  top: "fc"
+  inner_product_param {
+    num_output: 200
+  }
+}
+layer {
+  name: "prob"
+  type: "Softmax"
+  bottom: "fc"
+  top: "prob"
+}
