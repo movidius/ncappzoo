@@ -41,11 +41,11 @@ prereqs:
 	@chmod +x *.py
 
 .PHONY: prototxt
-prototxt: prereqs
+prototxt: 
 	@echo "\nmaking prototxt"
 	@if [ -e ${PATCHED_PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo "Prototxt file already exists, skipping download."; \
 	else \
 		echo "Downloading Prototxt file"; \
 		${GET_PROTOTXT}; \
@@ -60,24 +60,6 @@ prototxt: prereqs
 		fi ; \
 	fi  
 
-.PHONY: old_caffemodel
-old_caffemodel: 
-	@echo "\nmaking caffemodel"
-	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
-	then \
-		echo "caffemodel file already exists"; \
-	else \
-		echo "-----------------"; \
-		echo "The caffe model file is at the google drive URL below."; \
-		echo "For now the compiled graph file is included in this"; \
-		echo "project directory so its not required to download the model."; \
-		echo "or even compile it.  Its already there."; \
-		echo "If you want to compile the model yourself please download it here:"; \
-		echo ""; \
-		echo "https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc"; \
-		echo "-----------------"; \
-		echo "Attempting to download Caffe Model from google drive"; \
-	fi
 
 .PHONY: caffemodel
 caffemodel: 
@@ -100,20 +82,15 @@ caffemodel:
 	fi
 
 
-# If the model becomes available for download via wget do it like this:
-#@echo "Downloading caffemodel file"; \
-#${GET_CAFFEMODEL}; \
-#if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
-#then \
-#	echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
-#	exit 1; \
-#fi ; \
-
-
 .PHONY: compile
 compile: caffemodel prototxt
-	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	@echo "\nmaking compile"; \
+	if [ -e ${SSD_MOBILENET_GRAPH_FILENAME} ] ; \
+	then \
+		echo "NCS graph file already exists, skipping compile."; \
+	else \
+		${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${SSD_MOBILENET_GRAPH_FILENAME} -s 12 ${PROTOTXT_FILENAME}; \
+	fi
 
 .PHONY: run_py
 run_py: all
