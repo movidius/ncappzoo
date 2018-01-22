@@ -39,6 +39,12 @@ GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis
 INCEPTION_RESNET_PY = inception_resnet_v1.py
 GET_INCEPTION_RESNET = wget -c --no-cache -P . https://raw.githubusercontent.com/davidsandberg/facenet/361c501c8b45183b9f4ad0171a9b1b20b2690d9f/src/models/inception_resnet_v1.py
 
+
+# The facenet trained model is at this google drive url:
+# https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk
+# we will attempt to get it with by calling this script to do the wget command.
+GET_FACENET_ZIPPED_MODEL = ./get_zipped_facenet_model.sh
+
 .PHONY: all
 all: prereqs pictures compile
 
@@ -75,8 +81,18 @@ compile: model
 		cd ../.. ; \
 	fi
 
+.PHONY: zipped_model
+zipped_model: 
+	@echo "\nmaking zipped model" ; \
+	if [ -e ${MODEL_ZIP_FILENAME} ] ; \
+	then \
+		echo "Zipped model already exists, skipping download" ; \
+	else \
+		${GET_FACENET_ZIPPED_MODEL} ; \
+	fi
+
 .PHONY: model
-model: prereqs
+model: prereqs zipped_model
 	@echo "\nmaking model" ; \
 	if [ -e ${MODEL_ZIP_FILENAME} ] ; \
 	then \
