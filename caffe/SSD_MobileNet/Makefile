@@ -10,7 +10,14 @@ NCCHECK   = mvNCCheck
 # filenames for the graph files that we'll copy to this directory.
 SSD_MOBILENET_GRAPH_FILENAME = graph
 
+# deploy.prototxt from internet before patching
 PROTOTXT_FILENAME= MobileNetSSD_deploy.prototxt
+
+# After patching deploy.prototxt the name is this
+PATCHED_PROTOTXT_FILENAME= patched_${PROTOTXT_FILENAME}
+
+# The name of the patch to apply to the downloaded prototxt file
+PATCH_FOR_PROTOTXT_FILENAME = deploy_prototxt_update.patch
 
 GET_PROTOTXT = wget -P . -O ${PROTOTXT_FILENAME} https://raw.githubusercontent.com/chuanqi305/MobileNet-SSD/master/${PROTOTXT_FILENAME}
 
@@ -36,7 +43,7 @@ prereqs:
 .PHONY: prototxt
 prototxt: prereqs
 	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
+	@if [ -e ${PATCHED_PROTOTXT_FILENAME} ] ; \
 	then \
 		echo "Prototxt file already exists"; \
 	else \
@@ -45,6 +52,8 @@ prototxt: prereqs
 		if [ -e ${PROTOTXT_FILENAME} ] ; \
 		then \
 			echo "prototxt file downloaded."; \
+			echo "patching prototxt."; \
+			patch ${PROTOTXT_FILENAME}  -i ${PATCH_FOR_PROTOTXT_FILENAME} -o ${PATCHED_PROTOTXT_FILENAME}; \
 		else \
 			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
 			exit 1; \
@@ -126,6 +135,7 @@ help:
 clean: 
 	@echo "\nmaking clean"
 	rm -f ./${PROTOTXT_FILENAME}
+	rm -f ./${PATCHED_PROTOTXT_FILENAME}
 	rm -f ${SSD_MOBILENET_GRAPH_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
