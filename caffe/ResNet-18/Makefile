@@ -136,6 +136,8 @@ clean:
 	@echo "\nmaking clean"
 	rm -f ${CAFFEMODEL_FILENAME}
 	rm -f ${GRAPH_FILENAME}
+	rm -f ${DEPLOY_PROTOTXT_FILENAME}
+	rm -f ${TRAIN_PROTOTXT_FILENAME}
 	rm -f output.gv
 	rm -f output.gv.svg
 	rm -f output_report.html
