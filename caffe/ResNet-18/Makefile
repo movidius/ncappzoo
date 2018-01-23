@@ -8,7 +8,10 @@ NCPROFILE = mvNCProfile
 NCCHECK   = mvNCCheck
 
 
-PROTOTXT_FILENAME= resnet-18.prototxt
+TRAIN_PROTOTXT_FILENAME= train.prototxt
+DEPLOY_PROTOTXT_FILENAME = deploy.prototxt
+PROTOTXT_PATCH_FILENAME= resnet-18.prototxt.patch
+GET_TRAIN_PROTOTXT = wget -P . https://raw.githubusercontent.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet/master/${TRAIN_PROTOTXT_FILENAME}
 
 GRAPH_FILENAME = graph
 
@@ -30,9 +33,19 @@ prereqs:
 .PHONY: prototxt
 prototxt: prereqs
 	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
+	@if [ -e ${DEPLOY_PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo "Prototxt file already exists, skipping download."; \
+	else \
+		if ${GET_TRAIN_PROTOTXT} ; \
+		then \
+			cp ${TRAIN_PROTOTXT_FILENAME} ${DEPLOY_PROTOTXT_FILENAME} ; \
+			echo "Training prototxt file downloaded, now patch for deployment" ; \
+			patch ${DEPLOY_PROTOTXT_FILENAME} ${PROTOTXT_PATCH_FILENAME} ;\
+		else \
+			echo "Error, protoxt file failed to download."; \
+			echo "Please check internet connection and retry."; \
+		fi; \
 	fi  
 
 .PHONY: caffemodel
@@ -60,7 +73,7 @@ caffemodel:
 .PHONY: profile
 profile: prototxt
 	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
+	${NCPROFILE} ${DEPLOY_PROTOTXT_FILENAME} -s 12
 
 .PHONY: browse_profile
 browse_profile: profile
@@ -75,12 +88,12 @@ browse_profile: profile
 .PHONY: compile
 compile: prototxt caffemodel
 	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${GRAPH_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${GRAPH_FILENAME} -s 12 ${DEPLOY_PROTOTXT_FILENAME}
 
 .PHONY: check
 check: prototxt caffemodel
 	@echo "\nmaking check"
-	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546 -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy ${PROTOTXT_FILENAME}
+	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546 -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy ${DEPLOY_PROTOTXT_FILENAME}
 
 .PHONY: run
 run: compile
@@ -118,10 +131,6 @@ help:
 	@echo "  make run_py - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
-#clean_caffe_model:
-#	@echo "\nmaking clean_caffe_model"
-#	rm -f ${PROTOTXT_FILENAME}
-#	rm -f ${CAFFEMODEL_FILENAME}
 
 clean: 
 	@echo "\nmaking clean"
