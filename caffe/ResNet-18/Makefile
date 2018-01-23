@@ -10,9 +10,12 @@ NCCHECK   = mvNCCheck
 
 PROTOTXT_FILENAME= resnet-18.prototxt
 
+GRAPH_FILENAME = graph
+
 CAFFEMODEL_FILENAME = resnet-18.caffemodel
 CAFFEMODEL_URL = https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet
 
+GET_CAFFEMODEL = wget --no-check-certificate 'https://onedrive.live.com/download?cid=7C725726AF404CFD&resid=7C725726AF404CFD%21110&authkey=%21ANF8hWlK9D8LGrk' -O resnet-18.caffemodel
 
 .PHONY: all
 all: profile check compile cpp 
@@ -37,11 +40,22 @@ caffemodel:
 	@echo "\nmaking caffemodel"
 	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo "caffemodel file already exists, skipping download."; \
 	else \
-		echo "***\nPlease download the caffemodel manually at:\n\n${CAFFEMODEL_URL} \n***\n"; \
-		exit 1; \
+		if ${GET_CAFFEMODEL}; \
+		then \
+		    echo "Successfully downloaded caffemodel." ; \
+		else \
+			echo "\n***************" ; \
+			echo "Error downloading caffemodel file: ${CAFFEMODEL_FILENAME}" ; \
+			echo "Please check internet connection and retry or download manually at: "; \
+			echo "\n${CAFFEMODEL_URL}\n"; \
+			echo "***************" ; \
+			rm -f ${CAFFEMODEL_FILENAME} ; \
+			exit 1; \
+		fi ; \
 	fi  
+
 
 .PHONY: profile
 profile: prototxt
@@ -61,7 +75,7 @@ browse_profile: profile
 .PHONY: compile
 compile: prototxt caffemodel
 	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${GRAPH_FILENAME} -s 12 ${PROTOTXT_FILENAME}
 
 .PHONY: check
 check: prototxt caffemodel
@@ -111,7 +125,8 @@ help:
 
 clean: 
 	@echo "\nmaking clean"
-	rm -f graph
+	rm -f ${CAFFEMODEL_FILENAME}
+	rm -f ${GRAPH_FILENAME}
 	rm -f output.gv
 	rm -f output.gv.svg
 	rm -f output_report.html
@@ -120,3 +135,4 @@ clean:
 	rm -f output_result.npy
 	rm -f output_val.csv
 	rm -f cpp/run_cpp
+	
