@@ -10,20 +10,24 @@ NCCHECK   = mvNCCheck
 # filenames for the graph files that we'll copy to this directory.
 SSD_MOBILENET_GRAPH_FILENAME = graph
 
-# The caffe model file is here, but can't do wget for file on
-# google drive.  Need to figure out how to download this from
-# script or makefile.  For now the compiled graph file
-# will be checked into the repository. The 'make compile' will be
-# tell you to go download it manually.
-#https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc
-
+# deploy.prototxt from internet before patching
 PROTOTXT_FILENAME= MobileNetSSD_deploy.prototxt
-#PROTOTXT_FILENAME= mobile_net_ssd.prototxt
+
+# After patching deploy.prototxt the name is this
+PATCHED_PROTOTXT_FILENAME= patched_${PROTOTXT_FILENAME}
+
+# The name of the patch to apply to the downloaded prototxt file
+PATCH_FOR_PROTOTXT_FILENAME = deploy_prototxt_update.patch
 
 GET_PROTOTXT = wget -P . -O ${PROTOTXT_FILENAME} https://raw.githubusercontent.com/chuanqi305/MobileNet-SSD/master/${PROTOTXT_FILENAME}
 
 CAFFEMODEL_FILENAME = MobileNetSSD_deploy.caffemodel
-GET_CAFFEMODEL = wget -P . -N http://blah.com/${CAFFEMODEL_FILENAME}
+
+# The caffe model file is at this google drive link.
+# https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc
+#
+# This command does a wget for a google drive document ID 
+GET_CAFFEMODEL = touch /tmp/cookies.txt; wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=0B3gersZ2cHIxRm5PMWRoTkdHdHc' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=0B3gersZ2cHIxRm5PMWRoTkdHdHc" -O ${CAFFEMODEL_FILENAME} && rm -rf /tmp/cookies.txt
 
 
 .PHONY: all
@@ -37,67 +41,56 @@ prereqs:
 	@chmod +x *.py
 
 .PHONY: prototxt
-prototxt: prereqs
+prototxt: 
 	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
+	@if [ -e ${PATCHED_PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo "Prototxt file already exists, skipping download."; \
 	else \
 		echo "Downloading Prototxt file"; \
 		${GET_PROTOTXT}; \
 		if [ -e ${PROTOTXT_FILENAME} ] ; \
 		then \
 			echo "prototxt file downloaded."; \
+			echo "patching prototxt."; \
+			patch ${PROTOTXT_FILENAME}  -i ${PATCH_FOR_PROTOTXT_FILENAME} -o ${PATCHED_PROTOTXT_FILENAME}; \
 		else \
 			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
 			exit 1; \
 		fi ; \
 	fi  
 
+
 .PHONY: caffemodel
 caffemodel: 
-	@echo "\nmaking caffemodel"
-	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
+	@echo "\nmaking caffemodel"; \
+	if [ -e ${CAFFEMODEL_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo "caffemodel already exists, skipping download."; \
 	else \
-	    echo "-----------------"; \
-	    echo "The caffe model file is at the google drive URL below."; \
-	    echo "For now the compiled graph file is included in this"; \
-	    echo "project directory so its not required to download the model."; \
-	    echo "or even compile it.  Its already there."; \
-	    echo "If you want to compile the model yourself please download it here:"; \
-	    echo ""; \
-	    echo "https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc"; \
-	    echo "-----------------"; \
-    fi
-
-# If the model becomes available for download via wget do it like this:
-#@echo "Downloading caffemodel file"; \
-#${GET_CAFFEMODEL}; \
-#if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
-#then \
-#	echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
-#	exit 1; \
-#fi ; \
+		echo ""; \
+		echo "Attempting download of caffemodel file from this url: "; \
+		echo "https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc"; \
+		echo ""; \
+		${GET_CAFFEMODEL}; \
+		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
+		then \
+			echo "caffemodel download failed from url: "; \
+			echo "https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc"; \
+			echo "Please download it manually or check internet connection and retry."; \
+		fi; \
+	fi
 
 
 .PHONY: compile
-compile: 
-	@echo "\nmaking compile"
-	@echo "-----------------"
-	@echo "The compiled graph file for the network is included in the"
-	@echo "project directory for now so there is no need to compile it."
-	@echo "If you do want to compile it yourself you will need to first"
-	@echo "download the model from the URL below and then run the command below."
-	@echo ""
-	@echo "URL for caffe model is:"
-	@echo "https://drive.google.com/open?id=0B3gersZ2cHIxRm5PMWRoTkdHdHc"
-	@echo ""
-	@echo "Command to compile the model is: "
-	@echo "${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}"
-	@echo "-----------------"
-
+compile: caffemodel prototxt
+	@echo "\nmaking compile"; \
+	if [ -e ${SSD_MOBILENET_GRAPH_FILENAME} ] ; \
+	then \
+		echo "NCS graph file already exists, skipping compile."; \
+	else \
+		${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${SSD_MOBILENET_GRAPH_FILENAME} -s 12 ${PROTOTXT_FILENAME}; \
+	fi
 
 .PHONY: run_py
 run_py: all
@@ -119,6 +112,8 @@ help:
 clean: 
 	@echo "\nmaking clean"
 	rm -f ./${PROTOTXT_FILENAME}
-	# rm -f ${SSD_MOBILENET_GRAPH_FILENAME}
+	rm -f ./${PATCHED_PROTOTXT_FILENAME}
+	rm -f ${SSD_MOBILENET_GRAPH_FILENAME}
+	rm -f ${CAFFEMODEL_FILENAME}
 
 
