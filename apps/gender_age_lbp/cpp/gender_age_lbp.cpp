@@ -27,7 +27,7 @@ extern "C"
 #define XML_FILE "../lbpcascade_frontalface_improved.xml"
 // window height and width
 #define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_HEIGHT 360
 
 // network image resolution
 #define NETWORK_IMAGE_WIDTH 227
@@ -523,9 +523,9 @@ int main (int argc, char** argv) {
 
     // create a window
     namedWindow(WINDOW_NAME, WINDOW_NORMAL);
-    resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
+
     setWindowProperty(WINDOW_NAME, CV_WND_PROP_ASPECTRATIO, CV_WINDOW_KEEPRATIO);
-    
+    resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
     moveWindow(WINDOW_NAME, 0, 0);
     // set a point of origin for the window text
     winTextOrigin.x = 0;
@@ -639,6 +639,7 @@ int main (int argc, char** argv) {
                 // rectangle_text = "id: " + to_string(i) + " " + genderText + " " + ageText;
                 rectangle_text = genderText + " " + ageText;
             }
+
             // print the age and gender text to the window
             putText(imgIn, rectangle_text, topLeftRect[i], FONT, 3, textColor, 3);
         }
