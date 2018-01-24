@@ -11,7 +11,7 @@ NCCHECK   = mvNCCheck
 TRAIN_PROTOTXT_FILENAME= train.prototxt
 DEPLOY_PROTOTXT_FILENAME = deploy.prototxt
 PROTOTXT_PATCH_FILENAME= resnet-18.prototxt.patch
-GET_TRAIN_PROTOTXT = wget -P . https://raw.githubusercontent.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet/master/${TRAIN_PROTOTXT_FILENAME}
+GET_TRAIN_PROTOTXT = wget -P . https://raw.githubusercontent.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet/3f035441361357a0f213269a5f63a6176ea28ebe/${TRAIN_PROTOTXT_FILENAME}
 
 GRAPH_FILENAME = graph
 
