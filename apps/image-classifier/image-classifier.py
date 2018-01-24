@@ -16,11 +16,11 @@ import sys
 
 # User modifiable input parameters
 NCAPPZOO_PATH           = '../..'
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph' 
+GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
 IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
-LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEAN              = [ 104.00698793, 116.66876762, 122.67891434]
-IMAGE_STDDEV            = 1
+CATEGORIES_PATH         = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
+IMAGE_MEAN              = numpy.float16( [104.00698793, 116.66876762, 122.67891434] )
+IMAGE_STDDEV            = ( 1 )
 IMAGE_DIM               = ( 224, 224 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
@@ -54,11 +54,11 @@ img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
 img = img[:, :, ::-1]
 
 # Mean subtraction & scaling [A common technique used to center the data]
-img = img.astype( numpy.float32 )
+img = img.astype( numpy.float16 )
 img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
 
 # Load the image as a half-precision floating point array
-graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
+graph.LoadTensor( img, 'user object' )
 
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
@@ -68,12 +68,21 @@ output, userobj = graph.GetResult()
 # Print the results
 print('\n------- predictions --------')
 
-labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
+# Read all categories into a list
+categories = [line.rstrip('\n') for line in
+              open( CATEGORIES_PATH ) if line != 'classes\n']
 
 order = output.argsort()[::-1][:6]
 
+# Get execution time
+inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
+
 for i in range( 0, 4 ):
-	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
+    print( "Prediction for "
+            + ": " + categories[order[i]]
+            + " with %3.1f%% confidence"
+            % (100.0 * output[order[i]] )
+            + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
 # If a display is available, show the image on which inference was performed
 if 'DISPLAY' in os.environ:
