@@ -8,11 +8,17 @@ NCPROFILE = mvNCProfile
 NCCHECK   = mvNCCheck
 
 
-PROTOTXT_FILENAME= resnet-18.prototxt
+TRAIN_PROTOTXT_FILENAME= train.prototxt
+DEPLOY_PROTOTXT_FILENAME = deploy.prototxt
+PROTOTXT_PATCH_FILENAME= resnet-18.prototxt.patch
+GET_TRAIN_PROTOTXT = wget -P . https://raw.githubusercontent.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet/3f035441361357a0f213269a5f63a6176ea28ebe/${TRAIN_PROTOTXT_FILENAME}
+
+GRAPH_FILENAME = graph
 
 CAFFEMODEL_FILENAME = resnet-18.caffemodel
 CAFFEMODEL_URL = https://github.com/HolmesShuan/ResNet-18-Caffemodel-on-ImageNet
 
+GET_CAFFEMODEL = wget --no-check-certificate 'https://onedrive.live.com/download?cid=7C725726AF404CFD&resid=7C725726AF404CFD%21110&authkey=%21ANF8hWlK9D8LGrk' -O resnet-18.caffemodel
 
 .PHONY: all
 all: profile check compile cpp 
@@ -27,9 +33,19 @@ prereqs:
 .PHONY: prototxt
 prototxt: prereqs
 	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
+	@if [ -e ${DEPLOY_PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo "Prototxt file already exists, skipping download."; \
+	else \
+		if ${GET_TRAIN_PROTOTXT} ; \
+		then \
+			cp ${TRAIN_PROTOTXT_FILENAME} ${DEPLOY_PROTOTXT_FILENAME} ; \
+			echo "Training prototxt file downloaded, now patch for deployment" ; \
+			patch ${DEPLOY_PROTOTXT_FILENAME} ${PROTOTXT_PATCH_FILENAME} ;\
+		else \
+			echo "Error, protoxt file failed to download."; \
+			echo "Please check internet connection and retry."; \
+		fi; \
 	fi  
 
 .PHONY: caffemodel
@@ -37,16 +53,27 @@ caffemodel:
 	@echo "\nmaking caffemodel"
 	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo "caffemodel file already exists, skipping download."; \
 	else \
-		echo "***\nPlease download the caffemodel manually at:\n\n${CAFFEMODEL_URL} \n***\n"; \
-		exit 1; \
+		if ${GET_CAFFEMODEL}; \
+		then \
+		    echo "Successfully downloaded caffemodel." ; \
+		else \
+			echo "\n***************" ; \
+			echo "Error downloading caffemodel file: ${CAFFEMODEL_FILENAME}" ; \
+			echo "Please check internet connection and retry or download manually at: "; \
+			echo "\n${CAFFEMODEL_URL}\n"; \
+			echo "***************" ; \
+			rm -f ${CAFFEMODEL_FILENAME} ; \
+			exit 1; \
+		fi ; \
 	fi  
+
 
 .PHONY: profile
 profile: prototxt
 	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
+	${NCPROFILE} ${DEPLOY_PROTOTXT_FILENAME} -s 12
 
 .PHONY: browse_profile
 browse_profile: profile
@@ -61,12 +88,12 @@ browse_profile: profile
 .PHONY: compile
 compile: prototxt caffemodel
 	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -o ${GRAPH_FILENAME} -s 12 ${DEPLOY_PROTOTXT_FILENAME}
 
 .PHONY: check
 check: prototxt caffemodel
 	@echo "\nmaking check"
-	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546 -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy ${PROTOTXT_FILENAME}
+	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546 -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy ${DEPLOY_PROTOTXT_FILENAME}
 
 .PHONY: run
 run: compile
@@ -104,14 +131,13 @@ help:
 	@echo "  make run_py - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
-#clean_caffe_model:
-#	@echo "\nmaking clean_caffe_model"
-#	rm -f ${PROTOTXT_FILENAME}
-#	rm -f ${CAFFEMODEL_FILENAME}
 
 clean: 
 	@echo "\nmaking clean"
-	rm -f graph
+	rm -f ${CAFFEMODEL_FILENAME}
+	rm -f ${GRAPH_FILENAME}
+	rm -f ${DEPLOY_PROTOTXT_FILENAME}
+	rm -f ${TRAIN_PROTOTXT_FILENAME}
 	rm -f output.gv
 	rm -f output.gv.svg
 	rm -f output_report.html
@@ -120,3 +146,4 @@ clean:
 	rm -f output_result.npy
 	rm -f output_val.csv
 	rm -f cpp/run_cpp
+	
