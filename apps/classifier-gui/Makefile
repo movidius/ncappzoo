@@ -2,8 +2,13 @@
 all: run
 
 .PHONY: run
-run: all
+run: googlenet
 	python3 classifier-gui.py
+
+.PHONY: googlenet
+googlenet: 
+	@echo "\nmaking googlenet"
+	(cd ../../caffe/GoogLeNet; make compile;)
 
 .PHONY: help
 help:
