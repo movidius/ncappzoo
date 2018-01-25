@@ -1,10 +1,5 @@
 .PHONY: all
-all: dependencies ilsvrc12 mobilenet googlenet squeezenet alexnet
-
-.PHONY: dependencies
-dependencies:
-	@echo "\Installing dependencies"
-	sudo apt-get install python3-tk
+all: ilsvrc12 mobilenet agenet gendernet googlenet squeezenet alexnet
 
 .PHONY: ilsvrc12
 ilsvrc12:
@@ -15,6 +10,16 @@ ilsvrc12:
 mobilenet: 
 	@echo "\nmaking mobilenet"
 	(cd ../../tensorflow/mobilenets; make compile;)
+
+.PHONY: agenet
+agenet: 
+	@echo "\nmaking AgeNet"
+	(cd ../../caffe/AgeNet; make compile;)
+
+.PHONY: gendernet 
+gendernet:
+	@echo "\nmaking GenderNet"
+	(cd ../../caffe/GenderNet; make compile;)
 
 .PHONY: googlenet
 googlenet: 
@@ -31,11 +36,10 @@ alexnet:
 	@echo "\nmaking alexet"
 	(cd ../../caffe/AlexNet; make compile;)
 
-
 .PHONY: run
 run: all
-	@echo "\nRunning rapid-image-classifier.py";
-	python3 rapid-image-classifier.py
+	@echo "\nRunning live-image-classifier.py";
+	python3 live-image-classifier.py
 
 .PHONY: help
 help:
@@ -44,4 +48,3 @@ help:
 	@echo "  make - Builds all dependencies, but does not run this program";
 	@echo "  make all - Builds all dependencies and runs this program";
 	@echo "  make run - Runs this program";
-
