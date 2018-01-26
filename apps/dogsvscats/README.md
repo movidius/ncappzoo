@@ -1,6 +1,6 @@
 # Dogs vs Cats on Intel Movidius™ Neural Compute Stick (NCS)
 
-Dataset preparation script for Kaggle's Dog vs Cats competition. This project was created to support a tutorial on how to train a customized version of GoogLeNet using Caffeand then deploy it to Intel® Movidius™ Neural Compute Stick (NCS) for inference. You can read more about this project (and a step-by-step guide) on <a href="https://movidius.github.io/blog/deploying-custom-caffe-models/">NCS developer blog</a>. 
+Dataset preparation script for Kaggle's Dog vs Cats competition. This project was created to support a tutorial on how to train a customized version of GoogLeNet using Caffe and then deploy it to Intel® Movidius™ Neural Compute Stick (NCS) for inference. You can read more about this project (and a step-by-step guide) on <a href="https://movidius.github.io/blog/deploying-custom-caffe-models/">NCS developer blog</a>. 
 
 ## Prerequisites
 
@@ -11,19 +11,23 @@ This code example requires that the following components are available:
 
 ## Running the Example
 
-~~~
-mkdir -p ~/workspace
-cd ~/workspace
-git clone https://github.com/movidius/ncappzoo
-~~~
+1. Clone NC App Zoo to your training system.
 
-Download <a href="https://www.kaggle.com/c/dogs-vs-cats/data">test1.zip and train1.zip</a> from Kaggle, into ~/workspace/ncappzoo/apps/dogsvscats/data. Now run the below steps on your training hardware:
+   ~~~
+   mkdir -p ~/workspace
+   cd ~/workspace
+   git clone https://github.com/movidius/ncappzoo
+   ~~~
 
-~~~
-cd ~/workspace/ncappzoo/apps/dogsvscats
-export CAFFE_PATH=/PATH/TO/YOUR/CAFFE/INSTALL_DIR
-make run
-~~~
+2. Download <a href="https://www.kaggle.com/c/dogs-vs-cats/data">test1.zip and train1.zip</a> from Kaggle, into `~/workspace/ncappzoo/apps/dogsvscats/data`.
+
+3. Now run the below steps on your training hardware:
+
+   ~~~
+   cd ~/workspace/ncappzoo/apps/dogsvscats
+   export CAFFE_PATH=/PATH/TO/YOUR/CAFFE/INSTALL_DIR
+   make run
+   ~~~
 
 If everything went well, you should see an output similar to this:
 
@@ -55,12 +59,12 @@ I0125 17:11:38.870297  6748 compute_image_mean.cpp:119] mean_value channel [1]: 
 I0125 17:11:38.870393  6748 compute_image_mean.cpp:119] mean_value channel [2]: 124.181
 ~~~
 
+4. Head over to the <a href="https://movidius.github.io/blog/deploying-custom-caffe-models/">NCS developer blog</a> for next steps.
+
 ## Troubleshooting
 
-1. Do you see this error:
+1. If you see this error, make sure you have exported your caffe installation path to `CAFFE_PATH`. See step 3 in `Run this example` section.
 
    ~~~
    ./create-lmdb.sh: 45: ./create-lmdb.sh: /build/tools//convert_imageset: not found
    ~~~
-
-*  Make sure you have exported your caffe installation path to CAFFE_PATH. See the command just before `make` in `Run this example` section.
