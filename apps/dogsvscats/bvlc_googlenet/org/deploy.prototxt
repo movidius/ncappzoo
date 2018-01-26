@@ -2127,10 +2127,10 @@ layer {
   }
 }
 layer {
-  name: "loss3/classifier"
+  name: "loss3/classifier_dc"
   type: "InnerProduct"
   bottom: "pool5/7x7_s1"
-  top: "loss3/classifier"
+  top: "loss3/classifier_dc"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -2153,6 +2153,6 @@ layer {
 layer {
   name: "prob"
   type: "Softmax"
-  bottom: "loss3/classifier"
+  bottom: "loss3/classifier_dc"
   top: "prob"
 }
