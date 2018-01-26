@@ -77,19 +77,11 @@ def run_inference(image_to_classify, ssd_mobilenet_graph):
                 print('box at index: ' + str(box_index) + ' has nonfinite data, ignoring it')
                 continue
 
-            x1 = int(output[base_index + 3] * image_to_classify.shape[0])
-            y1 = int(output[base_index + 4] * image_to_classify.shape[1])
-            x2 = int(output[base_index + 5] * image_to_classify.shape[0])
-            y2 = int(output[base_index + 6] * image_to_classify.shape[1])
-
-            if (x1 < 0 or y1 < 0 or x2 < 0 or y2 < 0):
-                print('box at index: ' + str(box_index) + ' has coordinate < 0, ignoring it')
-                continue
-
-            if (x1 > image_to_classify.shape[0] or y1 > image_to_classify.shape[1] or
-                x2 > image_to_classify.shape[0] or y2 > image_to_classify.shape[1] ):
-                print('box at index: ' + str(box_index) + ' has coordinate out of bounds, ignoring it')
-                continue
+            # clip the boxes to the image size incase network returns boxes outside of the image
+            x1 = max(0, int(output[base_index + 3] * image_to_classify.shape[0]))
+            y1 = max(0, int(output[base_index + 4] * image_to_classify.shape[1]))
+            x2 = min(image_to_classify.shape[0], int(output[base_index + 5] * image_to_classify.shape[0]))
+            y2 = min(image_to_classify.shape[1], int(output[base_index + 6] * image_to_classify.shape[1]))
 
             x1_ = str(x1)
             y1_ = str(y1)
