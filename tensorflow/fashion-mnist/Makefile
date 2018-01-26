@@ -31,7 +31,7 @@ profile:
 
 .PHONY: help
 help:
-	@echo "possible make targets: ";
+	@echo "\nPossible make targets: ";
 	@echo "  make help - Shows this message.";
 	@echo "  make - Builds all dependencies, but does not run this program.";
 	@echo "  make data - Downloads dataset.;"
@@ -39,3 +39,8 @@ help:
 	@echo "  make export - Export the trained model for inference.";
 	@echo "  make compile - Convert the trained model into Movidius graph file.";
 	@echo "  make profile - Run the model on NCS and extract complexity, bandwidth and execution time for each layer.";
+
+.PHONY: clean
+clean:
+	@echo "\nMaking clean...";
+	rm -rf model
