@@ -63,7 +63,7 @@ I0125 17:11:38.870393  6748 compute_image_mean.cpp:119] mean_value channel [2]: 
 
 ## Troubleshooting
 
-1. If you see this error, make sure you have exported your caffe installation path to `CAFFE_PATH`. See step 3 in `Run this example` section.
+1. If you see the below error, make sure you have exported your caffe installation path to `CAFFE_PATH`. See step 3 in `Run this example` section.
 
    ~~~
    ./create-lmdb.sh: 45: ./create-lmdb.sh: /build/tools//convert_imageset: not found
