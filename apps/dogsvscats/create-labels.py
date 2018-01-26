@@ -13,7 +13,7 @@ import sys
 import glob
 import ntpath
 
-IMAGES_PATH             = sys.argv[1] + '/train/'
+IMAGES_PATH = sys.argv[1] + '/train/'
 
 # ---- Main function (entry point for this script ) --------------------------
 def main():
