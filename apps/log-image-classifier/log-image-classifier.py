@@ -17,14 +17,15 @@ from os import listdir, path
 from os.path import expanduser, isfile, join
 from glob import glob
 import ntpath
+import csv
 
 # User modifiable input parameters
-NCAPPZOO_PATH           = '../..' 
-GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
+NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
+GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
-LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
-IMAGE_MEAN              = numpy.float16( 127.5 )
-IMAGE_STDDEV            = ( 1 / 127.5 )
+LABELS_PATH             = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
+IMAGE_MEAN              = numpy.float16( [ 104.00698793, 116.66876762, 122.67891434] )
+IMAGE_STDDEV            = ( 1 )
 IMAGE_DIM               = ( 224, 224 )
 
 # Max number of images to process
@@ -101,9 +102,14 @@ def pre_process_image():
 
 def infer_image( graph, file_list, imgarray, print_imgarray ):
 
+    probabilities = []
+    inference_time = []
+
     # Load the labels file 
     labels =[ line.rstrip('\n') for line in 
-                   open( LABELS_PATH ) if line != 'classes\n'] 
+                   open( LABELS_PATH ) if line != 'top_predictions\n'] 
+
+    print( "\nPerforming inference on a lot of images..." )
 
     for index, img in enumerate( imgarray ):
         # Load the image as a half-precision floating point array
@@ -112,28 +118,40 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
         # Get the results from NCS
         output, userobj = graph.GetResult()
 
+        # Determine index of top 5 categories
+        top_predictions = output.argsort()[::-1][:5]
+
         # Get execution time
         inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
 
-        # Find the index of highest confidence 
-        top_prediction = output.argmax()
-
         # Print top prediction
-        print( "Prediction for " 
-                + ntpath.basename( file_list[index] ) 
-                + ": " + labels[top_prediction] 
-                + " with %3.1f%% confidence" 
-                % (100.0 * output[top_prediction] )
-                + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
+#        print( "Prediction for " 
+#                + ntpath.basename( file_list[index] ) 
+#                + ": " + labels[ top_predictions[0] ] 
+#                + " with %3.1f%% confidence" 
+#                % (100.0 * output[ top_predictions[0] ] )
+#                + " in %.2f ms" % ( numpy.sum( inference_time ) ) )
 
         # Display the image on which inference was performed
-        # ---------------------------------------------------------
-        # Uncomment below line if you get 
-        #  'No suitable plugin registered for imshow' error message
-        #skimage.io.use_plugin( 'matplotlib' )
-        # ---------------------------------------------------------
-        #skimage.io.imshow( print_imgarray[index] )
-        #skimage.io.show( )
+#        skimage.io.imshow( print_imgarray[index] )
+#        skimage.io.show( )
+
+        with open( 'inferences.csv', 'a', newline='' ) as csvfile:
+
+            inference_log = csv.writer( csvfile, delimiter=',', 
+                                        quotechar='|', 
+                                        quoting=csv.QUOTE_MINIMAL )
+
+            inference_log.writerow( [ top_predictions[0], output[ top_predictions[0] ], 
+                                      top_predictions[1], output[ top_predictions[1] ], 
+                                      top_predictions[2], output[ top_predictions[2] ], 
+                                      top_predictions[3], output[ top_predictions[3] ], 
+                                      top_predictions[4], output[ top_predictions[4] ], 
+                                      numpy.sum( inference_time ) ] )
+
+    print( "\nInference complete! View results in ./inferences.csv." )
+
+    return
 
 # ---- Step 5: Unload the graph and close the device -------------------------
 
