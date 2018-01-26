@@ -1,4 +1,5 @@
 # Fashion MNIST
+## On Intel® Movidius™ Neural Compute Stick (NCS)
 
 This is a TensorFlow implementation of Fashion MNIST. The model can be trained either on a CPU or GPU based system, and then deployed onto Intel® Movidius™ Neural Compute Stick (NCS) for inference.
 
@@ -12,7 +13,7 @@ This sample project requires that the following componets are available:
 
 ## Running the example
 
-**Training:** Download dataset, train the network and export model for inference
+### Training: Download dataset, train the network and export model for inference.
 
 Run these instructions within your tensorflow virtual environment or docker contrainer on your training hardware. In my case, it was `source ~/workspace/tensorflow/tf_env_py3/bin/activate`.
 
@@ -24,7 +25,7 @@ cd ~/workspace/ncappzoo/tensorflow/fashion-mnist/
 make
 ~~~
 
-**Inference:** Deploy the trained network on NCS
+### Inference: Deploy the trained network on NCS.
 
 Run these instructions on a system where NCSDK is installed. If NCSDK is not installed on the system where you trained and exported the model, copy `model-inference.meta` over to the system with NCSDK.
 
@@ -71,7 +72,7 @@ Here is a diff of the changes I made to `~/workspace/ncappzoo/image-classifier/i
 +# MNIST dataset is monochromatic, so we don't need to worry about color conversion
 ~~~
 
-Now, just run `python3 image-classifier.py` inside `~/workspace/ncappzoo/image-classifier/`. If everything went well, you should see an output similar to this:
+Now run `python3 image-classifier.py` inside `~/workspace/ncappzoo/image-classifier/`. If everything went well, you should see an output similar to this:
 
 ~~~
 ------- predictions --------
