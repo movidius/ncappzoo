@@ -45,7 +45,7 @@ help:
 	@echo "  make all - Runs all targets in the required sequence";
 	@echo "  make deps - Installs dependencies";
 	@echo "  make unzip - Extracts dataset";
-	@echo "  make labels - Creates train.tx & val.txt needed to generate lmdb file";
+	@echo "  make labels - Creates train.txt & val.txt needed to generate lmdb file";
 	@echo "  make lmdb - Creates lmdb files needed to initiate Caffe training";
 	@echo "  make mean - Computes dataset mean";
 
@@ -54,8 +54,7 @@ clean:
 	@echo "making clean"
 	rm -rf $(DATA_ROOT)/train
 	rm -rf $(DATA_ROOT)/test1
-#	rm -rf $(DATA_ROOT)/train/train.txt
-#	rm -rf $(DATA_ROOT)/train/val.txt
 	rm -rf $(DATA_ROOT)/dogsvscats_train_lmdb
 	rm -rf $(DATA_ROOT)/dogsvscats_val_lmdb
-	rm -rf $(DATA_ROOT)/dogsvscats-mean.binaryproto
+	rm -rf $(DATA_ROOT)/dogsvscats-train-mean.binaryproto
+	rm -rf $(DATA_ROOT)/dogsvscats-val-mean.binaryproto
