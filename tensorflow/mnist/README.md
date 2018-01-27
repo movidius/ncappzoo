@@ -1,7 +1,7 @@
-# Fashion MNIST
+# MNIST
 ## On Intel® Movidius™ Neural Compute Stick (NCS)
 
-This is a TensorFlow™ implementation of Fashion MNIST. The model can be trained either on a CPU or GPU based system, and then deployed onto Intel® Movidius™ Neural Compute Stick (NCS) for inference.
+This is a TensorFlow™ implementation of MNIST. The model can be trained either on a CPU or GPU based system, and then deployed onto Intel® Movidius™ Neural Compute Stick (NCS) for inference.
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ Run these instructions within your tensorflow virtual environment or docker cont
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
-cd ~/workspace/ncappzoo/tensorflow/fashion-mnist/
+cd ~/workspace/ncappzoo/tensorflow/mnist/
 make
 ```
 
@@ -35,13 +35,13 @@ The below instructions will convert your meta file into a Movidius graph file, w
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
-cd ~/workspace/ncappzoo/tensorflow/fashion-mnist/
+cd ~/workspace/ncappzoo/tensorflow/mnist/
 make compile
 ```
 
 Now that you have a Movidius graph file, you can use either image-classifier or rapid-image-classifier to deploy it onto the NCS and run inferences. You will have to make some changes to the default app, so that you are pointing to the right graph file and the right test image.
 
-> Like MNIST dataset, Fashion MNIST too is provided in IDX file format, where images are represented as matrices. For inference, you can either read those matrices directly into the NCS app, or you can first convert them to png images. I did the latter.
+> MNIST dataset is provided in IDX file format, where images are represented as matrices. For inference, you can either read those matrices directly into the NCS app, or you can first convert them to png images. I did the latter.
 
 Here is a diff of the changes I made to `~/workspace/ncappzoo/image-classifier/image-classifier.py`:
 
@@ -54,9 +54,9 @@ Here is a diff of the changes I made to `~/workspace/ncappzoo/image-classifier/i
 -IMAGE_MEAN              = numpy.float16( [104.00698793, 116.66876762, 122.67891434] )
 -IMAGE_STDDEV            = ( 1 )
 -IMAGE_DIM               = ( 224, 224 )
-+GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/fashion-mnist/model/graph'
-+IMAGE_PATH              = NCAPPZOO_PATH + '/tensorflow/fashion-mnist/data/testing/6/5469.png'
-+CATEGORIES_PATH         = NCAPPZOO_PATH + '/tensorflow/fashion-mnist/data/categories.txt'
++GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mnist/model/graph'
++IMAGE_PATH              = NCAPPZOO_PATH + '/tensorflow/mnist/data/testing/6/5469.png'
++CATEGORIES_PATH         = NCAPPZOO_PATH + '/tensorflow/mnist/data/categories.txt'
 +IMAGE_MEAN              = numpy.float16( 0 )
 +IMAGE_STDDEV            = ( 1 / 127.5 )
 +IMAGE_DIM               = ( 28, 28 )
@@ -76,12 +76,12 @@ Now run `python3 image-classifier.py` inside `~/workspace/ncappzoo/image-classif
 
 ```
 ------- predictions --------
-Prediction for : Shirt with 71.3% confidence in 4.56 ms
-Prediction for : T-shirt/top with 24.4% confidence in 4.56 ms
-Prediction for : Pullover with 3.8% confidence in 4.56 ms
-Prediction for : Coat with 0.4% confidence in 4.56 ms
+Prediction for : 6 with 100.0% confidence in 4.63 ms
+Prediction for : 9 with 0.0% confidence in 4.63 ms
+Prediction for : 8 with 0.0% confidence in 4.63 ms
+Prediction for : 7 with 0.0% confidence in 4.63 ms
 ```
 
 You should also see the image on which the inference was performed.
 
-> You can make similar changes to `~/workspace/ncappzoo/image-classifier/rapid-image-classifier.py`, with the exception of `IMAGE_PATH = NCAPPZOO + "/tensorflow/fashion-mnist/data/testing/3/`.
+> You can make similar changes to `~/workspace/ncappzoo/image-classifier/rapid-image-classifier.py`, with the exception of `IMAGE_PATH = NCAPPZOO + "/tensorflow/mnist/data/testing/3/`.
