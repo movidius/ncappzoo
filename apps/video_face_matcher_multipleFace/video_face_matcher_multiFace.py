@@ -241,9 +241,8 @@ def main():
 
     valid_output = []
     for i in validated_image_list:
-        validated_image = cv2.imread("/home/mashrin/Documents/ncappzoo/apps/video_face_matcher/validated_images/"+i)
+        validated_image = cv2.imread("./validated_images/"+i)
         cv2.waitKey(0)
-#        cv2.imshow('image',validated_image)
         valid_output.append(run_inference(validated_image, graph))
     if (use_camera):
         run_camera(valid_output, validated_image_list, graph)
