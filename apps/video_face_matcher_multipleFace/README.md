@@ -1,12 +1,12 @@
 # Introduction
 The video_face_matcher example app uses the TensorFlow [ncappzoo/tensorflow/facenet](../../tensorflow/facenet) neural network to find a face in a video camera stream that matches with a known face image.  
 
-The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the window to indicate a match was found.   
+The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches one of the known valid faces saved in (video_face_matcher_multipleFace/validated_images/) a green frame is displayed around the window to indicate a match was found.
 
 # Details
-To make the program recognize your face or any face that you would like replace the video_face_matcher/validated_images/valid.jpg image file with a similar image of the person you would like to recognize.
+To make the program recognize your face or any face that you would like add the image file to video_face_matcher_multipleFace/validated_images/ to recognize.
 
-To determine a match the FACE_MATCH_THRESHOLD value is used.  You might want to adjust this value keeping in mind that the closer this value is to 0.0, the more exact and less forgiving the matching will be.  The initial value for FACE_MATCH_THRESHOLD is 1.2 but you will likely want to play with this value for your own needs.
+To determine a match the FACE_MATCH_THRESHOLD value is used.  You might want to adjust this value keeping in mind that the closer this value is to 0.0, the more exact and less forgiving the matching will be.  The initial value for FACE_MATCH_THRESHOLD is 0.6 but you will likely want to play with this value for your own needs.
 
 The provided Makefile does the following:
 1. Makes the facenet graph file from the ncappzoo/tensorflow/facenet example and copies it to the base directory of this project.
