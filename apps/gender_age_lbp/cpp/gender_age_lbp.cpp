@@ -27,7 +27,7 @@ extern "C"
 #define XML_FILE "../lbpcascade_frontalface_improved.xml"
 // window height and width
 #define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_HEIGHT 360
 
 // network image resolution
 #define NETWORK_IMAGE_WIDTH 227
@@ -52,9 +52,9 @@ bool enableAgeNetwork = true;
 // text colors and font
 const int FONT = cv::FONT_HERSHEY_PLAIN;
 const cv::Scalar BLUE = cv::Scalar(255, 0, 0, 255);
-const cv::Scalar GREEN = cv::Scalar(0, 255, 0, 255);
+const cv::Scalar GREEN = cv::Scalar(100, 255, 100, 255);
 const cv::Scalar RED = cv::Scalar(0, 0, 255, 255);
-const cv::Scalar PINK = Scalar(255, 105, 180, 255);
+const cv::Scalar PINK = Scalar(255, 80, 180, 255);
 const cv::Scalar BLACK = Scalar(0, 0, 0, 255);
 
 // max chars to use for full path.
@@ -523,9 +523,9 @@ int main (int argc, char** argv) {
 
     // create a window
     namedWindow(WINDOW_NAME, WINDOW_NORMAL);
-    resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
+
     setWindowProperty(WINDOW_NAME, CV_WND_PROP_ASPECTRATIO, CV_WINDOW_KEEPRATIO);
-    
+    resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
     moveWindow(WINDOW_NAME, 0, 0);
     // set a point of origin for the window text
     winTextOrigin.x = 0;
@@ -626,7 +626,7 @@ int main (int argc, char** argv) {
                             currentInferenceResult = getInferenceResults(croppedFaceMat, categories[1], mvncStat[1], graph_handle[1]);
                         } else {
                             currentInferenceResult = getInferenceResults(croppedFaceMat, categories[0], mvncStat[0], graph_handle[0]);
-                            cout << ageText << endl;
+                            //cout << ageText << endl;
                             textColor = GREEN;
                         }
                         ageText = currentInferenceResult.ageCategory;
@@ -639,11 +639,12 @@ int main (int argc, char** argv) {
                 // rectangle_text = "id: " + to_string(i) + " " + genderText + " " + ageText;
                 rectangle_text = genderText + " " + ageText;
             }
+
             // print the age and gender text to the window
-            putText(imgIn, rectangle_text, topLeftRect[i], FONT, 2, textColor, 1);
+            putText(imgIn, rectangle_text, topLeftRect[i], FONT, 3, textColor, 3);
         }
 
-        putText(imgIn,"Press ESC to exit", winTextOrigin, FONT, 2, GREEN, 1);
+        putText(imgIn,"Press ESC to exit", winTextOrigin, FONT, 2, GREEN, 2);
         // show the opencv mat in the window
         imshow(WINDOW_NAME, imgIn);
 

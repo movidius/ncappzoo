@@ -18,7 +18,7 @@ IMGSIZE = "224"
 
 #Load preprocessing data
 mean = 127.5 
-std = 1/127.5
+std = 1.0/127.5
 
 if len(sys.argv) > 1:
     IMGCLASS = sys.argv[1]

@@ -86,7 +86,7 @@ with open(graph_folder + "/graph", mode="rb") as f:
 
 #Load preprocessing data
 mean = 118 
-std = 1/128 
+std = 1.0/128.0 
 
 #Load categories from ImageNet Labels
 ##RR  categories = []
