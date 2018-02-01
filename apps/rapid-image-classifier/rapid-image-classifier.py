@@ -24,7 +24,7 @@ GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
 LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
 IMAGE_MEAN              = numpy.float16( 127.5 )
-IMAGE_STDDEV            = ( 1 / 127.5 )
+IMAGE_STDDEV            = ( 1.0 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
 
 # Max number of images to process

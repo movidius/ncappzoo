@@ -28,7 +28,7 @@ with open(path_to_networks + graph_filename, mode='rb') as f:
 
 #Load preprocessing data
 mean = 128
-std = 1/128
+std = 1.0/128.0
 
 #Load categories
 categories = []
