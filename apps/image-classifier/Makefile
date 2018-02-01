@@ -35,15 +35,6 @@ run: all
 .PHONY: help
 help:
 	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: run";
-	@echo "  make run - runs the stream_infer program";
-	@echo "  make clean - removes all created content and temporary files";
-
-clean: clean
-	@echo "\nmaking clean";
-	(cd ../../data/ilsvrc12/; make clean;);
-	(cd ../../caffe/GenderNet; make clean;);
-	(cd ../../caffe/GoogLeNet; make clean;);
-	(cd ../../caffe/SqueezeNet; make clean;);
-	(cd ../../caffe/AlexNet; make clean;);
+	@echo "  make help - Shows this message";
+	@echo "  make - Builds all dependencies, but does not run this program";
+	@echo "  make run - Runs this program";
