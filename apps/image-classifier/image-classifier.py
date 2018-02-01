@@ -20,7 +20,7 @@ GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
 IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
 LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
 IMAGE_MEAN              = [ 104.00698793, 116.66876762, 122.67891434]
-IMAGE_STDDEV            = 1
+IMAGE_STDDEV            = 1.0
 IMAGE_DIM               = ( 224, 224 )
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------

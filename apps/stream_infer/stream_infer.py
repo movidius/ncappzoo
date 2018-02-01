@@ -295,8 +295,8 @@ if __name__=="__main__":
         gNetworkMean = f.readline().split()
         gNetworkStd = f.readline().split()
         for i in range(3):
-            gNetworkMean[i] = 255 * float(gNetworkMean[i])
-            gNetworkStd[i] = 1 / (255 * float(gNetworkStd[i]))
+            gNetworkMean[i] = 255.0 * float(gNetworkMean[i])
+            gNetworkStd[i] = 1.0 / (255.0 * float(gNetworkStd[i]))
 
     # Load categories from categories.txt
     gNetworkCategories = []

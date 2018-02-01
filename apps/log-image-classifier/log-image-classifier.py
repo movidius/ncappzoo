@@ -25,7 +25,7 @@ GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
 LABELS_PATH             = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
 IMAGE_MEAN              = numpy.float16( [ 104.00698793, 116.66876762, 122.67891434] )
-IMAGE_STDDEV            = ( 1 )
+IMAGE_STDDEV            = ( 1.0 )
 IMAGE_DIM               = ( 224, 224 )
 
 # Max number of images to process
