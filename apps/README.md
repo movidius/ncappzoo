@@ -1,1 +1,2 @@
-#Application examples
+#Application examples for the Intel Neural Compute Stick
+
