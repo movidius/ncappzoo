@@ -37,6 +37,11 @@ run: all
 	@echo "\nRunning rapid-image-classifier.py";
 	python3 rapid-image-classifier.py
 
+.PHONY: clean
+clean:
+	@echo "\nmaking clean";
+	@echo "  Nothing to clean";
+
 .PHONY: help
 help:
 	@echo "possible make targets: ";
