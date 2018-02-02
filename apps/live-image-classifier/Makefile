@@ -41,6 +41,11 @@ run: all
 	@echo "\nRunning live-image-classifier.py";
 	python3 live-image-classifier.py
 
+.PHONY: clean
+clean:
+	@echo "\nmaking clean";
+	@echo "  Nothing to clean";
+
 .PHONY: help
 help:
 	@echo "possible make targets: ";
