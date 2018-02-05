@@ -7,7 +7,7 @@ The following list gives a brief description of each of the applications.
 
 - **MultiStick_GoogLeNet:** A demo that makes use of multiple NCS sticks all executing Caffe GoogLeNet image classificaiton simultaneously demonstrating scalability. One GUI window shows inferences on a single stick and an other window uses the rest of the sticks in the system. 
 - **MultiStick_TF_Inception:** Similar to MultiStick_GoogLeNet but uses TensorFlow Inception network.
-- **benchmarkncs:**
+- **benchmarkncs:** Runs multiple inferences on multiple neural networks within the repository and returns inference per second results for each one.  If multiple NCS devices are plugged in will give numbers for one device and for multiple.
 - **birds:**
 - **classifier-gui:**
 - **gender_age_lbp:**
