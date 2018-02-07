@@ -192,14 +192,16 @@ def write_inferences_csv(output_path, images):
         for image in images:
             output_file.write(image.result_string() + '\n')
 
-def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200, 
-    log_loss_max=7.0, time_limit=1000.0):
+
+def score_inferences(images, min_proba=1e-5, mult0=100, mult1=0.18,
+    n_classes=200, log_loss_max=12.0, time_limit=1000.0):
     """ Compute the logLoss and reference computation time
     
     Args:
         images (list): list of processed MovidiusImage instances
         min_proba (float): minimum probability to be used in logLoss
-        mult (int): number of images used for the reference time
+        mult0 (int): number of images used for the reference time
+        mult1 (float): multiplier for the custom loss function
         n_classes (int): total number of classes
         log_loss_limit (float): minimum log_loss requirement
         time_limit (float): maximum time per image (in ms)
@@ -231,16 +233,18 @@ def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200,
     top_1_accuracy /=  n_images
     top_k_accuracy /=  n_images
     image_time /= n_images
-    t = mult * image_time
     print("top_1_accuracy = %.9f" % top_1_accuracy)
     print("top_k_accuracy = %.9f" % top_k_accuracy )
     print("log_loss = %.9f" % log_loss)
     print("image_time = %.9f" % image_time)
-    if image_time > time_limit or log_loss > log_loss_max:
+    if image_time > time_limit:
         score = 0.0
     else:
-        t_max = mult * time_limit
-        score = 1e6 * (1.0 - log_loss * np.log(t) / (log_loss_max *  np.log(t_max)))
+        t = max(1.0, mult0 * image_time)
+        t_max = max(1.0, mult0 * time_limit)
+        tc_loss = log_loss + mult1 * np.log(t)
+        tc_loss_max = log_loss_max  + mult1 * np.log(t_max)
+        score = 1e6 * (1.0 - tc_loss / tc_loss_max)
     print("score = %.2f" % score)
     return score
     
