@@ -21,8 +21,8 @@ import ntpath
 # User modifiable input parameters
 NCAPPZOO_PATH           = '../..' 
 GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/mobilenets/graph'
-IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
-LABELS_PATH             = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
+IMAGE_PATH              = NCAPPZOO_PATH + '/data/images'
+CATEGORIES_PATH         = NCAPPZOO_PATH + '/tensorflow/mobilenets/categories.txt'
 IMAGE_MEAN              = numpy.float16( 127.5 )
 IMAGE_STDDEV            = ( 1 / 127.5 )
 IMAGE_DIM               = ( 224, 224 )
@@ -70,7 +70,7 @@ def pre_process_image():
     print( "\n\nPre-processing images..." )
 
     # Create a list of all files in current directory & sub-directories
-    file_list = [ y for x in os.walk( IMAGES_PATH ) 
+    file_list = [ y for x in os.walk( IMAGE_PATH ) 
                   for y in glob( os.path.join( x[0], '*.jpg' ) ) ]
 
     for file_index, file_name in enumerate( file_list ):
@@ -103,7 +103,7 @@ def infer_image( graph, file_list, imgarray, print_imgarray ):
 
     # Load the labels file 
     labels =[ line.rstrip('\n') for line in 
-                   open( LABELS_PATH ) if line != 'classes\n'] 
+                   open( CATEGORIES_PATH ) if line != 'classes\n'] 
 
     for index, img in enumerate( imgarray ):
         # Load the image as a half-precision floating point array
