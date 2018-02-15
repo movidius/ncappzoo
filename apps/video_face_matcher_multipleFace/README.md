@@ -1,4 +1,4 @@
-	# Introduction
+# Introduction
 The video_face_matcher_multipleFace example app uses the TensorFlow [ncappzoo/tensorflow/facenet](../../tensorflow/facenet) neural network to find a face in a video camera stream that matches with a list of known face image.  
 
 The provided video_face_matcher_multipleFace.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches one of the known valid faces saved in (video_face_matcher_multipleFace/validated_images/) a green frame is displayed around the window to indicate a match was found.
