@@ -1,5 +1,5 @@
 .PHONY: all
-all: data train export
+all: data train freeze
 
 .PHONY: data
 data:
@@ -12,22 +12,31 @@ data:
 .PHONY: train
 train:
 	@echo "\nTraining Fashion MNIST..."
-	(python3 single-conv-train.py)
+	(python3 single-conv-train.py --model_dir=model)
 
-.PHONY: export
-export:
+check_tf:
+ifndef TF_SRC_PATH
+	$(error TF_SRC_PATH is not defined. Run `export TF_SRC_PATH=path/to/your/tensorflow/source/repo`)
+endif
+
+.PHONY: freeze
+freeze: check_tf
 	@echo "\nExporting network model for inference..." 
-	(python3 single-conv-inference.py)
+	(cd model; python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
+             --input_graph=model.pbtxt \
+             --input_checkpoint=model.ckpt \
+             --output_graph=model-frozen.pb \
+             --output_node_name=dense2/dense/Softmax;)
 
 .PHONY: compile
 compile:
 	@echo "\nCompiling model to Movidius graph..."
-	(cd model; mvNCCompile -s 12 model-inference.meta;)
+	(cd model; mvNCCompile -s 12 model-frozen.pb -in=input -on=dense2/dense/Softmax;)
 
 .PHONY: profile
 profile:
 	@echo "\nProfiling the model..."
-	(cd model; mvNCProfile -s 12 model-inference.meta;)
+	(cd model; mvNCProfile -s 12 model-frozen.pb -in=input -on=dense2/dense/Softmax;)
 
 .PHONY: help
 help:
@@ -36,7 +45,7 @@ help:
 	@echo "  make - Builds all dependencies, but does not run this program.";
 	@echo "  make data - Downloads dataset.;"
 	@echo "  make train - Start training the neural network.";
-	@echo "  make export - Export the trained model for inference.";
+	@echo "  make freeze - Export the trained model for inference.";
 	@echo "  make compile - Convert the trained model into Movidius graph file.";
 	@echo "  make profile - Run the model on NCS and extract complexity, bandwidth and execution time for each layer.";
 

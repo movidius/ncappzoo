@@ -21,21 +21,20 @@ This sample project requires that the following componets are available:
 
 ### Training: Download dataset, train the network and export model for inference.
 
-Run these instructions within your tensorflow virtual environment or docker contrainer on your training hardware. In my case, it was `source ~/workspace/tensorflow/tf_env_py3/bin/activate`.
+Run these instructions within your tensorflow virtual environment or docker contrainer on your training hardware. In my case, it was `source ~/workspace/tensorflow/tf_env_py3/bin/activate`. These instructions will train the custom model on fashion MNIST dataset, and freezes the graph for inference. See `make freeze` target in `Makefile`.
 
 ```
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
 cd ~/workspace/ncappzoo/tensorflow/single-conv/
+export TF_SRC_PATH=path/to/your/tensorflow/source/directory
 make
 ```
 
 ### Inference: Deploy the trained network on NCS.
 
-Run these instructions on a system where NCSDK is installed. If NCSDK is not installed on the system where you trained and exported the model, copy `model-inference.meta` over to the system with NCSDK.
-
-The below instructions will convert your meta file into a Movidius graph file, which can then be loaded on to the NCS.
+Run these instructions on a system where NCSDK is installed. If NCSDK is not installed on the system where you trained and exported the model, copy `model/model-frozen.pb` over to the system with NCSDK. These instructions will convert your frozen TensorFlow graph into a Movidius graph file, which can then be loaded on to the NCS.
 
 ```
 mkdir -p ~/workspace
@@ -49,45 +48,25 @@ Now that you have a Movidius graph file, you can use either image-classifier or 
 
 > Like MNIST dataset, Fashion MNIST too is provided in IDX file format, where images are represented as matrices. For inference, you can either read those matrices directly into the NCS app, or you can first convert them to png images. I did the latter.
 
-Here is a diff of the changes I made to `~/workspace/ncappzoo/image-classifier/image-classifier.py`:
+~~~
+cd ~/workspace/ncappzoo/apps/image-classifier
+python3 image-classifier.py --graph ~/workspace/ncappzoo/tensorflow/single-conv/model/graph --dim 28 28 --mean 0 --scale 0.00392 --colormode "monochrome" --labels ~/workspace/ncappzoo/tensorflow/single-conv/data/categories.txt --image ~/workspace/ncappzoo/tensorflow/single-conv/data/testing/0/7602.png 
+~~~
 
-```python
- # User modifiable input parameters
- NCAPPZOO_PATH           = '../..'
--GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
--IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
--CATEGORIES_PATH         = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
--IMAGE_MEAN              = numpy.float16( [104.00698793, 116.66876762, 122.67891434] )
--IMAGE_STDDEV            = ( 1 )
--IMAGE_DIM               = ( 224, 224 )
-+GRAPH_PATH              = NCAPPZOO_PATH + '/tensorflow/single-conv/model/graph'
-+IMAGE_PATH              = NCAPPZOO_PATH + '/tensorflow/single-conv/data/testing/6/5469.png'
-+CATEGORIES_PATH         = NCAPPZOO_PATH + '/tensorflow/single-conv/data/categories.txt'
-+IMAGE_MEAN              = numpy.float16( 0 )
-+IMAGE_STDDEV            = ( 1 / 127.5 )
-+IMAGE_DIM               = ( 28, 28 )
- 
- # ---- Step 1: Open the enumerated device and get a handle to it -------------
- 
-@@ -50,8 +50,7 @@ graph = device.AllocateGraph( blob )
- img = print_img = skimage.io.imread( IMAGE_PATH )
- img = skimage.transform.resize( img, IMAGE_DIM, preserve_range=True )
- 
--# Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
--img = img[:, :, ::-1]
-+# MNIST dataset is monochromatic, so we don't need to worry about color conversion
-```
-
-Now run `python3 image-classifier.py` inside `~/workspace/ncappzoo/image-classifier/`. If everything went well, you should see an output similar to this:
+> Note that the model was trained on 28x28 monochromatic images, so the inference will not work well if you try to pass an RGB image downloaded from the internet.
 
 ```
-------- predictions --------
-Prediction for : Shirt with 22.7% confidence in 1.17 ms
-Prediction for : T-shirt/top with 8.8% confidence in 1.17 ms
-Prediction for : Pullover with 8.6% confidence in 1.17 ms
-Prediction for : Ankle boot with 8.6% confidence in 1.17 ms
+==============================================================
+Top predictions for 7602.png
+Execution time: 1.12351ms
+--------------------------------------------------------------
+99.5%	T-shirt/top
+0.5%	Dress
+0.0%	Ankle boot
+0.0%	Bag
+0.0%	Sneaker
+0.0%	Shirt
+==============================================================
 ```
 
 You should also see the image on which the inference was performed.
-
-> You can make similar changes to `~/workspace/ncappzoo/image-classifier/rapid-image-classifier.py`, with the exception of `IMAGE_PATH = NCAPPZOO + "/tensorflow/single-conv/data/testing/3/`.

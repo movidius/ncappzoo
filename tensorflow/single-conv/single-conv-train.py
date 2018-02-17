@@ -136,16 +136,13 @@ def main(_):
     correct_prediction = tf.cast(correct_prediction, tf.float32)
   accuracy = tf.reduce_mean(correct_prediction)
 
-  graph_location = os.path.expanduser( './model' )
-  print('Saving graph to: %s' % graph_location)
-  train_writer = tf.summary.FileWriter(graph_location)
-  train_writer.add_graph(tf.get_default_graph())
-  
   saver = tf.train.Saver()
-  tf.train.export_meta_graph(filename=graph_location + '/model.meta')
 
   with tf.Session() as sess:
+
     sess.run(tf.global_variables_initializer())
+    train_writer = tf.summary.FileWriter( FLAGS.model_dir, sess.graph )
+
     for i in range(20000):
       batch = mnist.train.next_batch(50)
       if i % 100 == 0:
@@ -156,12 +153,20 @@ def main(_):
 
     print('test accuracy %g' % accuracy.eval(feed_dict={
         x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
-    save_path = saver.save(sess, graph_location + "/model")
+
+    save_path = saver.save(sess, FLAGS.model_dir + "/model.ckpt")
+    tf.train.write_graph( sess.graph_def, FLAGS.model_dir, "model.pbtxt" )
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
+
   parser.add_argument('--data_dir', type=str,
                       default='data',
                       help='Directory for storing input data')
+
+  parser.add_argument('--model_dir', type=str,
+                      default='model',
+                      help='Directory where the model files will be created')
+
   FLAGS, unparsed = parser.parse_known_args()
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
