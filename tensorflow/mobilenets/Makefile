@@ -1,96 +1,73 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
-
-.IGNORE: profile check compile
-
-IMGCLASS ?=1.0
-IMGSIZE ?=224
-
-TF_MODEL = https://raw.githubusercontent.com/tensorflow/models/master/research/slim/nets/mobilenet_v1.py
-WEIGHTS_FILENAME = mobilenet_v1_$(IMGCLASS)_$(IMGSIZE)_2017_06_14.tar.gz
-GET_WEIGHTS = (wget http://download.tensorflow.org/models/${WEIGHTS_FILENAME} && tar zxf ${WEIGHTS_FILENAME} && rm ${WEIGHTS_FILENAME})
-
-MODEL_FILENAME = output/mobilenet_v1_$(IMGCLASS)_$(IMGSIZE).meta
-CONV_SCRIPT = ./save_session.py
-
-INPUT_NODE_FLAG = -in=input
-OUTPUT_NODE_FLAG = -on=MobilenetV1/Predictions/Softmax
+# MobileNet pre-trained checkpoint files listed @ https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md
+MOBILENET_VERSION?=v1
+MOBILENET_DEPTH?=1.0
+MOBILENET_SIZE?=224
+MOBILENET_CKPT=mobilenet_$(MOBILENET_VERSION)_$(MOBILENET_DEPTH)_$(MOBILENET_SIZE)
+MOBILENET_CKPT_TAR=$(MOBILENET_CKPT)_2017_06_14.tar.gz
 
 .PHONY: all
-all: profile check compile
+all: checkpoint export freeze profile
 
-.PHONY: prereqs
-prereqs:
-	(cd ../../data/ilsvrc12; make)
-	@sed -i 's/\r//' run.py
-	@chmod +x run.py
+.PHONY: checkpoint
+checkpoint:
+	@echo "\nDownloading checkpoint files..."
+	(mkdir -p model)
+	(cd model; wget -N http://download.tensorflow.org/models/$(MOBILENET_CKPT_TAR);)
+	(cd model; tar -xvf $(MOBILENET_CKPT_TAR);)
 
-.PHONY: profile
-profile: weights
-	${NCPROFILE} -s 12 ${MODEL_FILENAME} ${INPUT_NODE_FLAG} ${OUTPUT_NODE_FLAG}
+check_model:
+ifndef TF_MODELS_PATH
+	$(error TF_MODELS_PATH is not defined. Run `export TF_MODELS_PATH=path/to/your/tensorflow/models/repo`)
+endif
 
-.PHONY: browse_profile
-browse_profile: weights profile
-	@if [ -e output_report.html ] ; \
-	then \
-		firefox output_report.html & \
-	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
+.PHONY: export
+export: check_model
+	@echo "\nExporting network model for inference..."
+	(cd model; python3 $(TF_MODELS_PATH)/research/slim/export_inference_graph.py \
+             --alsologtostderr \
+             --model_name=mobilenet_v1 \
+             --batch_size=1 \
+             --image_size=$(MOBILENET_SIZE) \
+             --output_file=$(MOBILENET_CKPT).pb;)
 
-.PHONY: weights
-weights:
-	@sed -i 's/\r//' ${CONV_SCRIPT}
-	@chmod +x ${CONV_SCRIPT}
-	@test -f mobilenet_v1.py || wget $(TF_MODEL)
-	@test -f ${MODEL_FILENAME} || (${GET_WEIGHTS} && ${CONV_SCRIPT}  $(IMGCLASS) $(IMGSIZE))
+check_tf:
+ifndef TF_SRC_PATH
+	$(error TF_SRC_PATH is not defined. Run `export TF_SRC_PATH=path/to/your/tensorflow/source/repo`)
+endif
+
+.PHONY: freeze
+freeze: check_tf
+	@echo "\nFreezing the network model for inference..." 
+	(cd model; python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
+             --input_graph=$(MOBILENET_CKPT).pb \
+             --input_binary=true \
+             --input_checkpoint=$(MOBILENET_CKPT).ckpt \
+             --output_graph=$(MOBILENET_CKPT)_frozen.pb \
+             --output_node_name=MobilenetV1/Predictions/Reshape_1;)
 
 .PHONY: compile
-compile: weights
-	${NCCOMPILE} -s 12 ${MODEL_FILENAME} ${INPUT_NODE_FLAG} ${OUTPUT_NODE_FLAG}
+compile:
+	@echo "\nCompiling model to Movidius graph..."
+	(cd model; mvNCCompile -s 12 $(MOBILENET_CKPT)_frozen.pb -in=input -on=MobilenetV1/Predictions/Reshape_1;)
 
-.PHONY: check
-check: weights
-	-${NCCHECK} -s 12 ${MODEL_FILENAME} ${INPUT_NODE_FLAG} ${OUTPUT_NODE_FLAG} -i ../../data/images/cat.jpg -id 829 -S 2 -M 128 -cs 0,1,2
-
-.PHONY: run
-run: compile
-	./run.py $(IMGCLASS) $(IMGSIZE)
-
-.PHONY: run_py
-run_py: compile
-	./run.py $(IMGCLASS) $(IMGSIZE)
+.PHONY: profile
+profile:
+	@echo "\nProfiling the model..."
+	(cd model; mvNCProfile -s 12 $(MOBILENET_CKPT)_frozen.pb -in=input -on=MobilenetV1/Predictions/Reshape_1;)
 
 .PHONY: help
 help:
-	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make weights - downloads the trained model";
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make check - runs SDK checker tool to verify an NCS graph file";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make run_py - runs the run.py python example program";
-	@echo "  make clean - removes all created content"
+	@echo "\nPossible make targets: ";
+	@echo "  make help - Shows this message.";
+	@echo "  make - Builds all dependencies, but does not run this program.";
+	@echo "  make data - Downloads dataset.;"
+	@echo "  make train - Start training the neural network.";
+	@echo "  make freeze - Export the trained model for inference.";
+	@echo "  make compile - Convert the trained model into Movidius graph file.";
+	@echo "  make profile - Run the model on NCS and extract complexity, bandwidth and execution time for each layer.";
 
-
-clean: 
-	@rm -f output.gv
-	@rm -f output.gv.svg
-	@rm -f output_report.html
-	@rm -f output_expected.npy
-	@rm -f *.ckpt
-	@rm -f output_result.npy
-	@rm -f output_val.csv
-	@rm -rf output
-	@rm -rf mobilenet*.ckpt.*
-	@rm -f graph
-	@rm -f mobilenet_v1.py*
-	@rm -f *.gz
+.PHONY: clean
+clean:
+	@echo "\nMaking clean...";
+	rm -rf model
