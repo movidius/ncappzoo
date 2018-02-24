@@ -1,24 +1,23 @@
 
-VERSION?=v1
-DEPTH?=1.0
-IMGSIZE?=224
-MODEL_CKPT=mobilenet_$(VERSION)_$(DEPTH)_$(IMGSIZE)
-MODEL_CKPT_TAR=$(MODEL_CKPT)_2017_06_14.tar.gz
+VERSION?=v3
+MODEL_CKPT=$(MODEL_NAME)
 
-# MobileNet model names as defined in https://github.com/tensorflow/models/blob/master/research/slim/nets/nets_factory.py
-ifeq ($(DEPTH),1.0) 
-MODEL_NAME=mobilenet_$(VERSION)
-else ifeq ($(DEPTH),0.75)
-MODEL_NAME=mobilenet_$(VERSION)_075
-else ifeq ($(DEPTH),0.50)
-MODEL_NAME=mobilenet_$(VERSION)_050
-else ifeq ($(DEPTH),0.25)
-MODEL_NAME=mobilenet_$(VERSION)_025
+# Inception model names as defined in https://github.com/tensorflow/models/blob/master/research/slim/nets/nets_factory.py
+MODEL_NAME=inception_$(VERSION)
+
+ifeq ($(VERSION),v1) 
+MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_28.tar.gz
+OUTPUT_NODE_NAME=InceptionV1/Logits/Predictions/Reshape_1
+else ifeq ($(VERSION),v2) 
+MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_28.tar.gz
+OUTPUT_NODE_NAME=InceptionV2/Predictions/Reshape_1
+else ifeq ($(VERSION),v3) 
+MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_28.tar.gz
+OUTPUT_NODE_NAME=InceptionV3/Predictions/Reshape_1
+else ifeq ($(VERSION),v4) 
+MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_09_09.tar.gz
+OUTPUT_NODE_NAME=InceptionV4/Logits/Predictions
 endif
-
-OUTPUT_NODE_NAME=MobilenetV1/Predictions/Reshape_1
-
-YELLOW='\033[1;33m'
 
 .PHONY: all
 all: profile
@@ -35,6 +34,8 @@ ifndef TF_MODELS_PATH
 	$(error TF_MODELS_PATH is not defined. Run `export TF_MODELS_PATH=path/to/your/tensorflow/models/repo`)
 endif
 
+YELLOW='\033[1;33m'
+
 .PHONY: export
 export: check_model
 	@echo "\nExporting model for inference..."
@@ -42,7 +43,6 @@ export: check_model
              --alsologtostderr \
              --model_name=$(MODEL_NAME) \
              --batch_size=1 \
-             --image_size=$(IMGSIZE) \
              --output_file=$(MODEL_CKPT).pb;)
 
 check_tf:
