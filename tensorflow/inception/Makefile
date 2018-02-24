@@ -19,6 +19,9 @@ MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_09_09.tar.gz
 OUTPUT_NODE_NAME=InceptionV4/Logits/Predictions
 endif
 
+YELLOW='\033[1;33m'
+NOCOLOR='\033[0m'
+
 .PHONY: all
 all: profile
 
@@ -33,8 +36,6 @@ check_model:
 ifndef TF_MODELS_PATH
 	$(error TF_MODELS_PATH is not defined. Run `export TF_MODELS_PATH=path/to/your/tensorflow/models/repo`)
 endif
-
-YELLOW='\033[1;33m'
 
 .PHONY: export
 export: check_model
@@ -64,19 +65,19 @@ freeze: check_tf
 compile: checkpoint export freeze
 	@echo "\nCompiling model to Movidius graph..."
 	(cd model; mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: profile
 profile: checkpoint export freeze
 	@echo "\nProfiling the model..."
 	(cd model; mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: check
 check: checkpoint export freeze
 	@echo "\nComparing results with standard Tensorflow..."
 	(cd model; mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: help
 help:

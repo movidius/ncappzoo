@@ -19,6 +19,7 @@ endif
 OUTPUT_NODE_NAME=MobilenetV1/Predictions/Reshape_1
 
 YELLOW='\033[1;33m'
+NOCOLOR='\033[0m'
 
 .PHONY: all
 all: profile
@@ -64,19 +65,19 @@ freeze: check_tf
 compile: checkpoint export freeze
 	@echo "\nCompiling model to Movidius graph..."
 	(cd model; mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: profile
 profile: checkpoint export freeze
 	@echo "\nProfiling the model..."
 	(cd model; mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: check
 check: checkpoint export freeze
 	@echo "\nComparing results with standard Tensorflow..."
 	(cd model; mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: help
 help:
