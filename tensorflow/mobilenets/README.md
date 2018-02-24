@@ -2,7 +2,7 @@
 
 <a href="https://arxiv.org/abs/1704.04861" target="_blank">MobileNets</a> are a class of efficient convolutional neural networks (CNNs) designed for mobile and embedded vision applications. MobileNets use depth multiplier and image size as hyper-parameters, which can be used to tweak accuracy and latency of the model during training. This ability to tweak the model allows the model builder to train a model that strikes a perfect balance between the application requirements and hardware constrains of their system.
 
-TensorFlow™ provides a set of pre-trained models with different combinations of depth multiplier and image size. The Makefile in this project helps convert any of the TensorFlow MobileNet_V1 models to a Movidius graph file, which can be deployed on to the Intel® Movidius™ Neural Compute Stick (NCS) for inference. The <a href="https://movidius.github.io/blog/ncs-rpi3-mobilenets/" _target="blank">NCS developer blog</a> provides some benchmarking numbers related to MobileNets running on NCS and a Raspberry Pi single board computer.
+TensorFlow™ provides a set of pre-trained models with different combinations of depth multiplier and image size. The Makefile in this project helps convert any of the <a href="https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet_v1.md" target="_blank">TensorFlow MobileNet_V1 models</a> to a Movidius graph file, which can be deployed on to the Intel® Movidius™ Neural Compute Stick (NCS) for inference. The <a href="https://movidius.github.io/blog/ncs-rpi3-mobilenets/" _target="blank">NCS developer blog</a> provides some benchmarking numbers related to MobileNets running on NCS and a Raspberry Pi single board computer.
 
 ## Prerequisites
 
@@ -16,13 +16,17 @@ This code example requires that the following components are available:
 
 ~~~
 mkdir -p ~/workspace/tensorflow
+
+# Clone TensorFlow source and models repo
 cd ~/workspace/tensorflow
 git clone https://github.com/tensorflow/tensorflow
 git clone https://github.com/tensorflow/models
 
+# Clone NC App Zoo
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
 
+# Download, export, freeze and profile MobileNetV1 model
 cd ~/workspace/ncappzoo/apps/image-classifier/
 export TF_SRC_PATH=~/workspace/tensorflow/tensorflow
 export TF_MODELS_PATH=~/workspace/tensorflow/models
