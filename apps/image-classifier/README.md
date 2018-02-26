@@ -31,5 +31,9 @@ prediction 5 is n02971356 carton
 
 You should also see the image on which inference was performed.
 
+## Troubleshooting
 
-
+~~~
+RuntimeError: No suitable plugin registered for imshow.
+~~~
+* Run `sudo apt-get install python3-tk` and then rerun `make run`.
