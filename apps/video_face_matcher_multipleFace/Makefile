@@ -33,7 +33,7 @@ compile: facenet
 .PHONY: run_py
 run_py: prereqs facenet
 	@echo "\nmaking run_py"
-	python3 ./video_face_matcher_multipleFace.py
+	python3 ./video_face_matcher_multiFace.py
 
 
 
