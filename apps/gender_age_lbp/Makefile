@@ -22,7 +22,7 @@ gender_age_lbp: gendernet agenet
 	wget -nc https://raw.githubusercontent.com/opencv/opencv/master/data/lbpcascades/lbpcascade_frontalface_improved.xml;
 	cp gendernet.graph gender_graph/graph;
 	cp agenet.graph age_graph/graph;
-	g++ -std=c++11 cpp/gender_age_lbp.cpp cpp/fp16.c -o cpp/gender_age_lbp -L/usr/local/lib -lmvnc -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect -lopencv_videoio
+	./compile.sh;
 	@echo "Created cpp/gender_age_lbp executable"
 
 .PHONY: run

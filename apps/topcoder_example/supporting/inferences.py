@@ -193,7 +193,7 @@ def write_inferences_csv(output_path, images):
             output_file.write(image.result_string() + '\n')
 
 def score_inferences(images, min_proba = 1e-15, mult = 100, n_classes=200, 
-    log_loss_max=7.0, time_limit=1000.0):
+    log_loss_max=15, time_limit=1000.0):
     """ Compute the logLoss and reference computation time
     
     Args:
