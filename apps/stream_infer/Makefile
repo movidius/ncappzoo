@@ -1,6 +1,6 @@
 
 .PHONY: all
-all: gendernet googlenet squeezenet alexnet
+all: squeezenet
 
 .PHONY: gendernet
 gendernet: 
