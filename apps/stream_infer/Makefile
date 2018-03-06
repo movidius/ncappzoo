@@ -1,11 +1,26 @@
 
 .PHONY: all
-all: squeezenet
+all: gendernet googlenet squeezenet alexnet
+
+.PHONY: gendernet
+gendernet: 
+	@echo "\nmaking gendernet"
+	(cd ../../caffe/GenderNet; make compile;)
+
+.PHONY: googlenet
+googlenet: 
+	@echo "\nmaking googlenet"
+	(cd ../../caffe/GoogLeNet; make compile;)
 
 .PHONY: squeezenet
 squeezenet: 
 	@echo "\nmaking squeezenet"
 	(cd ../../caffe/SqueezeNet; make compile;)
+
+.PHONY: alexnet
+alexnet:
+	@echo "\nmaking alexet"
+	(cd ../../caffe/AlexNet; make compile;)
 
 .PHONY: run
 run: squeezenet
