@@ -143,7 +143,7 @@ def main(_):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter( FLAGS.model_dir, sess.graph )
 
-    for i in range(20000):
+    for i in range(2000):
       batch = mnist.train.next_batch(50)
       if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={
@@ -154,8 +154,8 @@ def main(_):
     print('test accuracy %g' % accuracy.eval(feed_dict={
         x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
-    save_path = saver.save(sess, FLAGS.model_dir + "/model.ckpt")
-    tf.train.write_graph( sess.graph_def, FLAGS.model_dir, "model.pbtxt" )
+    save_path = saver.save(sess, FLAGS.model_dir + "/" + FLAGS.model_name + ".ckpt")
+    tf.train.write_graph( sess.graph_def, FLAGS.model_dir, FLAGS.model_name + ".pb", as_text=False )
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
@@ -167,6 +167,10 @@ if __name__ == '__main__':
   parser.add_argument('--model_dir', type=str,
                       default='model',
                       help='Directory where the model files will be created')
+
+  parser.add_argument('--model_name', type=str,
+                      default='model',
+                      help='Name of the model that will be created')
 
   FLAGS, unparsed = parser.parse_known_args()
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)

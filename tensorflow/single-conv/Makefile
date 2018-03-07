@@ -1,5 +1,12 @@
+
+MODEL_CKPT=model
+OUTPUT_NODE_NAME=dense2/dense/Softmax
+
+YELLOW='\033[1;33m'
+NOCOLOR='\033[0m'
+
 .PHONY: all
-all: data train freeze
+all: check_tf data train profile
 
 .PHONY: data
 data:
@@ -12,7 +19,7 @@ data:
 .PHONY: train
 train:
 	@echo "\nTraining Fashion MNIST..."
-	(python3 single-conv-train.py --model_dir=model)
+	(python3 single-conv-train.py --data_dir=data --model_dir=model --model_name=$(MODEL_CKPT))
 
 check_tf:
 ifndef TF_SRC_PATH
@@ -21,32 +28,47 @@ endif
 
 .PHONY: freeze
 freeze: check_tf
-	@echo "\nExporting network model for inference..." 
+	@echo "\nFreezing model for inference..." 
 	(cd model; python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
-             --input_graph=model.pbtxt \
-             --input_checkpoint=model.ckpt \
-             --output_graph=model-frozen.pb \
-             --output_node_name=dense2/dense/Softmax;)
+             --input_graph=$(MODEL_CKPT).pb \
+             --input_binary=true \
+             --input_checkpoint=$(MODEL_CKPT).ckpt \
+             --output_graph=$(MODEL_CKPT)_frozen.pb \
+             --output_node_name=$(OUTPUT_NODE_NAME);)
 
 .PHONY: compile
-compile:
+compile: freeze
 	@echo "\nCompiling model to Movidius graph..."
-	(cd model; mvNCCompile -s 12 model-frozen.pb -in=input -on=dense2/dense/Softmax;)
+	(cd model; mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences by using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: profile
-profile:
+profile: freeze
 	@echo "\nProfiling the model..."
-	(cd model; mvNCProfile -s 12 model-frozen.pb -in=input -on=dense2/dense/Softmax;)
+	(cd model; mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences by using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
+
+.PHONY: check
+check: freeze
+	@echo "\nComparing results with standard TensorFlow..."
+	(cd model; mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	@echo $(YELLOW)"Movidius graph generated! You can run inferences by using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
+
+.PHONY: run
+run: compile
+	@echo "\nRunning inferences using image-classifier project..."
+	(python3 ../../apps/image-classifier/image-classifier.py --graph ./model/graph --dim 28 28 --mean 0 --scale 0.00392 --colormode "monochrome" --labels ./data/categories.txt --image ./data/testing/5/3698.png)
 
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
 	@echo "  make help - Shows this message.";
-	@echo "  make - Builds all dependencies, but does not run this program.";
+	@echo "  make - Builds all dependencies, but does not run the inference app.";
 	@echo "  make data - Downloads dataset.;"
 	@echo "  make train - Start training the neural network.";
 	@echo "  make freeze - Export the trained model for inference.";
 	@echo "  make compile - Convert the trained model into Movidius graph file.";
+	@echo "  make check - Compare inference results with that of TensorFlow running on CPU/GPU.";
 	@echo "  make profile - Run the model on NCS and extract complexity, bandwidth and execution time for each layer.";
 
 .PHONY: clean
