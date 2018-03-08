@@ -32,11 +32,6 @@ run: all
 	@echo "\nRunning image-classifier.py";
 	python3 image-classifier.py
 
-.PHONY: clean
-clean:
-	@echo "\nmaking clean";
-	@echo "  Nothing to clean";
-
 .PHONY: help
 help:
 	@echo "possible make targets: ";
