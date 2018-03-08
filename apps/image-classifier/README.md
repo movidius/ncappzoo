@@ -36,36 +36,28 @@ Execution time: 95.0071ms
 
 You should also see the image on which inference was performed.
 
-<<<<<<< HEAD
-## Troubleshooting
-
-~~~
-RuntimeError: No suitable plugin registered for imshow.
-~~~
-* Run `sudo apt-get install python3-tk` and then rerun `make run`.
-=======
 ## Configuring this example
 
 This example runs GoogLeNet by default, but you can configure it run other pre-trained deep neural networks. Below are some example commands:
 
 AlexNet (Caffe)
 ~~~
-python3 image-classifier.py --graph ../../caffe/AlexNet/graph --dim 227 227 --image ../../data/images/nps_electric_guitar.png
+python3 image-classifier.py --graph ../../caffe/AlexNet/graph --dim 227 227 --image ../../data/images/pic_053.jpg
 ~~~
 
 SqueezeNet (Caffe)
 ~~~
-python3 image-classifier.py --graph ../../caffe/SqueezeNet/graph --dim 227 227 --image ../../data/images/pic_011.jpg 
+python3 image-classifier.py --graph ../../caffe/SqueezeNet/graph --dim 227 227 --image ../../data/images/pic_053.jpg
 ~~~
 
 Mobilenet (Tensorflow)
 ~~~
-python3 image-classifier.py --graph ../../tensorflow/mobilenets/graph --labels ../../tensorflow/mobilenets/categories.txt --mean 127.5 --scale 0.00789 --dim 224 224 --colormode="RGB" --image ../../data/images/pic_053.jpg 
+python3 image-classifier.py --graph ../../tensorflow/mobilenets/graph --labels ../../tensorflow/mobilenets/model/lables.txt --mean 127.5 --scale 0.00789 --dim 224 224 --colormode="RGB" --image ../../data/images/pic_053.jpg 
 ~~~
 
 Inception (Tensorflow)
 ~~~
-python3 image-classifier.py --graph ../../tensorflow/inception_v1/graph --labels ../../tensorflow/inception_v1/categories.txt --mean 127.5 --scale 0.00789 --dim 224 224 --colormode="RGB" --image ../../data/images/pic_012.jpg 
+python3 image-classifier.py --graph ../../tensorflow/inception_v1/graph --labels ../../tensorflow/inception_v3/model/labels.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB" --image ../../data/images/pic_053.jpg 
 ~~~
 
 ## Customizing this example
@@ -76,4 +68,3 @@ You can use this project as a template for your custom image classifier app. Bel
 2. Steps 1, 2 and 5 are common across all Neural Compute Stick apps, so you can re-use those fuctions without modifications.
 3. Step 3, 'Pre-process the images' is probably the most customizable function. As the name suggests, you can include all image pre-processing tasks in this function. Ex. if you don't want to warp the input image, just crop it before calling `skimage.transform.resize`.
 4. Step 4 should be modified only if there is a need to change the way inference results are read and printed.
->>>>>>> 7990938... Updated image-classifier to include command line arguments
