@@ -8,7 +8,7 @@ The NC App Zoo is a community repository with many content owners and maintainer
 The NC App Zoo contains the following top-level directories.  See the README file in each of these directory or just click on the links below to explore the contents of the NC App Zoo.
 - **[apps](apps/README.md)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the NC App Zoo!**
 - **[caffe](caffe/README.md)** : Scripts to download caffe models and compile graphs for use with the NCS
-- **[tensorflow](tensorflow/readme.md)** : Scripts to download TensorFlow™ models and compile graphs for use with the NCS
+- **[tensorflow](tensorflow/README.md)** : Scripts to download TensorFlow™ models and compile graphs for use with the NCS
 - **data** : Data and scripts to download data for use with models and applications that use the NCS
 
 The top-level directories above have subdirectories that hold project content. Each of these project subdirectories has one or more owners that assumes responsibility for it. The [OWNERS](OWNERS) file contains the mapping of subdirectory to owner. 
