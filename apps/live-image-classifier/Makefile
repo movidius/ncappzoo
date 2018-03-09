@@ -1,25 +1,25 @@
 .PHONY: all
-all: ilsvrc12 mobilenet agenet gendernet googlenet squeezenet alexnet
+all: ilsvrc12 gendernet
 
 .PHONY: ilsvrc12
 ilsvrc12:
 	@echo "\making ilsvrc12"
 	(cd ../../data/ilsvrc12; make;)
 
-.PHONY: mobilenet
-mobilenet: 
-	@echo "\nmaking mobilenet"
-	(cd ../../tensorflow/mobilenets; make compile;)
+.PHONY: gendernet
+gendernet: 
+	@echo "\nmaking gendernet"
+	(cd ../../caffe/GenderNet; make compile;)
 
 .PHONY: agenet
 agenet: 
 	@echo "\nmaking AgeNet"
 	(cd ../../caffe/AgeNet; make compile;)
 
-.PHONY: gendernet 
-gendernet:
-	@echo "\nmaking GenderNet"
-	(cd ../../caffe/GenderNet; make compile;)
+.PHONY: mobilenet
+mobilenet: 
+	@echo "\nmaking mobilenet"
+	(cd ../../tensorflow/mobilenets; make compile;)
 
 .PHONY: googlenet
 googlenet: 
@@ -39,12 +39,7 @@ alexnet:
 .PHONY: run
 run: all
 	@echo "\nRunning live-image-classifier.py";
-	python3 live-image-classifier.py
-
-.PHONY: clean
-clean:
-	@echo "\nmaking clean";
-	@echo "  Nothing to clean";
+	python3 live-image-classifier.py --graph ../../caffe/GenderNet/graph --dim 227 227 --labels ../../data/age_gender/gender_categories.txt
 
 .PHONY: help
 help:
