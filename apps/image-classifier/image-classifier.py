@@ -18,21 +18,10 @@ import skimage.transform
 import mvnc.mvncapi as mvnc
 
 # Number of top prodictions to print
-NUM_PREDICTIONS		= 6
+NUM_PREDICTIONS		= 5
 
-<<<<<<< HEAD
-# User modifiable input parameters
-NCAPPZOO_PATH           = '../..'
-GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph' 
-IMAGE_PATH              = NCAPPZOO_PATH + '/data/images/cat.jpg'
-LABELS_FILE_PATH        = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
-IMAGE_MEAN              = [ 104.00698793, 116.66876762, 122.67891434]
-IMAGE_STDDEV            = 1
-IMAGE_DIM               = ( 224, 224 )
-=======
 # Variable to store commandline arguments
-ARGS                    = None
->>>>>>> 7990938... Updated image-classifier to include command line arguments
+ARGS                = None
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -65,14 +54,6 @@ def load_graph( device ):
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-<<<<<<< HEAD
-# Mean subtraction & scaling [A common technique used to center the data]
-img = img.astype( numpy.float32 )
-img = ( img - IMAGE_MEAN ) * IMAGE_STDDEV
-
-# Load the image as a half-precision floating point array
-graph.LoadTensor( img.astype( numpy.float16 ), 'user object' )
-=======
 def pre_process_image():
 
     # Read & resize image [Image size is defined during training]
@@ -88,7 +69,6 @@ def pre_process_image():
     img = ( img - numpy.float16( ARGS.mean ) ) * ARGS.scale
 
     return img
->>>>>>> 7990938... Updated image-classifier to include command line arguments
 
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
@@ -103,26 +83,17 @@ def infer_image( graph, img ):
     graph.LoadTensor( img, 'user object' )
     output, userobj = graph.GetResult()
 
-<<<<<<< HEAD
-labels = numpy.loadtxt( LABELS_FILE_PATH, str, delimiter = '\t' )
-=======
     # Load the image as a half-precision floating point array
     graph.LoadTensor( img, 'user object' )
->>>>>>> 7990938... Updated image-classifier to include command line arguments
 
     # Get the results from NCS
     output, userobj = graph.GetResult()
 
-<<<<<<< HEAD
-for i in range( 0, 4 ):
-	print ('prediction ' + str(i) + ' is ' + labels[order[i]])
-=======
     # Sort the indices of top predictions
     order = output.argsort()[::-1][:NUM_PREDICTIONS]
 
     # Get execution time
     inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
->>>>>>> 7990938... Updated image-classifier to include command line arguments
 
     # Print the results
     print( "\n==============================================================" )

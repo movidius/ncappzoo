@@ -24,7 +24,7 @@ import mvnc.mvncapi as mvnc
 MAX_IMAGE_COUNT		= 200
 
 # Variable to store commandline arguments
-ARGS                    = None
+ARGS                = None
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
