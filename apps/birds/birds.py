@@ -11,7 +11,7 @@ import cv2
 import os
 
 # will execute on all images in this directory
-input_image_path = '.'
+input_image_path = './images'
 
 tiny_yolo_graph_file= './yolo_tiny.graph'
 googlenet_graph_file= './googlenet.graph'
@@ -404,7 +404,7 @@ def main():
 
     # get list of all the .jpg files in the image directory
     input_image_filename_list = os.listdir(input_image_path)
-    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
+    input_image_filename_list = [input_image_path + '/' + i for i in input_image_filename_list if i.endswith('.jpg')]
 
     if (len(input_image_filename_list) < 1):
         # no images to show
