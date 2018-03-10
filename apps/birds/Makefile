@@ -70,12 +70,18 @@ help:
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
 	@echo "  make run_py - runs the birds.py python example program";
-	@echo "  make clean - removes all created content"
+	@echo "  make clean - removes all created content in this directory."
 
 .PHONY: clean
 clean: 
 	@echo "\nmaking clean"
 	rm -f ${YOLO_TINY_GRAPH_FILENAME}
 	rm -f ${GOOGLENET_GRAPH_FILENAME}
-	rm -f *.jpg
+	rm -f eagles_2.jpg
+	rm -f jas_birds_10.jpg
+	rm -f jas_birds_2.jpg
+	rm -f jas_birds_8.jpg
+	rm -f nps_birds_1.jpg
+	rm -f nps_birds_2.jpg
+	rm -f nps_birds_3.jpg
 
