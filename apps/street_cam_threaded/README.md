@@ -1,10 +1,10 @@
 # Introduction
-The street_cam_threaded application is a object recognition and classification program.  It uses two the NCS devices along with TinyYolo and GoogLeNet to take a video stream and for each frame in the video it will first get bounding boxes for objects via TinyYolo then it will use GoogLeNet to further classify the objects found.  It depends on the caffe/TinyYolo and caffe/GoogLeNet ncappzoo examples.  It is an improvement on the stream_ty_gn application in that it uses a threaded approach to inferences.
+The street_cam_threaded application is an object recognition and classification program.  It uses two or more Neural Compute devices (Intel Neural Compute Stick) along with TinyYolo and GoogLeNet to process a video stream such that each frame in the video first gets bounding boxes for objects via TinyYolo then GoogLeNet is used to further classify the objects found.  It requires the caffe/TinyYolo and caffe/GoogLeNet neural networks in the ncappzoo, but will automatically make these as part of the project Makefile.  It is an improvement on the street_cam application in that it uses a threaded approach so that frames with multiple objects in them can be classified faster.
 
 The provided Makefile does the following:
 1. Builds both TinyYolo and GoogLeNet from their respective directories within the repo.
 2. Copies the built NCS graph files from TinyYolo and GoogLeNet to the current directory.
-3. Runs the provided stream_ty_gn_threaded.py program that creates a GUI window that shows the camera stream along with boxes around the identified objects. 
+3. Runs the provided program that creates a GUI window that shows the camera stream along with boxes around the identified objects. 
 
 # Prerequisites
 This program requires:
@@ -36,7 +36,9 @@ There are a few thresholds in the code you may want to tweek if you aren't getti
 - <strong>TY_INITIAL_MAX_IOU </strong>: Determines which boxes from Tiny Yolo should be separate objects vs identifying the same object.  This is based on the intersection-over-union calculation.  The closer this is to 1.0 the more similar the boxes need to be in order to be considered around the same object.
 - <strong>GN_PROBABILITY_MIN</strong>:  This is the minimum probability from googlenet that will be used to override the general tiny yolo classification with a more specific googlenet classification.  It should be between 0.0 and 1.0.  A value of 0.0 will override every tiny yolo classification with the googlenet classification. 
 
-You can modify these thresholds at runtime with hotkeys to see the changes to the values affect the object identification.  The following hotkeys are mapped to make these adjustments.
+You can modify these thresholds at runtime with hotkeys to see how changes to the values affect the object identification.  
+
+The following hotkeys are available in the program.
 * 'B' increase TY_BOX_PROBABILITY_THRESHOLD
 * 'b' decrease TY_BOX_PROBABILITY_THRESHOLD
 * 'I' increase TY_MAX_IOU
@@ -44,6 +46,7 @@ You can modify these thresholds at runtime with hotkeys to see the changes to th
 * 'G' increase GN_PROBABILITY_MIN
 * 'g' decrease GN_PROBABILITY_MIN
 * '2' toggle the GoogLeNet processing.
+* 'q' quit program
 
 # Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
@@ -52,7 +55,7 @@ Provided Makefile has various targets that help with the above mentioned tasks.
 Shows available targets.
 
 ## make all
-Builds and/or gathers all the required files needed to run the application except building and installing opencv.  This must be done as a separate step with make opencv
+Builds and/or gathers all the required files needed to run the application except building and installing opencv.  This can be done as a separate step with make opencv if required.  
 
 ## make opencv
 Removes the version of OpenCV that was installed with the NCSDK and builds and installs a compatible version of OpenCV 3.3 for this app. This will take a while to finish. Once you have done this on your system you shouldn't need to do it again.
