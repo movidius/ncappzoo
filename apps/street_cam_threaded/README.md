@@ -1,5 +1,5 @@
 # Introduction
-The stream_ty_gn_threaded application is a object recognition and classification program.  It uses two the NCS devices along with TinyYolo and GoogLeNet to take a video stream and for each frame of video first it will get bounding boxes for objects via TinyYolo then it will use GoogLeNet to further classify the objects found.  It depends on the caffe/TinyYolo and caffe/GoogLeNet appzoo examples.  It is an improvement on the stream_ty_gn application in that it processes the inference with a threaded approace
+The street_cam_threaded application is a object recognition and classification program.  It uses two the NCS devices along with TinyYolo and GoogLeNet to take a video stream and for each frame in the video it will first get bounding boxes for objects via TinyYolo then it will use GoogLeNet to further classify the objects found.  It depends on the caffe/TinyYolo and caffe/GoogLeNet ncappzoo examples.  It is an improvement on the stream_ty_gn application in that it uses a threaded approach to inferences.
 
 The provided Makefile does the following:
 1. Builds both TinyYolo and GoogLeNet from their respective directories within the repo.
@@ -8,11 +8,11 @@ The provided Makefile does the following:
 
 # Prerequisites
 This program requires:
-- 2 NCS devices
+- 2 or more Neural Compute devices such as [the Intel® Movidius™ NCS](https://developer.movidius.com/buy)
 - NCSDK 1.09 or greater
 - opencv 3.3 with video for linux support
 
-Note: The OpenCV version that installs with the current ncsdk (1.10.00) does <strong>not</strong> provide V4L support.  To run this application you will need to replace the ncsdk version with a version built from source.  To remove the old opencv and build and install a compatible version you can run the following command from the app's base directory:
+Note: The OpenCV version that installs with some earlier ncsdk installations does <strong>not</strong> provide V4L support.  To run this application you may need to replace the ncsdk installed opencv with a version built from source.  To remove the old opencv and build and install a compatible version you can run the following command from the app's base directory:
 ```
    make opencv
 ```   
@@ -20,7 +20,7 @@ Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 mac
 
 
 # How it Works
-Two NCS devices are needed to run this application, one executes inferences for the Tiny Yolo network and one executes inferences for the googlenet network.  OpenCV is used to open a stored video (or easily modifiable to use a camera stream.) For each frame of video that is processed, the program first runs a Tiny Yolo inference to find all objects in the image.  This will be limited to the 20 categories that Tiny Yolo recognizes.  Those categories can be seen in the code in this line:
+At least two NCS devices are needed to run this application, one executes inferences for the Tiny Yolo network and the rest execute inferences for the googlenet network.  OpenCV is used to open a stored video (or easily modifiable to use a camera stream.) For each frame of video that is processed, the program first runs a Tiny Yolo inference to find all objects in the image.  This will be limited to the 20 categories that Tiny Yolo recognizes.  Those categories can be seen in the code in this line:
 
 ```python
    network_classifications = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car",
