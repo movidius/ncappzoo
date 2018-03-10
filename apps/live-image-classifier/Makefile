@@ -41,9 +41,19 @@ run: all
 	@echo "\nRunning live-image-classifier.py";
 	python3 live-image-classifier.py --graph ../../caffe/GenderNet/graph --dim 227 227 --labels ../../data/age_gender/gender_categories.txt
 
+.PHONY: clean
+clean: 
+	@echo "\nmaking clean"
+	@echo "  Nothing to remove.";
+	
+
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - Shows this message";
 	@echo "  make - Builds all dependencies, but does not run this program";
 	@echo "  make run - Runs this program";
+	@echo "  make clean - Removes build artifacts created by this Makefile";
+
+
+
