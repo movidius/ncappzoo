@@ -41,9 +41,16 @@ run: all
 	@echo "\nRunning image-classifier.py";
 	python3 image-classifier.py
 
+ .PHONY: clean
+ clean: 
+	@echo "\nmaking clean"
+	@echo "  Nothing to remove.";
+
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - Shows this message";
 	@echo "  make - Builds all dependencies, but does not run this program";
 	@echo "  make run - Runs this program";
+	@echo "  make clean - removes files files and directories created in this directory";
+
