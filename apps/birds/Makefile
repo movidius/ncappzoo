@@ -83,6 +83,6 @@ clean:
 	@echo "\nmaking clean"
 	rm -f ${YOLO_TINY_GRAPH_FILENAME}
 	rm -f ${GOOGLENET_GRAPH_FILENAME}
-	rm -r ${IMAGE_DIR}
+	rm -rf ${IMAGE_DIR}
 
 
