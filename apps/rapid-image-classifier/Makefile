@@ -43,8 +43,8 @@ run: all
 
 .PHONY: clean
 clean: 
-        @echo "\nmaking clean"
-        @echo "  Nothing to remove.";
+	@echo "\nmaking clean"
+	@echo "  Nothing to remove.";
 
 .PHONY: help
 help:
