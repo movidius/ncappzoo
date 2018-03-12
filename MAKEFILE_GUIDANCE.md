@@ -2,7 +2,7 @@
 See below for the guidence as to what must/should be in your Makefiles when creating a pull request.
 
 ## Makefiles in the apps directory
-App Makefiles build source code and download or copy (from other repo subdirectories) any required files to the directory. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.  
+App Makefiles build source code and download or copy (from other repo subdirectories) any required files to the directory, as well as run your app. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.  
 
 ### App Makefile **required targets**: 
   - make help : Display make targets and descriptions.
