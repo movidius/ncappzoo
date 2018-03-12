@@ -7,6 +7,9 @@ CATEGORIES_TXT = https://www.topcoder.com/contest/problem/IntelMovidius/categori
 .PHONY: default
 default: help ;
 
+.PHONY: all
+all: help ;
+
 data:
 	@(mkdir -p $(DATADIR);)
 	@echo "Downloading training dataset..."
