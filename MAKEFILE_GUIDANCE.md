@@ -6,8 +6,8 @@ App Makefiles build source code and download or copy (from other repo subdirecto
 
 ### App Makefile **required targets**: 
   - make help : Display make targets and descriptions.
-  - make data : Download data (images, etc) if no data download required, empty target.
-  - make deps : Download/Prepare/compile networks if not needed create empty target
+  - make data : Download data (images, etc.) If no data download required create empty target.
+  - make deps : Download/Prepare/compile networks.  If not needed create empty target.
   - make all : Prepares everything needed to run the application including other projects in the repository. Should not run application, should not popup GUI.
   - make run : Runs the application with default parameters if needed.
   - make clean : Removes all the files in this project directory that may get created when making or running this project.  Should not clean other projects in the repository.
@@ -23,6 +23,7 @@ App Makefiles build source code and download or copy (from other repo subdirecto
  ### Model Makefile **required targets** are:
   - make help : Display make targets and descriptions.
   - make all : runs compile, profile, and check for the network.
+  - make deps : Download/Prepare networks.  If not needed create empty target
   - make compile : Run the NCSDK compiler to create a graph file.
   - make profile : Run the NCSDK profiler to display a profile of the network
   - make check : Run the NCSDK checker to validate the network
