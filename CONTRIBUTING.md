@@ -20,6 +20,7 @@ The following **should** be included in the apps subdirectories:
 - README.md : Markdown file that explains everything needed to build, run, and test your application.
 - Makefile : Prepare, Build, test, run the application.  [See the Makefile Guidence](MAKEFILE_GUIDANCE.md) for instructions as to what should be in the make file. 
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
+- screen_shot.jpg : An image with pixel width of 200 to represent your application (optional.)
 
 The following should **not** typically be stored in the apps subdirectories:
 - NCS graph files : These can be created from your Makefile.
