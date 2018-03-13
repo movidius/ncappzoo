@@ -14,7 +14,7 @@ App Makefiles build source code and download or copy (from other repo subdirecto
   
  
  ## Makefiles for models
- Makefiles for Caffe or TensorFlow models should compile, profile, validate the neural network in the directory.
+ Makefiles for Caffe or TensorFlow models should compile, profile, validate the neural network in the directory.  You can use the ncappzoo/caffe/GoogLeNet/Makefile as the pattern to follow.
  
  ### Makefile **required targets** for ncappzoo/caffe and ncappzoo/tensorflow directories:
   - **make help** : Display make targets and descriptions.
