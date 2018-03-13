@@ -191,7 +191,7 @@ def get_intersection_over_union(box_1, box_2):
 # Displays a gui window with an image that contains
 # boxes and lables for found objects.  will not return until
 # user presses a key.
-# source_image is on which the inference was run. it is assumed to have dimensions matching the network
+# source_image is the original image for the inference before it was resized or otherwise changed.
 # filtered_objects is a list of lists (as returned from filter_objects()
 # each of the inner lists represent one found object and contain
 # the following 6 values:
@@ -201,21 +201,22 @@ def get_intersection_over_union(box_1, box_2):
 #    float value for box width in pixels within source image
 #    float value for box height in pixels within source image
 #    float value that is the probability for the network classification.
-# source_image_width is the width of the source_image
-# source image_height is the height of the source image
 def display_objects_in_gui(source_image, filtered_objects):
-	# copy image so we can draw on it.
+    # copy image so we can draw on it. Could just draw directly on source image if not concerned about that.
     display_image = source_image.copy()
     source_image_width = source_image.shape[1]
     source_image_height = source_image.shape[0]
 
+    x_ratio = float(source_image_width) / NETWORK_IMAGE_WIDTH
+    y_ratio = float(source_image_height) / NETWORK_IMAGE_HEIGHT
+
     # loop through each box and draw it on the image along with a classification label
     print('Found this many objects in the image: ' + str(len(filtered_objects)))
     for obj_index in range(len(filtered_objects)):
-        center_x = int(filtered_objects[obj_index][1])
-        center_y = int(filtered_objects[obj_index][2])
-        half_width = int(filtered_objects[obj_index][3])//2
-        half_height = int(filtered_objects[obj_index][4])//2
+        center_x = int(filtered_objects[obj_index][1] * x_ratio) 
+        center_y = int(filtered_objects[obj_index][2] * y_ratio)
+        half_width = int(filtered_objects[obj_index][3] * x_ratio)//2
+        half_height = int(filtered_objects[obj_index][4] * y_ratio)//2
 
         # calculate box (left, top) and (right, bottom) coordinates
         box_left = max(center_x - half_width, 0)
@@ -271,13 +272,14 @@ def main():
     graph = device.AllocateGraph(graph_from_disk)
 
     # Read image from file, resize it to network width and height
-    # save a copy in img_cv for display, then convert to float32, normalize (divide by 255),
+    # save a copy in display_image for display, then convert to float32, normalize (divide by 255),
     # and finally convert to convert to float16 to pass to LoadTensor as input for an inference
     input_image = cv2.imread(input_image_file)
-    input_image = cv2.resize(input_image, (NETWORK_IMAGE_WIDTH, NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
     display_image = input_image
+    input_image = cv2.resize(input_image, (NETWORK_IMAGE_WIDTH, NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
     input_image = input_image.astype(np.float32)
     input_image = np.divide(input_image, 255.0)
+    input_image = input_image[:, :, ::-1]  # convert to RGB
 
     # Load tensor and get result.  This executes the inference on the NCS
     graph.LoadTensor(input_image.astype(np.float16), 'user object')
