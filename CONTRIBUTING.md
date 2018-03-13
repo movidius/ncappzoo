@@ -18,7 +18,7 @@ The guidelines for what each directory should contain are as follows.
 ### The **apps** subdirectories
 The following **should** be included in the apps subdirectories:
 - README.md : Markdown file that explains everything needed to build, run, and test your application.
-- Makefile : Prepare, Build, test, run the application.  [See the Makefile Guidence](MAKEFILE_GUIDANCE.md) for instructions as to what should be in the make file. 
+- Makefile : [See the Makefile Guidence](MAKEFILE_GUIDANCE.md) for details of how your make file should prepare, build, test, and run the application.
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
 - screen_shot.jpg : An image with pixel width of 200 to represent your application (optional.)
 
