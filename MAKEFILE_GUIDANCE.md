@@ -1,7 +1,7 @@
 # Makefile Guidance 
 See below for the guidence as to what must be in your project Makefiles when creating a pull request for a new project whether its an application or neural network.  The targets below are the minimum Makefile targets that are expected to be in your project, of course contributors are free to add any other targets that make sense for their particular project.
 
-## Makefiles in the apps directory
+## Makefiles for applications
 App Makefiles build source code and download or copy (from other repo subdirectories) any required files to the directory, as well as run your app. If your app needs content from other areas in the repo, like a network graph file, your Makefile should invoke the other Makefile to produce the content needed. You can use the apps/stream_infer/Makefile as the pattern to follow.  
 
 ### Makefile **required targets** for ncappzoo/apps directory: 
@@ -13,10 +13,10 @@ App Makefiles build source code and download or copy (from other repo subdirecto
   - **make clean** : Removes all the files in this project directory that may get created when making or running this project.  Should not clean other projects in the repository.
   
  
- ## Makefiles in the caffe or tensorflow directories
+ ## Makefiles for models
  Makefiles for Caffe or TensorFlow models should compile, profile, validate the neural network in the directory.
  
- ### Model Makefile **required targets** for ncappzoo/caffe and ncappzoo/tensorflow directories:
+ ### Makefile **required targets** for ncappzoo/caffe and ncappzoo/tensorflow directories:
   - **make help** : Display make targets and descriptions.
   - **make all** : runs compile, profile, and check for the network.
   - **make deps** : Download/Prepare networks.  If not needed create empty target
