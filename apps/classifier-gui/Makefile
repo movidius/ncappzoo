@@ -1,5 +1,5 @@
 .PHONY: all
-all: run
+all: googlenet
 
 .PHONY: run
 run: googlenet

@@ -538,6 +538,7 @@ def main():
         # modify input_image for TinyYolo input
         input_image = input_image.astype(np.float32)
         input_image = np.divide(input_image, 255.0)
+        input_image = input_image[:, :, ::-1]  # convert to RGB
 
         # Load tensor and get result.  This executes the inference on the NCS
         ty_graph.LoadTensor(input_image.astype(np.float16), 'user object')

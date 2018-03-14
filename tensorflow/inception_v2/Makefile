@@ -87,3 +87,5 @@ clean:
 	@rm -f output_result.npy
 	@rm -f output_val.csv
 	@rm -rf output
+	@rm -f graph
+

@@ -11,7 +11,7 @@ import cv2
 import os
 
 # will execute on all images in this directory
-input_image_path = '.'
+input_image_path = './images'
 
 tiny_yolo_graph_file= './yolo_tiny.graph'
 googlenet_graph_file= './googlenet.graph'
@@ -132,7 +132,7 @@ def get_duplicate_box_mask(box_list):
     # The intersection-over-union threshold to use when determining duplicates.
     # objects/boxes found that are over this threshold will be
     # considered the same object
-    max_iou = 0.35
+    max_iou = 0.25
 
     box_mask = np.ones(len(box_list))
 
@@ -213,7 +213,7 @@ def get_intersection_over_union(box_1, box_2):
 # Displays a gui window with an image that contains
 # boxes and lables for found objects.  will not return until
 # user presses a key or times out.
-# source_image is on which the inference was run.
+# source_image is the original image before resizing or otherwise changed
 #
 # filtered_objects is a list of lists (as returned from filter_objects()
 #   and then added to by get_googlenet_classifications()
@@ -245,12 +245,15 @@ def display_objects_in_gui(source_image, filtered_objects):
     source_image_width = source_image.shape[1]
     source_image_height = source_image.shape[0]
 
+    x_ratio = float(source_image_width) / TY_NETWORK_IMAGE_WIDTH
+    y_ratio = float(source_image_height) / TY_NETWORK_IMAGE_HEIGHT
+
     # loop through each box and draw it on the image along with a classification label
     for obj_index in range(len(filtered_objects)):
-        center_x = int(filtered_objects[obj_index][1])
-        center_y = int(filtered_objects[obj_index][2])
-        half_width = int(filtered_objects[obj_index][3])//2 + DISPLAY_BOX_WIDTH_PAD
-        half_height = int(filtered_objects[obj_index][4])//2 + DISPLAY_BOX_HEIGHT_PAD
+        center_x = int(filtered_objects[obj_index][1] * x_ratio)
+        center_y = int(filtered_objects[obj_index][2]* y_ratio)
+        half_width = int(filtered_objects[obj_index][3]*x_ratio)//2 + DISPLAY_BOX_WIDTH_PAD
+        half_height = int(filtered_objects[obj_index][4]*y_ratio)//2 + DISPLAY_BOX_HEIGHT_PAD
 
         # calculate box (left, top) and (right, bottom) coordinates
         box_left = max(center_x - half_width, 0)
@@ -305,7 +308,9 @@ def display_objects_in_gui(source_image, filtered_objects):
 #
 # source_image the original image on which the inference was run.  The boxes
 #   defined by filtered_objects are rectangles within this image and will be
-#   used as input for googlenet
+#   used as input for googlenet.  This image may be scaled differently from 
+#   the tiny yolo network dimensions in which case the boxes in filtered objects
+#   will be scaled to match.
 #
 # filtered_objects [IN/OUT] upon input is a list of lists (as returned from filter_objects()
 #   each of the inner lists represent one found object and contain
@@ -325,22 +330,24 @@ def display_objects_in_gui(source_image, filtered_objects):
 # returns None
 def get_googlenet_classifications(gn_graph, source_image, filtered_objects):
 
+    source_image_width = source_image.shape[1]
+    source_image_height = source_image.shape[0]
+    x_scale = float(source_image_width) / TY_NETWORK_IMAGE_WIDTH
+    y_scale = float(source_image_height) / TY_NETWORK_IMAGE_HEIGHT
+
     # pad the height and width of the image boxes by this amount
     # to make sure we get the whole object in the image that
     # we pass to googlenet
-    WIDTH_PAD = 20
-    HEIGHT_PAD = 30
-
-    source_image_width = source_image.shape[1]
-    source_image_height = source_image.shape[0]
+    WIDTH_PAD = int(20 * x_scale)
+    HEIGHT_PAD = int(30 * y_scale)
 
     # loop through each box and crop the image in that rectangle
     # from the source image and then use it as input for googlenet
     for obj_index in range(len(filtered_objects)):
-        center_x = int(filtered_objects[obj_index][1])
-        center_y = int(filtered_objects[obj_index][2])
-        half_width = int(filtered_objects[obj_index][3])//2 + WIDTH_PAD
-        half_height = int(filtered_objects[obj_index][4])//2 + HEIGHT_PAD
+        center_x = int(filtered_objects[obj_index][1]*x_scale)
+        center_y = int(filtered_objects[obj_index][2]*y_scale)
+        half_width = int(filtered_objects[obj_index][3]*x_scale)//2 + WIDTH_PAD
+        half_height = int(filtered_objects[obj_index][4]*y_scale)//2 + HEIGHT_PAD
 
         # calculate box (left, top) and (right, bottom) coordinates
         box_left = max(center_x - half_width, 0)
@@ -391,7 +398,22 @@ def googlenet_inference(gn_graph, input_image):
     '''
 
     # index, label, probability
-    return order[0], gn_labels[order[0]], output[order[0]]
+    ret_index = order[0]
+    ret_label = gn_labels[order[0]]
+    ret_prob = output[order[0]]
+
+    # check for inference results that are not birds.  The hardcoded numbers
+    # in this condition are indices within the googlenet categories
+    # read from the synset_words.txt file.  The inclusive ranges of indices
+    # 127-147, 81-101, 7-24 are all known to be birds.  There may be other 
+    # birds indices in which case they should be added here.
+    if (not (((ret_index >= 127) and (ret_index <= 146)) or
+             ((ret_index >= 81) and (ret_index <=101)) or
+             ((ret_index >= 7) and (ret_index <=24)) )) :
+        # its not classifying as a bird so set googlenet probability to 0
+        ret_prob = 0.0
+
+    return ret_index, ret_label, ret_prob
 
 
 
@@ -404,7 +426,7 @@ def main():
 
     # get list of all the .jpg files in the image directory
     input_image_filename_list = os.listdir(input_image_path)
-    input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.jpg')]
+    input_image_filename_list = [input_image_path + '/' + i for i in input_image_filename_list if i.endswith('.jpg')]
 
     if (len(input_image_filename_list) < 1):
         # no images to show
@@ -455,8 +477,19 @@ def main():
         # save a copy in img_cv for display, then convert to float32, normalize (divide by 255),
         # and finally convert to convert to float16 to pass to LoadTensor as input for an inference
         input_image = cv2.imread(input_image_file)
-        input_image = cv2.resize(input_image, (TY_NETWORK_IMAGE_WIDTH, TY_NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
+
+        # resize the image to be a standard width for all images and maintain aspect ratio
+        STANDARD_RESIZE_WIDTH = 800
+        input_image_width = input_image.shape[1]
+        input_image_height = input_image.shape[0]
+        standard_scale = float(STANDARD_RESIZE_WIDTH) / input_image_width
+        new_width = int(input_image_width * standard_scale) # this should be == STANDARD_RESIZE_WIDTH
+        new_height = int(input_image_height * standard_scale)
+        input_image = cv2.resize(input_image, (new_width, new_height), cv2.INTER_LINEAR)
+
         display_image = input_image
+        input_image = cv2.resize(input_image, (TY_NETWORK_IMAGE_WIDTH, TY_NETWORK_IMAGE_HEIGHT), cv2.INTER_LINEAR)
+        input_image = input_image[:, :, ::-1]  # convert to RGB
         input_image = input_image.astype(np.float32)
         input_image = np.divide(input_image, 255.0)
 

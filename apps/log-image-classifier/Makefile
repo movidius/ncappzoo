@@ -1,5 +1,5 @@
 .PHONY: all
-all: dependencies ilsvrc12 mobilenet googlenet squeezenet alexnet
+all: dependencies ilsvrc12 googlenet squeezenet alexnet
 
 .PHONY: dependencies
 dependencies:

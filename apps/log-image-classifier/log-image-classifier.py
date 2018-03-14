@@ -20,7 +20,7 @@ import ntpath
 import csv
 
 # User modifiable input parameters
-NCAPPZOO_PATH           = expanduser( '~/workspace/ncappzoo' )
+NCAPPZOO_PATH           = expanduser( '../..' )
 GRAPH_PATH              = NCAPPZOO_PATH + '/caffe/GoogLeNet/graph'
 IMAGES_PATH             = NCAPPZOO_PATH + '/data/images'
 LABELS_PATH             = NCAPPZOO_PATH + '/data/ilsvrc12/synset_words.txt'
