@@ -47,6 +47,11 @@ run_py: prereqs ilsvrc12 compile
 	@echo "\nmaking run_py"
 	python3 ./stream_ty_gn_threaded.py
 
+.PHONY: run
+run: prereqs ilsvrc12 compile
+	@echo "\nmaking run"
+	python3 ./stream_ty_gn_threaded.py
+
 .PHONY: opencv
 opencv: 
 	@echo "\nmaking opencv"
