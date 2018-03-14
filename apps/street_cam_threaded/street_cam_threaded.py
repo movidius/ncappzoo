@@ -24,7 +24,7 @@ GOOGLENET_GRAPH_FILE = './googlenet.graph'
 VIDEO_QUEUE_PUT_WAIT_MAX = 4
 VIDEO_QUEUE_FULL_SLEEP_SECONDS = 0.01
 # for title bar of GUI window
-cv_window_name = 'street cam - Q to quit'
+cv_window_name = 'street cam threaded - Q to quit'
 
 VIDEO_QUEUE_SIZE = 2
 GN_INPUT_QUEUE_SIZE = 10

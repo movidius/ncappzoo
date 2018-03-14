@@ -116,6 +116,7 @@ class tiny_yolo_processor:
                                  cv2.INTER_LINEAR)
 
         # modify inference_image for TinyYolo input
+        inference_image = inference_image[:, :, ::-1]  # convert to RGB
         inference_image = inference_image.astype(np.float32)
         inference_image = np.divide(inference_image, 255.0)
 
