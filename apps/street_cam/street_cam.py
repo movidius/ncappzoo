@@ -564,6 +564,7 @@ def main():
                 display_image = input_image.copy()
 
                 # modify input_image for TinyYolo input
+                input_image = input_image[:, :, ::-1]  # convert to RGB
                 input_image = input_image.astype(np.float32)
                 input_image = np.divide(input_image, 255.0)
 
