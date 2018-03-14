@@ -35,6 +35,11 @@ run_py: prereqs facenet
 	@echo "\nmaking run_py"
 	python3 ./video_face_matcher.py
 
+.PHONY: run
+run: prereqs facenet
+	@echo "\nmaking run"
+	python3 ./video_face_matcher.py
+
 .PHONY: opencv
 opencv: 
 	@echo "\nmaking opencv"
@@ -46,7 +51,7 @@ help:
 	@echo "  make help - shows this message";
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make compile - compiles required networks with SDK compiler tool to create graph files";
-	@echo "  make run_py - runs the street_cam_threaded.py python example program";
+	@echo "  make run - runs the street_cam_threaded.py python example program";
 	@echo "  make opencv - removes pip3 opencv and builds from source then installs a new version" ;
 	@echo "  make clean - removes all created content"
 
