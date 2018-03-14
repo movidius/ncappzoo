@@ -1,5 +1,5 @@
 .PHONY: all
-all: ilsvrc12 gendernet
+all: gendernet agenet
 
 .PHONY: ilsvrc12
 ilsvrc12:
@@ -39,14 +39,13 @@ alexnet:
 .PHONY: run
 run: all
 	@echo "\nRunning live-image-classifier.py";
-	python3 live-image-classifier.py --graph ../../caffe/GenderNet/graph --dim 227 227 --labels ../../data/age_gender/gender_categories.txt
+	python3 live-image-classifier.py --graph ../../caffe/AgeNet/graph --labels ../../data/age_gender/age_categories.txt
 
 .PHONY: clean
 clean: 
 	@echo "\nmaking clean"
 	@echo "  Nothing to remove.";
 	
-
 .PHONY: help
 help:
 	@echo "possible make targets: ";
@@ -54,6 +53,3 @@ help:
 	@echo "  make - Builds all dependencies, but does not run this program";
 	@echo "  make run - Runs this program";
 	@echo "  make clean - Removes build artifacts created by this Makefile";
-
-
-
