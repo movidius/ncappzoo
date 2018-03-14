@@ -105,7 +105,7 @@ def infer_image( graph, img, frame ):
     inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
 
     print(  "I am %3.1f%%" % (100.0 * output[top_prediction] ) + " confidant"
-            + " it is a(n) " + labels[top_prediction]
+            + " you are " + labels[top_prediction]
             + " ( %.2f ms )" % ( numpy.sum( inference_time ) ) )
 
     # If a display is available, show the image on which inference was performed
@@ -147,16 +147,16 @@ if __name__ == '__main__':
                          Intel® Movidius™ Neural Compute Stick." )
 
     parser.add_argument( '-g', '--graph', type=str,
-                         default='../../caffe/GoogLeNet/graph',
+                         default='../../caffe/GenderNet/graph',
                          help="Absolute path to the neural network graph file." )
 
     parser.add_argument( '-l', '--labels', type=str,
-                         default='../../data/ilsvrc12/synset_words.txt',
+                         default='../../data/age_gender/gender_categories.txt',
                          help="Absolute path to labels file." )
 
     parser.add_argument( '-M', '--mean', type=float,
                          nargs='+',
-                         default=[104.00698793, 116.66876762, 122.67891434],
+                         default=[78.42633776, 87.76891437, 114.89584775],
                          help="',' delimited floating point values for image mean." )
 
     parser.add_argument( '-S', '--scale', type=float,
@@ -165,13 +165,13 @@ if __name__ == '__main__':
 
     parser.add_argument( '-D', '--dim', type=int,
                          nargs='+',
-                         default=[224, 224],
+                         default=[227, 227],
                          help="Image dimensions. ex. -D 224 224" )
 
     parser.add_argument( '-c', '--colormode', type=str,
-                         default="BGR",
+                         default="RGB",
                          help="RGB vs BGR color sequence. \
-                               ex. TensorFlow = RGB, Caffe = BGR" )
+                               Defined during model training." )
 
     parser.add_argument( '-v', '--video', type=int,
                          default=0,
