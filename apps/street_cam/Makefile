@@ -59,6 +59,12 @@ run_py: prereqs ilsvrc12 compile
 	@echo "\nmaking run_py"
 	python3 ./street_cam.py
 
+.PHONY: run
+run: prereqs ilsvrc12 compile
+	@echo "\nmaking run"
+	python3 ./street_cam.py
+
+
 .PHONY: opencv
 opencv: 
 	@echo "\nmaking opencv"
