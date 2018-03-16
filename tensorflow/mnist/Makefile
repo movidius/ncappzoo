@@ -95,48 +95,27 @@ check: prototxt caffemodel
 #-${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281 ${PROTOTXT_FILENAME} -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy
 	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546  ${PROTOTXT_FILENAME} -S 255 -M 110
 
+
 .PHONY: run
 run: compile
 	@echo "\nmaking run"
-	./run.py
-
-.PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	./run.py
-
-.PHONY:	cpp
-cpp: cpp/run.cpp cpp/fp16.c
-	@echo "\nmaking cpp"
-	g++ cpp/run.cpp cpp/fp16.c -o cpp/run_cpp -lmvnc
-
-.PHONY: run_cpp
-run_cpp: compile cpp
-	@echo "\nmaking run_cpp"
-	cd cpp; ./run_cpp; cd ..
+	python3 ./run.py
 
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
 	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
-	@echo "  make caffemodel - downloads the caffemodel for the network"
+	@echo "  make deps - downloads and prepares the network";
 	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
 	@echo "  make check - runs SDK checker tool to verify an NCS graph file";
 	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
 	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make cpp - builds the run_cpp executable example";
-	@echo "  make run_cpp - runs the run_cpp executable example program";
-	@echo "  make run_py - runs the run.py python example program";
+	@echo "  make run - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
-clean_caffe_model:
-	@echo "\nmaking clean_caffe_model"
-	rm -f ${PROTOTXT_FILENAME}
-	rm -f ${CAFFEMODEL_FILENAME}
 
-clean: clean_caffe_model
+clean: clean
 	@echo "\nmaking clean"
 	rm -f graph
 	rm -f output.gv
@@ -146,4 +125,4 @@ clean: clean_caffe_model
 	rm -f zero_weights.caffemodel
 	rm -f output_result.npy
 	rm -f output_val.csv
-	rm -f cpp/run_cpp
+	rm -f ${NETWORK_SCRIPT_FILENAME}
