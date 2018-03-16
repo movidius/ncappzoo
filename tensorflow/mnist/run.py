@@ -17,7 +17,19 @@ from os import system
 
 dim=(28,28)
 
-imagename = '/home/neal/Downloads/mnist/testSample/img_1.jpg'
+#imagename = '/home/neal/Downloads/mnist/testSample/img_53.jpg'
+#imagename = './digit_images/zero.png'
+#imagename = './digit_images/one.png'
+#imagename = './digit_images/two.png'
+#imagename = './digit_images/three.png'
+#imagename = './digit_images/four.png'
+#imagename = './digit_images/five.png'
+#imagename = './digit_images/six.png'
+#imagename = './digit_images/seven.png'
+#imagename = './digit_images/eight.png'
+imagename = './digit_images/nine.png'
+
+
 
 def infer(imgname):
         # ***************************************************************
@@ -57,13 +69,15 @@ def infer(imgname):
         # ***************************************************************
         # Load the image
         # ***************************************************************
-        mnist_mean = [128.0, 128.0, 128.0]
+        mnist_mean = 128.0
         img = cv2.imread(imgname)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img=cv2.resize(img,dim)
-
         img = img.astype(numpy.float32)
-        img[:] = ((img[:] - 128.0)*(1.0/255.0))
+
+        img[:] = ((img[:]) )
+        #img[:] = ((img[:] - mnist_mean)*(1.0/255.0))
+
         #img[:,:,0] = ((img[:,:,0] - mnist_mean[0])*(1/255.0))
         #img[:,:,1] = ((img[:,:,1] - mnist_mean[1])*(1/255.0))
         #img[:,:,2] = ((img[:,:,2] - mnist_mean[2])*(1/255.0))
@@ -77,9 +91,10 @@ def infer(imgname):
         # Get the result from the NCS
         # ***************************************************************
         output, userobj = graph.GetResult()
+        five_highest_indices = (-output).argsort()[:5]
 
         print ('-----------------------------------------------------------')
-        print ('file: ' + imgname)
+        print ('file: ' + imgname + '--> '+ labels[five_highest_indices[0]])
         print ('-----------------------------------------------------------')
         res_str = 'Raw inference results: ['
         for out_index in range(0, len(output) ):
@@ -93,7 +108,7 @@ def infer(imgname):
         print ('Top 5 results from most ceretain to least:')
         print ('---')
         result = ''
-        five_highest_indices = (-output).argsort()[:5]
+
         for index in range(0, 5):
             one_prediction = 'certainty ' + str(output[five_highest_indices[index]]) + ' --> ' + labels[five_highest_indices[index]]
             #print (one_prediction)
