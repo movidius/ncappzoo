@@ -17,28 +17,8 @@ from os import system
 
 dim=(28,28)
 
-#imagename = '/home/neal/Downloads/mnist/testSample/img_53.jpg'
-#imagename = './digit_images/zero.png'
-#imagename = './digit_images/one.png'
-#imagename = './digit_images/two.png'
-#imagename = './digit_images/three.png'
-#imagename = './digit_images/four.png'
-#imagename = './digit_images/five.png'
-#imagename = './digit_images/six.png'
-#imagename = './digit_images/seven.png'
-#imagename = './digit_images/eight.png'
-imagename = './digit_images/nine.png'
 
-
-
-def infer(imgname):
-        # ***************************************************************
-        # get labels
-        # ***************************************************************
-
-        labels=[ 'digit 0', 'digit 1', 'digit 2', 'digit 3', 'digit 4', 'digit 5', 'digit 6', 'digit 7', 'digit 8', 'digit 9']
-        
-
+def do_initialize():
         # ***************************************************************
         # Get a list of ALL the sticks that are plugged in
         # ***************************************************************
@@ -46,26 +26,37 @@ def infer(imgname):
         if len(devices) == 0:
                 print('No devices found')
                 quit()
-        
+
         # ***************************************************************
         # Pick the first stick to run the network
         # ***************************************************************
         device = mvnc.Device(devices[0])
-        
+
         # ***************************************************************
         # Open the NCS
         # ***************************************************************
         device.OpenDevice()
 
-        filefolder = os.path.dirname(os.path.realpath(__file__)) 
+        filefolder = os.path.dirname(os.path.realpath(__file__))
         network_blob = filefolder + '/mnist_inference.graph'
 
-        #Load blob
+        # Load blob
         with open(network_blob, mode='rb') as f:
                 blob = f.read()
-        
+
         graph = device.AllocateGraph(blob)
+
+        return device, graph
+
+
+def do_inference(graph, imgname):
+        # ***************************************************************
+        # get labels
+        # ***************************************************************
+
+        labels=[ 'digit 0', 'digit 1', 'digit 2', 'digit 3', 'digit 4', 'digit 5', 'digit 6', 'digit 7', 'digit 8', 'digit 9']
         
+
         # ***************************************************************
         # Load the image
         # ***************************************************************
@@ -75,8 +66,8 @@ def infer(imgname):
         img=cv2.resize(img,dim)
         img = img.astype(numpy.float32)
 
-        img[:] = ((img[:]) )
-        #img[:] = ((img[:] - mnist_mean)*(1.0/255.0))
+        #img[:] = ((img[:]) )
+        img[:] = ((img[:] )*(1.0/255.0))
 
         #img[:,:,0] = ((img[:,:,0] - mnist_mean[0])*(1/255.0))
         #img[:,:,1] = ((img[:,:,1] - mnist_mean[1])*(1/255.0))
@@ -91,53 +82,69 @@ def infer(imgname):
         # Get the result from the NCS
         # ***************************************************************
         output, userobj = graph.GetResult()
+
+        #printing the raw results,
+        #res_str = 'Raw inference results: ['
+        #for out_index in range(0, len(output) ):
+        #    res_str = res_str + str(output[out_index])
+        #    if (out_index != (len(output)-1)):
+        #        res_str = res_str + ', '
+        #res_str = res_str + ']'
+        #print (res_str)
+
+        # sort indices in order of highest probabilities
         five_highest_indices = (-output).argsort()[:5]
 
-        print ('-----------------------------------------------------------')
-        print ('file: ' + imgname + '--> '+ labels[five_highest_indices[0]])
-        print ('-----------------------------------------------------------')
-        res_str = 'Raw inference results: ['
-        for out_index in range(0, len(output) ):
-            res_str = res_str + str(output[out_index])
-            if (out_index != (len(output)-1)):
-                res_str = res_str + ', '
-        res_str = res_str + ']'
-        print (res_str)
-
-        print ('---')
-        print ('Top 5 results from most ceretain to least:')
-        print ('---')
-        result = ''
+        inference_labels = []
+        inference_probabilities = []
 
         for index in range(0, 5):
-            one_prediction = 'certainty ' + str(output[five_highest_indices[index]]) + ' --> ' + labels[five_highest_indices[index]]
-            #print (one_prediction)
-            result = result + one_prediction + '\n'
+            inference_probabilities.append(str(output[five_highest_indices[index]]))
+            inference_labels.append(labels[five_highest_indices[index]])
 
+        return inference_labels, inference_probabilities
 
-        # ***************************************************************
-        # Print the results of the inference form the NCS
-        # ***************************************************************
-        #order = output.argsort()[::-1][:6]
-        #print('\n------- predictions --------')
-        #result = ""
-        #for i in range(0,5):
-        #        #print ('prediction ' + str(i) + ' (probability ' + str(output[order[i]]) + ') is ' + labels[order[i]] + '  label index is: ' + str(order[i]) )
-        #        label = re.search("n[0-9]+\s([^,]+)", labels[order[i]]).groups(1)[0]
-        #        result = result + "\n%20s %0.2f %%" % (label, output[order[i]]*100)
-        
-        # ***************************************************************
-        # Clean up the graph and the device
-        # ***************************************************************
+def do_cleanup(device, graph):
         graph.DeallocateGraph()
         device.CloseDevice()
 
-        return result, imgname
+def show_inference_results(imagename, infer_labels, infer_probabilities):
+        print('-----------------------------------------------------------')
+        print('file: ' + imagename + '--> ' + infer_labels[0])
+        print('-----------------------------------------------------------')
+
+        print('---')
+        print('Top 5 results from most certain to least:')
+        print('---')
+
+        for index in range(0, 5):
+                one_prediction = 'certainty ' + str(infer_probabilities[index]) + ' --> ' + infer_labels[index]
+                print(one_prediction)
+
+        print('-----------------------------------------------------------')
+
 
 if __name__ == "__main__":
-        result,imgname = infer(imagename)
-        print (result)
-        print ('-----------------------------------------------------------')
+        image_name_list = []
+        image_name_list.append('./digit_images/zero.png')
+        image_name_list.append('./digit_images/one.png')
+        image_name_list.append('./digit_images/two.png')
+        image_name_list.append('./digit_images/three.png')
+        image_name_list.append('./digit_images/four.png')
+        image_name_list.append('./digit_images/five.png')
+        image_name_list.append('./digit_images/six.png')
+        image_name_list.append('./digit_images/seven.png')
+        image_name_list.append('./digit_images/eight.png')
+        image_name_list.append('./digit_images/nine.png')
+
+        device, graph = do_initialize()
+
+        for index in range(0, len(image_name_list)):
+            infer_labels, infer_probabilities = do_inference(graph, image_name_list[index])
+            show_inference_results(image_name_list[index], infer_labels, infer_probabilities)
+
+        do_cleanup(device, graph)
+
 
 
 
