@@ -26,7 +26,7 @@ if len(sys.argv) > 1:
     if len(sys.argv) > 2:
       images_folder = sys.argv[2]
       if len(sys.argv) > 3:
-        reqsize = sys.argv[3]
+        reqsize = int(sys.argv[3])
 else:
     print("WARNING: using", graph_folder, "for graph file")
     print("WARNING: using", images_folder, "for images dir")
