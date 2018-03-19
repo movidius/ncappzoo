@@ -1,8 +1,4 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
 NCCOMPILE = mvNCCompile
 NCPROFILE = mvNCProfile
 NCCHECK   = mvNCCheck
@@ -11,13 +7,41 @@ NCCHECK   = mvNCCheck
 NETWORK_SCRIPT_FILENAME= mnist_deep.py
 GET_NETWORK_SCRIPT = wget -P . https://raw.githubusercontent.com/tensorflow/tensorflow/r1.4/tensorflow/examples/tutorials/mnist/${NETWORK_SCRIPT_FILENAME}
 
+MODEL_INFERENCE_DATA_FILENAME = mnist_inference.data-00000-of-00001
+MODEL_INFERENCE_INDEX_FILENAME = mnist_inference.index
+MODEL_INFERENCE_META_FILENAME = mnist_inference.meta
+
+IMAGE_DIR = ./digit_images
+GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/licenses.txt; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/zero.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/one.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/twp.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/three.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/four.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/five.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/six.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/seven.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/eight.png; \
+             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/nine.png
+
+
+GET_MODEL_DATA = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_DATA_FILENAME}
+GET_MODEL_INDEX = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_INDEX_FILENAME}
+GET_MODEL_META =  wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_META_FILENAME}
+
+GRAPH_FILENAME = mnist_inference.graph
 
 .PHONY: all
-all: profile check compile cpp 
+all: deps compile
 
 .PHONY: deps
-deps:
-	@echo "\making deps"
+deps: images model
+	@echo "\nmaking deps"
+
+.PHONY: network_code
+network_code:
+	@echo "\making network_code"
 	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
 	then \
 		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
@@ -34,45 +58,68 @@ deps:
 	fi
 
 
-.PHONY: train_network
-train_network: downloads
-	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
-	then \
-		echo "Prototxt file already exists"; \
-	else \
-		echo "Downloading Prototxt file"; \
-		${GET_PROTOTXT}; \
-		if [ -e ${PROTOTXT_FILENAME} ] ; \
-		then \
-			echo "Adding input shape to prototxt file."; \
-			awk 'NR <2 {print}' < ${PROTOTXT_FILENAME} > temp; cat input_shape.prototxt >> temp; awk 'NR > 7 {print}' < ${PROTOTXT_FILENAME} >> temp; mv temp ${PROTOTXT_FILENAME}; \
-		else \
-			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi  
+.PHONY: images
+images:
+	@echo "\nmaking images"
+	${GET_IMAGES};
 
-.PHONY: caffemodel
-caffemodel: 
-	@echo "\nmaking caffemodel"
-	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
+
+.PHONY: model
+model:
+	@echo "\nmaking model"
+	@if [ -e ${MODEL_INFERENCE_DATA_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo "model file ${MODEL_INFERENCE_DATA_FILENAME} already exists, skipping download"; \
 	else \
-		echo "Downloading caffemodel file"; \
-		${GET_CAFFEMODEL}; \
-		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
+		echo "Downloading ${MODEL_INFERENCE_DATA_FILENAME} file"; \
+		${GET_MODEL_DATA}; \
+		if [ -e ${MODEL_INFERENCE_DATA_FILENAME} ] ; \
 		then \
-			echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
+			echo "download ${MODEL_INFERENCE_DATA_FILENAME} done."; \
+		else \
+			echo "***\nError - Could not download ${MODEL_INFERENCE_DATA_FILENAME}. Check network and proxy settings \n***\n"; \
 			exit 1; \
 		fi ; \
-	fi  
+	fi
+	@if [ -e ${MODEL_INFERENCE_META_FILENAME} ] ; \
+	then \
+		echo "model file ${MODEL_INFERENCE_META_FILENAME} already exists, skipping download"; \
+	else \
+		echo "Downloading ${MODEL_INFERENCE_META_FILENAME} file"; \
+		${GET_MODEL_META}; \
+		if [ -e ${MODEL_INFERENCE_META_FILENAME} ] ; \
+		then \
+			echo "download ${MODEL_INFERENCE_META_FILENAME} done."; \
+		else \
+			echo "***\nError - Could not download ${MODEL_INFERENCE_META_FILENAME}. Check network and proxy settings \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi
+	@if [ -e ${MODEL_INFERENCE_INDEX_FILENAME} ] ; \
+	then \
+		echo "model file ${MODEL_INFERENCE_INDEX_FILENAME} already exists, skipping download"; \
+	else \
+		echo "Downloading ${MODEL_INFERENCE_INDEX_FILENAME} file"; \
+		${GET_MODEL_INDEX}; \
+		if [ -e ${MODEL_INFERENCE_INDEX_FILENAME} ] ; \
+		then \
+			echo "download ${MODEL_INFERENCE_INDEX_FILENAME} done."; \
+		else \
+			echo "***\nError - Could not download ${MODEL_INFERENCE_INDEX_FILENAME}. Check network and proxy settings \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi
+
+
+.PHONY: train_network
+train_network: network_code
+	@echo "\nmaking train_network"
+
 
 .PHONY: profile
-profile: prototxt
+profile: model
 	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
+	@echo "No profile for this network yet"
 
 .PHONY: browse_profile
 browse_profile: profile
@@ -84,16 +131,30 @@ browse_profile: profile
 		@echo "***\nError - output_report.html not found" ; \
 	fi ; 
 
+
 .PHONY: compile
-compile: prototxt caffemodel
+compile: model
 	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	@if [ -e ${GRAPH_FILENAME} ] ; \
+	then \
+		echo "graph file ${GRAPH_FILENAME} already exists, skipping compile"; \
+	else \
+		echo "Compiling to create ${GRAPH_FILENAME}"; \
+		${NCCOMPILE} ${MODEL_INFERENCE_META_FILENAME} -w mnist_inference -s 12 -in input -on output -o ${GRAPH_FILENAME}; \
+		if [ -e ${GRAPH_FILENAME} ] ; \
+		then \
+			echo "compile done, created ${GRAPH_FILENAME}."; \
+		else \
+			echo "***\nError - Could not compile, not able to create ${GRAPH_FILENAME} \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi
+
 
 .PHONY: check
-check: prototxt caffemodel
+check: model
 	@echo "\nmaking check"
-#-${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281 ${PROTOTXT_FILENAME} -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy
-	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/nps_electric_guitar.png -s 12 -id 546  ${PROTOTXT_FILENAME} -S 255 -M 110
+	@echo "\No check for this network yet."
 
 
 .PHONY: run
@@ -105,24 +166,21 @@ run: compile
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make deps - downloads and prepares the network";
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make check - runs SDK checker tool to verify an NCS graph file";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
+	@echo "  make all - makes the following: deps, compile;
+	@echo "  make deps - downloads and prepares the trained network";
+	@echo "  make compile - runs SDK compiler tool to compile the graph file for the network";
+	@echo "  make check - (TBD) runs SDK checker tool to verify an NCS graph file";
+	@echo "  make profile - (TBD) runs the SDK profiler tool to profile the network creating output_report.html";
+	@echo "  make browse_profile - (TBD) runs the SDK profiler tool and brings up report in browser.";
 	@echo "  make run - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
 
 clean: clean
 	@echo "\nmaking clean"
-	rm -f graph
-	rm -f output.gv
-	rm -f output.gv.svg
-	rm -f output_report.html
-	rm -f output_expected.npy
-	rm -f zero_weights.caffemodel
-	rm -f output_result.npy
-	rm -f output_val.csv
+	rm -f ${GRAPH_FILENAME}
+	rm -f ${MODEL_INFERENCE_META_FILENAME}
+	rm -f ${MODEL_INFERENCE_INDEX_FILENAME}
+	rm -f ${MODEL_INFERENCE_DATA_FILENAME}
 	rm -f ${NETWORK_SCRIPT_FILENAME}
+	rm -rf ${IMAGE_DIR}
