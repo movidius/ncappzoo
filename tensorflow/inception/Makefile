@@ -42,14 +42,14 @@ endif
 .PHONY: checkpoint
 checkpoint:
 	@echo $(YELLOW)"\nDownloading checkpoint files..."$(NOCOLOR)
-	(mkdir -p model)
-	(cd model; wget -nc http://download.tensorflow.org/models/$(MODEL_CKPT_TAR);)
-	(cd model; tar -xvf $(MODEL_CKPT_TAR);)
+	(mkdir -p model/$(VERSION))
+	(cd model/$(VERSION); wget -nc http://download.tensorflow.org/models/$(MODEL_CKPT_TAR);)
+	(cd model/$(VERSION); tar -xvf $(MODEL_CKPT_TAR);)
 
 .PHONY: export
 export: check_model
 	@echo $(YELLOW)"\nExporting GraphDef file..."$(NOCOLOR)
-	(cd model; python3 $(TF_MODELS_PATH)/research/slim/export_inference_graph.py \
+	(cd model/$(VERSION); python3 $(TF_MODELS_PATH)/research/slim/export_inference_graph.py \
 		--alsologtostderr \
 		--model_name=$(MODEL_NAME) \
 		--batch_size=1 \
@@ -60,7 +60,7 @@ export: check_model
 .PHONY: freeze
 freeze: check_tf checkpoint export
 	@echo $(YELLOW)"\nFreezing model for inference..."$(NOCOLOR)
-	(cd model; python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
+	(cd model/$(VERSION); python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
 		--input_graph=$(MODEL_CKPT).pb \
 		--input_binary=true \
 		--input_checkpoint=$(MODEL_CKPT).ckpt \
@@ -70,25 +70,25 @@ freeze: check_tf checkpoint export
 .PHONY: compile
 compile: freeze
 	@echo $(YELLOW)"\nCompiling model to Movidius graph..."$(NOCOLOR)
-	(cd model; mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	(cd model/$(VERSION); mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
 	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: profile
 profile: freeze
 	@echo $(YELLOW)"\nProfiling the model..."$(NOCOLOR)
-	(cd model; mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	(cd model/$(VERSION); mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
 	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: check
 check: freeze
 	@echo $(YELLOW)"\nComparing results with standard Tensorflow..."$(NOCOLOR)
-	(cd model; mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
+	(cd model/$(VERSION); mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
 	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
 .PHONY: run
 run: compile
 	@echo $(YELLOW)"\nRunning inferences using image-classifier project..."$(NOCOLOR)
-	(python3 ../../apps/image-classifier/image-classifier.py --graph ./model/graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./model/labels.txt --image ../../data/images/pic_053.jpg)
+	(python3 ../../apps/image-classifier/image-classifier.py --graph ./model/$(VERSION)/graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./model/$(VERSION)/labels.txt --image ../../data/images/pic_053.jpg)
 
 .PHONY: help
 help:
