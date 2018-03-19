@@ -44,7 +44,7 @@ python3 live-image-classifier.py --graph ../../tensorflow/mobilenets/graph --lab
 
 Inception (Tensorflow)
 ~~~
-python3 live-image-classifier.py --graph ../../tensorflow/inception_v3/graph --labels ../../tensorflow/inception_v3/model/label.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB"
+python3 live-image-classifier.py --graph ../../tensorflow/inception/model/v3/graph --labels ../../tensorflow/inception/model/v3/label.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB"
 ~~~
 
 ## Customizing this example

@@ -57,7 +57,7 @@ python3 image-classifier.py --graph ../../tensorflow/mobilenets/graph --labels .
 
 Inception (Tensorflow)
 ~~~
-python3 image-classifier.py --graph ../../tensorflow/inception_v1/graph --labels ../../tensorflow/inception_v3/model/labels.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB" --image ../../data/images/pic_053.jpg 
+python3 image-classifier.py --graph ../../tensorflow/inception/model/v3/graph --labels ../../tensorflow/inception/model/v3/labels.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB" --image ../../data/images/pic_053.jpg 
 ~~~
 
 ## Customizing this example
