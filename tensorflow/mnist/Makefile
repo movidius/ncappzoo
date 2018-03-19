@@ -158,7 +158,7 @@ check: model
 
 
 .PHONY: run
-run: compile
+run: deps compile
 	@echo "\nmaking run"
 	python3 ./run.py
 
