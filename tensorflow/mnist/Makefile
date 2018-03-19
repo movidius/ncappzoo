@@ -166,7 +166,7 @@ run: compile
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: deps, compile;
+	@echo "  make all - makes the following: deps, compile";
 	@echo "  make deps - downloads and prepares the trained network";
 	@echo "  make compile - runs SDK compiler tool to compile the graph file for the network";
 	@echo "  make check - (TBD) runs SDK checker tool to verify an NCS graph file";
