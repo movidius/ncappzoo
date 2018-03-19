@@ -2,9 +2,14 @@
 
 
 .PHONY: all
-all: tf_inception_v1 tf_inception_v3
+all: tf_inception_v1 tf_inception_v3 python3-tk
 
-.PHONY: tf_inception_v1
+.PHONY: python3-tk
+python3-tk: 
+	@echo "\nChecking python3-tk dependency"
+	./python3-tk_dep_check.sh
+
+.PHONY: tf_inception_v1 
 tf_inception_v1: 
 	@echo "\nmaking tf inception_v1"
 	(cd ../../tensorflow/inception_v1; make compile;)
@@ -15,16 +20,16 @@ tf_inception_v3:
 	(cd ../../tensorflow/inception_v3; make compile;)
 
 .PHONY: run
-run: tf_inception_v1
+run: tf_inception_v1 python3-tk
 	@echo "\nmaking run";
 	python3 MultiStick_Inception.py 
 
-.PHONY: run_inception_v1
+.PHONY: run_inception_v1 python3-tk
 run_inception_v1: tf_inception_v1
 	@echo "\nmaking run_inception_v1";
 	python3 MultiStick_Inception.py ../../tensorflow/inception_v1/ ../../data/images/
 
-.PHONY: run_inception_v3
+.PHONY: run_inception_v3 python3-tk
 run_inception_v3: tf_inception_v3
 	@echo "\nmaking run_inception_v3";
 	python3 MultiStick_Inception.py ../../tensorflow/inception_v3/ ../../data/images/

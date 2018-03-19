@@ -11,7 +11,7 @@
 # *******************************************************
 
 import sys
-graph_folder="../../tensorflow/inception_v3/"
+graph_folder="../../tensorflow/inception_v1/"
 images_folder = "../../data/images/"
 labels_file = "../../data/ilsvrc12/synset_words.txt"
 mean_file = "../../data/ilsvrc12/ilsvrc_2012_mean.npy"
@@ -36,13 +36,6 @@ else:
 # Install prerequisites
 # *****************************************************************
 from os import listdir, system, getpid
-
-print("\n\nInstalling prerequisites\n\n")
-system("sudo -H apt-get install python3-tk")
-system("(cd " + graph_folder + "; make compile)")
-
-# *****************************************************************
-
 from mvnc import mvncapi as mvnc
 import numpy
 import cv2
