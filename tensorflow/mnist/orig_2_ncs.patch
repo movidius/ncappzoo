@@ -5,8 +5,8 @@
     save_path = saver.save(sess, graph_location + "/mnist_model")
 .
 158a
-    # NPS changing 20000 to smaller number
-    # for i in range(20000):
+    # NPS change 20000 to smaller number if you are testing
+    # for i in range(1000):
 .
 156a
   # NPS added line
