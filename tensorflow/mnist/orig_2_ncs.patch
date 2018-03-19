@@ -1,0 +1,20 @@
+168a
+
+    # NPS added two lines
+    graph_location = "."
+    save_path = saver.save(sess, graph_location + "/mnist_model")
+.
+158a
+    # NPS changing 20000 to smaller number
+    # for i in range(20000):
+.
+156a
+  # NPS added line
+  saver = tf.train.Saver()
+
+.
+131c
+  # NPS replaced line
+  #x = tf.placeholder(tf.float32, [None, 784])
+  x = tf.placeholder(tf.float32, [None, 784], name="input")
+.
