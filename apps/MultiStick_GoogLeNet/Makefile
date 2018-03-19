@@ -9,8 +9,13 @@ googlenet:
 	@echo "\nmaking googlenet"
 	(cd ../../caffe/GoogLeNet; make compile;)
 
+.PHONY: python3-tk
+python3-tk: 
+	@echo "\nChecking python3-tk dependency"
+	./python3-tk_dep_check.sh
+
 .PHONY: run
-run: googlenet
+run: googlenet python3-tk
 	@echo "\nmaking run";
 	python3 MultiStick_GoogLeNet.py
 

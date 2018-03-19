@@ -32,17 +32,7 @@ else:
 
 # ****************************************************************
 
-# *****************************************************************
-# Install prerequisites
-# *****************************************************************
 from os import listdir, system, getpid
-
-print("\n\nInstalling prerequisites\n\n")
-system("sudo -H apt-get install python3-tk")
-system("(cd " + graph_folder + "; make compile)")
-
-# *****************************************************************
-
 from mvnc import mvncapi as mvnc
 import numpy
 import cv2
