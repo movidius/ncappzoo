@@ -23,7 +23,7 @@ Downloads the trained model
 compiles the trained model to generate a Movidius internal 'graph' format file.  This file can be loaded on the Neural Compute Stick for inferencing.  Demonstrates NCSDK tool: mvNCCompile
 
 ## make run
-Runs the provided program which sends a demonstrates using the NCSDK to run an inference using this network.
+Runs the provided program which demonstrates using the NCSDK to run an inference using this network.
 
 ## make clean
 Removes all the temporary and target files that are created by the Makefile.
