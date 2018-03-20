@@ -22,21 +22,6 @@ PATCH_FOR_INFERENCE_FILENAME = ncs_2_inference.patch
 MNIST_NCS_FILENAME = mnist_deep_mod.py
 MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
 
-IMAGE_DIR = ./digit_images
-GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/licenses.txt; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/zero.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/one.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/twp.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/three.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/four.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/five.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/six.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/seven.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/eight.png; \
-             wget -c --no-cache -P ${IMAGE_DIR} https://raw.githubusercontent.com/nealvis/media/master/digit_pics/nine.png
-
-
 GET_MODEL_DATA = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_DATA_FILENAME}
 GET_MODEL_INDEX = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_INDEX_FILENAME}
 GET_MODEL_META =  wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_META_FILENAME}
@@ -47,7 +32,7 @@ GRAPH_FILENAME = mnist_inference.graph
 all: deps compile
 
 .PHONY: deps
-deps: images model
+deps: model
 	@echo "\nmaking deps"
 
 .PHONY: network_code
@@ -67,12 +52,6 @@ network_code:
 			exit 1; \
 		fi ; \
 	fi
-
-
-.PHONY: images
-images:
-	@echo "\nmaking images"
-	${GET_IMAGES};
 
 
 .PHONY: model
@@ -238,7 +217,6 @@ clean: clean
 	rm -f ${MODEL_INFERENCE_INDEX_FILENAME}
 	rm -f ${MODEL_INFERENCE_DATA_FILENAME}
 	rm -f ${NETWORK_SCRIPT_FILENAME}
-	rm -rf ${IMAGE_DIR}
 	rm -f ${MODEL_META_FILENAME}
 	rm -f ${MODEL_INDEX_FILENAME}
 	rm -f ${MODEL_DATA_FILENAME}
