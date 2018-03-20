@@ -13,7 +13,7 @@ from typing import List
 
 
 NETWORK_IMAGE_DIMENSIONS = (28,28)
-IMAGE_PATH = './digit_images'
+IMAGE_PATH = '../../data/digit_images'
 
 def do_initialize() -> (mvnc.Device, mvnc.Graph):
     """Creates and opens the Neural Compute device and c
