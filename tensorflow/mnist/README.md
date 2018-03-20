@@ -10,21 +10,27 @@ This network is based on the [TensorFlow 1.4 mnist_deep.py example.](https://git
 # Makefile
 Provided Makefile provides targets to do all of the following.
 
-## make help
-Shows makefile possible targets and brief descriptions. 
-
 ## make all
 Makes, downloads, and prepares everything needed to run the example program.
+
+## make clean
+Removes all the temporary and target files that are created by the Makefile.
+
+## make compile
+Compiles the trained model to generate a Movidius internal 'graph' format file.  This file can be loaded on the Neural Compute Stick for inferencing.  Demonstrates NCSDK tool: mvNCCompile
+
+## deps 
+Downloads and prepares a trained network for compilation with the NCSDK
+
+## make help
+Shows makefile possible targets and brief descriptions. 
 
 ## make model
 Downloads the trained model
 
-## make compile
-compiles the trained model to generate a Movidius internal 'graph' format file.  This file can be loaded on the Neural Compute Stick for inferencing.  Demonstrates NCSDK tool: mvNCCompile
-
 ## make run
 Runs the provided program which demonstrates using the NCSDK to run an inference using this network.
 
-## make clean
-Removes all the temporary and target files that are created by the Makefile.
+## make train
+Creates an NCSDK compatibile version of the network and trains it.  This may take 20 min or more depending on your system setup and performance.  
 
