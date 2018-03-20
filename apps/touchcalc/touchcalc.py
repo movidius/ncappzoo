@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 
+import digitdetector
+
 
 class TouchCalc:
-    def __init__(self, window_title='TouchApp', width=800, height=800):
+    def __init__(self, window_title='TouchCalc', width=800, height=800):
         # Save these for use later
         self._height = height
         self._width = width
@@ -28,7 +30,7 @@ class TouchCalc:
     def _clear(self):
         """Clear the canvas and redraw buttons."""
         self._canvas[:] = 255
-        self._draw_buttons()
+        self._draw_ui()
 
     def _draw(self, event, x, y, flags, param):
         """Event listener for mouse events."""
@@ -39,7 +41,7 @@ class TouchCalc:
                     self._clear()
                 if x > self._width - 100:
                     # Bottom right corner was clicked
-                    self._submit()
+                    self.submit()
             else:
                 self._drawing = True
 
@@ -50,29 +52,42 @@ class TouchCalc:
         elif event == cv2.EVENT_LBUTTONUP:
             self._drawing = False
 
-    def _draw_buttons(self):
+    def _draw_ui(self, color=(255, 0, 0)):
         """Draw buttons on the canvas."""
         font_name = cv2.FONT_HERSHEY_DUPLEX
         font_scale = 2
         font_thickness = 3
-        font_color = (255, 0, 0)  # BGR
         y_coord = self._height - 10
 
-        cv2.putText(self._canvas, 'C', (0, y_coord), font_name, font_scale, font_color, font_thickness)
-        cv2.putText(self._canvas, '=', (self._width - 50, y_coord), font_name, font_scale, font_color, font_thickness)
+        cv2.putText(self._canvas, 'C', (0, y_coord), font_name, font_scale, color, font_thickness)
+        cv2.putText(self._canvas, '=', (self._width - 50, y_coord), font_name, font_scale, color, font_thickness)
 
-    def _submit(self):
-        """Do something when the submit button is clicked."""
-        # TODO
-        print('Submit!')
+    def close(self):
+        """Close and destroy the window."""
+        cv2.destroyWindow(self._window_name)
 
     def show(self):
         """Show the window if hidden and update the display."""
         cv2.imshow(self._window_name, self._canvas)
 
-    def close(self):
-        """Close and destroy the window."""
-        cv2.destroyWindow(self._window_name)
+    def submit(self):
+        """Process the image when the submit button is clicked."""
+        # Remove the buttons
+        self._draw_ui(color=(255, 255, 255))
+
+        # Detect the digits
+        digits = digitdetector.detect(self._canvas)
+
+        # Draw the buttons again
+        self._draw_ui()
+
+        # Save the regions to file
+        '''for n, rect in enumerate(digits):
+            x, y, w, h = rect
+            cv2.imwrite(str(n) + ".jpg", self._canvas[y:(y+h), x:(x+w)])'''
+
+        # TODO: more stuff
+        print('Submit!')
 
 
 if __name__ == '__main__':
