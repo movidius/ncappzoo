@@ -5,6 +5,8 @@ The mnist network can be used for handwriting recognition for the digits 0-9.  T
 3. Compiles the network using the Neural Compute SDK.
 4. There is a python example (run.py) which runs an inference for all of the test images to show how to use the network with the Neural Compute API thats provided in the Neural Compute SDK.
 
+This network is based on the [TensorFlow 1.4 mnist_deep.py example.](https://github.com/tensorflow/tensorflow/blob/r1.4/tensorflow/examples/tutorials/mnist/mnist_deep.py)  It was modified, trained, and saved in accordance with the [NCSDK TensorFlow Guidance page ](https://movidius.github.io/ncsdk/tf_compile_guidance.html) so that it can be compiled with the NCSDK compiler.
+
 # Makefile
 Provided Makefile provides targets to do all of the following.
 
@@ -25,3 +27,4 @@ Runs the provided program which sends a demonstrates using the NCSDK to run an i
 
 ## make clean
 Removes all the temporary and target files that are created by the Makefile.
+

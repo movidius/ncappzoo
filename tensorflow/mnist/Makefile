@@ -7,9 +7,20 @@ NCCHECK   = mvNCCheck
 NETWORK_SCRIPT_FILENAME= mnist_deep.py
 GET_NETWORK_SCRIPT = wget -P . https://raw.githubusercontent.com/tensorflow/tensorflow/r1.4/tensorflow/examples/tutorials/mnist/${NETWORK_SCRIPT_FILENAME}
 
+MODEL_DATA_FILENAME = mnist_model.data-00000-of-00001
+MODEL_INDEX_FILENAME = mnist_model.index
+MODEL_META_FILENAME = mnist_model.meta
+
 MODEL_INFERENCE_DATA_FILENAME = mnist_inference.data-00000-of-00001
 MODEL_INFERENCE_INDEX_FILENAME = mnist_inference.index
 MODEL_INFERENCE_META_FILENAME = mnist_inference.meta
+
+
+PATCH_FOR_NCS_FILENAME = orig_2_ncs.patch
+PATCH_FOR_INFERENCE_FILENAME = ncs_2_inference.patch
+
+MNIST_NCS_FILENAME = mnist_deep_mod.py
+MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
 
 IMAGE_DIR = ./digit_images
 GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
@@ -111,9 +122,52 @@ model:
 	fi
 
 
-.PHONY: train_network
-train_network: network_code
-	@echo "\nmaking train_network"
+.PHONY: train
+train:
+	@echo "\nmaking train";
+	@echo "\nTo train the network the following steps will be taken:";
+	@echo "  - Download the TensorFlow mnist_deep.py example";
+	@echo "  - Modify the mnist_deep.py -> mnist_deep_mod.py for NCS compatibility";
+	@echo "  - run mnist_deep_mod.py to train the network, it will save trained network in:";
+	@echo "      ${MODEL_DATA_FILENAME}";
+	@echo "      ${MODEL_INDEX_FILENAME}";
+	@echo "      ${MODEL_META_FILENAME}";
+	@echo "  - modify mnist_deep_mod.py -> mnist_deep_inference.py for inference only version";
+	@echo "    of the network (no training code)."
+	@echo "  - run mnist_deep_inference.py to read the saved network and write an inference";
+	@echo "    only version of the network that the NCSDK can compile in these files:";
+	@echo "      ${MODEL_INFERENCE_DATA_FILENAME}";
+	@echo "      ${MODEL_INFERENCE_INDEX_FILENAME}";
+	@echo "      ${MODEL_INFERENCE_META_FILENAME}";
+	@echo "  "
+	@echo "After complete, you will be able to compile the network you just trained with:"
+	@echo "make compile"
+	@echo ""
+	@read -p"Press ENTER to continue the steps above (this will take about 20 min) or Ctrl-C to cancel" variable_nps;echo;
+
+	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
+	then \
+		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
+	else \
+		echo "Downloading ${NETWORK_SCRIPT_FILENAME} file"; \
+		${GET_NETWORK_SCRIPT}; \
+		if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
+		then \
+			echo "download ${NETWORK_SCRIPT_FILENAME} done."; \
+		else \
+			echo "***\nError - Could not download ${NETWORK_SCRIPT_FILENAME}. Check network and proxy settings \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi ;
+
+
+	@echo "patching example for NCSDK";
+	patch ${NETWORK_SCRIPT_FILENAME} -i ${PATCH_FOR_NCS_FILENAME} -o ${MNIST_NCS_FILENAME};
+	patch ${MNIST_NCS_FILENAME} -i ${PATCH_FOR_INFERENCE_FILENAME} -o ${MNIST_INFERENCE_FILENAME};
+	@echo "Running patched code to start training";
+	python3 ./${MNIST_NCS_FILENAME}
+	@echo "Running code to save for NCSDK";
+	python3 ./${MNIST_INFERENCE_FILENAME}
 
 
 .PHONY: profile
@@ -167,13 +221,14 @@ help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
 	@echo "  make all - makes the following: deps, compile";
-	@echo "  make deps - downloads and prepares the trained network";
-	@echo "  make compile - runs SDK compiler tool to compile the graph file for the network";
-	@echo "  make check - (TBD) runs SDK checker tool to verify an NCS graph file";
-	@echo "  make profile - (TBD) runs the SDK profiler tool to profile the network creating output_report.html";
 	@echo "  make browse_profile - (TBD) runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make run - runs the run.py python example program";
+	@echo "  make check - (TBD) runs SDK checker tool to verify an NCS graph file";
 	@echo "  make clean - removes all created content"
+	@echo "  make compile - runs SDK compiler tool to compile the graph file for the network";
+	@echo "  make deps - downloads and prepares the trained network";
+	@echo "  make profile - (TBD) runs the SDK profiler tool to profile the network creating output_report.html";
+	@echo "  make run - runs the run.py python example program";
+	@echo "  make train - creates NCSDK compatible version of TF network and trains it.";
 
 
 clean: clean
@@ -184,3 +239,9 @@ clean: clean
 	rm -f ${MODEL_INFERENCE_DATA_FILENAME}
 	rm -f ${NETWORK_SCRIPT_FILENAME}
 	rm -rf ${IMAGE_DIR}
+	rm -f ${MODEL_META_FILENAME}
+	rm -f ${MODEL_INDEX_FILENAME}
+	rm -f ${MODEL_DATA_FILENAME}
+	rm -f checkpoint
+	rm -f ${MNIST_NCS_FILENAME}
+	rm -f ${MNIST_INFERENCE_FILENAME}
