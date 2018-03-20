@@ -36,5 +36,6 @@ tensorflow/inception_v1, Intel Corporation, neal.p.smith@intel.com
 tensorflow/inception_v2, Intel Corporation, neal.p.smith@intel.com
 tensorflow/inception_v3, Intel Corporation, neal.p.smith@intel.com
 tensorflow/inception_v4, Intel Corporation, neal.p.smith@intel.com
+tensorflow/mnist, Intel Corporation, neal.p.smith@intel.com
 tensorflow/mobilenets, Intel Corporation, neal.p.smith@intel.com
 
