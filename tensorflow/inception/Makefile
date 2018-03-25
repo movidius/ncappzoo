@@ -23,6 +23,8 @@ MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_09_09.tar.gz
 OUTPUT_NODE_NAME=InceptionV4/Logits/Predictions
 endif
 
+PROJECT_DIR = $(CURDIR)
+
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 
@@ -31,13 +33,36 @@ all: profile
 
 check_model:
 ifndef TF_MODELS_PATH
-	$(error TF_MODELS_PATH is not defined. Run `export TF_MODELS_PATH=path/to/your/tensorflow/models/repo`)
+	@echo "TF_MODELS_PATH not set, using project directory";
+	$(eval TF_MODELS_PATH=${PROJECT_DIR}/models)
+	@echo "TF_MODELS_PATH is now: ${TF_MODELS_PATH}"
+	@if [ -d ${TF_MODELS_PATH} ] ; \
+	then \
+		echo "TF_MODELS_PATH exists, skipping clone" ; \
+	else \
+		echo "TF_MODELS_PATH does not exist, cloning"; \
+		git clone https://github.com/tensorflow/models.git; \
+	fi
+else
+	@echo "TF_MODELS_PATH is ${TF_MODELS_PATH}" ;
 endif
 
 check_tf:
 ifndef TF_SRC_PATH
-	$(error TF_SRC_PATH is not defined. Run `export TF_SRC_PATH=path/to/your/tensorflow/source/repo`)
+	@echo "TF_SRC_PATH not set, using project directory.";
+	$(eval TF_SRC_PATH=${PROJECT_DIR}/tensorflow)
+	@echo "TF_SRC_PATH is now: ${TF_SRC_PATH}"
+	@if [ -d ${TF_SRC_PATH} ] ; \
+	then \
+		echo "TF_SRC_PATH exists, skipping clone" ; \
+	else \
+		echo "TF_SRC_PATH does not exist, cloning"; \
+		git clone https://github.com/tensorflow/tensorflow.git; \
+	fi
+else
+	@echo "TF_SRC_PATH is ${TF_SRC_PATH}" ;
 endif
+
 
 .PHONY: checkpoint
 checkpoint:
@@ -106,3 +131,5 @@ help:
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -rf model
+	rm -rf models
+	rm -rf tensorflow
