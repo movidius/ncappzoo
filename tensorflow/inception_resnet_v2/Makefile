@@ -11,15 +11,37 @@ NOCOLOR='\033[0m'
 .PHONY: all
 all: profile
 
+PROJECT_DIR = $(CURDIR)
+ZOO_RELATIVE_TF_SRC_PROJ = ../tf_src
+ZOO_RELATIVE_TF_MODELS_PROJ = ../tf_models
+ZOO_TF_SRC_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_SRC_PROJ}/tensorflow
+ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
+
+
+# Checks if TF_MODELS_PATH is set.  If it isn't set then will make the
+# tf_models project in the ncappzoo/tensorflow/tf_models directory.
 check_model:
 ifndef TF_MODELS_PATH
-	$(error TF_MODELS_PATH is not defined. Run `export TF_MODELS_PATH=path/to/your/tensorflow/models/repo`)
+	@echo "TF_MODELS_PATH not set, making tf_models";
+	(cd ../tf_models; make all; cd ${PROJECT_DIR})
+	$(eval TF_MODELS_PATH = ${ZOO_TF_MODELS_PATH})
+	@echo "TF_MODELS_PATH is ${TF_MODELS_PATH}" ;
+else
+	@echo "TF_MODELS_PATH is ${TF_MODELS_PATH}" ;
 endif
 
+# Checks if TF_SRC_PATH is set.  If it isn't set then will make the
+# tf_models project in the ncappzoo/tensorflow/tf_src directory.
 check_tf:
 ifndef TF_SRC_PATH
-	$(error TF_SRC_PATH is not defined. Run `export TF_SRC_PATH=path/to/your/tensorflow/source/repo`)
+	@echo "TF_SRC_PATH not set, making tf_src";
+	(cd ../tf_src; make all; cd ${PROJECT_DIR})
+	$(eval TF_SRC_PATH=${ZOO_TF_SRC_PATH})
+	@echo "TF_SRC_PATH is ${TF_SRC_PATH}" ;
+else
+	@echo "TF_SRC_PATH is ${TF_SRC_PATH}" ;
 endif
+
 
 .PHONY: checkpoint
 checkpoint:
@@ -70,14 +92,15 @@ check: freeze
 .PHONY: run
 run: compile
 	@echo $(YELLOW)"\nRunning inferences using image-classifier project..."$(NOCOLOR)
-	(python3 ../../apps/image-classifier/image-classifier.py --graph ./model/graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./model/labels.txt --image ../../data/images/pic_053.jpg)
+	(python3 ../../apps/image-classifier/image-classifier.py --graph ./graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./labels.txt --image ../../data/images/pic_053.jpg)
 
 .PHONY: help
 help:
 	@echo $(YELLOW)"\nPossible make targets: "$(NOCOLOR);
 	@echo "  make help - Shows this message.";
-	@echo "  make - Builds all dependencies, but does not run this program.";
+	@echo "  make all - Builds all dependencies, but does not run this program.";
 	@echo "  make checkpoint - Downloads pre-trained checkpoint files.;"
+	@echo "  make clean - removes files created in this directory.;"
 	@echo "  make export - Export the neural network model for inference.";
 	@echo "  make freeze - Freeze the neural network model for inference.";
 	@echo "  make compile - Convert the frozen model into Movidius graph file.";
