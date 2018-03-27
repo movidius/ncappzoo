@@ -22,12 +22,12 @@ run: tf_inception_v1
 .PHONY: run_inception_v1
 run_inception_v1: tf_inception_v1
 	@echo "\nmaking run_inception_v1";
-	python3 MultiStick_Inception.py ../../tensorflow/inception/model/ ../../data/images/ 224
+	python3 MultiStick_Inception.py ../../tensorflow/inception/model/v1/ ../../data/images/ 224
 
 .PHONY: run_inception_v3
 run_inception_v3: tf_inception_v3
 	@echo "\nmaking run_inception_v3";
-	python3 MultiStick_Inception.py ../../tensorflow/inception/model/ ../../data/images/ 229
+	python3 MultiStick_Inception.py ../../tensorflow/inception/model/v3/ ../../data/images/ 229
 
 .PHONY: help
 help:
@@ -37,7 +37,3 @@ help:
 	@echo "  make run - runs the program and prompts for network and images dirs";
 	@echo "  make run_inception_v1 - runs the program with inception_v1";
 	@echo "  make run_inception_v3 - runs the program with inception_v3";
-	@echo "  make clean - removes all created content and temporary files";
-
-clean: clean
-	@echo "\nmaking clean";
