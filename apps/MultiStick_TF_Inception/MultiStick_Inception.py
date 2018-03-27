@@ -15,7 +15,7 @@ graph_folder="../../tensorflow/inception/model/v1/"
 images_folder = "../../data/images/"
 labels_file = "../../data/ilsvrc12/synset_words.txt"
 mean_file = "../../data/ilsvrc12/ilsvrc_2012_mean.npy"
-reqsize = int( 229 )
+reqsize = int( 224 )
 
 if sys.version_info.major < 3 or sys.version_info.minor < 4:
     print("Please using python3.4 or greater!")
