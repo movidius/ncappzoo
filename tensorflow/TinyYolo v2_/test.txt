@@ -1,0 +1,8 @@
+sample_images/000001.jpg sample_ann/000001.xml
+sample_images/000002.jpg sample_ann/000002.xml
+sample_images/000004.jpg sample_ann/000004.xml
+sample_images/000005.jpg sample_ann/000005.xml
+sample_images/000006.jpg sample_ann/000006.xml
+sample_images/000007.jpg sample_ann/000007.xml
+sample_images/000008.jpg sample_ann/000008.xml
+sample_images/000009.jpg sample_ann/000009.xml
