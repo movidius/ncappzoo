@@ -55,7 +55,7 @@ python3 rapid-image-classifier.py --graph ../../tensorflow/mobilenets/graph --la
 
 Inception (Tensorflow)
 ~~~
-python3 rapid-image-classifier.py --graph ../../tensorflow/inception_v3/graph --labels ../../tensorflow/inception_v3/model/labels.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB"
+python3 rapid-image-classifier.py --graph ../../tensorflow/inception/model/v3/graph --labels ../../tensorflow/inception/model/v3/labels.txt --mean 127.5 --scale 0.00789 --dim 299 299 --colormode="RGB"
 ~~~
 
 ## Customizing this example
