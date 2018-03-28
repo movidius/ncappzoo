@@ -31,7 +31,7 @@ I found these objects in  ( 80.62 ms ):
 This example grabs camera frames from `/dev/video0` by default; If your system has multiple cameras you can choose the required camera using the `--video` option. Below is an example:
 
 ~~~
-python3 ssd-object-detector.py --video 1
+python3 live-object-detector.py --video 1
 ~~~
 
 ## Customizing this example
