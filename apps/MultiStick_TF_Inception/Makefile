@@ -37,3 +37,10 @@ help:
 	@echo "  make run - runs the program and prompts for network and images dirs";
 	@echo "  make run_inception_v1 - runs the program with inception_v1";
 	@echo "  make run_inception_v3 - runs the program with inception_v3";
+
+
+
+.PHONY: clean
+clean:
+	@echo "Cleaning: ";
+
