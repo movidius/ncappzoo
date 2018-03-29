@@ -66,6 +66,26 @@ class TouchCalc:
         """Close and destroy the window."""
         cv2.destroyWindow(self._window_name)
 
+
+    def is_window_closed(self):
+        """ Determines if the user closed the window"""
+
+        # check if the window has been closed.  all properties will return -1.0
+        # for windows that are closed. If the user has closed the window via the
+        # x on the title bar the property will be < 0 or an exception raised.  We are
+        # getting property aspect ratio but it could probably be any property
+        prop_asp = 1
+        try:
+            prop_asp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_ASPECT_RATIO)
+        except:
+            return True
+        if (prop_asp < 0.0):
+            # the property returned was < 0 so assume window was closed by user
+            return True
+
+        return False
+
+
     def show(self):
         """Show the window if hidden and update the display."""
         cv2.imshow(self._window_name, self._canvas)
@@ -91,9 +111,15 @@ class TouchCalc:
 
 
 if __name__ == '__main__':
-    app = TouchCalc()
+    touch_calc_window_title = "mnist calculator"
+    app = TouchCalc(touch_calc_window_title)
     while True:
+
+        if (app.is_window_closed()):
+            break;
+
         app.show()
+
         key = cv2.waitKey(1)
         if key != -1:
             # Exit if any key is pressed
