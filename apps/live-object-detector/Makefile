@@ -1,6 +1,7 @@
 
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
+VIDEO?=0
 
 .PHONY: all
 all: run
@@ -13,7 +14,7 @@ mobilenet:
 .PHONY: run
 run: mobilenet-ssd
 	@echo $(YELLOW)"\nRunning live-object-detector.py"$(NOCOLOR);
-	python3 live-object-detector.py
+	python3 live-object-detector.py --video $(VIDEO)
 
 .PHONY: help
 help:

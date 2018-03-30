@@ -71,8 +71,8 @@ def pre_process_image():
     img = cv2.resize( frame, tuple( ARGS.dim ) )
 
     # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
-#    if( ARGS.colormode == "BGR" ):
-#        img = img[:, :, ::-1]
+    if( ARGS.colormode == "BGR" ):
+        img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
     img = img.astype( numpy.float16 )
@@ -114,10 +114,8 @@ def infer_image( graph, img, frame ):
                + " Bottom Right: " + str( output_dict['detection_boxes_' + str(i)][1] ) )
 
         # Draw bounding boxes around valid detections 
-        y1 = int( output_dict['detection_boxes_' + str(i)][0][0] )
-        x1 = int( output_dict['detection_boxes_' + str(i)][0][1] )
-        y2 = int( output_dict['detection_boxes_' + str(i)][1][0] )
-        x2 = int( output_dict['detection_boxes_' + str(i)][1][1] )
+        (y1, x1) = output_dict.get('detection_boxes_' + str(i))[0]
+        (y2, x2) = output_dict.get('detection_boxes_' + str(i))[1]
 
         frame = visualize_output.draw_bounding_box( 
                        y1, x1, y2, x2, 

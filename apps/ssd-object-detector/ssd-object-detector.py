@@ -112,15 +112,13 @@ def infer_image( graph, img ):
     print( "--------------------------------------------------------------" )
     for i in range( 0, output_dict['num_detections'] ):
         print( "%3.1f%%\t" % output_dict['detection_scores_' + str(i)]
-              + labels[ int(output_dict['detection_classes_' + str(i)]) ]
-              + ": Top Left: " + str( output_dict['detection_boxes_' + str(i)][0] )
-              + " Bottom Right: " + str( output_dict['detection_boxes_' + str(i)][1] ) )
+               + labels[ int(output_dict['detection_classes_' + str(i)]) ]
+               + ": Top Left: " + str( output_dict['detection_boxes_' + str(i)][0] )
+               + " Bottom Right: " + str( output_dict['detection_boxes_' + str(i)][1] ) )
 
         # Draw bounding boxes around valid detections 
-        y1 = int( output_dict['detection_boxes_' + str(i)][0][0] )
-        x1 = int( output_dict['detection_boxes_' + str(i)][0][1] )
-        y2 = int( output_dict['detection_boxes_' + str(i)][1][0] )
-        x2 = int( output_dict['detection_boxes_' + str(i)][1][1] )
+        (y1, x1) = output_dict.get('detection_boxes_' + str(i))[0]
+        (y2, x2) = output_dict.get('detection_boxes_' + str(i))[1]
 
         img_draw = visualize_output.draw_bounding_box( 
                        y1, x1, y2, x2, 
@@ -190,7 +188,6 @@ if __name__ == '__main__':
     parser.add_argument( '-c', '--colormode', type=str,
                          default="RGB",
                          help="RGB vs BGR color sequence. TensorFlow = RGB, Caffe = BGR" )
-
 
     ARGS = parser.parse_args()
 
