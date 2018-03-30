@@ -69,18 +69,28 @@ class TouchCalc:
 
     def is_window_closed(self):
         """ Determines if the user closed the window"""
-
+        # may only work with opencv 3.x
         # check if the window has been closed.  all properties will return -1.0
         # for windows that are closed. If the user has closed the window via the
         # x on the title bar the property will be < 0 or an exception raised.  We are
         # getting property aspect ratio but it could probably be any property
+
         prop_asp = 1
         try:
             prop_asp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_ASPECT_RATIO)
         except:
+            print("Caught exception, calling getWindowProperty aspect ratio")
             return True
+
         if (prop_asp < 0.0):
             # the property returned was < 0 so assume window was closed by user
+            print("aspect ratio is less than 0.")
+            return True
+
+        try:
+            tmp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_FULLSCREEN)
+        except:
+            print("Caught exception, calling getWindowProperty fullscreen")
             return True
 
         return False
