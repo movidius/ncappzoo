@@ -1,9 +1,5 @@
 # Intel Movidius Marathon Match - Solution Description
 
-## Overview
-
-Congrats on winning this marathon match. As part of your final submission and in order to receive payment for this marathon match, please complete the following document.
-
 ## 1. Introduction
 
 Tell us a bit about yourself, and why you have decided to participate in the contest.
