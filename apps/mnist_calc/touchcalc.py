@@ -1,10 +1,17 @@
 import cv2
 import numpy as np
-
+from mvnc import mvncapi as mvnc
+import numpy
+import cv2
+import os
+import sys
+from typing import List
 import digitdetector
 
 
 class TouchCalc:
+    NETWORK_IMAGE_DIMENSIONS = (28, 28)
+
     def __init__(self, window_title='TouchCalc', width=1400, height=500):
         # Save these for use later
         self._height = height
@@ -53,12 +60,17 @@ class TouchCalc:
         self._equals_left = self._operand2_left + self._operand2_width + self._pad
         self._equals_top = self._operand2_top + (int)(self._operand2_height / 2) - (int)(self._equals_height / 2)
 
+        self._answer_str = ""
+
         self._clear()
+
+        self._device, self._graph = self.do_mvnc_initialize()
 
 
     def _clear(self):
         """Clear the canvas and redraw buttons."""
         self._canvas[:] = 255
+        self._answer_str = ""
         self._draw_ui()
 
     def _draw(self, event, x, y, flags, param):
@@ -76,7 +88,7 @@ class TouchCalc:
 
         elif event == cv2.EVENT_MOUSEMOVE and self._drawing:
             if y < self._menu_bar_threshold:
-                cv2.circle(self._canvas, (x, y), 10, (0, 0, 0), -1)
+                cv2.circle(self._canvas, (x, y), 20, (0, 0, 0), -1)
 
         elif event == cv2.EVENT_LBUTTONUP:
             self._drawing = False
@@ -119,11 +131,23 @@ class TouchCalc:
                  (self._equals_left+self._equals_width, self._equals_top + (int)(self._equals_height / 2)+ 10),
                  self._operation_color, 5)
 
+        answer_height = 80
+        answer_width = 100
+        answer_left = self._equals_left + self._equals_width + self._pad
+        answer_top = self._equals_top
+        answer_bottom = answer_top + answer_height
+
+        if (self._answer_str != ""):
+            answer_font_scale = 4
+            cv2.putText(self._canvas, self._answer_str, (answer_left, answer_bottom), font_name, answer_font_scale, color, font_thickness)
+        else:
+            cv2.rectangle(self._canvas, (answer_left, answer_top), (answer_left + answer_width, answer_top+answer_height), (255, 255, 255), cv2.FILLED  )
+
 
     def close(self):
         """Close and destroy the window."""
         cv2.destroyWindow(self._window_name)
-
+        self.do_mvnc_cleanup(self._device, self._graph)
 
     def is_window_closed(self):
         """ Determines if the user closed the window"""
@@ -137,18 +161,18 @@ class TouchCalc:
         try:
             prop_asp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_ASPECT_RATIO)
         except:
-            print("Caught exception, calling getWindowProperty aspect ratio")
+            #print("Caught exception, calling getWindowProperty aspect ratio")
             return True
 
         if (prop_asp < 0.0):
             # the property returned was < 0 so assume window was closed by user
-            print("aspect ratio is less than 0.")
+            #print("aspect ratio is less than 0.")
             return True
 
         try:
             tmp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_FULLSCREEN)
         except:
-            print("Caught exception, calling getWindowProperty fullscreen")
+            #print("Caught exception, calling getWindowProperty fullscreen")
             return True
 
         return False
@@ -164,17 +188,31 @@ class TouchCalc:
         self._draw_ui(color=(255, 255, 255))
 
         # Detect the digits
-        digits = digitdetector.detect(self._canvas)
-        for box in digits :
-            print(box)
+        #digits = digitdetector.detect(self._canvas)
+        #for box in digits :
+        #    print(box)
 
-        box = digits[0]
-        print(box)
+        #box = digits[0]
+        #print(box)
 
         op1_image = self._canvas[self._operand1_top : self._operand1_top + self._operand1_height,  self._operand1_left : self._operand1_left + self._operand1_width]
         op2_image = self._canvas[self._operand2_top : self._operand2_top + self._operand2_height,  self._operand2_left : self._operand2_left + self._operand2_width]
-        cv2.imshow("op1", op1_image)
-        cv2.imshow("op2", op2_image)
+        #cv2.imshow("op1", op1_image)
+        #cv2.imshow("op2", op2_image)
+
+        op1_labels, op1_probs = self.do_inference(self._graph, op1_image, 1)
+        print ("op1 is: " + op1_labels[0] + "  op1 probability is: " + op1_probs[0])
+
+        op2_labels, op2_probs = self.do_inference(self._graph, op2_image, 1)
+        print ("op2 is: " + op2_labels[0] + "  op2 probability is: " + op2_probs[0])
+
+        op1 = int(op1_labels[0])
+        op2 = int(op2_labels[0])
+        answer_int = op1 + op2
+        self._answer_str = str(answer_int)
+
+
+
 
         # Draw the buttons again
         self._draw_ui()
@@ -186,6 +224,129 @@ class TouchCalc:
 
         # TODO: more stuff
         print('Submit!')
+
+
+    def do_mvnc_initialize(self) -> (mvnc.Device, mvnc.Graph):
+        """Creates and opens the Neural Compute device and
+        creates a graph that can execute inferences on it.
+
+        Returns
+        -------
+        device : mvnc.Device
+            The opened device.  Will be None if couldn't open Device.
+        graph : mvnc.Graph
+            The allocated graph to use for inferences.  Will be None if couldn't allocate graph
+        """
+        # ***************************************************************
+        # Get a list of ALL the sticks that are plugged in
+        # ***************************************************************
+        devices = mvnc.EnumerateDevices()
+        if len(devices) == 0:
+                print('Error - No devices found')
+                return (None, None)
+
+        # ***************************************************************
+        # Pick the first stick to run the network
+        # ***************************************************************
+        device = mvnc.Device(devices[0])
+
+        # ***************************************************************
+        # Open the NCS
+        # ***************************************************************
+        device.OpenDevice()
+
+        filefolder = os.path.dirname(os.path.realpath(__file__))
+        graph_filename = filefolder + '/mnist_inference.graph'
+
+        # Load graph file
+        try :
+            with open(graph_filename, mode='rb') as f:
+                in_memory_graph = f.read()
+        except :
+            print ("Error reading graph file: " + graph_filename)
+
+        graph = device.AllocateGraph(in_memory_graph)
+
+        return device, graph
+
+
+    def do_mvnc_cleanup(self, device: mvnc.Device, graph: mvnc.Graph) -> None:
+        """Cleans up the NCAPI resources.
+
+        Parameters
+        ----------
+        device : mvncapi.Device
+                 Device instance that was initialized in the do_initialize method
+        graph : mvncapi.Graph
+                Graph instance that was initialized in the do_initialize method
+
+        Returns
+        -------
+        None
+
+        """
+        graph.DeallocateGraph()
+        device.CloseDevice()
+
+
+    def do_inference(self, graph: mvnc.Graph, input_image: str, number_results : int = 5) -> (List[str], List[numpy.float16]) :
+        """ executes one inference which will determine the top classifications for an image file.
+
+        Parameters
+        ----------
+        graph : Graph
+            The graph to use for the inference.  This should be initialize prior to calling
+        input_image : opencv image/Mat
+            The image on which to run the inference.  if its not the right size will be resized internally
+        number_results : int
+            The number of results to return, defaults to 5
+
+        Returns
+        -------
+        labels : List[str]
+            The top labels for the inference.  labels[i] corresponds to probabilities[i]
+        probabilities: List[numpy.float16]
+            The top probabilities for the inference. probabilities[i] corresponds to labels[i]
+        """
+
+        # text labels for each of the possible classfications
+        labels=[ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+        # Load image from disk and preprocess it to prepare it for the network
+        # assuming we are reading a .jpg or .png color image so need to convert it
+        # single channel gray scale image for mnist network.
+        # Then resize the image to the size of image the network was trained with.
+        # Next convert image to floating point format and normalize
+        # so each pixel is a value between 0.0 and 1.0
+        image_for_inference = cv2.bitwise_not(input_image)
+        image_for_inference = cv2.cvtColor(image_for_inference, cv2.COLOR_BGR2GRAY)
+        image_for_inference = cv2.resize(image_for_inference, self.NETWORK_IMAGE_DIMENSIONS)
+        image_for_inference = image_for_inference.astype(numpy.float32)
+        image_for_inference[:] = ((image_for_inference[:] )*(1.0/255.0))
+
+        #cv2.imshow("infer image", image_for_inference)
+
+        # Start the inference by sending to the device/graph
+        self._graph.LoadTensor(image_for_inference.astype(numpy.float16), None)
+
+        # Get the result from the device/graph.  userobj should be the
+        # same value that was passed in LoadTensor above.
+        output, userobj = self._graph.GetResult()
+
+        # sort indices in order of highest probabilities
+        five_highest_indices = (-output).argsort()[:number_results]
+
+        # get the labels and probabilities for the top results from the inference
+        inference_labels = []
+        inference_probabilities = []
+
+        for index in range(0, number_results):
+            inference_probabilities.append(str(output[five_highest_indices[index]]))
+            inference_labels.append(labels[five_highest_indices[index]])
+
+        return inference_labels, inference_probabilities
+
 
 
 if __name__ == '__main__':
