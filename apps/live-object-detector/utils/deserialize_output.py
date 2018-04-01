@@ -51,13 +51,10 @@ def ssd( output, confidance_threshold, shape ):
         if( output[ base_index + 2 ] > confidance_threshold ):
 
             output_dict['detection_classes_' + str(valid_detections)] = \
-                output[base_index + 1]
+                int( output[base_index + 1] )
 
             output_dict['detection_scores_' + str(valid_detections)] = \
-                ( output[base_index + 2] * 100 )
-
-            output_dict['detection_scores_' + str(valid_detections)] = \
-                ( output[base_index + 2] * 100 )
+                int( output[base_index + 2] * 100 )
 
             x = [ int( output[base_index + 3] * width ), 
                   int( output[base_index + 5] * width ) ]
@@ -71,7 +68,7 @@ def ssd( output, confidance_threshold, shape ):
             valid_detections += 1
 
     # Update total number of detections to valid detections
-    output_dict['num_detections'] = valid_detections
+    output_dict['num_detections'] = int( valid_detections )
 
     return( output_dict )
 
