@@ -117,11 +117,18 @@ def infer_image( graph, img, frame ):
         (y1, x1) = output_dict.get('detection_boxes_' + str(i))[0]
         (y2, x2) = output_dict.get('detection_boxes_' + str(i))[1]
 
+        display_str = ( 
+                labels[output_dict.get('detection_classes_' + str(i))]
+                + ": "
+                + str( output_dict.get('detection_scores_' + str(i) ) )
+                + "%" )
+
         frame = visualize_output.draw_bounding_box( 
                        y1, x1, y2, x2, 
                        frame,
                        thickness=4,
-                       color=(255, 255, 0) )
+                       color=(255, 255, 0),
+                       display_str=display_str )
     print( '\n' )
 
     # If a display is available, show the image on which inference was performed
