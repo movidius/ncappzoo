@@ -14,9 +14,7 @@ import sys
 import numpy
 import ntpath
 import argparse
-import datetime
-import skimage.io
-import skimage.transform
+from time import localtime, strftime
 
 import mvnc.mvncapi as mvnc
 
@@ -109,22 +107,35 @@ def infer_image( graph, img, frame ):
 
     # Print the results
     for i in range( 0, output_dict['num_detections'] ):
-        if( output_dict['detection_classes_' + str(i)] == CLASS_PERSON ):
-            print( "Person detected on " + str( datetime.datetime.now() ) )
 
-            # Draw bounding boxes around valid detections 
+        # Filter a specific class/category
+        if( output_dict.get( 'detection_classes_' + str(i) ) == CLASS_PERSON ):
+
+            cur_time = strftime( "%Y_%m_%d_%H_%M_%S", localtime() )
+            print( "Person detected on " + cur_time )
+
+            # Extract top-left & bottom-right coordinates of detected objects 
             (y1, x1) = output_dict.get('detection_boxes_' + str(i))[0]
             (y2, x2) = output_dict.get('detection_boxes_' + str(i))[1]
 
+            display_str = ( 
+                labels[output_dict.get('detection_classes_' + str(i))]
+                + ": "
+                + str( output_dict.get('detection_scores_' + str(i) ) )
+                + "%" )
+
+            # Overlay bounding boxes, detection class and scores
             frame = visualize_output.draw_bounding_box( 
                         y1, x1, y2, x2, 
                         frame,
                         thickness=4,
-                        color=(255, 255, 0) )
+                        color=(255, 255, 0),
+                        display_str=display_str )
 
-            photo = os.path.dirname(os.path.realpath(__file__)) \
-                     + "/captures/photo_" + str(datetime.datetime.now().time()) + ".jpg"
-
+            # Capture snapshots
+            photo = ( os.path.dirname(os.path.realpath(__file__))
+                      + "/captures/photo_"
+                      + cur_time + ".jpg" )
             cv2.imwrite( photo, frame )
 
     # If a display is available, show the image on which inference was performed
@@ -201,8 +212,8 @@ if __name__ == '__main__':
     # Construct (open) the camera
     cam = cv2.VideoCapture( ARGS.video )
 
-    cam.set( cv2.CAP_PROP_FRAME_WIDTH, 1280 )
-    cam.set( cv2.CAP_PROP_FRAME_HEIGHT, 960 )
+    cam.set( cv2.CAP_PROP_FRAME_WIDTH, 620 )
+    cam.set( cv2.CAP_PROP_FRAME_HEIGHT, 480 )
 
     main()
 

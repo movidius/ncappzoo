@@ -8,20 +8,34 @@
 # Utilities to help visualize the output from
 # Intel® Movidius™ Neural Compute Stick (NCS) 
 
-import skimage
+import numpy
+import PIL.Image
+import PIL.ImageDraw
+import PIL.ImageFont
 
 def draw_bounding_box( y1, x1, y2, x2, 
-                       img_draw, 
+                       img, 
                        thickness=4, 
-                       color=(255, 255, 0) ):
+                       color=(255, 255, 0),
+                       display_str=() ):
 
-    rr, cc = [y1, y2, y2, y1], [x1, x1, x2, x2]
-    rr, cc = skimage.draw.polygon_perimeter(
-                 rr, cc, shape=img_draw.shape, clip=False)
+    """ Inputs
+    (x1, y1)  = Top left corner of the bounding box
+    (x2, y2)  = Bottom right corner of the bounding box
+    img       = Image/frame represented as numpy array
+    thickness = Thickness of the bounding box's outline
+    color     = Color of the bounding box's outline
+    """
+
+    img = PIL.Image.fromarray( img )
+    draw = PIL.ImageDraw.Draw( img )
 
     for x in range( 0, thickness ):
-        img_draw[rr-x, cc-x] = color
+        draw.rectangle( [(x1-x, y1-x), (x2-x, y2-x)], outline=color )
 
-    return img_draw
+    font = PIL.ImageFont.load_default()
+    draw.text( (x1, y1), display_str, font=font )
+
+    return numpy.array( img )
 
 # ==== End of file ===========================================================
