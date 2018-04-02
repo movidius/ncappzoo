@@ -66,6 +66,7 @@ class TouchCalc:
 
         self._device, self._graph = self.do_mvnc_initialize()
 
+        self._infer_count = 0
 
     def _clear(self):
         """Clear the canvas and redraw buttons."""
@@ -88,7 +89,7 @@ class TouchCalc:
 
         elif event == cv2.EVENT_MOUSEMOVE and self._drawing:
             if y < self._menu_bar_threshold:
-                cv2.circle(self._canvas, (x, y), 20, (0, 0, 0), -1)
+                cv2.circle(self._canvas, (x, y), 10, (0, 0, 0), -1)
 
         elif event == cv2.EVENT_LBUTTONUP:
             self._drawing = False
@@ -195,8 +196,64 @@ class TouchCalc:
         #box = digits[0]
         #print(box)
 
+        op_pad = 40
+
         op1_image = self._canvas[self._operand1_top : self._operand1_top + self._operand1_height,  self._operand1_left : self._operand1_left + self._operand1_width]
+        digits_op1 = digitdetector.detect(op1_image)
+        print(digits_op1[0])
+        op1_x1 = digits_op1[0][0]
+        op1_y1 = digits_op1[0][1]
+        op1_x2 = op1_x1+digits_op1[0][2]
+        op1_y2 = op1_y1+digits_op1[0][3]
+        op1_x1 -= op_pad
+        op1_x2 += op_pad
+        op1_y1 -= op_pad
+        op1_y2 += op_pad
+        op1_width = op1_x2 - op1_x1
+        op1_height = op1_y2 - op1_y1
+        if  (op1_width > op1_height):
+            # wider than high
+            diff = op1_width - op1_height
+            op1_y1 -= int(diff/2)
+            op1_y2 += int(diff/2)
+        else :
+            # higher than wide
+            diff = op1_height - op1_width
+            op1_x1 -= int(diff/2)
+            op1_x2 += int(diff/2)
+
+
+        op1_image = op1_image[op1_y1:op1_y2, op1_x1:op1_x2]
+        cv2.imshow("op1_image_digits", op1_image)
+
+
         op2_image = self._canvas[self._operand2_top : self._operand2_top + self._operand2_height,  self._operand2_left : self._operand2_left + self._operand2_width]
+        digits_op2 = digitdetector.detect(op2_image)
+        print(digits_op2[0])
+        op2_x1 = digits_op2[0][0]
+        op2_y1 = digits_op2[0][1]
+        op2_x2 = op2_x1 + digits_op2[0][2]
+        op2_y2 = op2_y1 + digits_op2[0][3]
+        op2_x1 -= op_pad
+        op2_x2 += op_pad
+        op2_y1 -= op_pad
+        op2_y2 += op_pad
+        op2_width = op2_x2 - op2_x1
+        op2_height = op2_y2 - op2_y1
+        if  (op2_width > op2_height):
+            # wider than high
+            diff = op2_width - op2_height
+            op2_y1 -= int(diff/2)
+            op2_y2 += int(diff/2)
+        else :
+            # higher than wide
+            diff = op2_height - op2_width
+            op2_x1 -= int(diff/2)
+            op2_x2 += int(diff/2)
+
+        op2_image = op2_image[op2_y1:op2_y2, op2_x1:op2_x2]
+        cv2.imshow("op2_image_digits", op2_image)
+
         #cv2.imshow("op1", op1_image)
         #cv2.imshow("op2", op2_image)
 
@@ -325,7 +382,10 @@ class TouchCalc:
         image_for_inference = image_for_inference.astype(numpy.float32)
         image_for_inference[:] = ((image_for_inference[:] )*(1.0/255.0))
 
-        #cv2.imshow("infer image", image_for_inference)
+
+        cv2.imshow("infer image_"+str(self._infer_count%2+1), image_for_inference)
+        cv2.resizeWindow("infer image_"+str(self._infer_count%2+1), 100, 100)
+        self._infer_count += 1
 
         # Start the inference by sending to the device/graph
         self._graph.LoadTensor(image_for_inference.astype(numpy.float16), None)
