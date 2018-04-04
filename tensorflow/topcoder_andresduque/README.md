@@ -215,7 +215,7 @@ To train, I used the code in github [TF-Movidius-Finetune](https://github.com/Te
 I used only the provided training data for contest.
 By default  [TF-Movidius-Finetune](https://github.com/Technica-Corporation/TF-Movidius-Finetune) use some data augmentation techniques like random crop, random flip and and random distortion of colors. I used the following training parameters (Other parameters where left unchanged from original code):
 
-* Train all layers (don’t freeze)
+* Train all layers (don't freeze)
 * Batch size: 64
 * Learning rate: 0.00005
 * Epochs: 15
@@ -236,7 +236,7 @@ Images are preprocessed in the same way as in training phase (Inception-V3 prepr
 * Ami-0bd0e56e
 * Movidius NCSDK
 * https://github.com/movidius/ncsdk
-####Provided training data and resources
+#### Provided training data and resources
 * https://community.topcoder.com/longcontest/?module=ViewProblemStatement&rd=17058&pm=14775
 * https://github.com/movidius/ncappzoo/tree/master/apps/topcoder_example
 
