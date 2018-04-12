@@ -1,4 +1,5 @@
-# Dogs vs Cats on Intel® Movidius™ Neural Compute Stick (NCS)
+# Dogs vs Cats on 
+# Intel® Movidius™ Neural Compute Stick (NCS)
 
 An advanced-level project demonstrating the process of training a customized version of GoogLeNet model using Caffe, and then deploy it to Intel® Movidius™ Neural Compute Stick (NCS) for inference. You can read more about this project (and a step-by-step guide) on <a href="https://movidius.github.io/blog/deploying-custom-caffe-models/">NCS developer blog</a>. 
 
@@ -7,7 +8,7 @@ An advanced-level project demonstrating the process of training a customized ver
 This code example requires that the following components are available:
 1. <a href="https://developer.movidius.com/buy" target="_blank">Movidius Neural Compute Stick</a>
 2. <a href="https://developer.movidius.com/start" target="_blank">Movidius Neural Compute SDK</a>
-3. A computer that is powerfull enough to run network training. It could be a GPU or a CPU-Only system.
+3. A computer that is powerfull enough to run network training. It could be a GPU or CPU-only system <a href="http://caffe.berkeleyvision.org/install_apt.html" target="_blank">pre-installed with Caffe</a>.
 
 ## Running the Example
 
