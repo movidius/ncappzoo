@@ -14,8 +14,6 @@ import sys
 import numpy
 import ntpath
 import argparse
-import skimage.io
-import skimage.transform
 
 import mvnc.mvncapi as mvnc
 
@@ -68,7 +66,7 @@ def pre_process_image( frame ):
     img = cv2.resize( frame, tuple( ARGS.dim ) )
 
     # Convert RGB to BGR [OpenCV reads image in BGR, some networks may need RGB]
-    if( ARGS.colormode == "bgr" ):
+    if( ARGS.colormode == "rgb" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
@@ -162,7 +160,7 @@ def main():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-                         description="Object detection using SSD on \
+                         description="Detect objects on a LIVE camera feed using \
                          Intel® Movidius™ Neural Compute Stick." )
 
     parser.add_argument( '-g', '--graph', type=str,
