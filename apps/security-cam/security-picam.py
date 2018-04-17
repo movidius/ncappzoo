@@ -20,9 +20,9 @@ import picamera.array
 import mvnc.mvncapi as mvnc
 
 from PIL import Image
+from time import localtime, strftime
 from utils import visualize_output
 from utils import deserialize_output
-from time import localtime, strftime
 
 # "Class of interest" - Display detections only if they match this class ID
 CLASS_PERSON         = 15
@@ -182,11 +182,6 @@ if __name__ == '__main__':
                          default='../../caffe/SSD_MobileNet/graph',
                          help="Absolute path to the neural network graph file." )
 
-    parser.add_argument( '-v', '--video', type=int,
-                         default=0,
-                         help="Index of your computer's V4L2 video device. \
-                               ex. 0 for /dev/video0" )
-
     parser.add_argument( '-l', '--labels', type=str,
                          default='../../caffe/SSD_MobileNet/labels.txt',
                          help="Absolute path to labels file." )
@@ -207,7 +202,7 @@ if __name__ == '__main__':
 
     parser.add_argument( '-c', '--colormode', type=str,
                          default="bgr",
-                         help="RGB vs BGR color sequence. TensorFlow = RGB, Caffe = BGR" )
+                         help="RGB vs BGR color sequence. This is network dependent." )
 
     ARGS = parser.parse_args()
 
