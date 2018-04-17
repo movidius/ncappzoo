@@ -52,7 +52,7 @@ python3 image-classifier.py --graph ../../caffe/SqueezeNet/graph --dim 227 227 -
 
 Mobilenet (Tensorflow)
 ~~~
-python3 image-classifier.py --graph ../../tensorflow/mobilenets/graph --labels ../../tensorflow/mobilenets/model/labels.txt --mean 127.5 --scale 0.00789 --dim 224 224 --colormode="RGB" --image ../../data/images/pic_053.jpg 
+python3 image-classifier.py --graph ../../tensorflow/mobilenets/model/graph --labels ../../tensorflow/mobilenets/model/labels.txt --mean 127.5 --scale 0.00789 --dim 224 224 --colormode="RGB" --image ../../data/images/pic_053.jpg 
 ~~~
 
 Inception (Tensorflow)
