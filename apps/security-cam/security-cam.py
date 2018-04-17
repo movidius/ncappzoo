@@ -70,7 +70,7 @@ def pre_process_image( frame ):
     img = cv2.resize( frame, tuple( ARGS.dim ) )
 
     # Convert RGB to BGR [OpenCV reads image in BGR, some networks may need RGB]
-    if( ARGS.colormode == "BGR" ):
+    if( ARGS.colormode == "rgb" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
@@ -169,7 +169,7 @@ def main():
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-                         description="Detect objects on a LIVE camera feed using \
+                         description="DIY smart security camera PoC using \
                          Intel® Movidius™ Neural Compute Stick." )
 
     parser.add_argument( '-g', '--graph', type=str,

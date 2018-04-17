@@ -23,7 +23,7 @@ run: mobilenet-ssd
 clean:
 	@echo "\n================================================================"
 	@echo $(YELLOW)"\nRunning clean..."$(NOCOLOR);
-	@(rm -rf captures/*)
+	@(rm -rf captures/photo*)
 	@echo $(YELLOW)"Done! Deleted all snapshots.\n"$(NOCOLOR)
 
 .PHONY: help
