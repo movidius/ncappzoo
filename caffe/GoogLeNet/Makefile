@@ -89,7 +89,7 @@ check: prototxt caffemodel
 .PHONY: run
 run: compile
 	@echo "\nmaking run"
-	./run.py
+	(cd ../../apps/image-classifier; python3 image-classifier.py;)
 
 .PHONY: run_py
 run_py: compile
