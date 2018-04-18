@@ -14,16 +14,14 @@ import sys
 import numpy
 import ntpath
 import argparse
-import skimage.io
-import skimage.transform
 
 import mvnc.mvncapi as mvnc
 
 # Variable to store commandline arguments
-ARGS                    = None
+ARGS                 = None
 
 # OpenCV object for video capture
-cam 					= None 
+camera               = None
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -56,13 +54,13 @@ def load_graph( device ):
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-def pre_process_image():
+def pre_process_image( frame ):
 
-    # Grab a frame from the camera
-    ret, frame = cam.read()
-    height, width, channels = frame.shape
+    # Resize image [Image size is defined by choosen network, during training]
+    img = cv2.resize( frame, tuple( ARGS.dim ) )
 
     # Extract/crop a section of the frame and resize it
+    height, width, channels = frame.shape
     x1 = int( width / 3 )
     y1 = int( height / 4 )
     x2 = int( width * 2 / 3 )
@@ -74,23 +72,19 @@ def pre_process_image():
     # Resize image [Image size if defined by choosen network, during training]
     img = cv2.resize( img, tuple( ARGS.dim ) )
 
-    # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
-    if( ARGS.colormode == "BGR" ):
+    # Convert BGR to RGB [OpenCV reads image in BGR, some networks may need RGB]
+    if( ARGS.colormode == "rgb" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
     img = img.astype( numpy.float16 )
     img = ( img - numpy.float16( ARGS.mean ) ) * ARGS.scale
 
-    return img, frame
+    return img
 
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
 def infer_image( graph, img, frame ):
-
-    # Load the labels file 
-    labels =[ line.rstrip('\n') for line in 
-                   open( ARGS.labels ) if line != 'classes\n'] 
 
     # Load the image as a half-precision floating point array
     graph.LoadTensor( img, 'user object' )
@@ -117,7 +111,7 @@ def infer_image( graph, img, frame ):
 def close_ncs_device( device, graph ):
     graph.DeallocateGraph()
     device.CloseDevice()
-    cam.release()
+    camera.release()
     cv2.destroyAllWindows()
 
 # ---- Main function (entry point for this script ) --------------------------
@@ -127,13 +121,15 @@ def main():
     device = open_ncs_device()
     graph = load_graph( device )
 
+    # Main loop: Capture live stream & send frames to NCS
     while( True ):
-        img, frame = pre_process_image()
+        ret, frame = camera.read()
+        img = pre_process_image( frame )
         infer_image( graph, img, frame )
 
-        # Display the frame for 5ms, and close the window so that the next frame 
-        # can be displayed. Close the window if 'q' or 'Q' is pressed.
-        if( cv2.waitKey( 1 ) & 0xFF == ord( 'q' ) ):
+        # Display the frame for 5ms, and close the window so that the next
+        # frame can be displayed. Close the window if 'q' or 'Q' is pressed.
+        if( cv2.waitKey( 5 ) & 0xFF == ord( 'q' ) ):
             break
 
     close_ncs_device( device, graph )
@@ -149,6 +145,11 @@ if __name__ == '__main__':
     parser.add_argument( '-g', '--graph', type=str,
                          default='../../caffe/GenderNet/graph',
                          help="Absolute path to the neural network graph file." )
+
+    parser.add_argument( '-v', '--video', type=int,
+                         default=0,
+                         help="Index of your computer's V4L2 video device. \
+                               ex. 0 for /dev/video0" )
 
     parser.add_argument( '-l', '--labels', type=str,
                          default='../../data/age_gender/gender_categories.txt',
@@ -169,19 +170,21 @@ if __name__ == '__main__':
                          help="Image dimensions. ex. -D 224 224" )
 
     parser.add_argument( '-c', '--colormode', type=str,
-                         default="RGB",
-                         help="RGB vs BGR color sequence. \
-                               Defined during model training." )
-
-    parser.add_argument( '-v', '--video', type=int,
-                         default=0,
-                         help="Index of your computer's V4L2 video device. \
-                               ex. 0 for /dev/video0" )
+                         default="rgb",
+                         help="RGB vs BGR color sequence. This is network dependent." )
 
     ARGS = parser.parse_args()
 
-    # Construct (open) the camera
-    cam = cv2.VideoCapture( ARGS.video )
+    # Create a VideoCapture object
+    camera = cv2.VideoCapture( ARGS.video )
+
+    # Set camera resolution
+    camera.set( cv2.CAP_PROP_FRAME_WIDTH, 620 )
+    camera.set( cv2.CAP_PROP_FRAME_HEIGHT, 480 )
+
+    # Load the labels file
+    labels =[ line.rstrip('\n') for line in
+              open( ARGS.labels ) if line != 'classes\n']
 
     main()
 
