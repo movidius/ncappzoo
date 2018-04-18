@@ -18,10 +18,10 @@ import skimage.transform
 import mvnc.mvncapi as mvnc
 
 # Number of top prodictions to print
-NUM_PREDICTIONS		= 5
+NUM_PREDICTIONS      = 2
 
 # Variable to store commandline arguments
-ARGS                = None
+ARGS                 = None
 
 # ---- Step 1: Open the enumerated device and get a handle to it -------------
 
@@ -54,14 +54,13 @@ def load_graph( device ):
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-def pre_process_image():
+def pre_process_image( img_draw ):
 
-    # Read & resize image [Image size is defined during training]
-    img = skimage.io.imread( ARGS.image )
-    img = skimage.transform.resize( img, ARGS.dim, preserve_range=True )
+    # Resize image [Image size is defined during training]
+    img = skimage.transform.resize( img_draw, ARGS.dim, preserve_range=True )
 
-    # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
-    if( ARGS.colormode == "BGR" ):
+    # Convert RGB to BGR [skimage reads image in RGB, some networks may need BGR]
+    if( ARGS.colormode == "bgr" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
@@ -73,10 +72,6 @@ def pre_process_image():
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
 def infer_image( graph, img ):
-
-    # Load the labels file 
-    labels =[ line.rstrip('\n') for line in 
-                   open( ARGS.labels ) if line != 'classes\n'] 
 
     # The first inference takes an additional ~20ms due to memory 
     # initializations, so we make a 'dummy forward pass'.
@@ -123,7 +118,8 @@ def main():
     device = open_ncs_device()
     graph = load_graph( device )
 
-    img = pre_process_image()
+    img_draw = skimage.io.imread( ARGS.image )
+    img = pre_process_image( img_draw )
     infer_image( graph, img )
 
     close_ncs_device( device, graph )
@@ -163,11 +159,14 @@ if __name__ == '__main__':
                          help="Image dimensions. ex. -D 224 224" )
 
     parser.add_argument( '-c', '--colormode', type=str,
-                         default="BGR",
-                         help="RGB vs BGR color sequence. TensorFlow = RGB, Caffe = BGR" )
-
+                         default="bgr",
+                         help="RGB vs BGR color sequence. This is network dependent." )
 
     ARGS = parser.parse_args()
+
+    # Load the labels file
+    labels =[ line.rstrip('\n') for line in
+              open( ARGS.labels ) if line != 'classes\n']
 
     main()
 

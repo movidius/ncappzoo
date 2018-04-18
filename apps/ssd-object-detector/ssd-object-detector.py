@@ -18,11 +18,11 @@ import skimage.transform
 
 import mvnc.mvncapi as mvnc
 
-from utils import deserialize_output
 from utils import visualize_output
+from utils import deserialize_output
 
 # Detection threshold: Minimum confidance to tag as valid detection
-CONFIDANCE_THRESHOLD = 0.40 # 60% confidant
+CONFIDANCE_THRESHOLD = 0.60 # 60% confidant
 
 # Variable to store commandline arguments
 ARGS                 = None
@@ -58,14 +58,13 @@ def load_graph( device ):
 
 # ---- Step 3: Pre-process the images ----------------------------------------
 
-def pre_process_image():
+def pre_process_image( img_draw ):
 
-    # Read & resize image [Image size is defined during training]
-    img = skimage.io.imread( ARGS.image )
-    img = skimage.transform.resize( img, ARGS.dim, preserve_range=True )
+    # Resize image [Image size is defined during training]
+    img = skimage.transform.resize( img_draw, ARGS.dim, preserve_range=True )
 
-    # Convert RGB to BGR [skimage reads image in RGB, but Caffe uses BGR]
-    if( ARGS.colormode == "BGR" ):
+    # Convert RGB to BGR [skimage reads image in RGB, some networks may need BGR]
+    if( ARGS.colormode == "bgr" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
@@ -77,10 +76,6 @@ def pre_process_image():
 # ---- Step 4: Read & print inference results from the NCS -------------------
 
 def infer_image( graph, img ):
-
-    # Load the labels file 
-    labels =[ line.rstrip('\n') for line in 
-                   open( ARGS.labels ) if line != 'classes\n'] 
 
     # Read original image, so we can perform visualization ops on it
     img_draw = skimage.io.imread( ARGS.image )
@@ -112,21 +107,27 @@ def infer_image( graph, img ):
     print( "--------------------------------------------------------------" )
     for i in range( 0, output_dict['num_detections'] ):
         print( "%3.1f%%\t" % output_dict['detection_scores_' + str(i)]
-              + labels[ int(output_dict['detection_classes_' + str(i)]) ]
-              + ": Top Left: " + str( output_dict['detection_boxes_' + str(i)][0] )
-              + " Bottom Right: " + str( output_dict['detection_boxes_' + str(i)][1] ) )
+               + labels[ int(output_dict['detection_classes_' + str(i)]) ]
+               + ": Top Left: " + str( output_dict['detection_boxes_' + str(i)][0] )
+               + " Bottom Right: " + str( output_dict['detection_boxes_' + str(i)][1] ) )
 
         # Draw bounding boxes around valid detections 
-        y1 = int( output_dict['detection_boxes_' + str(i)][0][0] )
-        x1 = int( output_dict['detection_boxes_' + str(i)][0][1] )
-        y2 = int( output_dict['detection_boxes_' + str(i)][1][0] )
-        x2 = int( output_dict['detection_boxes_' + str(i)][1][1] )
+        (y1, x1) = output_dict.get('detection_boxes_' + str(i))[0]
+        (y2, x2) = output_dict.get('detection_boxes_' + str(i))[1]
+
+        # Prep string to overlay on the image
+        display_str = ( 
+                labels[output_dict.get('detection_classes_' + str(i))]
+                + ": "
+                + str( output_dict.get('detection_scores_' + str(i) ) )
+                + "%" )
 
         img_draw = visualize_output.draw_bounding_box( 
                        y1, x1, y2, x2, 
                        img_draw,
                        thickness=4,
-                       color=(255, 255, 0) )
+                       color=(255, 255, 0),
+                       display_str=display_str )
 
     print( "==============================================================\n" )
 
@@ -148,7 +149,8 @@ def main():
     device = open_ncs_device()
     graph = load_graph( device )
 
-    img = pre_process_image()
+    img_draw = skimage.io.imread( ARGS.image )
+    img = pre_process_image( img_draw )
     infer_image( graph, img )
 
     close_ncs_device( device, graph )
@@ -188,11 +190,14 @@ if __name__ == '__main__':
                          help="Image dimensions. ex. -D 224 224" )
 
     parser.add_argument( '-c', '--colormode', type=str,
-                         default="RGB",
-                         help="RGB vs BGR color sequence. TensorFlow = RGB, Caffe = BGR" )
-
+                         default="bgr",
+                         help="RGB vs BGR color sequence. This is network dependent." )
 
     ARGS = parser.parse_args()
+
+    # Load the labels file
+    labels =[ line.rstrip('\n') for line in
+              open( ARGS.labels ) if line != 'classes\n']
 
     main()
 
