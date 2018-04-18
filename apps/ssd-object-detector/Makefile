@@ -6,7 +6,7 @@ NOCOLOR='\033[0m'
 all: run
 
 .PHONY: mobilenet-ssd
-mobilenet: 
+mobilenet-ssd:
 	@echo $(YELLOW)"\nmaking MobileNet SSD"$(NOCOLOR);
 	(cd ../../caffe/SSD_MobileNet; test -f graph || make compile;)
 
