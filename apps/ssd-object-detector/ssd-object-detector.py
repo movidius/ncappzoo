@@ -63,8 +63,8 @@ def pre_process_image( img_draw ):
     # Resize image [Image size is defined during training]
     img = skimage.transform.resize( img_draw, ARGS.dim, preserve_range=True )
 
-    # Convert RGB to BGR [OpenCV reads image in BGR, some networks may need RGB]
-    if( ARGS.colormode == "rgb" ):
+    # Convert RGB to BGR [skimage reads image in RGB, some networks may need BGR]
+    if( ARGS.colormode == "bgr" ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
