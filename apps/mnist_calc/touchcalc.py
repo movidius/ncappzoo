@@ -25,6 +25,7 @@ class TouchCalc:
 
         # Set a flag to know when the user is drawing and assign a mouse event listener
         self._drawing = False
+        self._last_point = None  # track the last point drawn for drawing lines
         cv2.setMouseCallback(self._window_name, self._draw)
 
         # The bottom 10% of the window will be a menu that can't be drawn on
@@ -89,10 +90,16 @@ class TouchCalc:
 
         elif event == cv2.EVENT_MOUSEMOVE and self._drawing:
             if y < self._menu_bar_threshold:
-                cv2.circle(self._canvas, (x, y), 10, (0, 0, 0), -1)
+                #cv2.circle(self._canvas, (x, y), 10, (0, 0, 0), -1)
+                if self._last_point:
+                    cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 10)
+                    self._last_point = (x, y)
+                else:
+                    self._last_point = (x, y)
 
         elif event == cv2.EVENT_LBUTTONUP:
             self._drawing = False
+            self._last_point = None
 
     def _draw_ui(self, color=(255, 0, 0)):
         """Draw buttons on the canvas."""
