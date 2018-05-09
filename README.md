@@ -4,6 +4,20 @@ Welcome to the Intel® Movidius™ Neural Compute App Zoo (NC App Zoo). This rep
  
 The NC App Zoo is a community repository with many content owners and maintainers. All NC App Zoo content is being made available here in a central location for others to download, experiment with, modify, build upon, and learn from.
 
+## NC App Zoo Repository Branches
+The projects in this repository depend on the NCSDK and the NCAPI contained within that SDK.  The [NCSDK 2.04 release](https://github.com/movidius/ncsdk/releases/tag/v2.04.00.06) introduced the NCAPI v2 which is not backwards compatible with the orginal NCAPI v1.  This means that applications built around NCAPI v1, including those in the NC App Zoo, will not run without modification when NCAPI v2 is installed on the host machine.
+
+If you are interested in NCSDK2 you can take a look at some of the [changes in NCAPI v2](https://movidius.github.io/ncsdk/ncapi/readme.html) as well as the [NCSDK 2.04 Release Notes](https://movidius.github.io/ncsdk/release_notes.html).
+
+While the transition to NCAPI v2 is going on the NC App Zoo will maintain a **ncsdk2** branch for NCSDK 2.x projects as well as the **master** branch which will continue to contain the NCSDK 1.x projects.
+You can use the following git command to use the ncsdk2 branch of the NC App Zoo repo:
+```bash
+git clone -b ncsdk2 https://github.com/movidius/ncappzoo.git
+```
+At some point in the future the NCSDK 2.x projects will move to the master as 1.x becomes obsolete.
+
+Also of note is the **[ncappzoo/ncapi2_shim](https://github.com/movidius/ncappzoo/tree/ncsdk2/ncapi2_shim)** project which will allow NCAPI v1 python code to run with NCAPI v2 installed with very little work.  See the README.md file in that directory for more information on how to use the shim.  Many projects in the ncsdk2 branch make use of this shim as well.
+
 ## NC App Zoo Repository Layout
 The NC App Zoo contains the following top-level directories.  See the README file in each of these directory or just click on the links below to explore the contents of the NC App Zoo.
 - **[apps](apps/README.md)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the NC App Zoo!**
