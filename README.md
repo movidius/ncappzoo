@@ -16,7 +16,7 @@ git clone -b ncsdk2 https://github.com/movidius/ncappzoo.git
 ```
 At some point in the future the NCSDK 2.x projects will move to the master as 1.x becomes obsolete.
 
-Also of note is the **ncappzoo/ncapi2_shim** project which will allow NCAPI v1 python code to run with NCAPI v2 installed with very little work.  See the README.md file in that directory for more information on how to use the shim.  Many project in the NC App Zoo ncsdk2 branch make use of this shim as well.
+Also of note is the **[ncappzoo/ncapi2_shim](https://github.com/movidius/ncappzoo/tree/ncsdk2/ncapi2_shim)** project which will allow NCAPI v1 python code to run with NCAPI v2 installed with very little work.  See the README.md file in that directory for more information on how to use the shim.  Many projects in the ncsdk2 branch make use of this shim as well.
  
 
 ## NC App Zoo Repository Layout
