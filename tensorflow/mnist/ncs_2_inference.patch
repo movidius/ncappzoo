@@ -1,0 +1,44 @@
+164,179c
+    # NPS adding sess and saver stuff here
+    sess.run(tf.local_variables_initializer())
+
+    # read the previously saved network.
+    saver.restore(sess, '.' + '/mnist_model')
+
+    # save the version of the network that can be compiled for NCS
+    saver.save(sess, '.' + '/mnist_inference')
+
+    # NPS removing training code
+.
+160c
+  saver = tf.train.Saver(tf.global_variables())
+.
+141,157c
+  # NPS remove training code
+.
+139c
+  y_conv = deepnn(x)
+  #NPS add softmax layer with name of output
+  output = tf.nn.softmax(y_conv, name='output')
+.
+137a
+  # NPS no longer returning keep_prob from deepnn()
+.
+135,136c
+  # NPS remove placeholder
+.
+131,132c
+  # NPS replaced line with named input node
+.
+127,128c
+
+  # NPS remove import data
+.
+99,100c
+    # NPS return only y_conv and skip dropout
+    y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+  return y_conv
+.
+88,92c
+  # NPS remove dropout layers
+.
