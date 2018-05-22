@@ -28,17 +28,28 @@ labels = ('background',
           'motorbike', 'person', 'pottedplant',
           'sheep', 'sofa', 'train', 'tvmonitor')
 
+# only accept classifications with 1 in the class id index.
+# default is to accept all object clasifications.
+# for example if object_classifications_mask[1] == 0 then
+#    will ignore aeroplanes
+object_classifications_mask = [1, 1, 1, 1, 1, 1, 1,
+                               1, 1, 1, 1, 1, 1, 1,
+                               1, 1, 1, 1, 1, 1, 1]
+
 # the ssd mobilenet image width and height
 NETWORK_IMAGE_WIDTH = 300
 NETWORK_IMAGE_HEIGHT = 300
 
 # the minimal score for a box to be shown
-min_score_percent = 60
+DEFAULT_INIT_MIN_SCORE = 60
+min_score_percent = DEFAULT_INIT_MIN_SCORE
 
 # the resize_window arg will modify these if its specified on the commandline
 resize_output = False
 resize_output_width = 0
 resize_output_height = 0
+
+
 
 # read video files from this directory
 input_video_path = '.'
@@ -88,12 +99,18 @@ def overlay_on_image(display_image, object_info):
     source_image_height = display_image.shape[0]
 
     base_index = 0
-    class_id = object_info[base_index + 1]
+    class_id = int(object_info[base_index + 1])
+    if (class_id < 0):
+        return
+
+    if (object_classifications_mask[class_id] == 0):
+        return
+
     percentage = int(object_info[base_index + 2] * 100)
     if (percentage <= min_score_percent):
         return
 
-    label_text = labels[int(class_id)] + " (" + str(percentage) + "%)"
+    label_text = labels[class_id] + " (" + str(percentage) + "%)"
     box_left = int(object_info[base_index + 3] * source_image_width)
     box_top = int(object_info[base_index + 4] * source_image_height)
     box_right = int(object_info[base_index + 5] * source_image_width)
@@ -125,14 +142,10 @@ def overlay_on_image(display_image, object_info):
     # label text above the box
     cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-    # display text to let user know how to quit
-    cv2.rectangle(display_image,(0, 0),(100, 15), (128, 128, 128), -1)
-    cv2.putText(display_image, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
-
 
 #return False if found invalid args or True if processed ok
 def handle_args():
-    global resize_output, resize_output_width, resize_output_height
+    global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask
     for an_arg in argv:
         if (an_arg == argv[0]):
             continue
@@ -140,7 +153,36 @@ def handle_args():
         elif (str(an_arg).lower() == 'help'):
             return False
 
-        elif (str(an_arg).startswith('resize_window=')):
+        elif (str(an_arg).lower().startswith('exclude_classes=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                exclude_list = str(val).split(',')
+                for exclude_id_str in exclude_list:
+                    exclude_id = int(exclude_id_str)
+                    if (exclude_id < 0 or exclude_id>len(labels)):
+                        print("invalid exclude_classes= parameter")
+                        return False
+                    print("Excluding class ID " + str(exclude_id) + " : " + labels[exclude_id])
+                    object_classifications_mask[int(exclude_id)] = 0
+            except:
+                print('Error with exclude_classes argument. ')
+                return False;
+
+        elif (str(an_arg).lower().startswith('init_min_score=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                init_min_score_str = val
+                init_min_score = int(init_min_score_str)
+                if (init_min_score < 0 or init_min_score > 100):
+                    print('Error with init_min_score argument.  It must be between 0-100')
+                    return False
+                min_score_percent = init_min_score
+                print ('Initial Minimum Score: ' + str(min_score_percent) + ' %')
+            except:
+                print('Error with init_min_score argument.  It must be between 0-100')
+                return False;
+
+        elif (str(an_arg).lower().startswith('resize_window=')):
             try:
                 arg, val = str(an_arg).split('=', 1)
                 width_height = str(val).split('x', 1)
@@ -212,6 +254,10 @@ def run_inference(image_to_classify, ssd_mobilenet_graph):
             # overlay boxes and labels on to the image
             overlay_on_image(image_to_classify, output[base_index:base_index + 7])
 
+    # display text to let user know how to quit
+    cv2.rectangle(image_to_classify,(0, 0),(100, 15), (128, 128, 128), -1)
+    cv2.putText(image_to_classify, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
+
 
 # prints usage information
 def print_usage():
@@ -222,9 +268,22 @@ def print_usage():
     print('  help - prints this message')
     print('  resize_window - resizes the GUI window to specified dimensions')
     print('                  must be formated similar to resize_window=1280x720')
+    print('                  Default isto not resize, use size of video frames.')
+    print('  init_min_score - set the minimum score for a box to be recognized')
+    print('                  must be a number between 0 and 100 inclusive.')
+    print('                  Default is: ' + str(DEFAULT_INIT_MIN_SCORE))
+
+    print('  exclude - comma separated list of object class IDs to exclude from following:')
+    index = 0
+    for oneLabel in labels:
+        print("                 class ID " + str(index) + ": " + oneLabel)
+        index += 1
+    print('            must be a number between 0 and ' + str(len(labels)) + ' inclusive.')
+    print('            Default is to exclude none.')
+
     print('')
     print('Example: ')
-    print('python3 run_video.py resize_window=1920x1080')
+    print('python3 run_video.py resize_window=1920x1080 init_min_score=50 exclude_classes=5,11')
 
 
 # This function is called from the entry point to do
