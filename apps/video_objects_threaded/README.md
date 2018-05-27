@@ -40,7 +40,7 @@ Downloads example video files.
 ## make opencv
 Removes the version of OpenCV that was installed with the NCSDK and builds and installs a compatible version of OpenCV 3.3 for this app. This will take a while to finish. Once you have done this on your system you shouldn't need to do it again.
 
-## make run_py
+## make run
 Runs the provided python program which shows the video stream along with the object boxes and classifications.
 
 ## make clean
