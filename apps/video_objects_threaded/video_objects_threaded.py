@@ -42,17 +42,8 @@ NETWORK_IMAGE_HEIGHT = 300
 DEFAULT_INIT_MIN_SCORE = 60
 min_score_percent = DEFAULT_INIT_MIN_SCORE
 
-VIDEO_QUEUE_PUT_WAIT_MAX = 4
-VIDEO_QUEUE_FULL_SLEEP_SECONDS = 0.01
 # for title bar of GUI window
 cv_window_name = 'video_objects with SSD_MobileNet'
-
-VIDEO_QUEUE_SIZE = 10
-OBJ_DETECT_OUTPUT_QUEUE_SIZE = 10
-
-# number of seconds to wait when putting or getting from queue's
-# besides the video output queue.
-QUEUE_WAIT_MAX = 2
 
 # the ssd_mobilenet_processor
 obj_detector_proc = None
@@ -68,16 +59,6 @@ resize_output = False
 resize_output_width = 0
 resize_output_height = 0
 
-
-# create a preprocessed image from the source image that complies to the
-# network expectations and return it
-def preprocess_image(source_image):
-    resized_image = cv2.resize(source_image, (NETWORK_IMAGE_WIDTH, NETWORK_IMAGE_HEIGHT))
-    
-    # trasnform values from range 0-255 to range -1.0 - 1.0
-    resized_image = resized_image - 127.5
-    resized_image = resized_image * 0.007843
-    return resized_image
 
 # handles key presses by adjusting global thresholds etc.
 # raw_key is the return value from cv2.waitkey
@@ -207,64 +188,6 @@ def handle_args():
     return True
 
 
-# Run an inference on the passed image
-# image_to_classify is the image on which an inference will be performed
-#    upon successful return this image will be overlayed with boxes
-#    and labels identifying the found objects within the image.
-# ssd_mobilenet_graph is the Graph object from the NCAPI which will
-#    be used to peform the inference.
-def run_inference(image_to_classify, ssd_mobilenet_graph):
-
-    # preprocess the image to meet nework expectations
-    resized_image = preprocess_image(image_to_classify)
-
-    # Send the image to the NCS as 16 bit floats
-    ssd_mobilenet_graph.LoadTensor(resized_image.astype(numpy.float16), None)
-
-    # Get the result from the NCS
-    output, userobj = ssd_mobilenet_graph.GetResult()
-
-    #   a.	First fp16 value holds the number of valid detections = num_valid.
-    #   b.	The next 6 values are unused.
-    #   c.	The next (7 * num_valid) values contain the valid detections data
-    #       Each group of 7 values will describe an object/box These 7 values in order.
-    #       The values are:
-    #         0: image_id (always 0)
-    #         1: class_id (this is an index into labels)
-    #         2: score (this is the probability for the class)
-    #         3: box left location within image as number between 0.0 and 1.0
-    #         4: box top location within image as number between 0.0 and 1.0
-    #         5: box right location within image as number between 0.0 and 1.0
-    #         6: box bottom location within image as number between 0.0 and 1.0
-
-    # number of boxes returned
-    num_valid_boxes = int(output[0])
-
-    for box_index in range(num_valid_boxes):
-            base_index = 7+ box_index * 7
-            if (not numpy.isfinite(output[base_index]) or
-                    not numpy.isfinite(output[base_index + 1]) or
-                    not numpy.isfinite(output[base_index + 2]) or
-                    not numpy.isfinite(output[base_index + 3]) or
-                    not numpy.isfinite(output[base_index + 4]) or
-                    not numpy.isfinite(output[base_index + 5]) or
-                    not numpy.isfinite(output[base_index + 6])):
-                # boxes with non finite (inf, nan, etc) numbers must be ignored
-                continue
-
-            x1 = max(int(output[base_index + 3] * image_to_classify.shape[0]), 0)
-            y1 = max(int(output[base_index + 4] * image_to_classify.shape[1]), 0)
-            x2 = min(int(output[base_index + 5] * image_to_classify.shape[0]), image_to_classify.shape[0]-1)
-            y2 = min((output[base_index + 6] * image_to_classify.shape[1]), image_to_classify.shape[1]-1)
-
-            # overlay boxes and labels on to the image
-            overlay_on_image(image_to_classify, output[base_index:base_index + 7])
-
-    # display text to let user know how to quit
-    cv2.rectangle(image_to_classify,(0, 0),(100, 15), (128, 128, 128), -1)
-    cv2.putText(image_to_classify, "Q to Quit", (10, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 0, 0), 1)
-
-
 # prints usage information
 def print_usage():
     print('\nusage: ')
@@ -292,11 +215,12 @@ def print_usage():
     print('python3 run_video.py resize_window=1920x1080 init_min_score=50 exclude_classes=5,11')
 
 
+
 # This function is called from the entry point to do
 # all the work.
 def main():
     global resize_output, resize_output_width, resize_output_height, \
-           obj_detector_proc, resize_output, resize_output_width, resize_output_height, video_proc, video_queue
+           obj_detector_proc, resize_output, resize_output_width, resize_output_height, video_proc
 
     if (not handle_args()):
         print_usage()
@@ -337,31 +261,16 @@ def main():
     cv2.moveWindow(cv_window_name, 10,  10)
     cv2.waitKey(1)
 
-    # Queue of video frame images which will be the output for the video processor
-    video_queue = queue.Queue(VIDEO_QUEUE_SIZE)
-
-    # Setup ssd_mobilenet_processor that reads from the video queue
-    # and writes to its own ty_output_queue
-    obj_detector_output_queue = queue.Queue(OBJ_DETECT_OUTPUT_QUEUE_SIZE)
-    obj_detector_proc = ssd_mobilenet_processor(SSDMN_GRAPH_FILENAME, ssdmn_device, video_queue, obj_detector_output_queue,
-                                                min_score_percent, QUEUE_WAIT_MAX, QUEUE_WAIT_MAX)
-
+    obj_detector_proc = ssd_mobilenet_processor(SSDMN_GRAPH_FILENAME, ssdmn_device)
 
 
     exit_app = False
     while (True):
         for input_video_file in input_video_filename_list :
 
-            # clear all the queues for the cases where this isn't the
-            # first video in the list.
-            video_queue.queue.clear()
-            obj_detector_output_queue.queue.clear()
-
             # video processor that will put video frames images on the video_queue
-            video_proc = video_processor(video_queue,
-                                        input_video_path + '/' + input_video_file,
-                                        VIDEO_QUEUE_PUT_WAIT_MAX,
-                                        VIDEO_QUEUE_FULL_SLEEP_SECONDS)
+            video_proc = video_processor(input_video_path + '/' + input_video_file,
+                                         obj_detect_proc = obj_detector_proc)
             video_proc.start_processing()
             obj_detector_proc.start_processing()
 
@@ -371,7 +280,7 @@ def main():
 
             while(True):
                 try:
-                    (display_image, filtered_objs) = obj_detector_output_queue.get(True, QUEUE_WAIT_MAX)
+                    (filtered_objs, display_image) = obj_detector_proc.get_async_inference_result()
                 except :
                     print("exception caught in main")
                     raise
@@ -393,19 +302,19 @@ def main():
                                                cv2.INTER_LINEAR)
                 cv2.imshow(cv_window_name, display_image)
 
-                obj_detector_output_queue.task_done()
-
                 raw_key = cv2.waitKey(1)
                 if (raw_key != -1):
                     if (handle_keys(raw_key) == False):
                         end_time = time.time()
                         exit_app = True
-                        break
+                        video_proc.stop_processing()
+                        continue
+
                 frame_count += 1
 
-                if (video_queue.empty()):
+                if (obj_detector_proc.is_input_queue_empty() == 0):
                     end_time = time.time()
-                    print('video queue empty')
+                    print('Neural Network Processor has nothing to process, assuming video is finished.')
                     break
 
             frames_per_second = frame_count / (end_time - start_time)
@@ -413,13 +322,16 @@ def main():
 
             throttling = ssdmn_device.get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
             if (throttling > 0):
-                print("\nDevice is throttling, level is: " + str(throttling) + "\n")
+                print("\nDevice is throttling, level is: " + str(throttling))
+                print("Sleeping for a few seconds....")
+                cv2.waitKey(2000)
 
-            video_proc.stop_processing()
-            video_proc.cleanup()
-            cv2.waitKey(1)
+            #video_proc.stop_processing()
+            #cv2.waitKey(1)
             obj_detector_proc.stop_processing()
             cv2.waitKey(1)
+
+            video_proc.cleanup()
 
             if (exit_app):
                 break
