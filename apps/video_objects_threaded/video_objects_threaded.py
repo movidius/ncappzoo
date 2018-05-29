@@ -15,15 +15,6 @@ import queue
 import sys
 from sys import argv
 
-# labels AKA classes.  The class IDs returned
-# are the indices into this list
-labels = ('background',
-          'aeroplane', 'bicycle', 'bird', 'boat',
-          'bottle', 'bus', 'car', 'cat', 'chair',
-          'cow', 'diningtable', 'dog', 'horse',
-          'motorbike', 'person', 'pottedplant',
-          'sheep', 'sofa', 'train', 'tvmonitor')
-
 # only accept classifications with 1 in the class id index.
 # default is to accept all object clasifications.
 # for example if object_classifications_mask[1] == 0 then
@@ -43,7 +34,7 @@ DEFAULT_INIT_MIN_SCORE = 60
 min_score_percent = DEFAULT_INIT_MIN_SCORE
 
 # for title bar of GUI window
-cv_window_name = 'video_objects with SSD_MobileNet'
+cv_window_name = 'video_objects_threaded - SSD_MobileNet'
 
 # the ssd_mobilenet_processor
 obj_detector_proc = None
@@ -63,16 +54,20 @@ resize_output_height = 0
 # handles key presses by adjusting global thresholds etc.
 # raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
-def handle_keys(raw_key):
+def handle_keys(raw_key, obj_detector_proc:ssd_mobilenet_processor):
     global min_score_percent
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
     elif (ascii_code == ord('B')):
-        min_score_percent += 5
+        min_score_percent = obj_detector_proc.get_box_probability_threshold() * 100.0 + 5
+        if (min_score_percent > 100.0): min_score_percent = 100.0
+        obj_detector_proc.set_box_probability_threshold(min_score_percent/100.0)
         print('New minimum box percentage: ' + str(min_score_percent) + '%')
     elif (ascii_code == ord('b')):
-        min_score_percent -= 5
+        min_score_percent = obj_detector_proc.get_box_probability_threshold() * 100.0 - 5
+        if (min_score_percent < 0.0): min_score_percent = 0.0
+        obj_detector_proc.set_box_probability_threshold(min_score_percent/100.0)
         print('New minimum box percentage: ' + str(min_score_percent) + '%')
 
     return True
@@ -83,11 +78,11 @@ def handle_keys(raw_key):
 # object_info is a list of lists which have 6 values each
 # these are the 6 values:
 #    [0] string that is network classification ie 'cat', or 'chair' etc
-#    [1] float value for box X1
-#    [2] float value for box Y1
-#    [3] float value for box X2
-#    [4] float value for box Y2
-#    [5] float value that is the probability for the network classification.
+#    [1] float value for box upper left X
+#    [2] float value for box upper left Y
+#    [3] float value for box lower right X
+#    [4] float value for box lower right Y
+#    [5] float value that is the probability 0.0 -1.0 for the network classification.
 # returns None
 def overlay_on_image(display_image, object_info_list):
     source_image_width = display_image.shape[1]
@@ -95,8 +90,6 @@ def overlay_on_image(display_image, object_info_list):
 
     for one_object in object_info_list:
         percentage = int(one_object[5] * 100)
-        if (percentage <= min_score_percent):
-            continue
 
         label_text = one_object[0] + " (" + str(percentage) + "%)"
         box_left =  int(one_object[1])  # int(object_info[base_index + 3] * source_image_width)
@@ -133,6 +126,9 @@ def overlay_on_image(display_image, object_info_list):
 #return False if found invalid args or True if processed ok
 def handle_args():
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask
+
+    labels = ssd_mobilenet_processor.get_classification_labels()
+
     for an_arg in argv:
         if (an_arg == argv[0]):
             continue
@@ -190,6 +186,8 @@ def handle_args():
 
 # prints usage information
 def print_usage():
+    labels = ssd_mobilenet_processor.get_classification_labels()
+
     print('\nusage: ')
     print('python3 run_video.py [help][resize_window=<width>x<height>]')
     print('')
@@ -202,12 +200,12 @@ def print_usage():
     print('                  must be a number between 0 and 100 inclusive.')
     print('                  Default is: ' + str(DEFAULT_INIT_MIN_SCORE))
 
-    print('  exclude - comma separated list of object class IDs to exclude from following:')
+    print('  exclude_classes - comma separated list of object class IDs to exclude from following:')
     index = 0
     for oneLabel in labels:
         print("                 class ID " + str(index) + ": " + oneLabel)
         index += 1
-    print('            must be a number between 0 and ' + str(len(labels)) + ' inclusive.')
+    print('            must be a number between 0 and ' + str(len(labels)-1) + ' inclusive.')
     print('            Default is to exclude none.')
 
     print('')
@@ -261,8 +259,9 @@ def main():
     cv2.moveWindow(cv_window_name, 10,  10)
     cv2.waitKey(1)
 
-    obj_detector_proc = ssd_mobilenet_processor(SSDMN_GRAPH_FILENAME, ssdmn_device)
-
+    obj_detector_proc = ssd_mobilenet_processor(SSDMN_GRAPH_FILENAME, ssdmn_device,
+                                                inital_box_prob_thresh=min_score_percent/100.0,
+                                                classification_mask=object_classifications_mask)
 
     exit_app = False
     while (True):
@@ -291,6 +290,7 @@ def main():
                 prop_val = cv2.getWindowProperty(cv_window_name, cv2.WND_PROP_ASPECT_RATIO)
                 if (prop_val < 0.0):
                     end_time = time.time()
+                    video_proc.stop_processing()
                     exit_app = True
                     break
 
@@ -304,7 +304,7 @@ def main():
 
                 raw_key = cv2.waitKey(1)
                 if (raw_key != -1):
-                    if (handle_keys(raw_key) == False):
+                    if (handle_keys(raw_key, obj_detector_proc) == False):
                         end_time = time.time()
                         exit_app = True
                         video_proc.stop_processing()

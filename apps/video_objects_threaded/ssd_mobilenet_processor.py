@@ -38,7 +38,7 @@ class ssd_mobilenet_processor:
     # initial_box_prob_threshold is the initial box probability threshold for boxes
     #     returned from the inferences
     def __init__(self, network_graph_filename: str, ncs_device: mvnc.Device, input_queue:queue.Queue=None, output_queue: queue.Queue=None,
-                 inital_box_prob_thresh: float=None, queue_wait_input:float=None, queue_wait_output:float=None):
+                 inital_box_prob_thresh: float=None, classification_mask:list=None, queue_wait_input:float=None, queue_wait_output:float=None):
 
         self._use_worker_thread = False
         self._queue_wait_input = queue_wait_input
@@ -57,7 +57,15 @@ class ssd_mobilenet_processor:
             print('\n\n')
             raise
 
+        self._classification_labels=ssd_mobilenet_processor.get_classification_labels()
+
         self._box_probability_threshold = inital_box_prob_thresh
+        self._classification_mask=classification_mask
+        if (self._classification_mask is None):
+            # if no mask passed then create one to accept all classifications
+            self._classification_mask = [1, 1, 1, 1, 1, 1, 1,
+                                         1, 1, 1, 1, 1, 1, 1,
+                                         1, 1, 1, 1, 1, 1, 1]
 
         self._input_queue = input_queue
         self._output_queue = output_queue
@@ -77,6 +85,17 @@ class ssd_mobilenet_processor:
         self._fifo_in.destroy()
         self._fifo_out.destroy()
         self._graph.destroy()
+
+    # get a list of the classifications that are supported
+    @staticmethod
+    def get_classification_labels():
+        ret_labels = list(['background',
+          'aeroplane', 'bicycle', 'bird', 'boat',
+          'bottle', 'bus', 'car', 'cat', 'chair',
+          'cow', 'dining table', 'dog', 'horse',
+          'motorbike', 'person', 'potted plant',
+          'sheep', 'sofa', 'train', 'tvmonitor'])
+        return ret_labels
 
     # start asynchronous processing of the images on the input queue via a worker thread
     # and place inference results on the output queue
@@ -292,12 +311,11 @@ class ssd_mobilenet_processor:
 
     # Interpret the output from a single inference of the neural network
     # and filter out objects/boxes with low probabilities.
-    # output is the array of floats returned from the API GetResult but converted
-    # to float32 format.
+    # inference_result is the array of floats returned from the NCAPI as float32.
     # input_image_width is the width of the input image
     # input_image_height is the height of the input image
-    # Returns a list of lists. each of the inner lists represent one found object and contain
-    # the following 6 values:
+    # Returns a list of lists. each of the inner lists represent one found object
+    # that match the filter criteria.  The each contain the following 6 values:
     #    string that is network classification ie 'cat', or 'chair' etc
     #    float value for box X pixel location of upper left within source image
     #    float value for box Y pixel location of upper left within source image
@@ -309,23 +327,10 @@ class ssd_mobilenet_processor:
         # the raw number of floats returned from the inference
         num_inference_results = len(inference_result)
 
-        # the 20 classes this network was trained on
-        # labels AKA classes.  The class IDs returned
-        # are the indices into this list
-        network_classifications = ('background',
-                  'aeroplane', 'bicycle', 'bird', 'boat',
-                  'bottle', 'bus', 'car', 'cat', 'chair',
-                  'cow', 'diningtable', 'dog', 'horse',
-                  'motorbike', 'person', 'pottedplant',
-                  'sheep', 'sofa', 'train', 'tvmonitor')
 
-        # which types of objects do we want to include.
-        #network_classifications_mask = [1, 1, 1, 1, 1, 1, 1,
-        #                                1, 1, 1, 1, 1, 1, 1,
-        #                                1, 1, 1, 1, 1, 1, 1]
 
-        num_classifications = len(network_classifications) # should be 21
 
+        num_classifications = len(self._classification_labels) # should be 21
 
         #   a.	First value holds the number of valid detections = num_valid.
         #   b.	The next 6 values are unused.
@@ -346,6 +351,13 @@ class ssd_mobilenet_processor:
         classes_boxes_and_probs = []
         for box_index in range(num_valid_boxes):
                 base_index = 7+ box_index * 7
+                if (inference_result[base_index + 2] < self._box_probability_threshold):
+                    # probability/confidence is too low for this box, omit it.
+                    continue
+                if (self._classification_mask[int(inference_result[base_index + 1])] != 1):
+                    # masking off these types of objects
+                    continue
+
                 if (not numpy.isfinite(inference_result[base_index]) or
                         not numpy.isfinite(inference_result[base_index + 1]) or
                         not numpy.isfinite(inference_result[base_index + 2]) or
@@ -361,7 +373,7 @@ class ssd_mobilenet_processor:
                 x2 = min(int(inference_result[base_index + 5] * input_image_width), input_image_width-1)
                 y2 = min(int(inference_result[base_index + 6] * input_image_height), input_image_height-1)
 
-                classes_boxes_and_probs.append([network_classifications[int(inference_result[base_index + 1])], # label
+                classes_boxes_and_probs.append([self._classification_labels[int(inference_result[base_index + 1])], # label
                                                 x1, y1, # upper left in source image
                                                 x2, y2, # lower right in source image
                                                 inference_result[base_index + 2] # confidence
