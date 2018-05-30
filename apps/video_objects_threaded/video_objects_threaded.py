@@ -1,17 +1,16 @@
 #! /usr/bin/env python3
 
-# Copyright(c) 2017 Intel Corporation. 
+# Copyright(c) 2017-2018 Intel Corporation.
 # License: MIT See LICENSE file in root directory.
 
 
 from mvnc import mvncapi as mvnc
-from video_processor import video_processor
-from ssd_mobilenet_processor import ssd_mobilenet_processor
-import numpy
+from video_processor import VideoProcessor
+from ssd_mobilenet_processor import SsdMobileNetProcessor
 import cv2
+import numpy
 import time
 import os
-import queue
 import sys
 from sys import argv
 
@@ -23,11 +22,7 @@ object_classifications_mask = [1, 1, 1, 1, 1, 1, 1,
                                1, 1, 1, 1, 1, 1, 1,
                                1, 1, 1, 1, 1, 1, 1]
 
-SSDMN_GRAPH_FILENAME = "./graph"
-
-# the ssd mobilenet image width and height
-NETWORK_IMAGE_WIDTH = 300
-NETWORK_IMAGE_HEIGHT = 300
+NETWORK_GRAPH_FILENAME = "./graph"
 
 # the minimal score for a box to be shown
 DEFAULT_INIT_MIN_SCORE = 60
@@ -36,11 +31,10 @@ min_score_percent = DEFAULT_INIT_MIN_SCORE
 # for title bar of GUI window
 cv_window_name = 'video_objects_threaded - SSD_MobileNet'
 
-# the ssd_mobilenet_processor
+# the SsdMobileNetProcessor
 obj_detector_proc = None
 
 video_proc = None
-video_queue = None
 
 # read video files from this directory
 input_video_path = '.'
@@ -51,10 +45,12 @@ resize_output_width = 0
 resize_output_height = 0
 
 
-# handles key presses by adjusting global thresholds etc.
-# raw_key is the return value from cv2.waitkey
-# returns False if program should end, or True if should continue
-def handle_keys(raw_key, obj_detector_proc:ssd_mobilenet_processor):
+def handle_keys(raw_key:int, obj_detector_proc:SsdMobileNetProcessor):
+    """Handles key presses by adjusting global thresholds etc.
+    :param raw_key: is the return value from cv2.waitkey
+    :param obj_detector_proc: the object detector in use.
+    :return: False if program should end, or True if should continue
+    """
     global min_score_percent
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
@@ -73,18 +69,20 @@ def handle_keys(raw_key, obj_detector_proc:ssd_mobilenet_processor):
     return True
 
 
-# overlays the boxes and labels onto the display image.
-# display_image is the image on which to overlay the boxes/labels
-# object_info is a list of lists which have 6 values each
-# these are the 6 values:
-#    [0] string that is network classification ie 'cat', or 'chair' etc
-#    [1] float value for box upper left X
-#    [2] float value for box upper left Y
-#    [3] float value for box lower right X
-#    [4] float value for box lower right Y
-#    [5] float value that is the probability 0.0 -1.0 for the network classification.
-# returns None
-def overlay_on_image(display_image, object_info_list):
+
+def overlay_on_image(display_image:numpy.ndarray, object_info_list:list):
+    """Overlays the boxes and labels onto the display image.
+    :param display_image: the image on which to overlay the boxes/labels
+    :param object_info_list: is a list of lists which have 6 values each
+           these are the 6 values:
+           [0] string that is network classification ie 'cat', or 'chair' etc
+           [1] float value for box upper left X
+           [2] float value for box upper left Y
+           [3] float value for box lower right X
+           [4] float value for box lower right Y
+           [5] float value that is the probability 0.0 -1.0 for the network classification.
+    :return: None
+    """
     source_image_width = display_image.shape[1]
     source_image_height = display_image.shape[0]
 
@@ -123,11 +121,14 @@ def overlay_on_image(display_image, object_info_list):
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
 
-#return False if found invalid args or True if processed ok
 def handle_args():
+    """Reads the commandline args and adjusts initial values of globals values to match
+
+    :return: False if there was an error with the args, or True if args processed ok.
+    """
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask
 
-    labels = ssd_mobilenet_processor.get_classification_labels()
+    labels = SsdMobileNetProcessor.get_classification_labels()
 
     for an_arg in argv:
         if (an_arg == argv[0]):
@@ -184,9 +185,12 @@ def handle_args():
     return True
 
 
-# prints usage information
 def print_usage():
-    labels = ssd_mobilenet_processor.get_classification_labels()
+    """Prints usage information for the program.
+
+    :return: None
+    """
+    labels = SsdMobileNetProcessor.get_classification_labels()
 
     print('\nusage: ')
     print('python3 run_video.py [help][resize_window=<width>x<height>]')
@@ -213,10 +217,11 @@ def print_usage():
     print('python3 run_video.py resize_window=1920x1080 init_min_score=50 exclude_classes=5,11')
 
 
-
-# This function is called from the entry point to do
-# all the work.
 def main():
+    """Main function for the program.  Everything starts here.
+
+    :return: None
+    """
     global resize_output, resize_output_width, resize_output_height, \
            obj_detector_proc, resize_output, resize_output_width, resize_output_height, video_proc
 
@@ -242,12 +247,12 @@ def main():
         return 1
 
     # Pick the first stick to run the network
-    # use the first NCS device for ssd mobilenet inferences
+    # use the first NCS device that opens for the object detection.
     dev_count = 0
     for one_device in devices:
         try:
-            ssdmn_device = mvnc.Device(one_device)
-            ssdmn_device.open()
+            obj_detect_dev = mvnc.Device(one_device)
+            obj_detect_dev.open()
             print("opened device " + str(dev_count))
             break;
         except:
@@ -259,19 +264,18 @@ def main():
     cv2.moveWindow(cv_window_name, 10,  10)
     cv2.waitKey(1)
 
-    obj_detector_proc = ssd_mobilenet_processor(SSDMN_GRAPH_FILENAME, ssdmn_device,
-                                                inital_box_prob_thresh=min_score_percent/100.0,
-                                                classification_mask=object_classifications_mask)
+    obj_detector_proc = SsdMobileNetProcessor(NETWORK_GRAPH_FILENAME, obj_detect_dev,
+                                              inital_box_prob_thresh=min_score_percent/100.0,
+                                              classification_mask=object_classifications_mask)
 
     exit_app = False
     while (True):
         for input_video_file in input_video_filename_list :
 
-            # video processor that will put video frames images on the video_queue
-            video_proc = video_processor(input_video_path + '/' + input_video_file,
-                                         obj_detect_proc = obj_detector_proc)
+            # video processor that will put video frames images on the object detector's input FIFO queue
+            video_proc = VideoProcessor(input_video_path + '/' + input_video_file,
+                                         network_processor = obj_detector_proc)
             video_proc.start_processing()
-            obj_detector_proc.start_processing()
 
             frame_count = 0
             start_time = time.time()
@@ -312,7 +316,7 @@ def main():
 
                 frame_count += 1
 
-                if (obj_detector_proc.is_input_queue_empty() == 0):
+                if (obj_detector_proc.is_input_queue_empty()):
                     end_time = time.time()
                     print('Neural Network Processor has nothing to process, assuming video is finished.')
                     break
@@ -320,15 +324,13 @@ def main():
             frames_per_second = frame_count / (end_time - start_time)
             print('Frames per Second: ' + str(frames_per_second))
 
-            throttling = ssdmn_device.get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
+            throttling = obj_detect_dev.get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
             if (throttling > 0):
                 print("\nDevice is throttling, level is: " + str(throttling))
                 print("Sleeping for a few seconds....")
                 cv2.waitKey(2000)
 
             #video_proc.stop_processing()
-            #cv2.waitKey(1)
-            obj_detector_proc.stop_processing()
             cv2.waitKey(1)
 
             video_proc.cleanup()
@@ -341,8 +343,8 @@ def main():
 
     # Clean up the graph and the device
     obj_detector_proc.cleanup()
-    ssdmn_device.close()
-    ssdmn_device.destroy()
+    obj_detect_dev.close()
+    obj_detect_dev.destroy()
 
     cv2.destroyAllWindows()
 

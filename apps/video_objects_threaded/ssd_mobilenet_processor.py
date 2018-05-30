@@ -13,38 +13,27 @@ import queue
 import threading
 
 
-class ssd_mobilenet_processor:
+class SsdMobileNetProcessor:
 
     # Tiny Yolo assumes input images are these dimensions.
     SSDMN_NETWORK_IMAGE_WIDTH = 300
     SSDMN_NETWORK_IMAGE_HEIGHT = 300
 
-    # initialize an instance of the class
-    # tiny_yolo_graph_file is the path and filename to the tiny yolo graph
-    #     file that was created by the ncsdk compiler
-    # ncs_device is an open ncs device object
-    # input_queue is a queue object from which images will be pulled and
-    #     inferences will be processed on.
-    # output_queue is a queue object on which the filtered inference results will
-    #     be placed along with the input image as a tuple
-    # The filtered results are a list of lists. each of the inner lists represent one found object and contain
-    # the following 6 values:
-    #    string that is network classification ie 'cat', or 'chair' etc
-    #    float value for box X pixel location of upper left within source image
-    #    float value for box Y pixel location of upper left within source image
-    #    float value for box X pixel location of lower right within source image
-    #    float value for box Y pixel location of lower right within source image
-    #    float value that is the probability for the network classification 0.0 - 1.0 inclusive.
-    # initial_box_prob_threshold is the initial box probability threshold for boxes
-    #     returned from the inferences
-    def __init__(self, network_graph_filename: str, ncs_device: mvnc.Device, input_queue:queue.Queue=None, output_queue: queue.Queue=None,
-                 inital_box_prob_thresh: float=None, classification_mask:list=None, queue_wait_input:float=None, queue_wait_output:float=None):
 
-        self._use_worker_thread = False
-        self._queue_wait_input = queue_wait_input
-        self._queue_wait_output = queue_wait_output
+    def __init__(self, network_graph_filename: str, ncs_device: mvnc.Device,
+                 inital_box_prob_thresh: float, classification_mask:list=None):
+        """Initializes an instance of the class
 
-        # Load googlenet graph from disk and allocate graph via API
+        :param network_graph_filename: is the path and filename to the graph
+               file that was created by the ncsdk compiler
+        :param ncs_device: is an open ncs device object to use for inferences for this graph file
+        :param inital_box_prob_thresh: the initial box probablity threshold. between 0.0 and 1.0
+        :param classification_mask: a list of 0 or 1 values, one for each classification label in the
+        _classification_mask list.  if the value is 0 then the corresponding classification won't be reported.
+        :return : None
+        """
+
+        # Load graph from disk and allocate graph.
         try:
             with open(network_graph_filename, mode='rb') as graph_file:
                 graph_in_memory = graph_file.read()
@@ -57,7 +46,7 @@ class ssd_mobilenet_processor:
             print('\n\n')
             raise
 
-        self._classification_labels=ssd_mobilenet_processor.get_classification_labels()
+        self._classification_labels=SsdMobileNetProcessor.get_classification_labels()
 
         self._box_probability_threshold = inital_box_prob_thresh
         self._classification_mask=classification_mask
@@ -67,28 +56,27 @@ class ssd_mobilenet_processor:
                                          1, 1, 1, 1, 1, 1, 1,
                                          1, 1, 1, 1, 1, 1, 1]
 
-        self._input_queue = input_queue
-        self._output_queue = output_queue
         self._end_flag = True
-        if ( (not (self._queue_wait_input is None)) and
-             (not (self._queue_wait_output is None)) and
-             (not (self._input_queue is None)) and
-             (not (self._output_queue is None)) ) :
-            self._use_worker_thread = True
 
-        self._worker_thread = threading.Thread(target=self._do_work, args=())
 
-    # call once when done with the instance of the class
     def cleanup(self):
+        """Call once when done with the instance of the class
+
+        :return: None
+        """
 
         self._drain_queues()
         self._fifo_in.destroy()
         self._fifo_out.destroy()
         self._graph.destroy()
 
-    # get a list of the classifications that are supported
+
     @staticmethod
     def get_classification_labels():
+        """get a list of the classifications that are supported by this neural network
+
+        :return: the list of the classification strings
+        """
         ret_labels = list(['background',
           'aeroplane', 'bicycle', 'bird', 'boat',
           'bottle', 'bus', 'car', 'cat', 'chair',
@@ -97,51 +85,17 @@ class ssd_mobilenet_processor:
           'sheep', 'sofa', 'train', 'tvmonitor'])
         return ret_labels
 
-    # start asynchronous processing of the images on the input queue via a worker thread
-    # and place inference results on the output queue
-    def start_processing(self):
-        self._end_flag = False
-        if (not self._use_worker_thread):
-            return
 
-        if (self._worker_thread == None):
-            self._worker_thread = threading.Thread(target=self._do_work, args=())
-
-        self._worker_thread.start()
-
-    # stop asynchronous processing of the images on input queue
-    # when returns the worker thread will be terminated
-    def stop_processing(self):
-
-        if (self._end_flag == True):
-            # Already stopped
-            return
-
-        self._end_flag = True
-
-        if (not self._use_worker_thread):
-            return
-
-        if (self._worker_thread == None):
-            # no thread to wait for
-            return
-
-        self._worker_thread.join()
-        self._worker_thread = None
-
-
-    # Start an asynchronous inference.  When its complete it will go to the output FIFO queue which
-    # can be read using the get_async_inference_result() method
-    # If there is no room on the input queue this function will block indefinitely until there is room,
-    # when there is room, it will queue the inference and return immediately
-    #
-    # input_image is the image on which to run the inference.
-    #     it can be any size but is assumed to be opencv standard format of BGRBGRBGR...
-    # Returns: nothing
     def start_aysnc_inference(self, input_image:numpy.ndarray):
-        # save original width and height
-        input_image_width = input_image.shape[1]
-        input_image_height = input_image.shape[0]
+        """Start an asynchronous inference.  When its complete it will go to the output FIFO queue which
+           can be read using the get_async_inference_result() method
+           If there is no room on the input queue this function will block indefinitely until there is room,
+           when there is room, it will queue the inference and return immediately
+
+        :param input_image: he image on which to run the inference.
+             it can be any size but is assumed to be opencv standard format of BGRBGRBGR...
+        :return: None
+        """
 
         # resize image to network width and height
         # then convert to float32, normalize (divide by 255),
@@ -149,8 +103,8 @@ class ssd_mobilenet_processor:
         # for an inference
         # this returns a new image so the input_image is unchanged
         inference_image = cv2.resize(input_image,
-                                 (ssd_mobilenet_processor.SSDMN_NETWORK_IMAGE_WIDTH,
-                                  ssd_mobilenet_processor.SSDMN_NETWORK_IMAGE_HEIGHT),
+                                 (SsdMobileNetProcessor.SSDMN_NETWORK_IMAGE_WIDTH,
+                                  SsdMobileNetProcessor.SSDMN_NETWORK_IMAGE_HEIGHT),
                                  cv2.INTER_LINEAR)
 
         # modify inference_image for network input
@@ -176,6 +130,19 @@ class ssd_mobilenet_processor:
     #    float value for box Y pixel location of lower right within source image
     #    float value that is the probability for the network classification 0.0 - 1.0 inclusive.
     def get_async_inference_result(self):
+        """Reads the next available object from the output FIFO queue.  If there is nothing on the output FIFO,
+        this fuction will block indefinitiley until there is.
+
+        :return: tuple of the filtered results along with the original input image
+        the filtered results is a list of lists. each of the inner lists represent one found object and contain
+        the following 6 values:
+           string that is network classification ie 'cat', or 'chair' etc
+           float value for box X pixel location of upper left within source image
+          float value for box Y pixel location of upper left within source image
+          float value for box X pixel location of lower right within source image
+          float value for box Y pixel location of lower right within source image
+          float value that is the probability for the network classification 0.0 - 1.0 inclusive.
+        """
 
         # get the result from the queue
         output, input_image = self._fifo_out.read_elem()
@@ -190,148 +157,100 @@ class ssd_mobilenet_processor:
 
     # get the number of elemets in the input queue
     def is_input_queue_empty(self):
-        if (self._use_worker_thread):
-            ret_val = self._input_queue.empty()
-        else:
-            count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
-            retval = (count == 0)
-        return count
+        """ determines if the input queue for this instance is empty
+
+        :return: True if input queue is empty or False if not.
+        """
+        count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
+        return (count == 0)
 
 
-    # clear everything from the input and output queues.
-    # call this to clear both input and output queues after no longer putting work into the input queue
     def _drain_queues(self):
+        """clears everything from the input and output queues. call this to clear both input and output
+        queues after no longer putting work into the input queues  (calling start_async_inference)
 
-        #first clear the input queue
-        if (self._use_worker_thread):
-            self._input_queue.clear()
-            self._output_queue.clear()
-        else:
-            while (self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL) != 0):
-                # at least one item to process in the input queue, read one from output queue
-                # and then loop back around
-                print("input FIFO has at least one item")
-                self._fifo_out.read_elem()
+        :return: None.
+        """
 
-            while (self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL) != 0):
-                # output FIFO not empty so keep reading from it until it is
-                print("output FIFO has at least one item")
-                self._fifo_out.read_elem()
+        while (self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL) != 0):
+            # at least one item to process in the input queue, read one from output queue
+            # and then loop back around
+            print("input FIFO has at least one item")
+            self._fifo_out.read_elem()
+
+        while (self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL) != 0):
+            # output FIFO not empty so keep reading from it until it is
+            print("output FIFO has at least one item")
+            self._fifo_out.read_elem()
+
         print ("Done Draining queues")
         print ("Input FIFO fill level: " + str(self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)))
         print ("Output FIFO fill level: " + str(self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)))
         return
 
-    # Do a single inference synchronously.
-    # input_image is the image on which to run the inference.
-    #     it can be any size
-    # Returns: tuple of the filtered results along with the original input image
-    # the filtered results is a list of lists. each of the inner lists represent one found object and contain
-    # the following 6 values:
-    #    string that is network classification ie 'cat', or 'chair' etc
-    #    float value for box X pixel location of upper left within source image
-    #    float value for box Y pixel location of upper left within source image
-    #    float value for box X pixel location of lower right within source image
-    #    float value for box Y pixel location of lower right within source image
-    #    float value that is the probability for the network classification 0.0 - 1.0 inclusive.
+
     def do_sync_inference(self, input_image:numpy.ndarray):
+        """Do a single inference synchronously.
+        Don't mix this with calls to get_async_inference_result, Use one or the other.  It is assumed
+        that the input queue is empty when this is called which will be the case if this isn't mixed
+        with calls to get_async_inference_result.
 
-        # save original width and height
-        input_image_width = input_image.shape[1]
-        input_image_height = input_image.shape[0]
+        :param input_image: the image on which to run the inference it can be any size.
+        :return: filtered results which is a list of lists. Each of the inner lists represent one
+        found object and contain the following 6 values:
+            string that is network classification ie 'cat', or 'chair' etc
+            float value for box X pixel location of upper left within source image
+            float value for box Y pixel location of upper left within source image
+            float value for box X pixel location of lower right within source image
+            float value for box Y pixel location of lower right within source image
+            float value that is the probability for the network classification 0.0 - 1.0 inclusive.
+        """
+        self.start_aysnc_inference(input_image)
+        filtered_objects, original_image = self.get_async_inference_result()
 
-        # resize image to network width and height
-        # then convert to float32, normalize (divide by 255),
-        # and finally convert to float16 to pass to LoadTensor as input
-        # for an inference
-        # this returns a new image so the input_image is unchanged
-        inference_image = cv2.resize(input_image,
-                                 (ssd_mobilenet_processor.SSDMN_NETWORK_IMAGE_WIDTH,
-                                  ssd_mobilenet_processor.SSDMN_NETWORK_IMAGE_HEIGHT),
-                                 cv2.INTER_LINEAR)
-
-        # modify inference_image for network input
-        inference_image = inference_image - 127.5
-        inference_image = inference_image * 0.007843
-
-        # Load tensor and get result.  This executes the inference on the NCS
-        self._graph.queue_inference_with_fifo_elem(self._fifo_in, self._fifo_out, inference_image.astype(numpy.float32), input_image)
-        output, userobj = self._fifo_out.read_elem()
-
-        # until API is fixed to return mutable output.
-        output.flags.writeable = True
-
-        # filter out all the objects/boxes that don't meet thresholds
-        return self._filter_objects(output, input_image_width, input_image_height)
+        return filtered_objects
 
 
-    # the worker thread which handles the asynchronous processing of images on the input
-    # queue, running inferences on the NCS and placing results on the output queue
-    def _do_work(self):
-        print('in ssd_mobilenet_processor worker thread')
-
-        while (not self._end_flag):
-            try:
-                # get input image from input queue.  This does not copy the image
-                input_image = self._input_queue.get(True, self._queue_wait_input)
-
-                # get the inference and filter etc.
-                filtered_objs = self.do_inference(input_image)
-
-                # put the results along with the input image on the output queue
-                self._output_queue.put((input_image, filtered_objs), True, self._queue_wait_output)
-
-                # finished with this input queue work item
-                self._input_queue.task_done()
-
-            except queue.Empty:
-                print('ssd_mobilenet_proc, input queue empty')
-            except queue.Full:
-                print('ssd_mobilenet_proc, output queue full')
-
-        print('exiting ssd_mobilenet_processor worker thread')
-
-
-    # get the box probability threshold.
-    # will be between 0.0 and 1.0
-    # higher number will result in less boxes returned
-    # during inferences
     def get_box_probability_threshold(self):
+        """Determine the current box probabilty threshold for this instance.  It will be between 0.0 and 1.0.
+        A higher number means less boxes will be returned.
+
+        :return: the box probability threshold currently in place for this instance.
+        """
         return self._box_probability_threshold
 
-    # set the box probability threshold.
-    # value is the new value, it must be between 0.0 and 1.0
-    #     lower values will allow less certain boxes in the inferences
-    #     which will result in more boxes per image.  Higher values will
-    #     filter out less certain boxes and result in fewer boxes per
-    #     inference.
+
     def set_box_probability_threshold(self, value):
+        """set the box probability threshold.
+
+        :param value: the new box probability threshold value, it must be between 0.0 and 1.0.
+        lower values will allow less certain boxes in the inferences
+        which will result in more boxes per image.  Higher values will
+        filter out less certain boxes and result in fewer boxes per
+        inference.
+        :return: None
+        """
         self._box_probability_threshold = value
 
 
-    # Interpret the output from a single inference of the neural network
-    # and filter out objects/boxes with low probabilities.
-    # inference_result is the array of floats returned from the NCAPI as float32.
-    # input_image_width is the width of the input image
-    # input_image_height is the height of the input image
-    # Returns a list of lists. each of the inner lists represent one found object
-    # that match the filter criteria.  The each contain the following 6 values:
-    #    string that is network classification ie 'cat', or 'chair' etc
-    #    float value for box X pixel location of upper left within source image
-    #    float value for box Y pixel location of upper left within source image
-    #    float value for box X pixel location of lower right within source image
-    #    float value for box Y pixel location of lower right within source image
-    #    float value that is the probability for the network classification 0.0 - 1.0 inclusive.
-    def _filter_objects(self, inference_result, input_image_width:int, input_image_height:int):
+    def _filter_objects(self, inference_result:numpy.ndarray, input_image_width:int, input_image_height:int):
+        """Interpret the output from a single inference of the neural network
+        and filter out objects/boxes with probabilities under the box probability threshold
 
-        # the raw number of floats returned from the inference
-        num_inference_results = len(inference_result)
+        :param inference_result: the array of floats returned from the NCAPI as float32.
+        :param input_image_width: width of the original input image, used to determine size of boxes
+        :param input_image_height: height of original input image used to determine size of boxes
+        :return: list of lists. each of the inner lists represent one found object
+        that match the filter criteria.  The each contain the following 6 values:
+        string that is network classification ie 'cat', or 'chair' etc
+            float value for box X pixel location of upper left within source image
+            float value for box Y pixel location of upper left within source image
+            float value for box X pixel location of lower right within source image
+            float value for box Y pixel location of lower right within source image
+            float value that is the probability for the network classification 0.0 - 1.0 inclusive.
+        """
 
-
-
-
-        num_classifications = len(self._classification_labels) # should be 21
-
+        # the inference result is in this format:
         #   a.	First value holds the number of valid detections = num_valid.
         #   b.	The next 6 values are unused.
         #   c.	The next (7 * num_valid) values contain the valid detections data
