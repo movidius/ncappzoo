@@ -15,7 +15,7 @@ import threading
 
 class SsdMobileNetProcessor:
 
-    # Tiny Yolo assumes input images are these dimensions.
+    # Neural network assumes input images are these dimensions.
     SSDMN_NETWORK_IMAGE_WIDTH = 300
     SSDMN_NETWORK_IMAGE_HEIGHT = 300
 
@@ -42,7 +42,7 @@ class SsdMobileNetProcessor:
 
         except:
             print('\n\n')
-            print('Error - could not load tiny yolo graph file: ' + network_graph_filename)
+            print('Error - could not load neural network graph file: ' + network_graph_filename)
             print('\n\n')
             raise
 
