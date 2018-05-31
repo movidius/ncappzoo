@@ -128,7 +128,6 @@ class VideoProcessor:
         self._pause_mode = True
 
 
-
     def unpause(self):
         """ Unpauses the asynchronous processing that was previously paused by calling pause
 
@@ -136,9 +135,7 @@ class VideoProcessor:
         """
         self._pause_mode = False
 
-    # Thread target.  When call start_processing and initialized with an output queue,
-    # this function will be called in its own thread.  it will keep working until stop_processing is called.
-    # or an error is encountered.
+
     def _do_work_queue(self):
         """Thread target.  When call start_processing and initialized with an output queue,
            this function will be called in its own thread.  it will keep working until stop_processing is called.
@@ -205,7 +202,8 @@ class VideoProcessor:
                         break
 
                     # wait until there is room on the network processor's input queue.
-                    # if we don't do this and clean up is called there is a race condition
+                    # if we don't do this and clean up is called from another thread then
+                    # there is a race condition
                     while (one_network_proc.is_input_queue_full() and (not (self._end_flag))):
                         time.sleep(0.1)
 
@@ -238,4 +236,5 @@ class VideoProcessor:
             self._worker_thread.join()
             self._worker_thread = None
 
+        # free up the video device resources
         self._video_device.release()

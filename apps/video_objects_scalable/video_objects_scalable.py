@@ -255,21 +255,26 @@ def main():
             print("opened device " + str(dev_count))
             obj_detector_proc = SsdMobileNetProcessor(NETWORK_GRAPH_FILENAME, obj_detect_dev,
                                                       inital_box_prob_thresh=min_score_percent / 100.0,
-                                                      classification_mask=object_classifications_mask)
+                                                      classification_mask=object_classifications_mask,
+                                                      name="object detector " + str(dev_count))
             obj_detect_list.append(obj_detector_proc)
 
         except:
             print("Could not open device " + str(dev_count) + ", trying next device")
             pass
+
         dev_count += 1
+
+    if len(obj_detect_list) < 1:
+        print('Could not open any NCS devices.')
+        print('Reinsert devices and try again!')
+        return 1
 
     print("Using " + str(len(obj_detect_list)) + " devices for object detection")
 
     cv2.namedWindow(cv_window_name)
     cv2.moveWindow(cv_window_name, 10,  10)
     cv2.waitKey(1)
-
-
 
     exit_app = False
     while (True):
@@ -280,7 +285,7 @@ def main():
 
             # video processor that will put video frames images on the object detector's input FIFO queue
             video_proc = VideoProcessor(input_video_path + '/' + input_video_file,
-                                         network_processor_list = obj_detect_list)
+                                        network_processor_list = obj_detect_list)
             video_proc.start_processing()
 
             frame_count = 0
@@ -347,9 +352,6 @@ def main():
             video_proc.stop_processing()
             video_proc.cleanup()
 
-            #time.sleep(2)
-            #video_proc.cleanup()
-
             if (exit_app):
                 break
 
@@ -359,6 +361,7 @@ def main():
 
     # Clean up the graph and the device
     for one_obj_detect_proc in obj_detect_list:
+        cv2.waitKey(1)
         one_obj_detect_proc.cleanup(True)
 
     cv2.destroyAllWindows()

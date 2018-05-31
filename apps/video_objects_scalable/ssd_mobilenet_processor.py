@@ -10,6 +10,7 @@ from mvnc import mvncapi as mvnc
 import numpy as numpy
 import cv2
 import time
+import threading
 
 
 class SsdMobileNetProcessor:
@@ -18,9 +19,9 @@ class SsdMobileNetProcessor:
     SSDMN_NETWORK_IMAGE_WIDTH = 300
     SSDMN_NETWORK_IMAGE_HEIGHT = 300
 
-
     def __init__(self, network_graph_filename: str, ncs_device: mvnc.Device,
-                 inital_box_prob_thresh: float, classification_mask:list=None):
+                 inital_box_prob_thresh: float, classification_mask:list=None,
+                 name = None):
         """Initializes an instance of the class
 
         :param network_graph_filename: is the path and filename to the graph
@@ -29,16 +30,18 @@ class SsdMobileNetProcessor:
         :param inital_box_prob_thresh: the initial box probablity threshold. between 0.0 and 1.0
         :param classification_mask: a list of 0 or 1 values, one for each classification label in the
         _classification_mask list.  if the value is 0 then the corresponding classification won't be reported.
+        :param name: A name to use for the processor.  Nice to have when debugging multiple instances
+        on multiple threads
         :return : None
         """
         self._device = ncs_device
-
+        self._network_graph_filename = network_graph_filename
         # Load graph from disk and allocate graph.
         try:
-            with open(network_graph_filename, mode='rb') as graph_file:
+            with open(self._network_graph_filename, mode='rb') as graph_file:
                 graph_in_memory = graph_file.read()
             self._graph = mvnc.Graph("SSD MobileNet Graph")
-            self._fifo_in, self._fifo_out = self._graph.allocate_with_fifos(ncs_device, graph_in_memory)
+            self._fifo_in, self._fifo_out = self._graph.allocate_with_fifos(self._device, graph_in_memory)
 
             self._input_fifo_capacity = self._fifo_in.get_option(mvnc.FifoOption.RO_CAPACITY)
             self._output_fifo_capacity = self._fifo_out.get_option(mvnc.FifoOption.RO_CAPACITY)
@@ -60,7 +63,13 @@ class SsdMobileNetProcessor:
                                          1, 1, 1, 1, 1, 1, 1]
 
         self._end_flag = True
+        self._name = name
+        if (self._name is None):
+            self._name = "no name"
 
+        # lock to let us count calls to asynchronus inferences and results
+        self._async_count_lock = threading.Lock()
+        self._async_inference_count = 0
 
     def cleanup(self, destroy_device=False):
         """Call once when done with the instance of the class
@@ -80,6 +89,12 @@ class SsdMobileNetProcessor:
             self._device.destroy()
 
     def drain_queues(self):
+        """ Drain the input and output FIFOs for the processor.  This should only be called
+        when its known that no calls to start_async_inference will be made during this method's
+        exectuion.
+
+        :return: None
+        """
         self._drain_queues()
 
     @staticmethod
@@ -122,24 +137,30 @@ class SsdMobileNetProcessor:
         inference_image = inference_image - 127.5
         inference_image = inference_image * 0.007843
 
+        self._inc_async_count()
+
         # Load tensor and get result.  This executes the inference on the NCS
         self._graph.queue_inference_with_fifo_elem(self._fifo_in, self._fifo_out, inference_image.astype(numpy.float32), input_image)
 
         return
 
+    def _inc_async_count(self):
+        self._async_count_lock.acquire()
+        self._async_inference_count += 1
+        self._async_count_lock.release()
 
-    # Reads the next available object from the output FIFO queue.
-    # If there is nothing on the output FIFO, this fuction will block indefinitiley
-    # until there is.
-    # Returns tuple of the filtered results along with the original input image
-    # the filtered results is a list of lists. each of the inner lists represent one found object and contain
-    # the following 6 values:
-    #    string that is network classification ie 'cat', or 'chair' etc
-    #    float value for box X pixel location of upper left within source image
-    #    float value for box Y pixel location of upper left within source image
-    #    float value for box X pixel location of lower right within source image
-    #    float value for box Y pixel location of lower right within source image
-    #    float value that is the probability for the network classification 0.0 - 1.0 inclusive.
+    def _dec_async_count(self):
+        self._async_count_lock.acquire()
+        self._async_inference_count -= 1
+        self._async_count_lock.release()
+
+    def _get_async_count(self):
+        self._async_count_lock.acquire()
+        ret_val = self._async_inference_count
+        self._async_count_lock.release()
+        return ret_val
+
+
     def get_async_inference_result(self):
         """Reads the next available object from the output FIFO queue.  If there is nothing on the output FIFO,
         this fuction will block indefinitiley until there is.
@@ -154,6 +175,8 @@ class SsdMobileNetProcessor:
           float value for box Y pixel location of lower right within source image
           float value that is the probability for the network classification 0.0 - 1.0 inclusive.
         """
+
+        self._dec_async_count()
 
         # get the result from the queue
         output, input_image = self._fifo_out.read_elem()
@@ -185,28 +208,59 @@ class SsdMobileNetProcessor:
         return ((self._input_fifo_capacity - count) == 0)
 
     def _drain_queues(self):
-        """clears everything from the input and output queues. call this to clear both input and output
-        queues after no longer putting work into the input queues  (calling start_async_inference)
+        """ Drain the input and output FIFOs for the processor.  This should only be called
+        when its known that no calls to start_async_inference will be made during this method's
+        exectuion.
 
         :return: None.
         """
+        print("\n===========================================================================")
+        print("**** Draining queue for " + self._name + " ****")
+        in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
+        out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
+        print ("Initial Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
+        print ("Initial Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
+        print ("Initial async count for '" + self._name + "' is " + str(self._get_async_count()))
+        count = 0
 
-        while (self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL) != 0):
-            # at least one item to process in the input queue, read one from output queue
-            # and then loop back around
-            print("input FIFO has at least one item")
-            self._fifo_out.read_elem()
+        while (self._get_async_count() != 0):
+            count += 1
+            if (out_count > 0):
+                print("Output FIFO has something now read it '" + self._name + "' fill level is: " + str(out_count))
+                #self._fifo_out.read_elem()
+                self.get_async_inference_result()
+                out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
+                print("Output FIFO read elem has returned for '" + self._name + "' fill level is: " + str(out_count))
+            else:
+                print("Output FIFO empty for '" + self._name + "' sleep and try again ")
+                time.sleep(0.1)
 
-        time.sleep(0.5)
-        while (self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL) != 0):
-            # output FIFO not empty so keep reading from it until it is
-            print("output FIFO has at least one item")
-            self._fifo_out.read_elem()
-            time.sleep(0.5)
+            #time.sleep(1.0)
 
-        print ("Done Draining queues")
-        print ("Input FIFO fill level: " + str(self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)))
-        print ("Output FIFO fill level: " + str(self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)))
+            in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
+            out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
+            print ("at count " + str(count) + " Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
+            print ("at count " + str(count) + " Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
+            print ("at count " + str(count) + " async count for '"  + self._name + "' is: " + str(self._get_async_count()))
+            if (count > 3):
+                blank_image = numpy.zeros((self.SSDMN_NETWORK_IMAGE_HEIGHT, self.SSDMN_NETWORK_IMAGE_WIDTH, 3),
+                                          numpy.float32)
+                self.do_sync_inference(blank_image)
+
+            if (count == 30):
+                # should really not be nearly this high of a number but working around an issue in the
+                # ncapi where an inferece can get stuck in process
+                raise Exception("Could not drain FIFO queues for '" + self._name + "'")
+
+        print("\n**** about to return draining queue for " + self._name + " ****")
+        in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
+        out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
+        print ("final Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
+        print ("final Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
+        print ("final async count for '" + self._name + "' is " + str(self._get_async_count()))
+
+        print("**** returning draining queue for " + self._name + " ****")
+        print("===========================================================================\n")
         return
 
 
