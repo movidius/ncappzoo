@@ -1,10 +1,9 @@
-CAFFE_SRC_PATH?=~/workspace/caffe
 DATA_DIR?=data
 TRAIN_DATA_DIR=$(DATA_DIR)/train
 TRAIN_LMDB_DIR=$(DATA_DIR)/train_lmdb
 VAL_LMDB_DIR=$(DATA_DIR)/val_lmdb
 
-RED='\033[1;33m'
+RED='\033[1;33m '
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 
