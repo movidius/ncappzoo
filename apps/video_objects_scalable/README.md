@@ -1,15 +1,29 @@
 # Introduction
-This project uses SSD MobileNet to do object recognition and classification for a street camera. Rather than a camera, video files will be used to simulate a camera. 
+This project uses SSD MobileNet to do object recognition and classification for on a video stream. Rather than a camera, video files will be used as input object recognition. 
+This project **builds on the video_objects_threaded project adding scalability such that plugging in more NCS devices will scale the performance** of the application.
+
+I've run this program with up to 6 NCS devices in parallel and seen frame rates up to 58 frames per second depending on the video content.  This project makes use of the NCAPI v2 FIFOs and is a good example of both how to scale and thread an NCSDK application.
 
 The provided Makefile does the following:
 1. Builds caffe ssd mobilenet graph file from the caffe/SSD_MobileNet directory in the repository.
 2. Copies the built NCS graph file from the SSD_MobileNet directory to the project base directory
-3. Downloads some sample traffic video files.
+3. Downloads some sample video files.
 3. Runs the provided video_objects_scalable.py program which creates a GUI window that shows the video stream along with labels and boxes around the identified objects.
+
+To run from the commandline type the following command
+```code
+python3 video_objects_scalable.py
+```
+To get a list of commandline options type the following command
+```code
+python3 video_objects_scalable.py help
+```
+
+
 
 # Prerequisites
 This program requires:
-- 1 NCS device
+- 1 or more NCS devices
 - NCSDK 2.04 or greater
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 
