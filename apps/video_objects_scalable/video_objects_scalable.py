@@ -67,7 +67,7 @@ def handle_keys(raw_key:int, obj_detector_list:list):
 
 
 
-def overlay_on_image(display_image:numpy.ndarray, object_info_list:list):
+def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:float):
     """Overlays the boxes and labels onto the display image.
     :param display_image: the image on which to overlay the boxes/labels
     :param object_info_list: is a list of lists which have 6 values each
@@ -116,6 +116,20 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list):
 
         # label text above the box
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
+
+    fps_text = "FPS: " + "{:.2f}".format(fps)
+    fps_thickness = 2
+    fps_multiplier = 1.5
+    fps_size = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, fps_thickness)[0]
+    fps_left = 10
+    fps_right = fps_left + fps_size[0]
+    fps_top = 10
+    fps_bottom = fps_top + fps_size[1]
+    label_background_color = (180, 180, 180)
+    label_text_color = (255, 0, 0)
+    cv2.rectangle(display_image, (fps_left - 10, fps_top - 10), (fps_right + 10, fps_bottom + 10),
+                  label_background_color, -1)
+    cv2.putText(display_image, fps_text, (fps_left, fps_bottom), cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, label_text_color,  fps_thickness)
 
 
 def handle_args():
@@ -312,7 +326,8 @@ def main():
                         exit_app = True
                         break
 
-                    overlay_on_image(display_image, filtered_objs)
+                    running_fps = frame_count / (time.time() - start_time)
+                    overlay_on_image(display_image, filtered_objs, running_fps)
 
                     if (resize_output):
                         display_image = cv2.resize(display_image,

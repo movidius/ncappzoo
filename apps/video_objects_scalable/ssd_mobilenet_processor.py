@@ -207,6 +207,7 @@ class SsdMobileNetProcessor:
         count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
         return ((self._input_fifo_capacity - count) == 0)
 
+
     def _drain_queues(self):
         """ Drain the input and output FIFOs for the processor.  This should only be called
         when its known that no calls to start_async_inference will be made during this method's
@@ -214,34 +215,20 @@ class SsdMobileNetProcessor:
 
         :return: None.
         """
-        print("\n===========================================================================")
-        print("**** Draining queue for " + self._name + " ****")
         in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
         out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
-        print ("Initial Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
-        print ("Initial Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
-        print ("Initial async count for '" + self._name + "' is " + str(self._get_async_count()))
         count = 0
 
         while (self._get_async_count() != 0):
             count += 1
             if (out_count > 0):
-                print("Output FIFO has something now read it '" + self._name + "' fill level is: " + str(out_count))
-                #self._fifo_out.read_elem()
                 self.get_async_inference_result()
                 out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
-                print("Output FIFO read elem has returned for '" + self._name + "' fill level is: " + str(out_count))
             else:
-                print("Output FIFO empty for '" + self._name + "' sleep and try again ")
                 time.sleep(0.1)
-
-            #time.sleep(1.0)
 
             in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
             out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
-            print ("at count " + str(count) + " Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
-            print ("at count " + str(count) + " Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
-            print ("at count " + str(count) + " async count for '"  + self._name + "' is: " + str(self._get_async_count()))
             if (count > 3):
                 blank_image = numpy.zeros((self.SSDMN_NETWORK_IMAGE_HEIGHT, self.SSDMN_NETWORK_IMAGE_WIDTH, 3),
                                           numpy.float32)
@@ -252,15 +239,8 @@ class SsdMobileNetProcessor:
                 # ncapi where an inferece can get stuck in process
                 raise Exception("Could not drain FIFO queues for '" + self._name + "'")
 
-        print("\n**** about to return draining queue for " + self._name + " ****")
         in_count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
         out_count = self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)
-        print ("final Input FIFO for  '"  + self._name + "' fill level: " + str(in_count))
-        print ("final Output FIFO for '"  + self._name + "' fill level: " + str(out_count))
-        print ("final async count for '" + self._name + "' is " + str(self._get_async_count()))
-
-        print("**** returning draining queue for " + self._name + " ****")
-        print("===========================================================================\n")
         return
 
 
