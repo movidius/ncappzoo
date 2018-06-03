@@ -34,10 +34,13 @@ cv_window_name = 'video_objects_threaded - SSD_MobileNet'
 # read video files from this directory
 input_video_path = '.'
 
-# the resize_window arg will modify these if its specified on the commandline
+# the resize_window arg will modify these if its specified on the commandlineq
 resize_output = False
 resize_output_width = 0
 resize_output_height = 0
+
+DEFAULT_SHOW_FPS = True
+show_fps = DEFAULT_SHOW_FPS
 
 
 def handle_keys(raw_key:int, obj_detector_list:list):
@@ -46,7 +49,7 @@ def handle_keys(raw_key:int, obj_detector_list:list):
     :param obj_detector_list: list of object detectors the object detector in use.
     :return: False if program should end, or True if should continue
     """
-    global min_score_percent
+    global min_score_percent, show_fps
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -62,6 +65,10 @@ def handle_keys(raw_key:int, obj_detector_list:list):
         for one_object_detect in obj_detector_list:
             one_object_detect.set_box_probability_threshold(min_score_percent/100.0)
         print('New minimum box percentage: ' + str(min_score_percent) + '%')
+
+    elif (ascii_code == ord('f')):
+        show_fps = not (show_fps)
+        print('New value for show_fps: ' + str(show_fps))
 
     return True
 
@@ -117,19 +124,20 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         # label text above the box
         cv2.putText(display_image, label_text, (label_left, label_bottom), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
 
-    fps_text = "FPS: " + "{:.2f}".format(fps)
-    fps_thickness = 2
-    fps_multiplier = 1.5
-    fps_size = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, fps_thickness)[0]
-    fps_left = 10
-    fps_right = fps_left + fps_size[0]
-    fps_top = 10
-    fps_bottom = fps_top + fps_size[1]
-    label_background_color = (180, 180, 180)
-    label_text_color = (255, 0, 0)
-    cv2.rectangle(display_image, (fps_left - 10, fps_top - 10), (fps_right + 10, fps_bottom + 10),
-                  label_background_color, -1)
-    cv2.putText(display_image, fps_text, (fps_left, fps_bottom), cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, label_text_color,  fps_thickness)
+    if (show_fps):
+        fps_text = "FPS: " + "{:.2f}".format(fps)
+        fps_thickness = 2
+        fps_multiplier = 1.5
+        fps_size = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, fps_thickness)[0]
+        fps_left = 10
+        fps_right = fps_left + fps_size[0]
+        fps_top = 10
+        fps_bottom = fps_top + fps_size[1]
+        label_background_color = (180, 180, 180)
+        label_text_color = (255, 0, 0)
+        cv2.rectangle(display_image, (fps_left - 10, fps_top - 10), (fps_right + 10, fps_bottom + 10),
+                      label_background_color, -1)
+        cv2.putText(display_image, fps_text, (fps_left, fps_bottom), cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, label_text_color,  fps_thickness)
 
 
 def handle_args():
@@ -137,7 +145,8 @@ def handle_args():
 
     :return: False if there was an error with the args, or True if args processed ok.
     """
-    global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask
+    global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask,\
+           show_fps
 
     labels = SsdMobileNetProcessor.get_classification_labels()
 
@@ -177,6 +186,15 @@ def handle_args():
                 print('Error with init_min_score argument.  It must be between 0-100')
                 return False;
 
+        elif (str(an_arg).lower().startswith('show_fps=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                show_fps = (val.lower() == 'true')
+                print ('show_fps: ' + str(show_fps))
+            except:
+                print("Error with show_fps argument.  It must be 'True' or 'False' ")
+                return False;
+
         elif (str(an_arg).lower().startswith('resize_window=')):
             try:
                 arg, val = str(an_arg).split('=', 1)
@@ -207,15 +225,20 @@ def print_usage():
     print('python3 run_video.py [help][resize_window=<width>x<height>]')
     print('')
     print('options:')
-    print('  help - prints this message')
-    print('  resize_window - resizes the GUI window to specified dimensions')
+    print('  help - Prints this message')
+    print('  resize_window - Resizes the GUI window to specified dimensions')
     print('                  must be formated similar to resize_window=1280x720')
     print('                  Default isto not resize, use size of video frames.')
-    print('  init_min_score - set the minimum score for a box to be recognized')
-    print('                  must be a number between 0 and 100 inclusive.')
-    print('                  Default is: ' + str(DEFAULT_INIT_MIN_SCORE))
 
-    print('  exclude_classes - comma separated list of object class IDs to exclude from following:')
+    print('  init_min_score - Set the minimum score for a box to be recognized')
+    print('                   must be a number between 0 and 100 inclusive.')
+    print('                   Default is: ' + str(DEFAULT_INIT_MIN_SCORE))
+
+    print("  show_fps - Show or do not show the Frames Per Second while running")
+    print("             must be 'True' or 'False'.")
+    print("             Default is: " + str(DEFAULT_SHOW_FPS))
+
+    print('  exclude_classes - Comma separated list of object class IDs to exclude from following:')
     index = 0
     for oneLabel in labels:
         print("                 class ID " + str(index) + ": " + oneLabel)
@@ -225,7 +248,7 @@ def print_usage():
 
     print('')
     print('Example: ')
-    print('python3 run_video.py resize_window=1920x1080 init_min_score=50 exclude_classes=5,11')
+    print('python3 run_video.py resize_window=1920x1080 sinit_min_score=50 show_fps=False exclude_classes=5,11')
 
 
 def main():
