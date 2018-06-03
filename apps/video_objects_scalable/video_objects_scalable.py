@@ -129,16 +129,25 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         fps_thickness = 2
         fps_multiplier = 1.5
         fps_size = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, fps_thickness)[0]
-        fps_left = 10
-        fps_right = fps_left + fps_size[0]
-        fps_top = 10
-        fps_bottom = fps_top + fps_size[1]
-        label_background_color = (180, 180, 180)
-        label_text_color = (255, 0, 0)
-        cv2.rectangle(display_image, (fps_left - 10, fps_top - 10), (fps_right + 10, fps_bottom + 10),
-                      label_background_color, -1)
-        cv2.putText(display_image, fps_text, (fps_left, fps_bottom), cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, label_text_color,  fps_thickness)
+        text_pad = 10
+        box_coord_left = 0
+        box_coord_top = 0
+        box_coord_right = box_coord_left + fps_size[0] + text_pad * 2
+        box_coord_bottom = box_coord_top + fps_size[1] + text_pad * 2
 
+        fps_left = box_coord_left + text_pad
+        fps_right = box_coord_right - text_pad
+        fps_top = box_coord_top + text_pad
+        fps_bottom = box_coord_bottom - text_pad
+        label_background_color = (200, 200, 200)
+        label_text_color = (255, 0, 0)
+
+        fps_image = numpy.full((box_coord_bottom - box_coord_top, box_coord_right - box_coord_left, 3), label_background_color, numpy.uint8)
+        cv2.putText(fps_image, fps_text, (fps_left, fps_bottom), cv2.FONT_HERSHEY_SIMPLEX, fps_multiplier, label_text_color,  fps_thickness)
+
+        fps_transparency = 0.4
+        cv2.addWeighted(display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right], 1.0 - fps_transparency,
+                        fps_image, fps_transparency, 0.0, display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right])
 
 def handle_args():
     """Reads the commandline args and adjusts initial values of globals values to match
