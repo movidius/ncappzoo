@@ -34,14 +34,14 @@ cv_window_name = 'video_objects_threaded - SSD_MobileNet'
 # read video files from this directory
 input_video_path = '.'
 
-# the resize_window arg will modify these if its specified on the commandlineq
+
+# the resize_window arg will modify these if its specified on the commandline
 resize_output = False
 resize_output_width = 0
 resize_output_height = 0
 
 DEFAULT_SHOW_FPS = True
 show_fps = DEFAULT_SHOW_FPS
-
 
 def handle_keys(raw_key:int, obj_detector_list:list):
     """Handles key presses by adjusting global thresholds etc.
@@ -149,6 +149,7 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         cv2.addWeighted(display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right], 1.0 - fps_transparency,
                         fps_image, fps_transparency, 0.0, display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right])
 
+
 def handle_args():
     """Reads the commandline args and adjusts initial values of globals values to match
 
@@ -234,6 +235,7 @@ def print_usage():
     print('python3 run_video.py [help][resize_window=<width>x<height>]')
     print('')
     print('options:')
+
     print('  help - Prints this message')
     print('  resize_window - Resizes the GUI window to specified dimensions')
     print('                  must be formated similar to resize_window=1280x720')
