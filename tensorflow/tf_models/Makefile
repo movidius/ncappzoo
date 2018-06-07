@@ -38,4 +38,5 @@ help:
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -rf models
+compile: all
 
