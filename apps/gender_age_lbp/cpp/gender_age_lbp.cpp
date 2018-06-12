@@ -473,29 +473,29 @@ networkResults getInferenceResults(cv::Mat inputMat, std::vector<std::string> ne
 
 }
 
+bool sortFaces(Rect face1, Rect face2) { return face1.x < face2.x; }
 
 int main (int argc, char** argv) {
     // Opencv variables
     Mat imgIn;
     VideoCapture capture;
     Mat croppedFaceMat;
-    Scalar textColor = BLACK;
     Point topLeftRect[5];
     Point bottomRightRect[5];
     Point winTextOrigin;
     CascadeClassifier faceCascade;
-
+    
     vector<Rect> faces;
-    String genderText;
-    String ageText;
-    String rectangle_text;
+    int vect_size = 10;
+    vector<String> rectangleText(vect_size, "");
+    vector<Scalar> textColor(vect_size, BLACK);
     clock_t start_time, elapsed_time;
     bool start_inference_timer = true;
     int key;
     networkResults currentInferenceResult;
 
     capture.open(CAM_SOURCE);
-
+    
     // set the window attributes
     capture.set(CV_CAP_PROP_FRAME_WIDTH, WINDOW_WIDTH);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, WINDOW_HEIGHT);
@@ -543,6 +543,7 @@ int main (int argc, char** argv) {
 
         // save rectangle of detected faces to the faces vector
         faceCascade.detectMultiScale(imgIn, faces, 1.1, 2, 0| CASCADE_SCALE_IMAGE, Size(30, 30) );
+        sort(faces.begin(), faces.end(), sortFaces);
 
         // start timer for inference intervals. Will make an inference every interval. DEFAULT is 1 second.
         if (start_inference_timer) {
@@ -550,7 +551,13 @@ int main (int argc, char** argv) {
             start_inference_timer = false;
         }
 
-        // Draw a rectangle and make an inference on each face
+        if (faces.size() > vect_size) {
+            rectangleText.resize(vect_size*2, "");
+            textColor.resize(vect_size*2, BLACK);
+            vect_size *= 2;
+        }
+        
+        // Draw a rectangle and make an inference on each face 
         for(int i = 0; i < faces.size(); i++) {
             // find the top left and bottom right corners of the rectangle of each face
             topLeftRect[i].x = faces[i].x - PADDING;
@@ -561,7 +568,7 @@ int main (int argc, char** argv) {
             // if the rectangle is within the window bounds, draw the rectangle around the person's face
             if (topLeftRect[i].x > 0 && topLeftRect[i].y > 0 && bottomRightRect[i].x < WINDOW_WIDTH && bottomRightRect[i].y < WINDOW_HEIGHT) {
                 // draw a rectangle around the detected face
-                rectangle(imgIn, topLeftRect[i], bottomRightRect[i], textColor, 2, 8, 0);
+                rectangle(imgIn, topLeftRect[i], bottomRightRect[i], textColor[i], 2, 8, 0);
 
                 elapsed_time = clock() - start_time;
 
@@ -572,7 +579,10 @@ int main (int argc, char** argv) {
                     Rect croppedFaceRect(topLeftRect[i], bottomRightRect[i]);
                     // converts the cropped face rectangle into a opencv mat
                     croppedFaceMat = imgIn(croppedFaceRect);
-
+                    
+                    String genderText = "";
+                    String ageText = "";                   
+                    
                     // process Gender network
                     if (enableGenderNetwork) {
                         // send the cropped opencv mat to the ncs device
@@ -581,14 +591,14 @@ int main (int argc, char** argv) {
                         // get the appropriate color and text based on the inference results
                         if (currentInferenceResult.genderConfidence >= MALE_GENDER_THRESHOLD) {
                             genderText = categories[0].front().c_str();
-                            textColor = BLUE;
+                            textColor[i] = BLUE;
                         } else
                         if (currentInferenceResult.genderConfidence <= FEMALE_GENDER_THRESHOLD){
                             genderText = categories[0].back().c_str();
-                            textColor = PINK;
+                            textColor[i] = PINK;
                         } else {
                             genderText = "Unknown";
-                            textColor = BLACK;
+                            textColor[i] = BLACK;
                         }
                     }
 
@@ -599,16 +609,18 @@ int main (int argc, char** argv) {
                                                                      age_fifo_in, age_fifo_out);
                         ageText = currentInferenceResult.ageCategory;
                     }
+                    // prepare the gender and age text to be printed to the window
+                    rectangleText[i] = genderText + " " + ageText;
 
                     // enable starting the timer again
                     start_inference_timer = true;
                 }
-                // prepare the gender and age text to be printed to the window
-                // rectangle_text = "id: " + to_string(i) + " " + genderText + " " + ageText;
-                rectangle_text = genderText + " " + ageText;
+                
+                
+                // print the age and gender text to the window
+                putText(imgIn, rectangleText[i], topLeftRect[i], FONT, 3, textColor[i], 3);
             }
-            // print the age and gender text to the window
-            putText(imgIn, rectangle_text, topLeftRect[i], FONT, 3, textColor, 3);
+            
         }
 
         putText(imgIn,"Press ESC to exit", winTextOrigin, FONT, 2, GREEN, 2);
