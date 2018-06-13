@@ -39,9 +39,6 @@ extern "C"
 #define GENDER_CAT_STAT_DIRECTORY "../catstat/Gender/"
 #define AGE_CAT_STAT_DIRECTORY "../catstat/Age/"
 
-// time in seconds to perform an inference on the NCS
-#define INFERENCE_INTERVAL 1
-
 using namespace std;
 using namespace cv;
 
@@ -51,6 +48,7 @@ bool enableAgeNetwork = true;
 
 // text colors and font
 const int FONT = cv::FONT_HERSHEY_PLAIN;
+const int FONT_SIZE = 2;
 const cv::Scalar BLUE = cv::Scalar(255, 0, 0, 255);
 const cv::Scalar GREEN = cv::Scalar(0, 255, 0, 255);
 const cv::Scalar RED = cv::Scalar(0, 0, 255, 255);
@@ -63,6 +61,9 @@ const unsigned int MAX_PATH = 256;
 // opencv cropped face padding. make this larger to increase rectangle size
 // default: 60
 const int PADDING = 60;
+
+// time to wait between face detection/inferences
+const double INFERENCE_INTERVAL = 0.25;
 
 // the thresholds which the program uses to decide the gender of a person
 // default: 0.60 and above is male, 0.40 and below is female
@@ -273,7 +274,9 @@ void initNCS(){
 
     }
 
-    std::cout << "Num of neural compute devices connected: " << numNCSConnected << std::endl;
+    if (numNCSConnected > 0) {
+        cout << "Num of neural compute devices connected: " << numNCSConnected << endl;
+    }
 }
 
 void initGenderNetwork() {
@@ -473,84 +476,91 @@ networkResults getInferenceResults(cv::Mat inputMat, std::vector<std::string> ne
 
 }
 
+/*
+ * Used to sort faces from left to right.
+ */
 bool sortFaces(Rect face1, Rect face2) { return face1.x < face2.x; }
 
+
 int main (int argc, char** argv) {
-    // Opencv variables
-    Mat imgIn;
+    // Camera and image frames
     VideoCapture capture;
-    Mat croppedFaceMat;
-    Point topLeftRect[5];
-    Point bottomRightRect[5];
-    Point winTextOrigin;
+    Mat imgIn;
+
+    // Face detection
     CascadeClassifier faceCascade;
-    
     vector<Rect> faces;
-    vector<String> rectangleText;
-    vector<Scalar> textColor;
+    vector<String> resultText;
+    vector<Scalar> resultColor;
+    Mat croppedFaceMat;
+    
+    // Times for inference timer
     clock_t start_time, elapsed_time;
+
+    // Key to escape from main loop and close program
+    const int breakKey = 27;  // esc == 27
     int key;
+
+    // Struct that will hold inference results
     networkResults currentInferenceResult;
 
+    // Set up the camera
     capture.open(CAM_SOURCE);
-    
-    // set the window attributes
     capture.set(CV_CAP_PROP_FRAME_WIDTH, WINDOW_WIDTH);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, WINDOW_HEIGHT);
 
-    // create a window
+    // Set up the display window
     namedWindow(WINDOW_NAME, WINDOW_NORMAL);
     resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
     setWindowProperty(WINDOW_NAME, CV_WND_PROP_ASPECTRATIO, CV_WINDOW_KEEPRATIO);
-    
     moveWindow(WINDOW_NAME, 0, 0);
-    // set a point of origin for the window text
-    winTextOrigin.x = 0;
-    winTextOrigin.y = 20;
+    Point winTextOrigin(0, 20);
 
-    // Load XML file
-    faceCascade.load(XML_FILE);
+    // Load XML file for the face detection cascade classifier
+    if (!faceCascade.load(XML_FILE)) {
+        cout << "Error - could not load face detection cascade XML file." << endl;
+        return -1;
+    }
 
-    // check if network was specified
+    // Check if a specific network was provided on the command line (if so, the other won't be used)
     if (argc == 2) {
         if (strcmp(argv[1], "gender") == 0) {
             enableAgeNetwork = false;
-        }
-        if (strcmp(argv[1], "age") == 0) {
+        } else if (strcmp(argv[1], "age") == 0) {
             enableGenderNetwork = false;
         }
     }
 
-    // initiailze the NCS devices and age and gender networks
+    // Initialize the NCS device(s) and network graphs and FIFO queues
     initNCS();
+    if (numNCSConnected == 0) return -1;
     initGenderNetwork();
     initAgeNetwork();
 
-    // Start the timer
+    // Get the current time; inferences will only be performed periodically
     start_time = clock();
 
     // main loop
     while (true) {
-        // If the user presses esc exit the loop
+        // If the user presses the break key exit the loop
         key = waitKey(1);
-        if ((key & 0xFF) == 27) {
-            // esc == 27
+        if ((key & 0xFF) == breakKey) {
             break;
         }
 
-        // feed the capture to the opencv mat
+        // Get a frame from the camera
         capture >> imgIn;
 
-        // flip the mat horizontally
+        // Flip the image horizontally
         flip(imgIn, imgIn, 1);
 
         // Check if it is time to do an inference
         elapsed_time = clock() - start_time;
-        if ((double)elapsed_time/(double)CLOCKS_PER_SEC >= 0.5) {
+        if ((double)elapsed_time/(double)CLOCKS_PER_SEC >= INFERENCE_INTERVAL) {
 
             // Clear the label and color vectors
-            rectangleText.clear();
-            textColor.clear();
+            resultText.clear();
+            resultColor.clear();
 
             // Detect faces and sort from left to right
             faceCascade.detectMultiScale(imgIn, faces, 1.1, 2, 0| CASCADE_SCALE_IMAGE, Size(30, 30) );
@@ -558,15 +568,15 @@ int main (int argc, char** argv) {
 
             // Process each face
             for(int i = 0; i < faces.size(); i++) {
-                // Get the top left and bottom right corners of the detected area, or the edge of the window
-                topLeftRect[i].x = ((faces[i].x - PADDING > 0) ? (faces[i].x - PADDING) : 0);
-                topLeftRect[i].y = ((faces[i].y - PADDING > 0) ? (faces[i].y - PADDING) : 0);
-                bottomRightRect[i].x = ((faces[i].x + faces[i].width + PADDING < WINDOW_WIDTH) ? (faces[i].x + faces[i].width + PADDING) : WINDOW_WIDTH);
-                bottomRightRect[i].y = ((faces[i].y + faces[i].height + PADDING < WINDOW_HEIGHT) ? (faces[i].y + faces[i].height + PADDING) : WINDOW_HEIGHT);
+                // Expand the detected face boundaries to have more padding and include the whole head
+                // Or if the rectangle boundary falls outside the window cut it off at the edge
+                Point topLeftCorner(max(faces[i].x - PADDING, 0), max(faces[i].y - PADDING, 0));
+                Point bottomRightCorner(min(faces[i].x + faces[i].width + PADDING, WINDOW_WIDTH), min(faces[i].y + faces[i].height + PADDING, WINDOW_HEIGHT));
+                faces[i] = Rect(topLeftCorner, bottomRightCorner);
 
                 // Crop the face from the image
-                Rect croppedFaceRect(topLeftRect[i], bottomRightRect[i]);
-                croppedFaceMat = imgIn(croppedFaceRect);
+                //Rect croppedFaceRect(topLeftRect[i], bottomRightRect[i]);
+                croppedFaceMat = imgIn(faces[i]);
 
                 // Process the GenderNet network
                 if (enableGenderNetwork) {
@@ -576,19 +586,19 @@ int main (int argc, char** argv) {
 
                     // Get the correct color and gender label
                     if (currentInferenceResult.genderConfidence >= MALE_GENDER_THRESHOLD) {
-                        rectangleText.push_back(categories[0].front().c_str());
-                        textColor.push_back(BLUE);
+                        resultText.push_back(categories[0].front().c_str());
+                        resultColor.push_back(BLUE);
                     } else if (currentInferenceResult.genderConfidence <= FEMALE_GENDER_THRESHOLD){
-                        rectangleText.push_back(categories[0].back().c_str());
-                        textColor.push_back(PINK);
+                        resultText.push_back(categories[0].back().c_str());
+                        resultColor.push_back(PINK);
                     } else {
-                        rectangleText.push_back("Unknown ");
-                        textColor.push_back(BLACK);
+                        resultText.push_back("Unknown ");
+                        resultColor.push_back(BLACK);
                     }
                 } else {
                     // Not processing for gender
-                    rectangleText.push_back("");
-                    textColor.push_back(BLACK);
+                    resultText.push_back("");
+                    resultColor.push_back(BLACK);
                 }
 
                 // Process the AgeNet network
@@ -596,9 +606,8 @@ int main (int argc, char** argv) {
                     // Queue an inference and get the result
                     currentInferenceResult = getInferenceResults(croppedFaceMat, categories[1], age_graph_handle,
                                                                  age_fifo_in, age_fifo_out);
-                    rectangleText[i] += currentInferenceResult.ageCategory;
+                    resultText[i] += currentInferenceResult.ageCategory;
                 }
-
             }
             // Reset the inference timer
             start_time = clock();
@@ -608,10 +617,10 @@ int main (int argc, char** argv) {
         putText(imgIn,"Press ESC to exit", winTextOrigin, FONT, 2, GREEN, 2);
         for(int i = 0; i < faces.size(); i++) {
             // Draw a rectangle around the detected face
-            rectangle(imgIn, topLeftRect[i], bottomRightRect[i], textColor[i], 2, 8, 0);
+            rectangle(imgIn, faces[i].tl(), faces[i].br(), resultColor[i], 2, 8, 0);
 
             // print the age and gender text to the window
-            putText(imgIn, rectangleText[i], topLeftRect[i], FONT, 3, textColor[i], 3);
+            putText(imgIn, resultText[i], faces[i].tl(), FONT, FONT_SIZE, resultColor[i], 3);
         }
 
         // Show the image in the window
@@ -620,10 +629,10 @@ int main (int argc, char** argv) {
     } // end main while loop
 
 
-    // close all windows
+    // Close all windows
     destroyAllWindows();
 
-    // clean up
+    // NCAPI clean up
     ncFifoDestroy(&age_fifo_in);
     ncFifoDestroy(&age_fifo_out);
     ncFifoDestroy(&gender_fifo_in);
@@ -634,5 +643,6 @@ int main (int argc, char** argv) {
         ncDeviceClose(dev_handle[i]);
         ncDeviceDestroy(&dev_handle[i]);
     }
+
     return 0;
 }
