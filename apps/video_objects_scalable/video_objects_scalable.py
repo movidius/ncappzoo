@@ -43,13 +43,17 @@ resize_output_height = 0
 DEFAULT_SHOW_FPS = True
 show_fps = DEFAULT_SHOW_FPS
 
+DEFAULT_SHOW_NCS_COUNT = True
+show_ncs_count = DEFAULT_SHOW_NCS_COUNT
+ncs_count = 0
+
 def handle_keys(raw_key:int, obj_detector_list:list):
     """Handles key presses by adjusting global thresholds etc.
     :param raw_key: is the return value from cv2.waitkey
     :param obj_detector_list: list of object detectors the object detector in use.
     :return: False if program should end, or True if should continue
     """
-    global min_score_percent, show_fps
+    global min_score_percent, show_fps, show_ncs_count
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -69,6 +73,10 @@ def handle_keys(raw_key:int, obj_detector_list:list):
     elif (ascii_code == ord('f')):
         show_fps = not (show_fps)
         print('New value for show_fps: ' + str(show_fps))
+
+    elif (ascii_code == ord('d')):
+        show_ncs_count = not (show_ncs_count)
+        print('New value for show_device_count: ' + str(show_fps))
 
     return True
 
@@ -136,8 +144,6 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         box_coord_bottom = box_coord_top + fps_size[1] + text_pad * 2
 
         fps_left = box_coord_left + text_pad
-        fps_right = box_coord_right - text_pad
-        fps_top = box_coord_top + text_pad
         fps_bottom = box_coord_bottom - text_pad
         label_background_color = (200, 200, 200)
         label_text_color = (255, 0, 0)
@@ -148,6 +154,28 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         fps_transparency = 0.4
         cv2.addWeighted(display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right], 1.0 - fps_transparency,
                         fps_image, fps_transparency, 0.0, display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right])
+        
+    if (show_ncs_count):
+        ncs_count_text = "Devices: " + str(ncs_count)
+        ncs_count_thickness = 2
+        ncs_count_multiplier = 1.5
+        ncs_count_size = cv2.getTextSize(ncs_count_text, cv2.FONT_HERSHEY_SIMPLEX, ncs_count_multiplier, ncs_count_thickness)[0]
+        ncs_count_text_pad = 10
+        ncs_count_box_coord_left = display_image.shape[1] - ncs_count_size[0] - + ncs_count_text_pad * 2  #0
+        ncs_count_box_coord_top = 0
+        ncs_count_box_coord_right = ncs_count_box_coord_left + ncs_count_size[0] + ncs_count_text_pad * 2
+        ncs_count_box_coord_bottom = ncs_count_box_coord_top + ncs_count_size[1] + ncs_count_text_pad * 2
+
+        ncs_count_label_background_color = (200, 200, 200)
+        ncs_count_label_text_color = (255, 0, 0)
+
+        ncs_count_image = numpy.full((ncs_count_box_coord_bottom - ncs_count_box_coord_top, ncs_count_box_coord_right - ncs_count_box_coord_left, 3), ncs_count_label_background_color, numpy.uint8)
+        cv2.putText(ncs_count_image, ncs_count_text, (0+ncs_count_text_pad, ncs_count_size[1] + ncs_count_text_pad ), cv2.FONT_HERSHEY_SIMPLEX, ncs_count_multiplier, ncs_count_label_text_color,  ncs_count_thickness)
+
+        ncs_count_transparency = 0.4
+        cv2.addWeighted(display_image[ncs_count_box_coord_top:ncs_count_box_coord_bottom, ncs_count_box_coord_left:ncs_count_box_coord_right], 1.0 - ncs_count_transparency,
+                        ncs_count_image, ncs_count_transparency, 0.0, display_image[ncs_count_box_coord_top:ncs_count_box_coord_bottom, ncs_count_box_coord_left:ncs_count_box_coord_right])
+
 
 
 def handle_args():
@@ -156,7 +184,7 @@ def handle_args():
     :return: False if there was an error with the args, or True if args processed ok.
     """
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask,\
-           show_fps
+           show_fps, show_ncs_count
 
     labels = SsdMobileNetProcessor.get_classification_labels()
 
@@ -205,6 +233,15 @@ def handle_args():
                 print("Error with show_fps argument.  It must be 'True' or 'False' ")
                 return False;
 
+        elif (str(an_arg).lower().startswith('show_device_count=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                show_ncs_count = (val.lower() == 'true')
+                print ('show_device_count: ' + str(show_ncs_count))
+            except:
+                print("Error with show_device_count argument.  It must be 'True' or 'False' ")
+                return False;
+
         elif (str(an_arg).lower().startswith('resize_window=')):
             try:
                 arg, val = str(an_arg).split('=', 1)
@@ -249,6 +286,10 @@ def print_usage():
     print("             must be 'True' or 'False'.")
     print("             Default is: " + str(DEFAULT_SHOW_FPS))
 
+    print("  show_device_count - Show or do not show the number of devices in use while running")
+    print("             must be 'True' or 'False'.")
+    print("             Default is: " + str(DEFAULT_SHOW_NCS_COUNT))
+
     print('  exclude_classes - Comma separated list of object class IDs to exclude from following:')
     index = 0
     for oneLabel in labels:
@@ -262,13 +303,28 @@ def print_usage():
     print('python3 run_video.py resize_window=1920x1080 sinit_min_score=50 show_fps=False exclude_classes=5,11')
 
 
+def print_hot_keys():
+    """Prints hot key bindings for the program.
+
+    :return: None
+    """
+    print("")
+    print("Hot keys while running and GUI in focus:")
+    print("-----------------------------------------------")
+    print("b/B: Decrement/Increment minimum box confidence")
+    print("f  : Toggle FPS display in GUI")
+    print("d  : Toggle device count display in GUI")
+    print("q  : Quit application")
+    print("")
+
 def main():
     """Main function for the program.  Everything starts here.
 
     :return: None
     """
     global resize_output, resize_output_width, resize_output_height, \
-           resize_output, resize_output_width, resize_output_height
+           resize_output, resize_output_width, resize_output_height, \
+           ncs_count
 
     if (not handle_args()):
         print_usage()
@@ -319,6 +375,9 @@ def main():
         return 1
 
     print("Using " + str(len(obj_detect_list)) + " devices for object detection")
+    print_hot_keys()
+
+    ncs_count = len(obj_detect_list)
 
     cv2.namedWindow(cv_window_name)
     cv2.moveWindow(cv_window_name, 10,  10)
