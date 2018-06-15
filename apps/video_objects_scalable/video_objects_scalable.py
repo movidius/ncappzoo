@@ -29,7 +29,7 @@ DEFAULT_INIT_MIN_SCORE = 60
 min_score_percent = DEFAULT_INIT_MIN_SCORE
 
 # for title bar of GUI window
-cv_window_name = 'video_objects_threaded - SSD_MobileNet'
+cv_window_name = 'video_objects_scalable - SSD_MobileNet'
 
 # read video files from this directory
 input_video_path = '.'
@@ -44,8 +44,13 @@ DEFAULT_SHOW_FPS = True
 show_fps = DEFAULT_SHOW_FPS
 
 DEFAULT_SHOW_NCS_COUNT = True
-show_ncs_count = DEFAULT_SHOW_NCS_COUNT
-ncs_count = 0
+show_device_count = DEFAULT_SHOW_NCS_COUNT
+device_count = 0
+
+DEFAULT_REST_SECONDS = 10
+rest_seconds = DEFAULT_REST_SECONDS
+rest_throttling_multiplier = 3
+
 
 def handle_keys(raw_key:int, obj_detector_list:list):
     """Handles key presses by adjusting global thresholds etc.
@@ -53,7 +58,7 @@ def handle_keys(raw_key:int, obj_detector_list:list):
     :param obj_detector_list: list of object detectors the object detector in use.
     :return: False if program should end, or True if should continue
     """
-    global min_score_percent, show_fps, show_ncs_count
+    global min_score_percent, show_fps, show_device_count
     ascii_code = raw_key & 0xFF
     if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
         return False
@@ -75,8 +80,8 @@ def handle_keys(raw_key:int, obj_detector_list:list):
         print('New value for show_fps: ' + str(show_fps))
 
     elif (ascii_code == ord('d')):
-        show_ncs_count = not (show_ncs_count)
-        print('New value for show_device_count: ' + str(show_fps))
+        show_device_count = not (show_device_count)
+        print('New value for show_device_count: ' + str(show_device_count))
 
     return True
 
@@ -155,8 +160,8 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         cv2.addWeighted(display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right], 1.0 - fps_transparency,
                         fps_image, fps_transparency, 0.0, display_image[box_coord_top:box_coord_bottom, box_coord_left:box_coord_right])
         
-    if (show_ncs_count):
-        ncs_count_text = "Devices: " + str(ncs_count)
+    if (show_device_count):
+        ncs_count_text = "Devices: " + str(device_count)
         ncs_count_thickness = 2
         ncs_count_multiplier = 1.5
         ncs_count_size = cv2.getTextSize(ncs_count_text, cv2.FONT_HERSHEY_SIMPLEX, ncs_count_multiplier, ncs_count_thickness)[0]
@@ -184,7 +189,7 @@ def handle_args():
     :return: False if there was an error with the args, or True if args processed ok.
     """
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask,\
-           show_fps, show_ncs_count
+           show_fps, show_device_count, device_count, rest_seconds
 
     labels = SsdMobileNetProcessor.get_classification_labels()
 
@@ -209,6 +214,33 @@ def handle_args():
             except:
                 print('Error with exclude_classes argument. ')
                 return False;
+
+        elif (str(an_arg).lower().startswith('device_count=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                device_count_str = val
+                device_count = int(device_count_str)
+                if (device_count < 0 ):
+                    print('Error with device_count argument.  It must be > 0')
+                    return False
+                print ('Device count: ' + str(device_count))
+            except:
+                print('Error with device count argument.  It must be between 1 and number of devices')
+                return False;
+
+        elif (str(an_arg).lower().startswith('rest_seconds=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                rest_seconds_str = val
+                rest_seconds = int(rest_seconds_str)
+                if (rest_seconds < 0 ):
+                    print('Error with rest_seconds argument.  It must be > 0')
+                    return False
+                print ('Rest Seconds: ' + str(rest_seconds))
+            except:
+                print('Error with rest seconds argument.  It must be between 1 and number of devices')
+                return False;
+
 
         elif (str(an_arg).lower().startswith('init_min_score=')):
             try:
@@ -236,8 +268,8 @@ def handle_args():
         elif (str(an_arg).lower().startswith('show_device_count=')):
             try:
                 arg, val = str(an_arg).split('=', 1)
-                show_ncs_count = (val.lower() == 'true')
-                print ('show_device_count: ' + str(show_ncs_count))
+                show_device_count = (val.lower() == 'true')
+                print ('show_device_count: ' + str(show_device_count))
             except:
                 print("Error with show_device_count argument.  It must be 'True' or 'False' ")
                 return False;
@@ -286,9 +318,21 @@ def print_usage():
     print("             must be 'True' or 'False'.")
     print("             Default is: " + str(DEFAULT_SHOW_FPS))
 
+    print("  device_count - The number of devices to use for inferencing.  If there are ")
+    print("                 more devices in the system than specified here then the extra")
+    print("                 devices will by cycled in and out of use, but no more than")
+    print("                 this many devices will be used at a time.  Must be between 1 and ")
+    print("                 the total number of devices in the system.")
+    print("                 Default is to use all devices in the system. ")
+
     print("  show_device_count - Show or do not show the number of devices in use while running")
     print("             must be 'True' or 'False'.")
     print("             Default is: " + str(DEFAULT_SHOW_NCS_COUNT))
+
+    print("  rest_seconds - The number of seconds to wait between movies ")
+    print("                 when devices are throttling a multiplier will be applied.")
+    print("                 This must be a positive integer.")
+    print("                 Default is: " + str(DEFAULT_REST_SECONDS))
 
     print('  exclude_classes - Comma separated list of object class IDs to exclude from following:')
     index = 0
@@ -300,7 +344,7 @@ def print_usage():
 
     print('')
     print('Example: ')
-    print('python3 run_video.py resize_window=1920x1080 sinit_min_score=50 show_fps=False exclude_classes=5,11')
+    print('python3 video_objects_scalable.py resize_window=1920x1080 init_min_score=50 show_fps=False device_count=2 show_device_count=True rest_seconds=20 exclude_classes=5,11')
 
 
 def print_hot_keys():
@@ -324,7 +368,7 @@ def main():
     """
     global resize_output, resize_output_width, resize_output_height, \
            resize_output, resize_output_width, resize_output_height, \
-           ncs_count
+           device_count
 
     if (not handle_args()):
         print_usage()
@@ -338,6 +382,14 @@ def main():
         print('No video (.mp4) files found')
         return 1
 
+    resting_image = cv2.imread("resting_image.png")
+    if (resting_image is None):
+        resting_image = numpy.zeros((800, 600, 3), numpy.uint8)
+
+    if (resize_output):
+        resting_image = cv2.resize(resting_image,
+                                   (resize_output_width, resize_output_height),
+                                   cv2.INTER_LINEAR)
 
     # Set logging level to only log errors
     mvnc.global_set_option(mvnc.GlobalOption.RW_LOG_LEVEL, 3)
@@ -348,26 +400,37 @@ def main():
         print('Insert device and try again!')
         return 1
 
+    if (device_count < 1) or (device_count > len(devices)):
+        device_count = len(devices)
+
+
     # Create an object detector processor for each device that opens
     # and store it in our list of processors
     obj_detect_list = list()
-    dev_count = 0
+    idle_obj_detect_list = list()
+
+    device_number = 0
+
     for one_device in devices:
         try:
             obj_detect_dev = mvnc.Device(one_device)
             obj_detect_dev.open()
-            print("opened device " + str(dev_count))
+            print("opened device " + str(device_number))
             obj_detector_proc = SsdMobileNetProcessor(NETWORK_GRAPH_FILENAME, obj_detect_dev,
                                                       inital_box_prob_thresh=min_score_percent / 100.0,
                                                       classification_mask=object_classifications_mask,
-                                                      name="object detector " + str(dev_count))
-            obj_detect_list.append(obj_detector_proc)
+                                                      name="object detector " + str(device_number))
+            if (device_number < device_count):
+                obj_detect_list.append(obj_detector_proc)
+            else:
+                idle_obj_detect_list.append(obj_detector_proc)
+
+            device_number += 1
 
         except:
-            print("Could not open device " + str(dev_count) + ", trying next device")
+            print("Could not open device " + str(device_number) + ", trying next device")
             pass
 
-        dev_count += 1
 
     if len(obj_detect_list) < 1:
         print('Could not open any NCS devices.')
@@ -376,8 +439,6 @@ def main():
 
     print("Using " + str(len(obj_detect_list)) + " devices for object detection")
     print_hot_keys()
-
-    ncs_count = len(obj_detect_list)
 
     cv2.namedWindow(cv_window_name)
     cv2.moveWindow(cv_window_name, 10,  10)
@@ -388,6 +449,7 @@ def main():
         for input_video_file in input_video_filename_list :
 
             for one_obj_detect_proc in obj_detect_list:
+                print("using object detector: " + one_obj_detect_proc.get_name())
                 one_obj_detect_proc.drain_queues()
 
             # video processor that will put video frames images on the object detector's input FIFO queue
@@ -451,11 +513,48 @@ def main():
             frames_per_second = frame_count / (end_time - start_time)
             print('Frames per Second: ' + str(frames_per_second))
 
-            #throttling = obj_detect_dev.get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
-            #if (throttling > 0):
-            #    print("\nDevice is throttling, level is: " + str(throttling))
-            #    print("Sleeping for a few seconds....")
-            #    cv2.waitKey(2000)
+            # check for throttling devices and save in throttling list
+            throttling_list = list()
+            for one_obj_detect_proc in obj_detect_list:
+                throttling = one_obj_detect_proc.get_device().get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
+                if (throttling > 0):
+                    print("\nDevice " + one_obj_detect_proc.get_name() + " is throttling, level is: " + str(throttling))
+                    throttling_list.append(one_obj_detect_proc)
+
+
+            if (not exit_app):
+                # rest between movies, display an image while resting
+                resting_display_image = cv2.resize(resting_image,
+                                                   (display_image.shape[1], display_image.shape[0]),
+                                                   cv2.INTER_LINEAR)
+                cv2.imshow(cv_window_name, resting_display_image)
+
+                if ((len(throttling_list) > len(idle_obj_detect_list))):
+                    # more devices throttling than we have in the idle list
+                    # so do extra rest by applying a multiplier to the rest time
+                    print("throttling devices... resting")
+                    cv2.waitKey(rest_seconds * 1000 * rest_throttling_multiplier)
+                else:
+                    cv2.waitKey(rest_seconds * 1000)
+
+            # remove the throttling devices from the main list and put them at the end so they will
+            # be moved to the idle list with priority
+            for one_throttling in throttling_list:
+                obj_detect_list.remove(one_throttling)
+                obj_detect_list.append(one_throttling)
+
+
+            num_idle = len(idle_obj_detect_list)
+            if (num_idle > len(obj_detect_list)):
+                num_idle = len(obj_detect_list)
+            if (num_idle > 0):
+                # replace one of the devices with an idle device
+                for idle_index in range(0, num_idle):
+                    #for one_idle_proc in idle_obj_detect_list:
+                    obj_detect_list.insert(0, idle_obj_detect_list.pop(0))
+
+                for idle_count in range(0, num_idle):
+                    idle_obj_detect_list.append(obj_detect_list.pop())
 
             video_proc.stop_processing()
             video_proc.cleanup()

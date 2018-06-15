@@ -88,6 +88,21 @@ class SsdMobileNetProcessor:
             self._device.close()
             self._device.destroy()
 
+
+    def get_device(self):
+        '''Get the device this processor is using.
+
+        :return:
+        '''
+        return self._device
+
+    def get_name(self):
+        '''Get the name of this processor.
+
+        :return:
+        '''
+        return self._name
+
     def drain_queues(self):
         """ Drain the input and output FIFOs for the processor.  This should only be called
         when its known that no calls to start_async_inference will be made during this method's
