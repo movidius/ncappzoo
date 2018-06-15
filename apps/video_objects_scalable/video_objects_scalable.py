@@ -44,6 +44,7 @@ DEFAULT_SHOW_FPS = True
 show_fps = DEFAULT_SHOW_FPS
 
 DEFAULT_SHOW_NCS_COUNT = True
+
 show_device_count = DEFAULT_SHOW_NCS_COUNT
 device_count = 0
 
@@ -162,6 +163,7 @@ def overlay_on_image(display_image:numpy.ndarray, object_info_list:list, fps:flo
         
     if (show_device_count):
         ncs_count_text = "Devices: " + str(device_count)
+
         ncs_count_thickness = 2
         ncs_count_multiplier = 1.5
         ncs_count_size = cv2.getTextSize(ncs_count_text, cv2.FONT_HERSHEY_SIMPLEX, ncs_count_multiplier, ncs_count_thickness)[0]
@@ -190,6 +192,7 @@ def handle_args():
     """
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask,\
            show_fps, show_device_count, device_count, rest_seconds
+
 
     labels = SsdMobileNetProcessor.get_classification_labels()
 
@@ -318,6 +321,7 @@ def print_usage():
     print("             must be 'True' or 'False'.")
     print("             Default is: " + str(DEFAULT_SHOW_FPS))
 
+
     print("  device_count - The number of devices to use for inferencing.  If there are ")
     print("                 more devices in the system than specified here then the extra")
     print("                 devices will by cycled in and out of use, but no more than")
@@ -361,6 +365,20 @@ def print_hot_keys():
     print("q  : Quit application")
     print("")
 
+def print_hot_keys():
+    """Prints hot key bindings for the program.
+
+    :return: None
+    """
+    print("")
+    print("Hot keys while running and GUI in focus:")
+    print("-----------------------------------------------")
+    print("b/B: Decrement/Increment minimum box confidence")
+    print("f  : Toggle FPS display in GUI")
+    print("d  : Toggle device count display in GUI")
+    print("q  : Quit application")
+    print("")
+
 def main():
     """Main function for the program.  Everything starts here.
 
@@ -369,6 +387,7 @@ def main():
     global resize_output, resize_output_width, resize_output_height, \
            resize_output, resize_output_width, resize_output_height, \
            device_count
+
 
     if (not handle_args()):
         print_usage()
