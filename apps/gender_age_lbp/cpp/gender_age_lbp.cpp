@@ -469,8 +469,9 @@ networkResults getInferenceResults(cv::Mat inputMat, std::vector<std::string> ne
 
     res_length /= sizeof(unsigned short);
     float result_fp32[2];
+    unsigned int res_l=res_length
     fp16tofloat(result_fp32, (unsigned char*)result_buf, res_length);
-
+    res_length=res_l
     // Sort the results to get the top result
     int indexes[res_length];
     for (unsigned int i = 0; i < res_length; i++) {
