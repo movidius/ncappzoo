@@ -23,3 +23,7 @@ help:
 	@echo "  make - Builds all dependencies, but does not run this program";
 	@echo "  make run - Runs this program";
 
+.PHONY: clean
+clean:
+	@echo "\nmaking clean";
+	@echo "  Nothing to clean";
