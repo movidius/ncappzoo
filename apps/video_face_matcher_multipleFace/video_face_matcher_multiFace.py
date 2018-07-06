@@ -242,7 +242,6 @@ def main():
     valid_output = []
     for i in validated_image_list:
         validated_image = cv2.imread("./validated_images/"+i)
-        cv2.waitKey(1)
         valid_output.append(run_inference(validated_image, graph))
     if (use_camera):
         run_camera(valid_output, validated_image_list, graph)
