@@ -1,0 +1,109 @@
+name: movi
+channels:
+- conda-forge
+- defaults
+dependencies:
+- backports=1.0=py36_1
+- backports.functools_lru_cache=1.4=py36_1
+- ca-certificates=2017.11.5=0
+- certifi=2017.11.5=py36_0
+- cycler=0.10.0=py36_0
+- dbus=1.10.22=0
+- expat=2.2.5=0
+- fontconfig=2.12.6=0
+- freetype=2.8.1=0
+- gettext=0.19.7=1
+- glib=2.55.0=0
+- gst-plugins-base=1.8.0=0
+- gstreamer=1.8.0=1
+- icu=58.2=0
+- jpeg=9b=2
+- libffi=3.2.1=3
+- libiconv=1.15=0
+- libpng=1.6.34=0
+- libxcb=1.12=1
+- libxml2=2.9.7=0
+- matplotlib=2.1.2=py36_0
+- ncurses=5.9=10
+- openssl=1.0.2n=0
+- pcre=8.39=0
+- pip=9.0.1=py36_1
+- pyparsing=2.2.0=py36_0
+- pyqt=5.6.0=py36_4
+- python=3.6.4=0
+- python-dateutil=2.6.1=py36_0
+- pytz=2017.3=py_2
+- qt=5.6.2=7
+- readline=7.0=0
+- setuptools=38.4.0=py36_0
+- sip=4.18=py36_1
+- six=1.11.0=py36_1
+- sqlite=3.20.1=2
+- tk=8.6.7=0
+- tornado=4.5.3=py36_0
+- wheel=0.30.0=py36_2
+- xorg-libxau=1.0.8=3
+- xorg-libxdmcp=1.1.2=3
+- xz=5.2.3=0
+- zlib=1.2.11=0
+- intel-openmp=2018.0.0=hc7b2577_8
+- libgcc-ng=7.2.0=h7cc24e2_2
+- libgfortran-ng=7.2.0=h9f7466a_2
+- mkl=2018.0.1=h19d6760_4
+- numpy=1.14.0=py36h3dfced4_1
+- pip:
+  - backports.functools-lru-cache==1.4
+  - batchup==0.1.0
+  - bleach==1.5.0
+  - blessings==1.6.1
+  - boto3==1.5.22
+  - botocore==1.8.36
+  - cffi==1.11.4
+  - click==6.7
+  - decorator==4.2.1
+  - docutils==0.14
+  - enum34==1.1.6
+  - filemagic==1.6  
+  - gpustat==0.4.1
+  - graphviz==0.8.2
+  - h5py==2.7.1
+  - html5lib==0.9999999
+  - imgaug==0.2.5
+  - ipdb==0.10.3
+  - ipython==6.2.1
+  - ipython-genutils==0.2.0
+  - jedi==0.11.1
+  - jmespath==0.9.3
+  - joblib==0.11
+  - line-profiler==2.1.2
+  - markdown==2.6.11
+  - networkx==2.1
+  - numexpr==2.6.4
+  - nvidia-ml-py3==7.352.0
+  - opencv-python==3.4.0.12
+  - pandas==0.22.0
+  - parso==0.1.1
+  - pexpect==4.3.1
+  - pickleshare==0.7.4
+  - pillow==5.0.0
+  - posix-spawn==0.2.post7
+  - prompt-toolkit==1.0.15
+  - protobuf==3.5.1
+  - psutil==5.4.3
+  - ptyprocess==0.5.2
+  - pycparser==2.18
+  - pygments==2.2.0
+  - pystache==0.5.4
+  - pywavelets==0.5.2
+  - pyyaml==3.12
+  - s3transfer==0.1.12
+  - scikit-image==0.13.1
+  - scipy==1.0.0
+  - simplegeneric==0.8.1
+  - tables==3.4.2
+  - tensorflow==1.5
+  - tqdm==4.19.5
+  - traitlets==4.3.2
+  - wcwidth==0.1.7
+  - werkzeug==0.14.1
+  - requests==2.18.4

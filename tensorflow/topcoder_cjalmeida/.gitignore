@@ -1,0 +1,14 @@
+.idea
+__pycache__
+checkpoints/
+models
+ncsdk
+ncappzoo
+input
+work
+*.lprof
+submissions/
+sdk
+tmp
+submission/
+weights/

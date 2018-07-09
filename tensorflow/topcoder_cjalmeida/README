@@ -1,0 +1,168 @@
+Movidius challenge submission
+=============================
+
+Model: Inception V3
+
+This submission supporting files has the following structure:
+
+./movidius/               # Base Python package with code
+./*.py                    # Entry point for different architectures. See "Model type" above.
+environment.yml           # The Anaconda environment with dependencies declarations
+
+All logic to generate the inferences is located in 'movidius/submission.py', 'do_submit' function. This method
+is driven by configuration set in '/movidius/<model>' packages. For instance, the "MobileNet" model has
+configurations in '/movidius/mobilenet/submission.py'
+
+Model was fine tuned for about 24 epochs, with all but 'Mixed_7x' and 'Logits' layers freeze - the last two being
+reinitialized. Then we decresed learning rate by 10x and switched to SGD with Momentum from Adam optimizer at
+epoch 42, then at 66, then stoped at 72.
+
+Inference instructions
+----------------------
+
+This will run the model inference given a compiled Movidius NCS graph. If you don't have the submission zip, download it from 
+
+  https://s3.amazonaws.com/cj-movidius/submission-6.zip
+
+1) Install NCSDK as usual.
+
+2) In the project root unzip the 'submission-X.zip' file to a 'submission' folder. Make sure you end up with a 'submission/compiled.graph'
+
+  $ mkdir submission
+  $ cd submission
+  $ unzip path/to/submission-6.zip
+
+3) Install Anaconda/Miniconda Python 3.6. Get it at https://conda.io/miniconda.html I'm assuming you installed at "~/miniconda"
+
+4) Create and activate a new Conda environment using the 'env-cpu' (no need for installed GPU)
+
+  $ ~/miniconda/binconda env create -f env-cpu.yml -n movidius
+  $ . ~/miniconda/bin/activate movidius
+  (movidius) $     # you should get a prefix in shell
+
+5) Clone (or softlink) the NCSDK repository to a 'ncsdk' folder inside the project. Ensure you have 'ncsdk/api/python/mvnc/mvncapi.py'
+
+  $ git clone https://github.com/movidius/ncsdk.git
+  $ ls ncsdk/api/python/mvnc/mvncapi.py
+
+6) Plug the Movidius stick and run the inferences:
+
+  (movidius) $ python run.py inference --submission submission --images input/provisional --out /tmp/infer.csv
+
+
+The output of "python run.py inference --help"
+
+    Usage: run.py inference [OPTIONS]
+
+    Options:
+    --submission PATH  The submission dir  [required]
+    --images PATH      The path to the images dir  [required]
+    --out PATH         The output CSV file  [required]
+    --help             Show this message and exit.
+
+The 'images' path is directory with the images to infer. The output is a CSV in the submission format (with timings)
+
+Compile + Inference instructions
+--------------------------------
+
+This will run the model inference given a pre-trained Tensorflow weights. Please download the weights from:
+
+  https://s3.amazonaws.com/cj-movidius/weights.zip
+
+
+1) Install NCSDK as usual.
+
+2) In the project root unzip the 'weights.zip' file to a 'weights' folder. Make sure you end up with 'weights/model.index' 
+and 'weights/model.data-*' files.
+
+  $ mkdir weights
+  $ cd weights
+  $ unzip path/to/weights.zip
+
+3) Install Anaconda/Miniconda Python 3.6. Get it at https://conda.io/miniconda.html I'm assuming you installed at "~/miniconda"
+
+4) Create and activate a new Conda environment using the 'env-cpu' (no need for installed GPU)
+
+  $ ~/miniconda/binconda env create -f env-cpu.yml -n movidius
+  $ . ~/miniconda/bin/activate movidius
+  (movidius) $     # you should get a prefix in shell
+
+5) Clone (or softlink) the NCSDK repository to a 'ncsdk' folder inside the project. Ensure you have 'ncsdk/api/python/mvnc/mvncapi.py'
+
+  $ git clone https://github.com/movidius/ncsdk.git
+  $ ls ncsdk/api/python/mvnc/mvncapi.py
+
+6) Plug the Movidius stick and run the compile-inference task:
+
+  $ python run.py compile-inference --weights weights --submission /tmp/submission --images input/provisional
+
+  The 'images' path is directory with the images to infer. The 'submission' arg points to where the compiled graph and inferences file
+  will be placed.
+
+  The output of "python run.py compile-inference --help"
+
+    Usage: run.py compile-inference [OPTIONS]
+
+    Options:
+    --weights PATH     The weights dir  [required]
+    --images PATH      The path to the images dir  [required]
+    --submission PATH  The submission dir  [required]
+    --help             Show this message and exit.
+
+Solution Description
+--------------------
+
+### Introduction
+Tell us a bit about yourself, and why you have decided to participate in the contest.
+  * Name: Cloves Almeida
+
+  * Handle: cjalmeida
+
+  * Placement you achieved in the MM: 4th.
+
+  * About you: Freelance Software Developer. Data scientist wannabe.
+
+  * Why you participated in the MM: For fun and profit! It’s a good way to show you know this stuff without having a PhD.
+
+### Solution Development 
+How did you solve the problem? What approaches did you try and what choices did you make, and why? Also, what alternative approaches did you consider?
+  * I used a stock pre-trained Inception V3 model using Tensorflow. Then fine-tuned on the provided samples, plus almost all extra available images from ImageNet I could find. 
+
+  * I picked Tensorflow over Caffe because that’s what I’m more familiar with.
+
+  * I tried other more both more simple and more complex networks. My initial submission was on Mobilenet but seems the network was too simple. I also tried Inception V4 but it was too slow.
+
+  * NASNet didn’t compile on Movidius – I tried to hack the SDK but it lacked documentation so I given up after a short while.
+
+  * I tried to train from scratch some other modified architectures that I didn’t have Imagenet pre-trained data for but it always resulted in poorer scores on my local validation.
+
+
+
+### Final Approach
+Please provide a bulleted description of your final approach. What ideas/decisions/features have been found to be the most important for your solution performance:
+  * Final model: Tensorflow + Inception V3. 
+
+  * Pre-trained on Imagenet. Fine-tuned on provided Imagenet data + extra Imagenet data (up to 800 samples per class). 
+
+  * Trained the logits + last 3 “Mixed” layers, froze other layers, including BatchNorm.
+
+  * No special handling for Movidius – if it compiles, it runs as expected.
+
+
+### Open Source Resources, Frameworks and Libraries
+Please specify the name of the open source resource along with a URL to where it’s housed and it’s license type:
+  * Tensorflow, tensorflow.org, Apache License 2.0
+  * Numpy, numpy.org, BSD
+  * Many smaller non-essential libraries.
+
+### Potential Algorithm Improvements
+Please specify any potential improvements that can be made to the algorithm:
+  * NASNet are reported to be more effective but I couldn’t make them compile on Movidius.
+
+
+### Algorithm Limitations
+Please specify any potential limitations with the algorithm:
+  * For the proposed challenge, none that I’m aware.
+
+
+
