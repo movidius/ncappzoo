@@ -31,6 +31,7 @@ help:
 	@echo $(YELLOW)"\nPossible make targets: "$(NOCOLOR);
 	@echo "  make help - Shows this message.";
 	@echo "  make clean - Deletes everything created in this directory";
+	@echo "  make compile - compiles all.";
 	@echo "  make all - Downloads tensorflow models repo from here:"
 	@echo "             ${GIT_REPO}" 
 
@@ -38,4 +39,5 @@ help:
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -rf tensorflow
+compile: all
 
