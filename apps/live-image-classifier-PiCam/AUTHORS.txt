@@ -1,0 +1,4 @@
+Name, email, organization
+Ashwin Vijayakumar, ashwin.vijayakumar@intel.com, Intel Corp
+
+Raspberry Pi Camera Module Update: Yavuz Kömeçoğlu (komecoglu.yavuz@gmail.com)
