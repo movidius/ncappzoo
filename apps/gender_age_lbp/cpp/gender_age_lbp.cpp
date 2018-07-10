@@ -450,7 +450,10 @@ networkResults getInferenceResults(cv::Mat inputMat, std::vector<std::string> ne
 
 
     res_length /= sizeof(unsigned short);
-    float result_fp32[2];
+
+    /* make this array large enough to hold the larger result of age/gender network results */
+    float result_fp32[8];
+
     fp16tofloat(result_fp32, (unsigned char*)result_buf, res_length);
 
     // Sort the results to get the top result
