@@ -52,6 +52,9 @@ DEFAULT_REST_SECONDS = 10
 rest_seconds = DEFAULT_REST_SECONDS
 rest_throttling_multiplier = 3
 
+DEFAULT_THROTTLE_CHECK_SECONDS = 30.0
+throttle_check_seconds = DEFAULT_THROTTLE_CHECK_SECONDS
+
 
 def handle_keys(raw_key:int, obj_detector_list:list):
     """Handles key presses by adjusting global thresholds etc.
@@ -191,7 +194,7 @@ def handle_args():
     :return: False if there was an error with the args, or True if args processed ok.
     """
     global resize_output, resize_output_width, resize_output_height, min_score_percent, object_classifications_mask,\
-           show_fps, show_device_count, device_count, rest_seconds
+           show_fps, show_device_count, device_count, rest_seconds, throttle_check_seconds
 
 
     labels = SsdMobileNetProcessor.get_classification_labels()
@@ -242,6 +245,19 @@ def handle_args():
                 print ('Rest Seconds: ' + str(rest_seconds))
             except:
                 print('Error with rest seconds argument.  It must be between 1 and number of devices')
+                return False;
+
+        elif (str(an_arg).lower().startswith('throttle_check_seconds=')):
+            try:
+                arg, val = str(an_arg).split('=', 1)
+                throttle_check_seconds_str = val
+                throttle_check_seconds = float(throttle_check_seconds_str)
+                if (throttle_check_seconds < 0 ):
+                    print('Error with throttle_check_seconds argument.  It must be > 0')
+                    return False
+                print ('Throttle Check Seconds: ' + str(throttle_check_seconds))
+            except:
+                print('Error with throttle check seconds argument.  It must be between 1 and number of devices')
                 return False;
 
 
@@ -338,6 +354,10 @@ def print_usage():
     print("                 This must be a positive integer.")
     print("                 Default is: " + str(DEFAULT_REST_SECONDS))
 
+    print("  throttle_check_seconds - The number of seconds between throttle checking during long movies ")
+    print("                 This must be a positive integer.")
+    print("                 Default is: " + str(DEFAULT_THROTTLE_CHECK_SECONDS))
+
     print('  exclude_classes - Comma separated list of object class IDs to exclude from following:')
     index = 0
     for oneLabel in labels:
@@ -348,7 +368,7 @@ def print_usage():
 
     print('')
     print('Example: ')
-    print('python3 video_objects_scalable.py resize_window=1920x1080 init_min_score=50 show_fps=False device_count=2 show_device_count=True rest_seconds=20 exclude_classes=5,11')
+    print('python3 video_objects_scalable.py resize_window=1920x1080 init_min_score=50 show_fps=False device_count=2 show_device_count=True rest_seconds=20 throttle_check_seconds=10.0 exclude_classes=5,11')
 
 
 def print_hot_keys():
@@ -478,6 +498,7 @@ def main():
 
             frame_count = 0
             start_time = time.time()
+            last_throttle_time = start_time
             end_time = start_time
 
             while(True):
@@ -526,6 +547,16 @@ def main():
                         done = True
                         print('video processor not processing, assuming video is finished.')
                         break
+
+                #if (frame_count % 100) == 0:
+                if ((time.time() - last_throttle_time) > throttle_check_seconds):
+                    #long movie, check for throttling devices
+                    # throttling = one_obj_detect_proc.get_device().get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
+                    last_throttle_time = time.time()
+                    print("movie not done, but going a long time so adjust for throttling")
+                    video_proc.pause()
+                    do_throttle_adjustment(obj_detect_list, idle_obj_detect_list)
+                    video_proc.unpause()
 
                 if (done) : break
 
@@ -591,6 +622,59 @@ def main():
         one_obj_detect_proc.cleanup(True)
 
     cv2.destroyAllWindows()
+
+
+def do_throttle_adjustment(obj_detect_list, idle_obj_detect_list):
+    throttling_list = list()
+    for one_obj_detect_proc in obj_detect_list:
+        throttling = one_obj_detect_proc.get_device().get_option(mvnc.DeviceOption.RO_THERMAL_THROTTLING_LEVEL)
+        if (throttling > 0):
+            print("\nDevice " + one_obj_detect_proc.get_name() + " is throttling, level is: " + str(throttling) + "\n")
+            throttling_list.append(one_obj_detect_proc)
+
+    if (len(throttling_list) < 1):
+        return
+
+    for one_obj_detect_proc in obj_detect_list:
+        one_obj_detect_proc.drain_queues()
+
+    for one_idle_proc in idle_obj_detect_list:
+        one_idle_proc.drain_queues()
+
+
+    # remove the throttling devices from the main list and put them at the end so they will
+    # be moved to the idle list with priority
+    for one_throttling in throttling_list:
+        #print("moving " + one_throttling.get_name() + " to end of object detect list")
+        obj_detect_list.remove(one_throttling)
+        obj_detect_list.append(one_throttling)
+
+    num_idle = len(idle_obj_detect_list)
+    if (num_idle > len(obj_detect_list)):
+        num_idle = len(obj_detect_list)
+    #print("number of idle processors after adjusting:" + str(num_idle))
+    if (num_idle > 0):
+        # replace one of the devices with an idle device
+        for idle_index in range(0, num_idle):
+            #print("idle index is: " + str(idle_index))
+            # for one_idle_proc in idle_obj_detect_list:
+            the_idle_to_use = idle_obj_detect_list.pop(0)
+            #print("moving idle : " + the_idle_to_use.get_name() + " to obj detect list")
+            obj_detect_list.insert(0, the_idle_to_use)
+
+        for idle_count in range(0, num_idle):
+            #print("idle count is: " + str(idle_count))
+            the_active_to_move = obj_detect_list.pop()
+            #print("removing from active list: " + the_active_to_move.get_name())
+            idle_obj_detect_list.append(the_active_to_move)
+
+    for one_obj_detect_proc in obj_detect_list:
+        one_obj_detect_proc.drain_queues()
+        print("\nNow using " + one_obj_detect_proc.get_name())
+
+    for one_idle_proc in idle_obj_detect_list:
+        one_idle_proc.drain_queues()
+
 
 
 # main entry point for program. we'll call main() to do what needs to be done.
