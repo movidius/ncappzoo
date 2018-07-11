@@ -1,7 +1,7 @@
 # Introduction
 The TinyYolo V2 network can be used for object recognition and classification.  See [https://pjreddie.com/darknet/yolov2/](https://pjreddie.com/darknet/yolov2/) for more information on this network. 
 The provided Makefile does the following
-1. Clones the Darkflow repo
+1. Clones the Darkflow repo.
 2. Downloads the Tiny Yolo v2 cfg and weights files.
 3. Converts the cfg and weights files to a Tensorflow pb file.
 3. Profiles and Compiles the network using the Neural Compute SDK.
