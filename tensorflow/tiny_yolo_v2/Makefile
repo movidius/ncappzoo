@@ -141,4 +141,4 @@ clean: clean_caffe_model
 	rm -rf sample_img
 	rm -rf ckpt
 	rm -f graph
-	rm -r ${TF_MODEL_FILENAME}
+	rm -f ${TF_MODEL_FILENAME}
