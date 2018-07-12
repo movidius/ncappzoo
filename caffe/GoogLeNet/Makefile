@@ -97,7 +97,7 @@ compile_cpp:
 .PHONY: run_cpp
 run_cpp: deps data compile_cpp
 	@echo "\nmaking run_cpp"
-	cd build; ./run_googlenet ../bvlc_googlenet.xml ../../../data/images/nps_electric_guitar.png; cd ..
+	cd build; ./run_googlenet ../${GRAPH_FILENAME} ../../../data/images/nps_electric_guitar.png; cd ..
 
 .PHONY: help
 help:
@@ -123,6 +123,6 @@ clean: clean_caffe_model
 	@echo "\nmaking clean"
 	rm -f bvlc_googlenet.bin
 	rm -f bvlc_googlenet.mapping.json
-	rm -f bvlc_googlenet.xml
+	rm -f ${GRAPH_FILENAME}
 	rm -f cpp/run_cpp
 	rm -rf build
