@@ -103,7 +103,7 @@ run_cpp: deps data compile_cpp
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile_model, check, compile_cpp";
+	@echo "  make all - everything needed to run, but doesn't run";
 	@echo "  make data - downloads required data.";
 	@echo "  make deps - makes dependencies for project, prepares model etc.";
 	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
