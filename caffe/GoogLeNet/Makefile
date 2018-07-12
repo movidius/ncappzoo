@@ -14,7 +14,7 @@ GET_PROTOTXT = wget -P . https://raw.githubusercontent.com/BVLC/caffe/master/mod
 CAFFEMODEL_FILENAME = bvlc_googlenet.caffemodel
 GET_CAFFEMODEL = wget -P . -N http://dl.caffe.berkeleyvision.org/${CAFFEMODEL_FILENAME}
 
-GRAPH_FILENAME = bvlc_googlenet.xml
+GRAPH_FILENAME_BASE = bvlc_googlenet
 
 .PHONY: all
 all: deps data compile_cpp 
@@ -97,7 +97,7 @@ compile_cpp:
 .PHONY: run_cpp
 run_cpp: deps data compile_cpp
 	@echo "\nmaking run_cpp"
-	cd build; ./run_googlenet ../${GRAPH_FILENAME} ../../../data/images/nps_electric_guitar.png; cd ..
+	cd build; ./run_googlenet ../${GRAPH_FILENAME_BASE}.xml ../../../data/images/nps_electric_guitar.png; cd ..
 
 .PHONY: help
 help:
@@ -121,8 +121,8 @@ clean_caffe_model:
 
 clean: clean_caffe_model
 	@echo "\nmaking clean"
-	rm -f bvlc_googlenet.bin
-	rm -f bvlc_googlenet.mapping.json
-	rm -f ${GRAPH_FILENAME}
+	rm -f ${GRAPH_FILENAME_BASE}.bin
+	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
+	rm -f ${GRAPH_FILENAME_BASE}.xml
 	rm -f cpp/run_cpp
 	rm -rf build
