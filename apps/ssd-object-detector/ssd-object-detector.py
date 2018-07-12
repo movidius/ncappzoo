@@ -18,8 +18,11 @@ import skimage.transform
 
 import mvnc.mvncapi as mvnc
 
-from utils import visualize_output
-from utils import deserialize_output
+curr_path = os.path.dirname(os.path.realpath(__file__))
+util_path = curr_path.replace(os.path.basename(curr_path), 'utils')
+sys.path.append(util_path)
+import visualize_output
+import deserialize_output
 
 # Detection threshold: Minimum confidance to tag as valid detection
 CONFIDANCE_THRESHOLD = 0.60 # 60% confidant
