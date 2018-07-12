@@ -91,7 +91,6 @@ check: prototxt caffemodel
 .PHONY: run
 run: run_cpp 
 	@echo "\nmaking run"
-	./run.py
 
 .PHONY: run_py
 run_py: compile
