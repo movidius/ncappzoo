@@ -14,6 +14,7 @@ WEIGHTS_FILENAME = yolov2-tiny-voc.weights
 TF_MODEL_FILENAME = yolov2-tiny-voc.pb
 GRAPH_FILENAME = tiny_yolo_v2.graph
 
+
 CLONE_DARKFLOW = git clone https://github.com/thtrieu/darkflow.git
 GET_CFG = wget --no-cache -P ./darkflow/cfg/ https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/${CFG_FILENAME}
 GET_WEIGHTS = wget --no-cache -P ./darkflow/bin/ https://pjreddie.com/media/files/${WEIGHTS_FILENAME}
@@ -70,6 +71,7 @@ download_weights:
 		${GET_WEIGHTS} ; \
 	fi 
 
+
 .PHONY: profile
 profile: generate_model
 	@echo "\nmaking profile"
@@ -109,25 +111,28 @@ run: compile
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: profile, compile";
-	@echo "  make generate_model - converts the darknet model to tensorflow pb file";
-	@echo "  make clone_darkflow_repo - clones the darkflow repo";
-	@echo "  make download_cfg - downloads the tiny yolo v2 cfg file";
-	@echo "  make download_weights - downloads the tiny yolo v2 weights file";
+	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
+	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
+	@echo "  make caffemodel - downloads the caffemodel for the network"
 	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
 	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
 	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
 	@echo "  make run - runs the run.py python example program";
-	@echo "  make run_py - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
-clean: 
+clean_caffe_model:
+	@echo "\nmaking clean_caffe_model"
+	rm -f ${PROTOTXT_FILENAME}
+	rm -f ${CAFFEMODEL_FILENAME}
+
+clean: clean_caffe_model
 	@echo "\nmaking clean"
 	rm -f ${GRAPH_FILENAME}
 	rm -f output.gv
 	rm -f output.gv.svg
 	rm -f output_report.html
 	rm -f output_expected.npy
+	rm -f zero_weights.caffemodel
 	rm -f output_result.npy
 	rm -f output_val.csv
 	rm -rf darkflow
