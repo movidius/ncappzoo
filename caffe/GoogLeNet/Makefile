@@ -17,7 +17,7 @@ GET_CAFFEMODEL = wget -P . -N http://dl.caffe.berkeleyvision.org/${CAFFEMODEL_FI
 GRAPH_FILENAME = bvlc_googlenet.xml
 
 .PHONY: all
-all: profile check compile cpp 
+all: deps data compile_cpp 
 
 .PHONY: data
 data:
