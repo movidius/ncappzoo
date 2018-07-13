@@ -24,10 +24,6 @@ GET_CAFFEMODEL = touch /tmp/cookies.txt; wget --load-cookies /tmp/cookies.txt "h
 
 GRAPH_FILENAME_BASE =  MobileNetSSD_deploy
 
-SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
-IMAGES_RELATIVE_DIR = ../../data/images
-TEST_IMAGE_FILENAME = nps_electric_guitar.png
-
 .PHONY: all
 all: deps data compile_model compile_cpp
 
