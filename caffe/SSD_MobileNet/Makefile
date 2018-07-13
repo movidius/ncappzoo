@@ -96,8 +96,13 @@ check: prototxt caffemodel
 	@echo "\nCheck not implemented yet."
 
 
+.PHONY: compile_cpp
+compile_cpp: 
+	@echo "\ncompile_cpp not implemented yet."
+
 .PHONY: run
-run: deps compile_model
+run: deps compile_model compile_cpp
+	@echo "\nrun not implemented yet."
 
 .PHONY: help
 help:
