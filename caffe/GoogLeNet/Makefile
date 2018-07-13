@@ -1,12 +1,4 @@
-
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
 NCCOMPILE = /opt/intel/computer_vision_sdk_2018.1.265/deployment_tools/model_optimizer/mo.py
-#NCPROFILE = mvNCProfile
-#NCCHECK   = mvNCCheck
-
 
 PROTOTXT_FILENAME= deploy.prototxt
 GET_PROTOTXT = wget -P . https://raw.githubusercontent.com/BVLC/caffe/master/models/bvlc_googlenet/deploy.prototxt
@@ -16,8 +8,12 @@ GET_CAFFEMODEL = wget -P . -N http://dl.caffe.berkeleyvision.org/${CAFFEMODEL_FI
 
 GRAPH_FILENAME_BASE = bvlc_googlenet
 
+SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
+IMAGES_RELATIVE_DIR = ../../data/images
+TEST_IMAGE_FILENAME = nps_electric_guitar.png
+
 .PHONY: all
-all: deps data compile_cpp 
+all: deps data compile_model compile_cpp
 
 .PHONY: data
 data:
@@ -67,13 +63,13 @@ profile: prototxt
 
 
 .PHONY: compile_model
-compile_model: prototxt caffemodel
+compile_model: deps
 	@echo "\nmaking compile"
 	python ${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME}
 
 
 .PHONY: deps
-deps: caffemodel prototxt compile_model
+deps: caffemodel prototxt
 	@echo "\nmaking deps"
 
 .PHONY: check
@@ -81,37 +77,31 @@ check: prototxt caffemodel
 	@echo "\nCheck not implemented yet."
 
 .PHONY: run
-run: run_cpp
+run: run_cpp 
 	@echo "\nmaking run"
-
-.PHONY: run_py
-run_py: compile_model
-	@echo "\nmaking run_py"
-	./run.py
 
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo "\nmaking compile_cpp"
-	(mkdir -p build; cd build; cmake ..; make)
+	(cd ${SIMPLE_CLASSIFIER_RELATIVE_DIR}; make compile_cpp; cd -)
 
 .PHONY: run_cpp
-run_cpp: deps data compile_cpp
+run_cpp: all
 	@echo "\nmaking run_cpp"
-	cd build; ./run_googlenet ../${GRAPH_FILENAME_BASE}.xml ../../../data/images/nps_electric_guitar.png; cd ..
+	${SIMPLE_CLASSIFIER_RELATIVE_DIR}/build/simple_classifier ${GRAPH_FILENAME_BASE}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}; 
 
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - everything needed to run, but doesn't run";
+	@echo "  make all - make all - everything needed to run, but doesn't run";
 	@echo "  make data - downloads required data.";
 	@echo "  make deps - makes dependencies for project, prepares model etc.";
 	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
 	@echo "  make caffemodel - downloads the caffemodel for the network"
 	@echo "  make compile_model - runs model compiler for the network";
-	@echo "  make compile_cpp - builds the run_cpp executable example";
-	@echo "  make run_cpp - builds and runs the C++ example program";
-	@echo "  make run_py - runs the python example program";
+	@echo "  make compile_cpp - builds the C++ example example";
+	@echo "  make run - builds and runs the C++ example program";
 	@echo "  make clean - removes all created content"
 
 clean_caffe_model:
@@ -124,5 +114,4 @@ clean: clean_caffe_model
 	rm -f ${GRAPH_FILENAME_BASE}.bin
 	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
 	rm -f ${GRAPH_FILENAME_BASE}.xml
-	rm -f cpp/run_cpp
-	rm -rf build
+
