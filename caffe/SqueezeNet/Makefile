@@ -86,11 +86,6 @@ check: prototxt caffemodel
 run: run_cpp 
 	@echo "\nmaking run"
 
-.PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	./run.py
-
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo "\nmaking compile_cpp"
@@ -127,7 +122,6 @@ clean: clean_caffe_model
 	rm -f ${GRAPH_FILENAME_BASE}.bin
 	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
 	rm -f ${GRAPH_FILENAME_BASE}.xml
-	rm -f cpp/run_cpp
 	rm -rf build
 	rm -f LICENSE.squeezenet
 
