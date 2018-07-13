@@ -49,7 +49,7 @@ caffemodel:
 	fi  
 
 .PHONY: profile
-profile: prototxt
+profile: 
 	@echo "\nProfile not implemented yet"
 
 .PHONY: compile_model
@@ -71,7 +71,7 @@ data:
 	@echo "\nmaking data - no data required for this project"
 
 .PHONY: check
-check: prototxt caffemodel
+check: 
 	@echo "\ncheck not implemented yet."
 
 .PHONY: compile_cpp
