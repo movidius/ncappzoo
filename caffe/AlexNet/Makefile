@@ -1,4 +1,5 @@
-NCCOMPILE = /opt/intel/computer_vision_sdk_2018.1.265/deployment_tools/model_optimizer/mo.py
+#NCCOMPILE = python /opt/intel/computer_vision_sdk/deployment_tools/model_optimizer/mo.py
+NCCOMPILE = mo.py
 
 PROTOTXT_FILENAME= deploy.prototxt
 GET_PROTOTXT = wget -P . https://raw.githubusercontent.com/BVLC/caffe/master/models/bvlc_alexnet/${PROTOTXT_FILENAME}
@@ -66,7 +67,7 @@ profile: prototxt
 .PHONY: compile_model
 compile_model: deps
 	@echo "\nmaking compile"
-	python ${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME}
+	${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME}
 
 .PHONY: deps
 deps: caffemodel prototxt
