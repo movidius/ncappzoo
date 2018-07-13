@@ -61,8 +61,7 @@ caffemodel:
 
 .PHONY: profile
 profile: prototxt
-	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
+	@echo "\nProfile not implemented yet"
 
 .PHONY: compile_model
 compile_model: deps
