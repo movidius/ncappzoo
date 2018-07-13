@@ -11,6 +11,10 @@ GET_CAFFEMODEL = wget -P . -N https://github.com/DeepScale/SqueezeNet/raw/master
 
 GRAPH_FILENAME_BASE = squeezenet_v1.0
 
+SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
+IMAGES_RELATIVE_DIR = ../../data/images
+TEST_IMAGE_FILENAME = nps_electric_guitar.png
+
 .PHONY: all
 all: deps data compile_model compile_cpp
 
@@ -89,12 +93,13 @@ run: run_cpp
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo "\nmaking compile_cpp"
-	(mkdir -p build; cd build; cmake ..; make)
+	(cd ${SIMPLE_CLASSIFIER_RELATIVE_DIR}; make compile_cpp; cd -)
 
 .PHONY: run_cpp
-run_cpp: deps data compile_cpp
+run_cpp: all
 	@echo "\nmaking run_cpp"
-	cd build; ./run_squeezenet ../${GRAPH_FILENAME_BASE}.xml ../../../data/images/nps_electric_guitar.png; cd ..
+	${SIMPLE_CLASSIFIER_RELATIVE_DIR}/build/simple_classifier ${GRAPH_FILENAME_BASE}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}; 
+
 
 .PHONY: help
 help:
@@ -106,9 +111,8 @@ help:
 	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
 	@echo "  make caffemodel - downloads the caffemodel for the network"
 	@echo "  make compile_model - runs model compiler for the network";
-	@echo "  make compile_cpp - builds the run_cpp executable example";
-	@echo "  make run_cpp - builds and runs the C++ example program";
-	@echo "  make run_py - runs the python example program";
+	@echo "  make compile_cpp - builds the C++ example example";
+	@echo "  make run - builds and runs the C++ example program";
 	@echo "  make clean - removes all created content"
 
 clean_caffe_model:
@@ -122,6 +126,5 @@ clean: clean_caffe_model
 	rm -f ${GRAPH_FILENAME_BASE}.bin
 	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
 	rm -f ${GRAPH_FILENAME_BASE}.xml
-	rm -rf build
 	rm -f LICENSE.squeezenet
 
