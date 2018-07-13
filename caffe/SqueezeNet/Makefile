@@ -69,13 +69,13 @@ profile: prototxt
 	@echo "\nProfile not implemented yet"
 
 .PHONY: compile_model
-compile_model: prototxt caffemodel
+compile_model: deps
 	@echo "\nmaking compile"
 	python ${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME}
 
 
 .PHONY: deps
-deps: caffemodel prototxt compile_model
+deps: caffemodel prototxt
 	@echo "\nmaking deps"
 
 .PHONY: check
