@@ -12,7 +12,7 @@ GET_CAFFEMODEL = wget -P . -N https://github.com/DeepScale/SqueezeNet/raw/master
 GRAPH_FILENAME_BASE = squeezenet_v1.0
 
 .PHONY: all
-all: deps data compile_cpp
+all: deps data compile_model compile_cpp
 
 .PHONY: data
 data:
