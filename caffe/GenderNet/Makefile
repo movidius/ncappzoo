@@ -32,6 +32,7 @@ prototxt:
 .PHONY: caffemodel
 caffemodel: 
 	test -f ${CAFFEMODEL_FILENAME} || ${GET_CAFFEMODEL}
+
 .PHONY: profile
 profile: prototxt
 	@echo "\nProfile not implemented yet"
