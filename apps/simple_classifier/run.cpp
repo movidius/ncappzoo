@@ -90,12 +90,17 @@ int main(int argc, char *argv[]) {
         auto output = infer_request.GetBlob(output_name);
         auto output_data = output->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
 
+        unsigned int results_to_display = 10;
         std::vector<unsigned> results;
         /*  This is to sort output probabilities and put it to results vector */
-        TopResults(10, *output, results);
+        TopResults(results_to_display, *output, results);
+        if (results.size() < results_to_display)
+        {
+            results_to_display = results.size();
+        }
 
-        std::cout << std::endl << "Top 10 results:" << std::endl << std::endl;
-        for (size_t id = 0; id < 10; ++id) {
+        std::cout << std::endl << "Top " << results_to_display << " results:" << std::endl << std::endl;
+        for (size_t id = 0; id < results_to_display; ++id) {
             std::cout.precision(7);
             auto result = output_data[results[id]];
             std::cout << std::left << std::fixed << result << " label #" << results[id] << std::endl;
