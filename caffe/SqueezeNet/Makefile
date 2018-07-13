@@ -1,11 +1,5 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
 NCCOMPILE = /opt/intel/computer_vision_sdk_2018.1.265/deployment_tools/model_optimizer/mo.py
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
 
 
 PROTOTXT_FILENAME= deploy.prototxt
