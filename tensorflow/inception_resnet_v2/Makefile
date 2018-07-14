@@ -5,11 +5,18 @@ IMGSIZE=299
 OUTPUT_NODE_NAME=InceptionResnetV2/Logits/Predictions
 MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_30.tar.gz
 
+GRAPH_FILENAME_BASE = inception_resnet_v2_frozen
+
+SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
+IMAGES_RELATIVE_DIR = ../../data/images
+TEST_IMAGE_FILENAME = nps_electric_guitar.png
+
+
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 
 .PHONY: all
-all: profile
+all: deps data compile_model compile_cpp
 
 PROJECT_DIR = $(CURDIR)
 ZOO_RELATIVE_TF_SRC_PROJ = ../tf_src
@@ -42,6 +49,9 @@ else
 	@echo "TF_SRC_PATH is ${TF_SRC_PATH}" ;
 endif
 
+.PHONY: deps
+deps: freeze
+	@echo "\nmaking deps"
 
 .PHONY: checkpoint
 checkpoint:
@@ -71,45 +81,70 @@ freeze: check_tf checkpoint export
 		--output_graph=$(MODEL_CKPT)_frozen.pb \
 		--output_node_name=$(OUTPUT_NODE_NAME);)
 
-.PHONY: compile
-compile: freeze
+.PHONY: compile_model_old
+compile_model_old: freeze
 	@echo $(YELLOW)"\nCompiling model to Movidius graph..."$(NOCOLOR)
 	(mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
 	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
 
-.PHONY: profile
-profile: freeze
-	@echo $(YELLOW)"\nProfiling the model..."$(NOCOLOR)
-	(mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
+
+.PHONY: compile_model
+compile_model: deps
+	@echo "\nmaking compile"; \
+	if [ -e ${GRAPH_FILENAME_BASE}.xml ] ; \
+	then \
+		echo "compiled model file already exists, skipping compile."; \
+	else \
+		${NCCOMPILE} --data_type FP16 --input_model $(MODEL_CKPT)_frozen.pb ;\
+	fi
+
+
 
 .PHONY: check
-check: freeze
-	@echo $(YELLOW)"\nComparing results with standard Tensorflow..."$(NOCOLOR)
-	(mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
+check: 
+	@echo "\nCheck not implemented yet."
+
+.PHONY: data
+data: 
+	@echo "\nmaking data - no data required for this project"
+
+.PHONY: profile
+profile: 
+	@echo "\nProfile not implemented yet"
 
 .PHONY: run
-run: compile
-	@echo $(YELLOW)"\nRunning inferences using image-classifier project..."$(NOCOLOR)
-	(python3 ../../apps/image-classifier/image-classifier.py --graph ./graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./labels.txt --image ../../data/images/pic_053.jpg)
+run: run_cpp 
+	@echo "\nmaking run"
+
+.PHONY:	compile_cpp
+compile_cpp:  
+	@echo "\nmaking compile_cpp"
+	(cd ${SIMPLE_CLASSIFIER_RELATIVE_DIR}; make compile_cpp; cd -)
+
+.PHONY: run_cpp
+run_cpp: all
+	@echo "\nmaking run_cpp"
+	${SIMPLE_CLASSIFIER_RELATIVE_DIR}/build/simple_classifier ${GRAPH_FILENAME_BASE}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}; 
+
+
 
 .PHONY: help
 help:
 	@echo $(YELLOW)"\nPossible make targets: "$(NOCOLOR);
 	@echo "  make help - Shows this message.";
-	@echo "  make all - Builds all dependencies, but does not run this program.";
-	@echo "  make checkpoint - Downloads pre-trained checkpoint files.;"
+	@echo "  make all - make all - everything needed to run, but doesn't run";
 	@echo "  make clean - removes files created in this directory.;"
-	@echo "  make export - Export the neural network model for inference.";
-	@echo "  make freeze - Freeze the neural network model for inference.";
-	@echo "  make compile - Convert the frozen model into Movidius graph file.";
-	@echo "  make check - Compare inference results with that of TensorFlow running on CPU/GPU.";
-	@echo "  make profile - Run the model on NCS and extract complexity, bandwidth and execution time for each layer.";
+	@echo "  make compile_cpp - builds C++ example to demonstrate the network ";
+	@echo "  make compile_model - runs model compiler for the network";
+	@echo "  make data - downloads required data.";
+	@echo "  make deps - makes dependencies for project, prepares model etc.";
+	@echo "  make run - builds and runs C++ example program";
+	@echo "  make clean - removes all created content"
 
 .PHONY: clean
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -f inception_resnet_v2* -v
-	rm -f output* -v
-	rm -f graph labels.txt
+	rm -f ${GRAPH_FILENAME_BASE}.bin
+	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
+	rm -f ${GRAPH_FILENAME_BASE}.xml
