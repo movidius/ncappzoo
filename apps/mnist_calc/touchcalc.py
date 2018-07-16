@@ -1,18 +1,153 @@
-import cv2
-import numpy as np
-from mvnc import mvncapi as mvnc
-import numpy
-import cv2
+#! /usr/bin/env python3
+
+# Copyright(c) 2017 Intel Corporation.
+# License: MIT See LICENSE file in root directory.
+# HMM & NPS
+
 import os
-import sys
-from typing import List
+
+import cv2
+import mvnc.mvncapi as mvnc
+import numpy as np
+
 import digitdetector
+from mnist_processor import MnistProcessor
+
+
+class UIElement:
+    def __init__(self, x, y, width=1, height=1, color=(0, 0, 0), thickness=1):
+        self.x = x
+        self.y = y
+
+        self._width = width
+        self._height = height
+
+        self.color = color
+        self.thickness = thickness
+
+    def __str__(self):
+        return 'x: ' + str(self.x) + ', ' + \
+               'y: ' + str(self.y) + ', ' + \
+               'w: ' + str(self.width) + ', ' + \
+               'h: ' + str(self.height)
+
+    def contains_point(self, x, y):
+        """Return True if a given point is within this element's boundaries, otherwise False."""
+        if self.left <= x <= self.right and self.top <= y <= self.bottom:
+            return True
+        else:
+            return False
+
+    def draw(self, target):
+        """Draw the outline of this element. Child classes override this to draw themselves appropriately."""
+        cv2.rectangle(target, (self.left, self.top), (self.right, self.bottom), self.color, 1)
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = value
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, value):
+        self._height = value
+
+    @property
+    def top(self):
+        return self.y
+
+    @property
+    def bottom(self):
+        return self.y + self.height
+
+    @property
+    def left(self):
+        return self.x
+
+    @property
+    def right(self):
+        return self.x + self.width
+
+    @property
+    def center_x(self):
+        return self.x + int(self.width / 2)
+
+    @property
+    def center_y(self):
+        return self.y + int(self.height / 2)
+
+
+class PlusSign(UIElement):
+    def draw(self, target):
+        # Horizontal line
+        cv2.line(target, (self.center_x, self.top), (self.center_x, self.bottom),
+                 self.color, self.thickness)
+        # Vertical line
+        cv2.line(target, (self.left, self.center_y), (self.left + self.width, self.center_y),
+                 self.color, self.thickness)
+
+
+class MinusSign(UIElement):
+    def draw(self, target):
+        # Horizontal line
+        cv2.line(target, (self.left, self.center_y), (self.right, self.center_y), self.color, self.thickness)
+
+
+class MultiplicationSign(UIElement):
+    def draw(self, target):
+        # Crossed diagonal lines (X)
+        cv2.line(target, (self.left, self.top), (self.right, self.bottom), self.color, self.thickness)
+        cv2.line(target, (self.left, self.bottom), (self.right, self.top), self.color, self.thickness)
+
+
+class DivisionSign(UIElement):
+    def draw(self, target):
+        # Horizontal line with dots above and below
+        cv2.line(target, (self.left, self.center_y), (self.right, self.center_y), self.color, self.thickness)
+        cv2.circle(target, (self.center_x, self.center_y - 30), 5, self.color, 5)
+        cv2.circle(target, (self.center_x, self.center_y + 30), 5, self.color, 5)
+
+
+class EqualsSign(UIElement):
+    def draw(self, target):
+        # Top line
+        cv2.line(target, (self.left, self.center_y - 10), (self.center_x, self.center_y - 10),
+                 self.color, self.thickness)
+        # Bottom line
+        cv2.line(target, (self.left, self.center_y + 10),(self.center_x, self.center_y + 10),
+                 self.color, self.thickness)
+
+
+class Label(UIElement):
+    def __init__(self, x, y, label, color=(0, 0, 0), thickness=1, scale=1):
+        super(Label, self).__init__(x, y, color=color, thickness=thickness)
+        self.label = label
+        self.font = cv2.FONT_HERSHEY_DUPLEX
+        self.color = color
+        self.scale = scale
+
+    def draw(self, target):
+        cv2.putText(target, self.label, (self.left, self.bottom), self.font, self.scale, self.color, self.thickness)
+
+    @property
+    def width(self):
+        size, baseline = cv2.getTextSize(self.label, self.font, self.scale, self.thickness)
+        return size[0]
+
+    @property
+    def height(self):
+        size, baseline = cv2.getTextSize(self.label, self.font, self.scale, self.thickness)
+        return size[1]
 
 
 class TouchCalc:
-    NETWORK_IMAGE_DIMENSIONS = (28, 28)
-
-    def __init__(self, window_title='TouchCalc', width=1400, height=500):
+    def __init__(self, window_title='MNIST DrawCalc', width=1400, height=500):
         # Save these for use later
         self._height = height
         self._width = width
@@ -26,408 +161,263 @@ class TouchCalc:
         # Set a flag to know when the user is drawing and assign a mouse event listener
         self._drawing = False
         self._last_point = None  # track the last point drawn for drawing lines
-        cv2.setMouseCallback(self._window_name, self._draw)
-
-        # The bottom 10% of the window will be a menu that can't be drawn on
-        self._menu_bar_threshold = int(self._height * .9)
+        cv2.setMouseCallback(self._window_name, self._mouse_event)
 
         # Set up a blank canvas
         self._canvas = np.zeros((height, width, 3), np.uint8)
 
-        self._box_color = (230, 230, 230)
+        # Sizes for calculating spacing
+        operator_width = 80
+        operator_height = 80
+        padding = 10
 
-        self._operation_width = 80
-        self._operation_height = 80
-        self._pad = 10
+        # Operands (the digits)
+        self._operand1 = UIElement(x=20, y=50, width=400, height=350, color=(230, 230, 230))
+        self._operand2 = UIElement(x=(self._operand1.x + self._operand1.width + operator_width + padding * 2),
+                                   y=self._operand1.y,
+                                   width=self._operand1.width,
+                                   height=self._operand1.height,
+                                   color=self._operand1.color)
 
-        self._operand1_left = 20
-        self._operand1_top = 50
-        self._operand1_width = 400
-        self._operand1_height = 350
+        # Operators (+, -, *, /, etc.)
+        operator_args = {'x': self._operand1.x + self._operand1.width + padding,
+                         'y': self._operand1.y + int(self._operand1.height / 2) - int(operator_height / 2),
+                         'width': operator_width,
+                         'height': operator_height,
+                         'thickness': 5}
+        self._plus_sign = PlusSign(**operator_args)
+        self._minus_sign = MinusSign(**operator_args)
+        self._multiplication_sign = MultiplicationSign(**operator_args)
+        self._division_sign = DivisionSign(**operator_args)
 
-        self._operand2_left = self._operand1_left + self._operand1_width + self._operation_width + self._pad + self._pad
-        self._operand2_top = self._operand1_top
-        self._operand2_width = self._operand1_width
-        self._operand2_height = self._operand1_height
+        # Set the default operator to +
+        self._operator = self._plus_sign
 
-        # operation rectangle, +, -, *, / etc
-        self._operation_color = (0, 0, 0)
-        self._operation_left = self._operand1_left + self._operand1_width + self._pad
-        self._operation_top = self._operand1_top + (int)(self._operand1_height / 2) - (int)(self._operation_height / 2)
+        # Equals sign (=)
+        self._equals_sign = EqualsSign(x=(self._operand2.x + self._operand2.width + padding),
+                                       y=(self._operand2.y + int(self._operand2.height / 2) - int(operator_height / 2)),
+                                       width=int(operator_width * 1.5),
+                                       height=operator_height,
+                                       thickness=5)
 
-        # equals sign
-        self._equals_height = self._operation_height
-        self._equals_width = self._operation_width
-        self._equals_left = self._operand2_left + self._operand2_width + self._pad
-        self._equals_top = self._operand2_top + (int)(self._operand2_height / 2) - (int)(self._equals_height / 2)
+        # Clear button
+        self._clear_all_button = Label(x=0, y=(self._height - int(self._height / 10)), label='C', scale=2, thickness=3)
+        self._clear_all_button.x = self._width - self._clear_all_button.width
 
-        self._answer_str = ""
+        # Operand labels
+        self._op1_label = Label(x=self._operand1.left, y=(self._operand1.bottom + 5), label='',
+                                scale=1, thickness=2, color=(255, 0, 0))
+        self._op2_label = Label(x=self._operand2.left, y=(self._operand2.bottom + 5), label='',
+                                scale=1, thickness=2, color=(255, 0, 0))
 
-        self._clear()
+        # Answer label
+        self._answer_label = Label(x=self._equals_sign.right + 10, y=self._equals_sign.top, label='',
+                                   thickness=3, scale=5, color=(255, 0, 0))
 
-        self._device, self._graph = self.do_mvnc_initialize()
+        # Instruction label
+        instructions = "Tap '=' to submit. Tap 'C' to clear. Tap the operator to change operations. Press any key to quit."
+        self._instruction_label = Label(x=0, y=5, label=instructions, scale=0.85, thickness=2)
 
-        self._infer_count = 0
+        # Calculation variables
+        self._op1, self._op1_prob = None, None
+        self._op2, self._op2_prob = None, None
+        self._answer = None
 
-    def _clear(self):
-        """Clear the canvas and redraw buttons."""
-        self._canvas[:] = 255
-        self._answer_str = ""
+        # Draw the screen
         self._draw_ui()
 
-    def _draw(self, event, x, y, flags, param):
+        # Initialize mvncapi objects
+        self._device, self._net_processor = None, None
+        self._do_mvnc_initialize()
+
+    def _clear_ui(self):
+        """Clear the digits and answer and redraw the UI."""
+        self._op1, self._op1_prob = None, None
+        self._op2, self._op2_prob = None, None
+        self._answer = None
+        self._draw_ui()
+
+    def _draw_ui(self):
+        """Clear the UI and draw the UI elements."""
+        # Clear the canvas
+        self._canvas[:] = 255
+
+        # Draw UI elements
+        self._operand1.draw(self._canvas)
+        self._operand2.draw(self._canvas)
+        self._operator.draw(self._canvas)
+        self._equals_sign.draw(self._canvas)
+        self._clear_all_button.draw(self._canvas)
+        self._instruction_label.draw(self._canvas)
+
+    def _draw_results(self):
+        """Label the detected digits, their probabilities, and the answer."""
+        self._op1_label.label = '{:d} ({:.2f}% probability)'.format(self._op1, self._op1_prob * 100) if self._op1 else 'No digit detected.'
+        self._op2_label.label = '{:d} ({:.2f}% probability)'.format(self._op2, self._op2_prob * 100) if self._op2 else 'No digit detected.'
+        self._answer_label.label = str(self._answer) if self._answer else None
+
+        self._op1_label.draw(self._canvas)
+        self._op2_label.draw(self._canvas)
+        self._answer_label.draw(self._canvas)
+
+    def _draw_operator(self):
+        """Clear the current operator area and answer area, and redraw."""
+        padding = 5  # need to overwrite a slightly larger area or some drawing may remain
+
+        # Clear the operator
+        cv2.rectangle(self._canvas, (self._operator.left - padding, self._operator.top - padding),
+                      (self._operator.right + padding, self._operator.bottom + padding),
+                      (255, 255, 255), cv2.FILLED)
+        # Clear the answer
+        cv2.rectangle(self._canvas, (self._answer_label.left - padding, self._answer_label.top - padding),
+                      (self._answer_label.right + padding, self._answer_label.bottom + padding),
+                      (255, 255, 255), cv2.FILLED)
+
+        # Draw the new operator
+        self._operator.draw(self._canvas)
+
+    def _mouse_event(self, event, x, y, flags, param):
         """Event listener for mouse events."""
         if event == cv2.EVENT_LBUTTONDOWN:
-            if y > self._menu_bar_threshold:
-                if x < 100:
-                    # Bottom left corner was clicked
-                    self._clear()
-                if x > self._width - 100:
-                    # Bottom right corner was clicked
-                    self.submit()
+            if self._equals_sign.contains_point(x, y):
+                # Equal sign was clicked
+                self.submit()
+                self._draw_results()
+            elif self._clear_all_button.contains_point(x, y):
+                # Clear was clicked
+                self._clear_ui()
+            elif self._operator.contains_point(x, y):
+                # The operator was clicked
+                if self._operator is self._plus_sign:
+                    self._operator = self._minus_sign
+                elif self._operator is self._minus_sign:
+                    self._operator = self._multiplication_sign
+                elif self._operator is self._multiplication_sign:
+                    self._operator = self._division_sign
+                elif self._operator is self._division_sign:
+                    self._operator = self._plus_sign
+                self._draw_operator()
             else:
                 self._drawing = True
 
         elif event == cv2.EVENT_MOUSEMOVE and self._drawing:
-            if y < self._menu_bar_threshold:
-                #cv2.circle(self._canvas, (x, y), 10, (0, 0, 0), -1)
+            if self._operand1.contains_point(x, y) or self._operand2.contains_point(x, y):
+                # Draw if this is inside an operand rectangle
                 if self._last_point:
                     cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 10)
                     self._last_point = (x, y)
                 else:
                     self._last_point = (x, y)
+            else:
+                # Drawing outside the boundaries, forget last point so line won't connect when re-entering boundary
+                self._last_point = None
 
         elif event == cv2.EVENT_LBUTTONUP:
             self._drawing = False
             self._last_point = None
 
-    def _draw_ui(self, color=(255, 0, 0)):
-        """Draw buttons on the canvas."""
-        font_name = cv2.FONT_HERSHEY_DUPLEX
-        font_scale = 2
-        font_thickness = 3
-        y_coord = self._height - 10
+    def _do_mvnc_initialize(self):
+        """Create and opens the Neural Compute device and create a MnistProcessor."""
+        # Get a list of all devices
+        devices = mvnc.enumerate_devices()
+        if len(devices) == 0:
+            print('Error - No devices found')
+            return
 
-        cv2.putText(self._canvas, 'C', (0, y_coord), font_name, font_scale, color, font_thickness)
-        cv2.putText(self._canvas, '=', (self._width - 50, y_coord), font_name, font_scale, color, font_thickness)
+        # Use the first device to run the network
+        self._device = mvnc.Device(devices[0])
+        self._device.open()
 
-        #operand 1 rect
-        cv2.rectangle(self._canvas, (self._operand1_left, self._operand1_top),
-                      (self._operand1_left + self._operand1_width, self._operand1_top+self._operand1_height),
-                      self._box_color, 1)
+        file_folder = os.path.dirname(os.path.realpath(__file__))
+        graph_filename = file_folder + '/mnist_inference.graph'
 
-        #operand 2 rect
-        cv2.rectangle(self._canvas, (self._operand2_left, self._operand2_top),
-                      (self._operand2_left + self._operand2_width, self._operand2_top+self._operand2_height),
-                      self._box_color, 1)
+        # Create processor object for this network
+        self._net_processor = MnistProcessor(graph_filename, self._device)
 
-        # operation ( + )
-        #cv2.rectangle(self._canvas, (operation_left, operation_top), (operation_left + operation_width, operation_top+operation_height), box_color, 1)
-        cv2.line(self._canvas, (self._operation_left + (int)(self._operation_width/2), self._operation_top ),
-                 (self._operation_left + (int)(self._operation_width / 2), self._operation_top + self._operation_height),
-                 self._operation_color, 5)
-        cv2.line(self._canvas, (self._operation_left, self._operation_top + (int)(self._operation_height/2) ),
-                 (self._operation_left+self._operation_width, self._operation_top + (int)(self._operation_height / 2)),
-                 self._operation_color, 5)
+    def _do_mvnc_cleanup(self):
+        """Clean up the NCAPI resources."""
+        self._net_processor.cleanup()
+        self._device.close()
+        self._device.destroy()
 
+    def _do_mvnc_infer(self, operand, img_label=None):
+        """Detect and classify digits. If you provide an img_label the cropped digit image will be written to file."""
+        # Detect the digit within the rectangle and crop the image around it
+        digits = digitdetector.detect(self._canvas[operand.top: operand.bottom, operand.left: operand.right])
+        if len(digits) > 0:
+            x, y, w, h = digits[0]
+            padding = int(w / 10)
+            digit_img = self._canvas[operand.top + y - padding: operand.top + y + h + padding,
+                                     operand.left + x - padding: operand.left + x + w + padding]
 
-        #cv2.rectangle(self._canvas, (equals_left, equals_top), (equals_left + equals_width, equals_top+equals_height), box_color, 1)
-        cv2.line(self._canvas, (self._equals_left, self._equals_top + (int)(self._equals_height/2) - 10 ),
-                 (self._equals_left+self._equals_width, self._equals_top + (int)(self._equals_height / 2) - 10),
-                 self._operation_color, 5)
-        cv2.line(self._canvas, (self._equals_left, self._equals_top + (int)(self._equals_height/2) + 10),
-                 (self._equals_left+self._equals_width, self._equals_top + (int)(self._equals_height / 2)+ 10),
-                 self._operation_color, 5)
+            # Write the cropped image to file if a label was provided
+            if img_label:
+                cv2.imwrite(img_label + ".png", digit_img)
 
-        answer_height = 80
-        answer_width = 100
-        answer_left = self._equals_left + self._equals_width + self._pad
-        answer_top = self._equals_top
-        answer_bottom = answer_top + answer_height
-
-        if (self._answer_str != ""):
-            answer_font_scale = 4
-            cv2.putText(self._canvas, self._answer_str, (answer_left, answer_bottom), font_name, answer_font_scale, color, font_thickness)
+            # Classify the digit and return the most probable result
+            value, probability = self._net_processor.do_sync_inference(digit_img)[0]
+            return value, probability
         else:
-            cv2.rectangle(self._canvas, (answer_left, answer_top), (answer_left + answer_width, answer_top+answer_height), (255, 255, 255), cv2.FILLED  )
-
+            return None, None
 
     def close(self):
         """Close and destroy the window."""
         cv2.destroyWindow(self._window_name)
-        self.do_mvnc_cleanup(self._device, self._graph)
+        self._do_mvnc_cleanup()
 
     def is_window_closed(self):
-        """ Determines if the user closed the window"""
-        # may only work with opencv 3.x
-        # check if the window has been closed.  all properties will return -1.0
-        # for windows that are closed. If the user has closed the window via the
-        # x on the title bar the property will be < 0 or an exception raised.  We are
-        # getting property aspect ratio but it could probably be any property
+        """Try to determine if the user closed the window (by clicking the x).
 
-        prop_asp = 1
+        This may only work with OpenCV 3.x.
+
+        All OpenCV window properties should return -1.0 for windows that are closed.
+        If we read a property that has a value < 0 or an exception is raised we assume
+        the window has been closed. We use the aspect ratio property but it could be any.
+
+        """
         try:
             prop_asp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_ASPECT_RATIO)
+            if prop_asp < 0.0:
+                # the property returned was < 0 so assume window was closed by user
+                return True
         except:
-            #print("Caught exception, calling getWindowProperty aspect ratio")
-            return True
-
-        if (prop_asp < 0.0):
-            # the property returned was < 0 so assume window was closed by user
-            #print("aspect ratio is less than 0.")
-            return True
-
-        try:
-            tmp = cv2.getWindowProperty(self._window_name, cv2.WND_PROP_FULLSCREEN)
-        except:
-            #print("Caught exception, calling getWindowProperty fullscreen")
             return True
 
         return False
-
 
     def show(self):
         """Show the window if hidden and update the display."""
         cv2.imshow(self._window_name, self._canvas)
 
     def submit(self):
-        """Process the image when the submit button is clicked."""
-        # Remove the buttons
-        self._draw_ui(color=(255, 255, 255))
+        """Process the calculation when the submit button is clicked."""
+        # Detect and classify digits
+        self._op1, self._op1_prob = self._do_mvnc_infer(self._operand1, 'op1')
+        self._op2, self._op2_prob = self._do_mvnc_infer(self._operand2, 'op2')
 
-        # Detect the digits
-        #digits = digitdetector.detect(self._canvas)
-        #for box in digits :
-        #    print(box)
-
-        #box = digits[0]
-        #print(box)
-
-        op_pad = 40
-
-        op1_image = self._canvas[self._operand1_top : self._operand1_top + self._operand1_height,  self._operand1_left : self._operand1_left + self._operand1_width]
-        digits_op1 = digitdetector.detect(op1_image)
-        print(digits_op1[0])
-        op1_x1 = digits_op1[0][0]
-        op1_y1 = digits_op1[0][1]
-        op1_x2 = op1_x1+digits_op1[0][2]
-        op1_y2 = op1_y1+digits_op1[0][3]
-        op1_x1 -= op_pad
-        op1_x2 += op_pad
-        op1_y1 -= op_pad
-        op1_y2 += op_pad
-        op1_width = op1_x2 - op1_x1
-        op1_height = op1_y2 - op1_y1
-        if  (op1_width > op1_height):
-            # wider than high
-            diff = op1_width - op1_height
-            op1_y1 -= int(diff/2)
-            op1_y2 += int(diff/2)
-        else :
-            # higher than wide
-            diff = op1_height - op1_width
-            op1_x1 -= int(diff/2)
-            op1_x2 += int(diff/2)
-
-
-        op1_image = op1_image[op1_y1:op1_y2, op1_x1:op1_x2]
-        cv2.imshow("op1_image_digits", op1_image)
-
-
-        op2_image = self._canvas[self._operand2_top : self._operand2_top + self._operand2_height,  self._operand2_left : self._operand2_left + self._operand2_width]
-        digits_op2 = digitdetector.detect(op2_image)
-        print(digits_op2[0])
-        op2_x1 = digits_op2[0][0]
-        op2_y1 = digits_op2[0][1]
-        op2_x2 = op2_x1 + digits_op2[0][2]
-        op2_y2 = op2_y1 + digits_op2[0][3]
-        op2_x1 -= op_pad
-        op2_x2 += op_pad
-        op2_y1 -= op_pad
-        op2_y2 += op_pad
-        op2_width = op2_x2 - op2_x1
-        op2_height = op2_y2 - op2_y1
-        if  (op2_width > op2_height):
-            # wider than high
-            diff = op2_width - op2_height
-            op2_y1 -= int(diff/2)
-            op2_y2 += int(diff/2)
-        else :
-            # higher than wide
-            diff = op2_height - op2_width
-            op2_x1 -= int(diff/2)
-            op2_x2 += int(diff/2)
-
-        op2_image = op2_image[op2_y1:op2_y2, op2_x1:op2_x2]
-        cv2.imshow("op2_image_digits", op2_image)
-
-        #cv2.imshow("op1", op1_image)
-        #cv2.imshow("op2", op2_image)
-
-        op1_labels, op1_probs = self.do_inference(self._graph, op1_image, 1)
-        print ("op1 is: " + op1_labels[0] + "  op1 probability is: " + op1_probs[0])
-
-        op2_labels, op2_probs = self.do_inference(self._graph, op2_image, 1)
-        print ("op2 is: " + op2_labels[0] + "  op2 probability is: " + op2_probs[0])
-
-        op1 = int(op1_labels[0])
-        op2 = int(op2_labels[0])
-        answer_int = op1 + op2
-        self._answer_str = str(answer_int)
-
-
-
-
-        # Draw the buttons again
-        self._draw_ui()
-
-        # Save the regions to file
-        '''for n, rect in enumerate(digits):
-            x, y, w, h = rect
-            cv2.imwrite(str(n) + ".jpg", self._canvas[y:(y+h), x:(x+w)])'''
-
-        # TODO: more stuff
-        print('Submit!')
-
-
-    def do_mvnc_initialize(self) -> (mvnc.Device, mvnc.Graph):
-        """Creates and opens the Neural Compute device and
-        creates a graph that can execute inferences on it.
-
-        Returns
-        -------
-        device : mvnc.Device
-            The opened device.  Will be None if couldn't open Device.
-        graph : mvnc.Graph
-            The allocated graph to use for inferences.  Will be None if couldn't allocate graph
-        """
-        # ***************************************************************
-        # Get a list of ALL the sticks that are plugged in
-        # ***************************************************************
-        devices = mvnc.EnumerateDevices()
-        if len(devices) == 0:
-                print('Error - No devices found')
-                return (None, None)
-
-        # ***************************************************************
-        # Pick the first stick to run the network
-        # ***************************************************************
-        device = mvnc.Device(devices[0])
-
-        # ***************************************************************
-        # Open the NCS
-        # ***************************************************************
-        device.OpenDevice()
-
-        filefolder = os.path.dirname(os.path.realpath(__file__))
-        graph_filename = filefolder + '/mnist_inference.graph'
-
-        # Load graph file
-        try :
-            with open(graph_filename, mode='rb') as f:
-                in_memory_graph = f.read()
-        except :
-            print ("Error reading graph file: " + graph_filename)
-
-        graph = device.AllocateGraph(in_memory_graph)
-
-        return device, graph
-
-
-    def do_mvnc_cleanup(self, device: mvnc.Device, graph: mvnc.Graph) -> None:
-        """Cleans up the NCAPI resources.
-
-        Parameters
-        ----------
-        device : mvncapi.Device
-                 Device instance that was initialized in the do_initialize method
-        graph : mvncapi.Graph
-                Graph instance that was initialized in the do_initialize method
-
-        Returns
-        -------
-        None
-
-        """
-        graph.DeallocateGraph()
-        device.CloseDevice()
-
-
-    def do_inference(self, graph: mvnc.Graph, input_image: str, number_results : int = 5) -> (List[str], List[numpy.float16]) :
-        """ executes one inference which will determine the top classifications for an image file.
-
-        Parameters
-        ----------
-        graph : Graph
-            The graph to use for the inference.  This should be initialize prior to calling
-        input_image : opencv image/Mat
-            The image on which to run the inference.  if its not the right size will be resized internally
-        number_results : int
-            The number of results to return, defaults to 5
-
-        Returns
-        -------
-        labels : List[str]
-            The top labels for the inference.  labels[i] corresponds to probabilities[i]
-        probabilities: List[numpy.float16]
-            The top probabilities for the inference. probabilities[i] corresponds to labels[i]
-        """
-
-        # text labels for each of the possible classfications
-        labels=[ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-
-        # Load image from disk and preprocess it to prepare it for the network
-        # assuming we are reading a .jpg or .png color image so need to convert it
-        # single channel gray scale image for mnist network.
-        # Then resize the image to the size of image the network was trained with.
-        # Next convert image to floating point format and normalize
-        # so each pixel is a value between 0.0 and 1.0
-        image_for_inference = cv2.bitwise_not(input_image)
-        image_for_inference = cv2.cvtColor(image_for_inference, cv2.COLOR_BGR2GRAY)
-        image_for_inference = cv2.resize(image_for_inference, self.NETWORK_IMAGE_DIMENSIONS)
-        image_for_inference = image_for_inference.astype(numpy.float32)
-        image_for_inference[:] = ((image_for_inference[:] )*(1.0/255.0))
-
-
-        cv2.imshow("infer image_"+str(self._infer_count%2+1), image_for_inference)
-        cv2.resizeWindow("infer image_"+str(self._infer_count%2+1), 100, 100)
-        self._infer_count += 1
-
-        # Start the inference by sending to the device/graph
-        self._graph.LoadTensor(image_for_inference.astype(numpy.float16), None)
-
-        # Get the result from the device/graph.  userobj should be the
-        # same value that was passed in LoadTensor above.
-        output, userobj = self._graph.GetResult()
-
-        # sort indices in order of highest probabilities
-        five_highest_indices = (-output).argsort()[:number_results]
-
-        # get the labels and probabilities for the top results from the inference
-        inference_labels = []
-        inference_probabilities = []
-
-        for index in range(0, number_results):
-            inference_probabilities.append(str(output[five_highest_indices[index]]))
-            inference_labels.append(labels[five_highest_indices[index]])
-
-        return inference_labels, inference_probabilities
-
+        # Calculate the answer
+        if not self._op1 or not self._op2:
+            self._answer = None
+        else:
+            if self._operator is self._plus_sign:
+                self._answer = self._op1 + self._op2
+            elif self._operator is self._minus_sign:
+                self._answer = self._op1 - self._op2
+            elif self._operator is self._multiplication_sign:
+                self._answer = self._op1 * self._op2
+            elif self._operator is self._division_sign:
+                # Will display "inf" if op2 is 0
+                self._answer = self._op1 / self._op2
 
 
 if __name__ == '__main__':
-    touch_calc_window_title = "mnist calculator"
-    app = TouchCalc(touch_calc_window_title)
+    app = TouchCalc('MNIST Calculator')
     while True:
 
-        if (app.is_window_closed()):
-            break;
+        if cv2.waitKey(1) != -1 or app.is_window_closed():
+            # Exit if any key is pressed or the window is closed
+            break
 
         app.show()
 
-        key = cv2.waitKey(1)
-        if key != -1:
-            # Exit if any key is pressed
-            break
     app.close()
