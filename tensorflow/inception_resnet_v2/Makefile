@@ -1,9 +1,13 @@
 
+#NCCOMPILE = python /opt/intel/computer_vision_sdk/deployment_tools/model_optimizer/mo.py
+NCCOMPILE = mo.py
+
 MODEL_NAME=inception_resnet_v2
 MODEL_CKPT=$(MODEL_NAME)
 IMGSIZE=299
 OUTPUT_NODE_NAME=InceptionResnetV2/Logits/Predictions
 MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_30.tar.gz
+MODEL_CKPT_AFTER_TAR=$(MODEL_CKPT)_2016_08_30.ckpt
 
 GRAPH_FILENAME_BASE = inception_resnet_v2_frozen
 
@@ -56,30 +60,45 @@ deps: freeze
 .PHONY: checkpoint
 checkpoint:
 	@echo $(YELLOW)"\nDownloading checkpoint files..."$(NOCOLOR)
-	(wget -nc http://download.tensorflow.org/models/$(MODEL_CKPT_TAR);)
-	(tar -xvf $(MODEL_CKPT_TAR);)
-	(rm -f $(MODEL_CKPT_TAR);)
+	@if [ -e $(MODEL_CKPT_AFTER_TAR) ] ; \
+	then \
+		echo "checkpoint file already exists, skipping checkpoint."; \
+	else \
+		wget -nc http://download.tensorflow.org/models/$(MODEL_CKPT_TAR); \
+		tar -xvf $(MODEL_CKPT_TAR); \
+		rm -f $(MODEL_CKPT_TAR); \
+	fi
 
 .PHONY: export
 export: check_model
 	@echo $(YELLOW)"\nExporting GraphDef file..."$(NOCOLOR)
-	(python3 $(TF_MODELS_PATH)/research/slim/export_inference_graph.py \
-		--alsologtostderr \
-		--model_name=$(MODEL_NAME) \
-		--batch_size=1 \
-		--dataset_name=imagenet \
-		--image_size=$(IMGSIZE) \
-		--output_file=$(MODEL_CKPT).pb;)
+	@if [ -e $(MODEL_CKPT).pb ] ; \
+	then \
+		echo "no export needed"; \
+	else \
+		python3 $(TF_MODELS_PATH)/research/slim/export_inference_graph.py \
+				--alsologtostderr \
+				--model_name=$(MODEL_NAME) \
+				--batch_size=1 \
+				--dataset_name=imagenet \
+				--image_size=$(IMGSIZE) \
+				--output_file=$(MODEL_CKPT).pb; \
+	fi
 
 .PHONY: freeze
 freeze: check_tf checkpoint export
 	@echo $(YELLOW)"\nFreezing model for inference..."$(NOCOLOR)
-	(python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
-		--input_graph=$(MODEL_CKPT).pb \
-		--input_binary=true \
-		--input_checkpoint=$(MODEL_CKPT)_2016_08_30.ckpt \
-		--output_graph=$(MODEL_CKPT)_frozen.pb \
-		--output_node_name=$(OUTPUT_NODE_NAME);)
+	@if [ -e $(MODEL_CKPT)_frozen.pb ] ; \
+	then \
+		echo "frozen model file already exists, skipping freeze."; \
+	else \
+		python3 $(TF_SRC_PATH)/tensorflow/python/tools/freeze_graph.py \
+			--input_graph=$(MODEL_CKPT).pb \
+			--input_binary=true \
+			--input_checkpoint=$(MODEL_CKPT)_2016_08_30.ckpt \
+			--output_graph=$(MODEL_CKPT)_frozen.pb \
+			--output_node_name=$(OUTPUT_NODE_NAME); \
+	fi
 
 .PHONY: compile_model_old
 compile_model_old: freeze
