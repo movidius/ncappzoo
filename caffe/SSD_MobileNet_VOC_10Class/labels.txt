@@ -1,0 +1,10 @@
+0: background
+1: bicycle
+2: bird
+3: bus
+4: car
+5: cat
+6: dog
+7: motorbike
+8: person
+9: pottedplant
