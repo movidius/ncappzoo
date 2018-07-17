@@ -14,7 +14,7 @@ This code example requires that the following components are available:
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
-cd ~/workspace/ncappzoo/apps/ssd-object-detector/
+cd ~/workspace/ncappzoo/apps/mobile-ssd-voc-10class/
 make run
 ~~~
  
@@ -22,10 +22,10 @@ When the application runs normally and is able to connect to the NCS device, the
 
 ~~~
 ==============================================================
-I found these objects in pic_064.jpg
-Execution time: 80.40859ms
+I found these objects in pic_075.jpg
+Execution time: 78.606514ms
 --------------------------------------------------------------
-99.7%	12: dog: Top Left: (46, 52) Bottom Right: (169, 182)
+100.0%	5: cat: Top Left: (24, 22) Bottom Right: (243, 150)
 ==============================================================
 ~~~
 
@@ -33,7 +33,7 @@ You should also see the image with a bounding box around the detected object.
 
 ## Configuring this example
 
-This example performs an inference on `ncappzoo/data/images/pic_064.jpg` by default; you can supply your own image using the `--image` options. Below is an example:
+This example performs an inference on `ncappzoo/data/images/pic_075.jpg` by default; you can supply your own image using the `--image` options. Below is an example:
 
 ~~~
 python3 ssd-object-detector.py --image ../../data/images/pic_053.jpg

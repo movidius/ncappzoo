@@ -1,5 +1,5 @@
 # Introduction
-This directory includes the SSD MobileNet network and example code.  It is a caffe based object recognition and classification network.  Please take a look at this github repository for more information: https://github.com/chuanqi305/MobileNet-SSD 
+This directory includes the SSD MobileNet network and example code.  It is a caffe based object recognition and classification network.  Please take a look at this github repository for more information: https://github.com/yuanyuanli85/MobileNet-SSD/ssd_voc_10class 
 
 The provided Makefile does the following:
 1. Downloads network prototxt and caffemodel.
