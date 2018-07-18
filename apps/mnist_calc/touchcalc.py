@@ -10,7 +10,6 @@ import cv2
 import mvnc.mvncapi as mvnc
 import numpy as np
 
-import digitdetector
 from mnist_processor import MnistProcessor
 
 
@@ -29,7 +28,9 @@ class UIElement:
         return 'x: ' + str(self.x) + ', ' + \
                'y: ' + str(self.y) + ', ' + \
                'w: ' + str(self.width) + ', ' + \
-               'h: ' + str(self.height)
+               'h: ' + str(self.height) + ', ' + \
+               'color: ' + str(self.color) + ', ' + \
+               'thickness: ' + str(self.thickness)
 
     def contains_point(self, x, y):
         """Return True if a given point is within this element's boundaries, otherwise False."""
@@ -38,9 +39,12 @@ class UIElement:
         else:
             return False
 
-    def draw(self, target):
-        """Draw the outline of this element. Child classes override this to draw themselves appropriately."""
-        cv2.rectangle(target, (self.left, self.top), (self.right, self.bottom), self.color, 1)
+    def clear(self, target):
+        """Draw a filled white rectangle over this element to clear it from the canvas."""
+        padding = self.thickness  # need to overwrite a slightly larger area or some drawn edges probably will remain
+        cv2.rectangle(target, (self.left - padding, self.top - padding),
+                      (self.right + padding, self.bottom + padding),
+                      (255, 255, 255), cv2.FILLED)
 
     @property
     def width(self):
@@ -81,6 +85,12 @@ class UIElement:
     @property
     def center_y(self):
         return self.y + int(self.height / 2)
+
+
+class Operand(UIElement):
+    def draw(self, target):
+        # Unfilled rectangle
+        cv2.rectangle(target, (self.left, self.top), (self.right, self.bottom), self.color, self.thickness)
 
 
 class PlusSign(UIElement):
@@ -132,7 +142,15 @@ class Label(UIElement):
         self.color = color
         self.scale = scale
 
+    def clear(self, target):
+        """Draw a filled white rectangle over this element to clear it from the canvas."""
+        padding = self.thickness  # need to overwrite a slightly larger area or some drawn edges probably will remain
+        cv2.rectangle(target, (self.left - padding, self.top - padding),
+                      (self.right + padding, self.bottom + padding * 4),  # clear more beneath to handle hanging letters like 'g'
+                      (255, 255, 255), cv2.FILLED)
+
     def draw(self, target):
+        # Write text label
         cv2.putText(target, self.label, (self.left, self.bottom), self.font, self.scale, self.color, self.thickness)
 
     @property
@@ -172,12 +190,13 @@ class TouchCalc:
         padding = 10
 
         # Operands (the digits)
-        self._operand1 = UIElement(x=20, y=50, width=400, height=350, color=(230, 230, 230))
-        self._operand2 = UIElement(x=(self._operand1.x + self._operand1.width + operator_width + padding * 2),
-                                   y=self._operand1.y,
-                                   width=self._operand1.width,
-                                   height=self._operand1.height,
-                                   color=self._operand1.color)
+        self._operand1 = Operand(x=20, y=50, width=400, height=350, color=(230, 230, 230), thickness=1)
+        self._operand2 = Operand(x=(self._operand1.x + self._operand1.width + operator_width + padding * 2),
+                                 y=self._operand1.y,
+                                 width=self._operand1.width,
+                                 height=self._operand1.height,
+                                 color=self._operand1.color,
+                                 thickness=self._operand1.thickness)
 
         # Operators (+, -, *, /, etc.)
         operator_args = {'x': self._operand1.x + self._operand1.width + padding,
@@ -252,29 +271,20 @@ class TouchCalc:
 
     def _draw_results(self):
         """Label the detected digits, their probabilities, and the answer."""
-        self._op1_label.label = '{:d} ({:.2f}% probability)'.format(self._op1, self._op1_prob * 100) if self._op1 else 'No digit detected.'
-        self._op2_label.label = '{:d} ({:.2f}% probability)'.format(self._op2, self._op2_prob * 100) if self._op2 else 'No digit detected.'
-        self._answer_label.label = str(self._answer) if self._answer else None
+        # Clear old labels
+        self._op1_label.clear(self._canvas)
+        self._op2_label.clear(self._canvas)
+        self._answer_label.clear(self._canvas)
 
+        # Set label text... need to check 'if is not None' because if they are 0 they evaluate to False
+        self._op1_label.label = '{:d} ({:.2f}% probability)'.format(self._op1, self._op1_prob * 100) if self._op1 is not None else 'No digit detected.'
+        self._op2_label.label = '{:d} ({:.2f}% probability)'.format(self._op2, self._op2_prob * 100) if self._op2 is not None else 'No digit detected.'
+        self._answer_label.label = str(self._answer) if self._answer is not None else None
+
+        # Draw new labels
         self._op1_label.draw(self._canvas)
         self._op2_label.draw(self._canvas)
         self._answer_label.draw(self._canvas)
-
-    def _draw_operator(self):
-        """Clear the current operator area and answer area, and redraw."""
-        padding = 5  # need to overwrite a slightly larger area or some drawing may remain
-
-        # Clear the operator
-        cv2.rectangle(self._canvas, (self._operator.left - padding, self._operator.top - padding),
-                      (self._operator.right + padding, self._operator.bottom + padding),
-                      (255, 255, 255), cv2.FILLED)
-        # Clear the answer
-        cv2.rectangle(self._canvas, (self._answer_label.left - padding, self._answer_label.top - padding),
-                      (self._answer_label.right + padding, self._answer_label.bottom + padding),
-                      (255, 255, 255), cv2.FILLED)
-
-        # Draw the new operator
-        self._operator.draw(self._canvas)
 
     def _mouse_event(self, event, x, y, flags, param):
         """Event listener for mouse events."""
@@ -287,7 +297,8 @@ class TouchCalc:
                 # Clear was clicked
                 self._clear_ui()
             elif self._operator.contains_point(x, y):
-                # The operator was clicked
+                # The operator was clicked, swap to the next operator
+                self._operator.clear(self._canvas)
                 if self._operator is self._plus_sign:
                     self._operator = self._minus_sign
                 elif self._operator is self._minus_sign:
@@ -296,7 +307,7 @@ class TouchCalc:
                     self._operator = self._division_sign
                 elif self._operator is self._division_sign:
                     self._operator = self._plus_sign
-                self._draw_operator()
+                self._operator.draw(self._canvas)
             else:
                 self._drawing = True
 
@@ -304,7 +315,7 @@ class TouchCalc:
             if self._operand1.contains_point(x, y) or self._operand2.contains_point(x, y):
                 # Draw if this is inside an operand rectangle
                 if self._last_point:
-                    cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 10)
+                    cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 20)
                     self._last_point = (x, y)
                 else:
                     self._last_point = (x, y)
@@ -342,13 +353,17 @@ class TouchCalc:
 
     def _do_mvnc_infer(self, operand, img_label=None):
         """Detect and classify digits. If you provide an img_label the cropped digit image will be written to file."""
-        # Detect the digit within the rectangle and crop the image around it
-        digits = digitdetector.detect(self._canvas[operand.top: operand.bottom, operand.left: operand.right])
+        # Get a list of rectangles for objects detected in this operand's box
+        op_img = self._canvas[operand.top: operand.bottom, operand.left: operand.right]
+        gray_img = cv2.cvtColor(op_img, cv2.COLOR_BGR2GRAY)
+        _, binary_img = cv2.threshold(gray_img, 127, 255, cv2.THRESH_BINARY_INV)
+        _, contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        digits = [cv2.boundingRect(contour) for contour in contours]
+
         if len(digits) > 0:
             x, y, w, h = digits[0]
-            padding = int(w / 10)
-            digit_img = self._canvas[operand.top + y - padding: operand.top + y + h + padding,
-                                     operand.left + x - padding: operand.left + x + w + padding]
+            digit_img = self._canvas[operand.top + y: operand.top + y + h,
+                                     operand.left + x: operand.left + x + w]
 
             # Write the cropped image to file if a label was provided
             if img_label:
@@ -395,8 +410,8 @@ class TouchCalc:
         self._op1, self._op1_prob = self._do_mvnc_infer(self._operand1, 'op1')
         self._op2, self._op2_prob = self._do_mvnc_infer(self._operand2, 'op2')
 
-        # Calculate the answer
-        if not self._op1 or not self._op2:
+        # Calculate the answer (must do "is None" instead of "not" because 0 evaluates as False)
+        if self._op1 is None or self._op2 is None:
             self._answer = None
         else:
             if self._operator is self._plus_sign:

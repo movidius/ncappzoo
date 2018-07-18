@@ -131,16 +131,27 @@ class MnistProcessor:
              This can be any size but is assumed to be in the OpenCV standard format of BGRBGRBGR...
         :return: None
         """
-        # Convert the image to binary black and white, resize, and scale pixel values for network
-        try:
-            inference_image = cv2.bitwise_not(input_image)
-            inference_image = cv2.cvtColor(inference_image, cv2.COLOR_BGR2GRAY)
-            inference_image = cv2.resize(inference_image,
-                                         (MnistProcessor.NETWORK_IMAGE_WIDTH,
-                                          MnistProcessor.NETWORK_IMAGE_HEIGHT),
-                                         cv2.INTER_LINEAR)
-        except:
-            print('broke')
+        # Convert the image to binary black and white
+        inference_image = cv2.bitwise_not(input_image)
+        inference_image = cv2.cvtColor(inference_image, cv2.COLOR_BGR2GRAY)
+
+        # Make the image square by creating a new square_img and copying inference_img into its center
+        h, w = inference_image.shape
+        h_diff = w - h if w > h else 0
+        w_diff = h - w if h > w else 0
+        square_img = numpy.zeros((w + w_diff, h + h_diff), numpy.uint8)
+        square_img[int(h_diff / 2): int(h_diff / 2) + h, int(w_diff / 2): int(w_diff/2) + w] = inference_image
+        inference_image = square_img
+
+        # Resize the image
+        padding = 2
+        inference_image = cv2.resize(inference_image,
+                                     (MnistProcessor.NETWORK_IMAGE_WIDTH - padding * 2,
+                                      MnistProcessor.NETWORK_IMAGE_HEIGHT - padding * 2),
+                                     cv2.INTER_LINEAR)
+
+        # Pad the edges slightly to make sure the number isn't bumping against the edges
+        inference_image = numpy.pad(inference_image, (padding, padding), 'constant', constant_values=0)
 
         # Modify inference_image for network input
         inference_image[:] = ((inference_image[:]) * (1.0 / 255.0))
