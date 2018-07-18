@@ -315,7 +315,7 @@ class TouchCalc:
             if self._operand1.contains_point(x, y) or self._operand2.contains_point(x, y):
                 # Draw if this is inside an operand rectangle
                 if self._last_point:
-                    cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 20)
+                    cv2.line(self._canvas, self._last_point, (x, y), (0, 0, 0), 30)
                     self._last_point = (x, y)
                 else:
                     self._last_point = (x, y)

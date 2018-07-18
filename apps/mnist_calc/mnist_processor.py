@@ -83,7 +83,7 @@ class MnistProcessor:
 
         # Get a list of sub-lists containing the detected digit as an int and the probability
         for i in sorted_indexes:
-            if inference_result[i] > self._probability_threshold:
+            if inference_result[i] >= self._probability_threshold:
                 results.append([i, inference_result[i]])
             else:
                 # If this index had a value under the probability threshold, the rest of the indexes will too
