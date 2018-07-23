@@ -15,19 +15,18 @@ SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
 IMAGES_RELATIVE_DIR = ../../data/images
 TEST_IMAGE_FILENAME = nps_electric_guitar.png
 
-
-YELLOW='\033[1;33m'
-NOCOLOR='\033[0m'
-
-.PHONY: all
-all: deps data compile_model compile_cpp
-
 PROJECT_DIR = $(CURDIR)
 ZOO_RELATIVE_TF_SRC_PROJ = ../tf_src
 ZOO_RELATIVE_TF_MODELS_PROJ = ../tf_models
 ZOO_TF_SRC_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_SRC_PROJ}/tensorflow
 ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
 
+
+YELLOW='\033[1;33m'
+NOCOLOR='\033[0m'
+
+.PHONY: all
+all: deps data compile_model compile_cpp
 
 # Checks if TF_MODELS_PATH is set.  If it isn't set then will make the
 # tf_models project in the ncappzoo/tensorflow/tf_models directory.
@@ -99,13 +98,6 @@ freeze: check_tf checkpoint export
 			--output_graph=$(MODEL_CKPT)_frozen.pb \
 			--output_node_name=$(OUTPUT_NODE_NAME); \
 	fi
-
-.PHONY: compile_model_old
-compile_model_old: freeze
-	@echo $(YELLOW)"\nCompiling model to Movidius graph..."$(NOCOLOR)
-	(mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
-
 
 .PHONY: compile_model
 compile_model: deps
