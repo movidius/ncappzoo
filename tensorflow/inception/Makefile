@@ -138,28 +138,38 @@ compile_model: deps
 		cd ${MODEL_RELATIVE_DIR}; \
 		${NCCOMPILE} --data_type FP16 --input_model $(MODEL_CKPT)_frozen.pb ; \
 		echo $(YELLOW)"Graph generated!\n"$(NOCOLOR) ;\
+		cd ../..; \
 	fi;
 
 # old  compile line
 #mvNCCompile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);
 
+.PHONY: check
+check: 
+	@echo "\nCheck not implemented yet."
+
+.PHONY: data
+data: 
+	@echo "\nmaking data - no data required for this project"
 
 .PHONY: profile
-profile: freeze
-	@echo $(YELLOW)"\nProfiling the model..."$(NOCOLOR)
-	(cd model/$(VERSION); mvNCProfile -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
-
-.PHONY: check
-check: freeze
-	@echo $(YELLOW)"\nComparing results with standard Tensorflow..."$(NOCOLOR)
-	(cd model/$(VERSION); mvNCCheck -s 12 $(MODEL_CKPT)_frozen.pb -in=input -on=$(OUTPUT_NODE_NAME);)
-	@echo $(YELLOW)"Movidius graph generated! You can run inferences using ncappzoo/apps/image-classifier project.\n"$(NOCOLOR)
+profile: 
+	@echo "\nProfile not implemented yet"
 
 .PHONY: run
-run: compile
-	@echo $(YELLOW)"\nRunning inferences using image-classifier project..."$(NOCOLOR)
-	(python3 ../../apps/image-classifier/image-classifier.py --graph ./model/$(VERSION)/graph --dim $(IMGSIZE) $(IMGSIZE) --mean 127.5 --scale 0.00789 --colormode "RGB" --labels ./model/$(VERSION)/labels.txt --image ../../data/images/pic_053.jpg)
+run: run_cpp 
+	@echo "\nmaking run"
+
+.PHONY:	compile_cpp
+compile_cpp:  
+	@echo "\nmaking compile_cpp"
+	(cd ${SIMPLE_CLASSIFIER_RELATIVE_DIR}; make compile_cpp; cd -)
+
+.PHONY: run_cpp
+run_cpp: all
+	@echo "\nmaking run_cpp"
+	${SIMPLE_CLASSIFIER_RELATIVE_DIR}/build/simple_classifier ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}; 
+
 
 .PHONY: help
 help:
