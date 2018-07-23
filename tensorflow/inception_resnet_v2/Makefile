@@ -152,7 +152,7 @@ help:
 	@echo $(YELLOW)"\nPossible make targets: "$(NOCOLOR);
 	@echo "  make help - Shows this message.";
 	@echo "  make all - make all - everything needed to run, but doesn't run";
-	@echo "  make clean - removes files created in this directory.;"
+	@echo "  make clean - removes files created in this directory.";
 	@echo "  make compile_cpp - builds C++ example to demonstrate the network ";
 	@echo "  make compile_model - runs model compiler for the network";
 	@echo "  make data - downloads required data.";
