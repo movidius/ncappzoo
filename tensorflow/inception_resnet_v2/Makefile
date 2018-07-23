@@ -167,3 +167,4 @@ clean:
 	rm -f ${GRAPH_FILENAME_BASE}.bin
 	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
 	rm -f ${GRAPH_FILENAME_BASE}.xml
+	rm -f labels.txt
