@@ -68,6 +68,20 @@ int main(int argc, char *argv[]) {
         auto infer_request = executable_network.CreateInferRequest();
 
         auto input = infer_request.GetBlob(input_name);
+
+        // NPS
+/*
+        PreProcessInfo my_ppi = input_info->getPreProcess();
+        MeanVariant mv = my_ppi.getMeanVariant();
+        std::cout << mv << std::endl;
+        mv = MeanVariant::MEAN_IMAGE;
+        my_ppi.setMeanImage(input);
+        my_ppi = input_info->getPreProcess();
+        mv = my_ppi.getMeanVariant();
+        std::cout << mv << std::endl;
+*/
+
+
         auto input_data = input->buffer().as<PrecisionTrait<Precision::U8>::value_type*>();
 
         /* Copying data from image to the input blob */
