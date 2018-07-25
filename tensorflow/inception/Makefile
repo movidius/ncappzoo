@@ -136,7 +136,7 @@ compile_model: deps
 		echo "compiled model file already exists, skipping compile."; \
 	else \
 		cd ${MODEL_RELATIVE_DIR}; \
-		${NCCOMPILE} --data_type FP16 --input_model $(MODEL_CKPT)_frozen.pb ; \
+		${NCCOMPILE} --data_type FP16 --reverse_input_channels --input_model $(MODEL_CKPT)_frozen.pb ; \
 		echo $(YELLOW)"Graph generated!\n"$(NOCOLOR) ;\
 		cd ../..; \
 	fi;
