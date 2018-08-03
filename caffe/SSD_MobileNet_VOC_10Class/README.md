@@ -1,10 +1,11 @@
 # Introduction
-This directory includes the SSD MobileNet network and example code.  It is a caffe based object recognition and classification network.  Please take a look at this github repository for more information: https://github.com/yuanyuanli85/caffe/tree/ssd_x10 
+This directory includes the SSD MobileNet network and example code.  It is a caffe based object recognition and classification network.  Please take a look at this github repository for more information: https://github.com/yuanyuanli85/caffe/tree/ssd_x10. There are 10 classes including background defined in lable.txt. 
 
 The provided Makefile does the following:
 1. Downloads network prototxt and caffemodel.
 2. Compiles the network files into a graph file for the NCS device.
 3. Runs the provided run.py program which creates a GUI window that shows the results of the network for a single image. 
+4. 
 
 # Prerequisites
 This program requires:
@@ -14,7 +15,7 @@ This program requires:
 - OpenCV
 - Caffe if you want to train this model yourself.
 
-#Install Caffe
+# Install Caffe
 This setp is required ONLY if you want to train the network by yourself. You can skip this setp if you want to use pre-trained model.
 ```
 git clone https://github.com/yuanyuanli85/caffe.git 
