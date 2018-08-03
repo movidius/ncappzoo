@@ -1,0 +1,51 @@
+item {
+  name: "none_of_the_above"
+  label: 0
+  display_name: "background"
+}
+item {
+  name: "bicycle"
+  label: 1
+  display_name: "bicycle"
+}
+item {
+  name: "bird"
+  label: 2
+  display_name: "bird"
+}
+item {
+  name: "bus"
+  label: 3
+  display_name: "bus"
+}
+item {
+  name: "car"
+  label: 4
+  display_name: "car"
+}
+item {
+  name: "cat"
+  label: 5
+  display_name: "cat"
+}
+item {
+  name: "dog"
+  label: 6
+  display_name: "dog"
+}
+item {
+  name: "motorbike"
+  label: 7
+  display_name: "motorbike"
+}
+item {
+  name: "person"
+  label: 8
+  display_name: "person"
+}
+item {
+  name: "pottedplant"
+  label: 9
+  display_name: "pottedplant"
+}
+
