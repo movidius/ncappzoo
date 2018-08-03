@@ -34,6 +34,17 @@ GET_CAFFEMODEL = touch /tmp/cookies.txt; wget --load-cookies /tmp/cookies.txt "h
 all: prereqs prototxt caffemodel compile
 
 
+.PHONY: data
+data: 
+	@echo "\ndownload data and create lmdb"	
+	@(cd ./data && ./download_data.sh && cd ../)
+	@(./create_lmdb.sh)
+
+.PHONY: train
+train: 
+	@echo "\nstart training"
+	@(./train.sh)
+
 .PHONY: prereqs
 prereqs:
 	@echo "\nmaking prereqs"

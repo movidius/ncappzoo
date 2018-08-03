@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #Check if net prototxt exists
 net_dir="mobilenet-ssd-1.0-x10"

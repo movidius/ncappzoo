@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cur_dir=$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd )
 
 
@@ -6,13 +8,15 @@ export PYTHONPATH=$PYTHONPATH:$CAFFE_PATH/python
 echo $PYTHONPATH
 
 ##Filter out annotations without defined 10 classes
-echo "run voc_filer.py"
+echo "run voc_filter.py"
 python voc_filter.py
 
 ##Generate file list for annotation conversion
+echo "generate file list"
 python generate_file_list.py
 
 ##Create lmdb
+echo "creating lmdb"
 redo=1
 data_root_dir="./data/VOCdevkit"
 mapfile="labelmap_voc.prototxt"
