@@ -1,4 +1,3 @@
-import argparse
 import os
 
 def get_str_from_path(xfile):
