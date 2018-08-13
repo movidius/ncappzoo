@@ -112,7 +112,9 @@ run: run_py
 .PHONY: help
 help:
 	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
+	@echo "  make help  - shows this message";
+	@echo "  make data  - downloads data, converts the annotations and generate the lmdb";
+	@echo "  make train - start to train the network";
 	@echo "  make all - makes everything needed to run but doesn't run";
 	@echo "  make run_py - runs the street_cam.py python example program";
 	@echo "  make clean - removes all created content"
