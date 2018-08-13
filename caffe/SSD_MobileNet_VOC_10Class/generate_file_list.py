@@ -1,3 +1,6 @@
+
+#Generate the list of file for train and test : trainval.txt and test.txt 
+
 import os
 
 def get_str_from_path(xfile):
