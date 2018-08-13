@@ -104,7 +104,7 @@ compile: caffemodel prototxt
 .PHONY: run_py
 run_py: all
 	@echo "\nmaking run_py"
-	python3 ./run.py
+	python3 ../../apps/ssd-object-detector/ssd-object-detector.py -g graph -l labels.txt
 
 .PHONY: run
 run: run_py
