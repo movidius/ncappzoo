@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Creat lmdb for training and testing.
+# Two lmdbs are going to be created under ./data/VOCdevkit/lmdb/trainval_lmdb and ./data/VOCdevkit/lmdb/test_lmdb
+
 cur_dir=$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd )
 
 
