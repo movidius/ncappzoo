@@ -49,5 +49,3 @@ Downloads the required dataset, and generate the lmdb for training. If everythin
 ## make train
 Train the network, and caffe snapshots will be stored in `./mobilenet-ssd-1.0-x10/snapshot`.
 
-## Note
-Currently the caffemodel file is not downloaded via the make file.  Instead the compiled graph file is included in the repository.  This is because the owner of the model file has hosted it on google drive which isn't easily downloaed via wget in the make file.  A message will print to the console rather than downloading the model and/or compiling it to a graph file.
