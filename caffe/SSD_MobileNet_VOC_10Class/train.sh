@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Scripts to create softlink for lmdb and start the training
+
 #Check if net prototxt exists
 net_dir="mobilenet-ssd-1.0-x10"
 if [ -d $CAFFE_PATH$net_dir ]

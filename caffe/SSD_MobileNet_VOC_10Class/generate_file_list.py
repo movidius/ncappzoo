@@ -1,3 +1,8 @@
+
+#Generate the list of file for train and test : ./data/trainval.txt and ./data/test.txt 
+#trainval.txt includes samples from VOC2012 trianval and VOC2007 trainval.
+#test.txt includes samples from VOC2007 test.
+
 import os
 
 def get_str_from_path(xfile):

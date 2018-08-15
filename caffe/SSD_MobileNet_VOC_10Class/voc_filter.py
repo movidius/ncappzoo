@@ -1,3 +1,6 @@
+# Filter out annotations without the objects belong to the defined 9 classes.
+# The filtered annotations will be put under Annotations_x10 in data/VOCdevkit/VOC2007 and ./data/VOCdevkit/VOC2012
+
 import xml.etree.ElementTree as ET
 import os
 

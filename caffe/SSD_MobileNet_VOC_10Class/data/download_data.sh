@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Download VOC dataset and extract the tar ball
+
 if [ -f VOCtrainval_11-May-2012.tar ]
 then 
     echo "VOCtrainval_11-May-2012.tar found"
