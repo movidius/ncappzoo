@@ -19,7 +19,7 @@ ifndef TF_SRC_PATH
 		echo "skipping clone, directory already exists: ${TF_SRC_PATH}" ; \
 	else \
 		echo "cloning ${GIT_REPO}"; \
-		git clone ${GIT_REPO}; \
+		git clone -b r1.7 ${GIT_REPO}; \
 	fi
 else
 	@echo "TF_SRC_PATH is ${TF_SRC_PATH}" ;
