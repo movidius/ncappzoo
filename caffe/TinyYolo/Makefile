@@ -1,5 +1,14 @@
-#NCCOMPILE = python /opt/intel/computer_vision_sdk/deployment_tools/model_optimizer/mo.py
-NCCOMPILE = mo.py
+
+ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
+	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
+endif
+
+NCCOMPILE = mvNCCompile
+NCPROFILE = mvNCProfile
+NCCHECK   = mvNCCheck
+
+GRAPH_FILENAME = graph
+GET_GRAPH = wget --no-cache -P . -o ${GRAPH_FILENAME} http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/yolo_tiny.graph
 
 PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
 GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${PROTOTXT_FILENAME}
@@ -8,11 +17,8 @@ CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
 GET_CAFFEMODEL = wget --no-cache -P . -N http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${CAFFEMODEL_FILENAME}
 
 
-GRAPH_FILENAME_BASE =  tiny-yolo-v1_53000
-
-
 .PHONY: all
-all: deps data compile_model compile_cpp
+all: profile compile 
 
 .PHONY: prototxt
 prototxt: 
@@ -49,51 +55,61 @@ caffemodel:
 	fi  
 
 .PHONY: profile
-profile: 
-	@echo "\nProfile not implemented yet"
+profile: prototxt
+	@echo "\nmaking profile"
+	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
 
-.PHONY: compile_model
-compile_model: deps
-	@echo "\nmaking compile"; \
-	if [ -e ${GRAPH_FILENAME_BASE}.xml ] ; \
+.PHONY: browse_profile
+browse_profile: profile
+	@echo "\nmaking browse_profile"
+	@if [ -e output_report.html ] ; \
 	then \
-		echo "compiled model file already exists, skipping compile."; \
+		firefox output_report.html & \
 	else \
-		${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME};\
-	fi
+		@echo "***\nError - output_report.html not found" ; \
+	fi ; 
 
-.PHONY: deps
-deps: caffemodel prototxt
-	@echo "\nmaking deps"
+.PHONY: compile
+compile: prototxt caffemodel
+	@echo "\nmaking compile"
+	${NCCOMPILE} -o ${GRAPH_FILENAME} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
 
-.PHONY: data
-data: 
-	@echo "\nmaking data - no data required for this project"
+.PHONY: graph
+graph: 
+	@echo "\nmaking (downloading) graph"
+	@if [ -e ${GRAPH_FILENAME} ] ; \
+	then \
+		echo "graph file already exists"; \
+	else \
+		${GET_GRAPH}; \
+		if ! [ -e ${GRAPH_FILENAME} ] ; \
+		then \
+			echo "***\nError - Could not download graph file. Check network and proxy settings \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi ;
 
-.PHONY: check
-check: 
-	@echo "\ncheck not implemented yet."
-
-.PHONY: compile_cpp
-compile_cpp: 
-	@echo "\ncompile_cpp not implemented yet."
+.PHONY: run_py
+run_py: compile
+	@echo "\nmaking run_py"
+	python3 ./run.py
 
 .PHONY: run
-run: deps compile_model compile_cpp
-	@echo "\nrun not implemented yet."
+run: compile
+	@echo "\nmaking run"
+	python3 ./run.py
 
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - make all - everything needed to run, but doesn't run";
-	@echo "  make data - downloads required data.";
-	@echo "  make deps - makes dependencies for project, prepares model etc.";
+	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
 	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
 	@echo "  make caffemodel - downloads the caffemodel for the network"
-	@echo "  make compile_model - runs model compiler for the network";
-	@echo "  make compile_cpp - builds the run_cpp executable example";
-	@echo "  make run - builds and runs the C++ example program";
+	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
+	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
+	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
+	@echo "  make run - runs the run.py python example program";
 	@echo "  make clean - removes all created content"
 
 clean_caffe_model:
@@ -103,7 +119,12 @@ clean_caffe_model:
 
 clean: clean_caffe_model
 	@echo "\nmaking clean"
-	rm -f ${GRAPH_FILENAME_BASE}.bin
-	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
-	rm -f ${GRAPH_FILENAME_BASE}.xml
+	rm -f ${GRAPH_FILENAME}
+	rm -f output.gv
+	rm -f output.gv.svg
+	rm -f output_report.html
+	rm -f output_expected.npy
+	rm -f zero_weights.caffemodel
+	rm -f output_result.npy
+	rm -f output_val.csv
 
