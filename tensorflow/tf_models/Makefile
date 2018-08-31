@@ -20,6 +20,9 @@ ifndef TF_MODELS_PATH
 	else \
 		echo "Cloning ${GIT_REPO}"; \
 		git clone ${GIT_REPO}; \
+		cd models; \
+		git checkout 08af77755a1cfbc05835d77b3261c92b314b4463; \
+		cd ..; \
 	fi
 else
 	@echo "TF_MODELS_PATH is ${TF_MODELS_PATH}" ;
