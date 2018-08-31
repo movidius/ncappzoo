@@ -1,11 +1,5 @@
-
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
+#NCCOMPILE = python /opt/intel/computer_vision_sdk/deployment_tools/model_optimizer/mo.py
+NCCOMPILE = mo.py
 
 PROTOTXT_FILENAME= deploy.prototxt
 GET_PROTOTXT = wget -P . https://raw.githubusercontent.com/BVLC/caffe/master/models/bvlc_alexnet/${PROTOTXT_FILENAME}
@@ -14,18 +8,24 @@ CAFFEMODEL_FILENAME = bvlc_alexnet.caffemodel
 GET_CAFFEMODEL = wget -P . -N http://dl.caffe.berkeleyvision.org/${CAFFEMODEL_FILENAME}
 
 
-.PHONY: all
-all: compile cpp
+GRAPH_FILENAME_BASE = bvlc_alexnet
 
-.PHONY: prereqs
-prereqs:
+SIMPLE_CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier
+IMAGES_RELATIVE_DIR = ../../data/images
+TEST_IMAGE_FILENAME = nps_electric_guitar.png
+
+.PHONY: all
+all: deps data compile_model compile_cpp
+
+.PHONY: data
+data:
 	@echo "\nmaking prereqs"
 	(cd ../../data/ilsvrc12; make)
 	@sed -i 's/\r//' run.py
 	chmod +x run.py
 
 .PHONY: prototxt
-prototxt: prereqs
+prototxt: 
 	@echo "\nmaking prototxt"
 	@if [ -e ${PROTOTXT_FILENAME} ] ; \
 	then \
@@ -61,64 +61,47 @@ caffemodel:
 
 .PHONY: profile
 profile: prototxt
-	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
+	@echo "\nProfile not implemented yet"
 
-.PHONY: browse_profile
-browse_profile: profile
-	@echo "\nmaking browse_profile"
-	@if [ -e output_report.html ] ; \
-	then \
-		firefox output_report.html & \
-	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
-
-.PHONY: compile
-compile: prototxt caffemodel
+.PHONY: compile_model
+compile_model: deps
 	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
+	${NCCOMPILE} --data_type FP16 --input_model ${CAFFEMODEL_FILENAME} --input_proto ${PROTOTXT_FILENAME}
+
+.PHONY: deps
+deps: caffemodel prototxt
+	@echo "\nmaking deps"
 
 .PHONY: check
 check: prototxt caffemodel
-	@echo "\nmaking check"
-#-${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281 ${PROTOTXT_FILENAME} -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy
-	-${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281 ${PROTOTXT_FILENAME} -M 110 -S 255
+	@echo "\nCheck not implemented yet."
 
 .PHONY: run
-run: compile
+run: run_cpp 
 	@echo "\nmaking run"
-	./run.py
 
-.PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	./run.py
-
-.PHONY:	cpp
-cpp: cpp/run.cpp 
-	@echo "\nmaking cpp"
-	g++ cpp/run.cpp -o cpp/run_cpp -lmvnc
+.PHONY:	compile_cpp
+compile_cpp:  
+	@echo "\nmaking compile_cpp"
+	(cd ${SIMPLE_CLASSIFIER_RELATIVE_DIR}; make compile_cpp; cd -)
 
 .PHONY: run_cpp
-run_cpp: compile cpp
+run_cpp: all
 	@echo "\nmaking run_cpp"
-	cd cpp; ./run_cpp; cd ..
+	${SIMPLE_CLASSIFIER_RELATIVE_DIR}/build/simple_classifier ${GRAPH_FILENAME_BASE}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}; 
 
 .PHONY: help
 help:
 	@echo "possible make targets: ";
 	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
+	@echo "  make all - make all - everything needed to run, but doesn't run";
+	@echo "  make data - downloads required data.";
+	@echo "  make deps - makes dependencies for project, prepares model etc.";
 	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
 	@echo "  make caffemodel - downloads the caffemodel for the network"
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make check - runs SDK checker tool to verify an NCS graph file";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make cpp - builds the run_cpp executable example";
-	@echo "  make run_cpp - runs the run_cpp executable example program";
-	@echo "  make run_py - runs the run.py python example program:";
+	@echo "  make compile_model - runs model compiler for the network";
+	@echo "  make compile_cpp - builds the run_cpp executable example";
+	@echo "  make run - builds and runs the C++ example program";
 	@echo "  make clean - removes all created content"
 
 clean_caffe_model:
@@ -126,14 +109,11 @@ clean_caffe_model:
 	rm -f ${PROTOTXT_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
+
 clean: clean_caffe_model
 	@echo "\nmaking clean"
-	rm -f graph
-	rm -f output.gv
-	rm -f output.gv.svg
-	rm -f output_report.html
-	rm -f output_expected.npy
-	rm -f zero_weights.caffemodel
-	rm -f output_result.npy
-	rm -f output_val.csv
-	rm -f cpp/run_cpp
+	rm -f ${GRAPH_FILENAME_BASE}.bin
+	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
+	rm -f ${GRAPH_FILENAME_BASE}.xml
+
+
