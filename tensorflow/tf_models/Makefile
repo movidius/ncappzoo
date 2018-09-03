@@ -20,6 +20,9 @@ ifndef TF_MODELS_PATH
 	else \
 		echo "Cloning ${GIT_REPO}"; \
 		git clone ${GIT_REPO}; \
+		cd models; \
+		git checkout 08af77755a1cfbc05835d77b3261c92b314b4463; \
+		cd ..; \
 	fi
 else
 	@echo "TF_MODELS_PATH is ${TF_MODELS_PATH}" ;
@@ -31,7 +34,7 @@ help:
 	@echo $(YELLOW)"\nPossible make targets: "$(NOCOLOR);
 	@echo "  make help - Shows this message.";
 	@echo "  make clean - Deletes everything created in this directory";
-	@echo "  make compile - compiles all.";
+	@echo "  make compile - Compiles all";
 	@echo "  make all - Downloads tensorflow models repo from here:"
 	@echo "             ${GIT_REPO}" 
 
@@ -39,5 +42,8 @@ help:
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -rf models
+
 compile: all
+
+
 
