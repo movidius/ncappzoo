@@ -8,8 +8,7 @@
 import numpy
 import cv2
 import sys
-sys.path.insert(0, "../../ncapi2_shim")
-import mvnc_simple_api as mvnc
+from mvnc import mvncapi
 
 dim=(300,300)
 EXAMPLES_BASE_DIR='../../'
@@ -33,7 +32,7 @@ LABELS = ('background',
 #    and labels identifying the found objects within the image.
 # ssd_mobilenet_graph is the Graph object from the NCAPI which will
 #    be used to peform the inference.
-def run_inference(image_to_classify, ssd_mobilenet_graph):
+def run_inference(image_to_classify, ssd_mobilenet_graph, fifo_in, fifo_out):
 
     # get a resized version of the image that is the dimensions
     # SSD Mobile net expects
@@ -42,12 +41,13 @@ def run_inference(image_to_classify, ssd_mobilenet_graph):
     # ***************************************************************
     # Send the image to the NCS
     # ***************************************************************
-    ssd_mobilenet_graph.LoadTensor(resized_image.astype(numpy.float16), None)
+    input_tensor = resized_image.astype(numpy.float16)
+    ssd_mobilenet_graph.queue_inference_with_fifo_elem(fifo_in, fifo_out, input_tensor, None)
 
     # ***************************************************************
     # Get the result from the NCS
     # ***************************************************************
-    output, userobj = ssd_mobilenet_graph.GetResult()
+    output, userobj = fifo_out.read_elem()
 
     #   a.	First fp16 value holds the number of valid detections = num_valid.
     #   b.	The next 6 values are unused.
@@ -176,42 +176,47 @@ def main():
 
     # Get a list of ALL the sticks that are plugged in
     # we need at least one
-    devices = mvnc.EnumerateDevices()
-    if len(devices) == 0:
+    device_list = mvncapi.enumerate_devices()
+    if len(device_list) == 0:
         print('No devices found')
         quit()
 
     # Pick the first stick to run the network
-    device = mvnc.Device(devices[0])
+    device = mvncapi.Device(device_list[0])
 
     # Open the NCS
-    device.OpenDevice()
+    device.open()
 
     # The graph file that was created with the ncsdk compiler
     graph_file_name = 'graph'
 
     # read in the graph file to memory buffer
     with open(graph_file_name, mode='rb') as f:
-        graph_in_memory = f.read()
+        graph_buffer = f.read()
 
     # create the NCAPI graph instance from the memory buffer containing the graph file.
-    graph = device.AllocateGraph(graph_in_memory)
+    graph = mvncapi.Graph("graph_v2")
+    fifo_in, fifo_out = graph.allocate_with_fifos(device, graph_buffer, 
+            input_fifo_data_type=mvncapi.FifoDataType.FP16,
+            output_fifo_data_type=mvncapi.FifoDataType.FP16)
 
     # read the image to run an inference on from the disk
     infer_image = cv2.imread(IMAGE_FULL_PATH)
 
     # run a single inference on the image and overwrite the
     # boxes and labels
-    run_inference(infer_image, graph)
+    run_inference(infer_image, graph, fifo_in, fifo_out)
 
     # display the results and wait for user to hit a key
     cv2.imshow(cv_window_name, infer_image)
     cv2.waitKey(0)
 
     # Clean up the graph and the device
-    graph.DeallocateGraph()
-    device.CloseDevice()
-
+    fifo_in.destroy()
+    fifo_out.destroy()
+    graph.destroy()
+    device.close()
+    device.destroy()
 
 # main entry point for program. we'll call main() to do what needs to be done.
 if __name__ == "__main__":
