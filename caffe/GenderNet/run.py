@@ -12,8 +12,6 @@ import cv2
 import time
 import csv
 import os
-import sys
-
 
 def execute_graph(blob,img):
 	mvnc.SetGlobalOption(mvnc.GlobalOption.LOG_LEVEL, 2)

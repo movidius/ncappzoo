@@ -15,7 +15,6 @@ import cv2
 import time
 import csv
 import os
-import sys
 
 dim=(224,224)
 EXAMPLES_BASE_DIR='../../'
