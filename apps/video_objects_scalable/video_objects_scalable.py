@@ -385,27 +385,12 @@ def print_hot_keys():
     print("q  : Quit application")
     print("")
 
-def print_hot_keys():
-    """Prints hot key bindings for the program.
-
-    :return: None
-    """
-    print("")
-    print("Hot keys while running and GUI in focus:")
-    print("-----------------------------------------------")
-    print("b/B: Decrement/Increment minimum box confidence")
-    print("f  : Toggle FPS display in GUI")
-    print("d  : Toggle device count display in GUI")
-    print("q  : Quit application")
-    print("")
-
 def main():
     """Main function for the program.  Everything starts here.
 
     :return: None
     """
     global resize_output, resize_output_width, resize_output_height, \
-           resize_output, resize_output_width, resize_output_height, \
            device_count
 
 
