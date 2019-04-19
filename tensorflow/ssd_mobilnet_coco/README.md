@@ -8,7 +8,7 @@ The [TensorFlow SSD Mobilenet V1/V2 COCO](https://github.com/tensorflow/models/b
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
 ## make all
-Runs nccompile and run.
+Runs mvNCCompile and make run.
 
 ## make compile_v1
 Uses the SSD Mobilenet V1 COCO network description and the trained weights files to generate a Movidius internal 'graph' format file.  This file is later used for loading the network on to the Neural Compute Stick and executing the network.
