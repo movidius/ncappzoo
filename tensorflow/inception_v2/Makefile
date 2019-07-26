@@ -17,7 +17,7 @@ MODEL_FILENAME = output/inception-v2.meta
 CONV_SCRIPT = ./save_session.py
 
 INPUT_NODE_FLAG = -in=input
-OUTPUT_NODE_FLAG = -on=Softmax
+OUTPUT_NODE_FLAG = -on=InceptionV2/Predictions/Reshape_1
 
 .PHONY: all
 all: profile check compile
