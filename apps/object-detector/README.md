@@ -1,6 +1,6 @@
-# ssd-object-detector
+# object-detector
 
-Detect objects in images using Single Shot Multibox Detectors (SSD) on Intel® Movidius™ Neural Compute Stick (NCS).
+Detect objects in images using Single Shot Multibox Detectors (SSD) or Tiny Yolo on Intel® Movidius™ Neural Compute Stick (NCS).
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ This code example requires that the following components are available:
 mkdir -p ~/workspace
 cd ~/workspace
 git clone https://github.com/movidius/ncappzoo
-cd ~/workspace/ncappzoo/apps/ssd-object-detector/
+cd ~/workspace/ncappzoo/apps/object-detector/
 make run
 ~~~
  
@@ -36,12 +36,12 @@ You should also see the image with a bounding box around the detected object.
 This example performs an inference on `ncappzoo/data/images/pic_064.jpg` by default; you can supply your own image using the `--image` options. Below is an example:
 
 ~~~
-python3 ssd-object-detector.py --image ../../data/images/pic_053.jpg
+python3 object-detector.py --image ../../data/images/pic_053.jpg
 ~~~
 
 ## Customizing this example
 
-You can use this project as a template for your custom SSD object detector app. Below are some tips to help customize the example.
+You can use this project as a template for your custom SSD/TinyYolo object detector app. Below are some tips to help customize the example.
 
 1. Before attemping to customize, check if the built-in options would suffice. Run `python3 object-detector.py -h` to list all available options.
 2. Steps 1, 2 and 5 are common across all Neural Compute Stick apps, so you can re-use those fuctions without modifications.

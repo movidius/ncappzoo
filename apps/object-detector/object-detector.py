@@ -10,7 +10,7 @@
 
 import os
 import sys
-import numpy
+import numpy as np
 import ntpath
 import argparse
 import skimage.io
@@ -68,8 +68,8 @@ def pre_process_image( img_draw ):
         img = img[:, :, ::-1]
 
     # Mean subtraction & scaling [A common technique used to center the data]
-    img = img.astype( numpy.float16 )
-    img = ( img - numpy.float16( ARGS.mean ) ) * ARGS.scale
+    img = img.astype( np.float16 )
+    img = ( img - np.float16( ARGS.mean ) ) * ARGS.scale
 
     return img
 
@@ -95,15 +95,15 @@ def infer_image( graph, img ):
     inference_time = graph.GetGraphOption( mvnc.GraphOption.TIME_TAKEN )
 
     # Deserialize the output into a python dictionary
-    output_dict = deserialize_output.ssd( 
-                      output, 
-                      CONFIDANCE_THRESHOLD, 
-                      img_draw.shape )
+    if ARGS.network == 'SSD':
+        output_dict = deserialize_output.ssd( output, CONFIDANCE_THRESHOLD, img_draw.shape )
+    elif ARGS.network == 'TinyYolo':
+        output_dict = deserialize_output.tinyyolo( output, CONFIDANCE_THRESHOLD, img_draw.shape )
 
     # Print the results
     print( "\n==============================================================" )
     print( "I found these objects in", ntpath.basename( ARGS.image ) )
-    print( "Execution time: " + str( numpy.sum( inference_time ) ) + "ms" )
+    print( "Execution time: " + str( np.sum( inference_time ) ) + "ms" )
     print( "--------------------------------------------------------------" )
     for i in range( 0, output_dict['num_detections'] ):
         print( "%3.1f%%\t" % output_dict['detection_scores_' + str(i)]
@@ -163,12 +163,16 @@ if __name__ == '__main__':
                          description="Object detection using SSD on \
                          Intel® Movidius™ Neural Compute Stick." )
 
+    parser.add_argument( '-n', '--network', type=str,
+                         default='SSD',
+                         help="network name: SSD or TinyYolo." )
+
     parser.add_argument( '-g', '--graph', type=str,
                          default='../../caffe/SSD_MobileNet/graph',
                          help="Absolute path to the neural network graph file." )
 
     parser.add_argument( '-i', '--image', type=str,
-                         default='../../data/images/pic_064.jpg',
+                         default='../../data/images/nps_chair.png',
                          help="Absolute path to the image that needs to be inferred." )
 
     parser.add_argument( '-l', '--labels', type=str,
