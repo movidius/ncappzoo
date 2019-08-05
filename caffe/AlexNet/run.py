@@ -9,7 +9,6 @@ import cv2
 import time
 import csv
 import os
-import sys
 import re
 from os import system
 

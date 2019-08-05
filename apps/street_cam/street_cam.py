@@ -8,7 +8,6 @@ import sys
 sys.path.insert(0, "../../ncapi2_shim")
 import mvnc_simple_api as mvnc
 
-import sys
 import numpy as np
 import cv2
 import time

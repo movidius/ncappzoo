@@ -9,7 +9,6 @@ import mvnc_simple_api as mvnc
 #from mvnc import mvncapi as mvnc
 import numpy
 import cv2
-import sys
 import os
 
 EXAMPLES_BASE_DIR='../../'
