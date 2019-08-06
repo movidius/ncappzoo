@@ -7,13 +7,11 @@ import sys
 sys.path.insert(0, "../../ncapi2_shim")
 import mvnc_simple_api as mvnc
 #from mvnc import mvncapi as mvnc
-import sys
 import numpy
 import cv2
 import time
 import csv
 import os
-import sys
 from sys import argv
 
 # name of the opencv window

@@ -128,5 +128,3 @@ help:
 clean:
 	@echo $(YELLOW)"\nMaking clean..."$(NOCOLOR);
 	rm -rf model
-	rm -rf labels.txt
-	rm -rf inception_v3.pb
