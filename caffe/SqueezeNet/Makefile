@@ -1,149 +1,116 @@
+NCCOMPILE = mo.py
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
+GREEN = '\033[1;32m'
+YELLOW = '\033[1;33m'
+RED = '\033[1;31m'
+NOCOLOR = '\033[0m'
 
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
+SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR = ../../apps/simple_classifier_cpp
+SIMPLE_CLASSIFIER_PY_RELATIVE_DIR = ../../apps/simple_classifier_py
 
+TEST_IMAGE_RELATIVE_DIR = ../../data/images
+LABELS_RELATIVE_DIR = ../../data/ilsvrc12
+MODEL_RELATIVE_DIR = ../../caffe/SqueezeNet
 
-PROTOTXT_FILENAME= deploy.prototxt
-GET_PROTOTXT = wget -P . https://github.com/DeepScale/SqueezeNet/raw/master/SqueezeNet_v1.0/${PROTOTXT_FILENAME}
+TEST_IMAGE_FILENAME = nps_electric_guitar.png
+LABELS_FILENAME = synset_labels.txt
 
-CAFFEMODEL_FILENAME = squeezenet_v1.0.caffemodel
-GET_CAFFEMODEL = wget -P . -N https://github.com/DeepScale/SqueezeNet/raw/master/SqueezeNet_v1.0/${CAFFEMODEL_FILENAME}
+ZOO_RELATIVE_DIR = ../../omz
+MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
+MODEL_DOWNLOADER_FILENAME = downloader.py
+SQUEEZENET_MODEL_ZOO_DIR = classification/squeezenet/1.0/caffe
 
+MODEL_FILE_NAME_BASE = squeezenet1.0
+MEAN_VALUES = [104,117,123]
 
 .PHONY: all
-all: profile check compile cpp
+all: deps data compile_model compile_cpp
 
-.PHONY: prereqs
-prereqs:
-	@echo "\nmaking prereqs"
-	(cd ../../data/ilsvrc12; make)
-	@sed -i 's/\r//' run.py
-	@chmod +x run.py
-	@if [ -e LICENSE.squeezenet ] ; \
+
+.PHONY: deps
+deps: download_model_files
+	@echo $(YELLOW)"\nSqueezeNet: Making dependencies..."$(NOCOLOR)
+
+	
+.PHONY: data
+data:
+	@echo $(YELLOW)"\nSqueezeNet: Downloading required data..."$(NOCOLOR)
+	(cd ../../data/ilsvrc12; make all);
+	
+	
+.PHONY: model_zoo
+model_zoo:
+	@echo $(YELLOW)"\nSqueezeNet: Making model zoo..."$(NOCOLOR)
+	(cd ${ZOO_RELATIVE_DIR}; make all;) 
+	
+
+.PHONY: download_model_files
+download_model_files: model_zoo
+	@echo $(YELLOW)"\nSqueezeNet: Checking zoo model files..."$(NOCOLOR)
+	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt ] ;\
 	then \
-		echo "LICENSE file already exists"; \
+		echo " - Model files already exists." ; \
 	else \
-		echo "Downloading LICENSE file"; \
-		wget -P . -N https://github.com/DeepScale/SqueezeNet/raw/master/LICENSE; mv LICENSE LICENSE.squeezenet; \
-	fi ; \
+		echo " - Model files do not exist. Using Model downloader to download the model..." ; \
+		(cd ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}; python3 ${MODEL_DOWNLOADER_FILENAME} --name ${MODEL_FILE_NAME_BASE};); \
+	fi
 
 
-.PHONY: prototxt
-prototxt: prereqs
-	@echo "\nmaking prototxt"
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
+.PHONY: compile_model
+compile_model: download_model_files
+	@echo $(YELLOW)"\nSqueezeNet: Compiling model to IR..."$(NOCOLOR)
+	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo " - IR files already exist. Skipping compile step."; \
 	else \
-		echo "Downloading Prototxt file"; \
-		${GET_PROTOTXT}; \
-		if [ -e ${PROTOTXT_FILENAME} ] ; \
-		then \
-			echo "modifying prototxt file."; \
-			sed -i '11s/10/1/' ${PROTOTXT_FILENAME}; sed -i '530s/pad/#pad/' ${PROTOTXT_FILENAME}; \
-		else \
-			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi  
+		${NCCOMPILE} --data_type=FP16 --input_model=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel --input_proto=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt --mean_values=${MEAN_VALUES} || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+	fi 
 
-.PHONY: caffemodel
-caffemodel: 
-	@echo "\nmaking caffemodel"
-	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
-	then \
-		echo "caffemodel file already exists"; \
-	else \
-		echo "Downloading caffemodel file"; \
-		${GET_CAFFEMODEL}; \
-		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
-		then \
-			echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi  
-
-.PHONY: profile
-profile: prototxt
-	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
-
-.PHONY: browse_profile
-browse_profile: profile
-	@echo "\nmaking browse_profile"
-	@if [ -e output_report.html ] ; \
-	then \
-		firefox output_report.html & \
-	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
-
-.PHONY: compile
-compile: prototxt caffemodel
-	@echo "\nmaking compile"
-	${NCCOMPILE} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
-
-.PHONY: check
-check: prototxt caffemodel
-	@echo "\nmaking check"
-#-${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281 ${PROTOTXT_FILENAME} -S 255 -M ../../data/ilsvrc12/ilsvrc_2012_mean.npy
-	${NCCHECK} -w ${CAFFEMODEL_FILENAME} -i ../../data/images/cat.jpg -s 12 -id 281  ${PROTOTXT_FILENAME} -S 255 -M 120
-
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nSqueezeNet: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+	
 .PHONY: run
-run: compile
-	@echo "\nmaking run"
-	./run.py
+run: run_py
 
-.PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	./run.py
 
-.PHONY:	cpp
-cpp: cpp/run.cpp
-	@echo "\nmaking cpp"
-	g++ cpp/run.cpp -o cpp/run_cpp -lmvnc
+.PHONY:	compile_cpp
+compile_cpp:  
+	@echo $(YELLOW)"\nSqueezeNet: Compiling C++ sample..."$(NOCOLOR)
+	(cd ${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}; make compile_cpp; cd -)
+
 
 .PHONY: run_cpp
-run_cpp: compile cpp
-	@echo "\nmaking run_cpp"
-	cd cpp; ./run_cpp; cd ..
+run_cpp: install-reqs data deps compile_cpp compile_model
+	@echo $(YELLOW)"\nSqueezeNet: Running C++ sample..."$(NOCOLOR)
+	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml  ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
+
+
+.PHONY: run_py
+run_py: install-reqs deps data compile_model
+	@echo $(YELLOW)"\nSqueezeNet: Running Python sample..."$(NOCOLOR)
+	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
+	
 
 .PHONY: help
 help:
-	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
-	@echo "  make caffemodel - downloads the caffemodel for the network"
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make check - runs SDK checker tool to verify an NCS graph file";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make cpp - builds the run_cpp executable example";
-	@echo "  make run_cpp - runs the run_cpp executable example program";
-	@echo "  make run_py - runs the run.py python example program";
-	@echo "  make clean - removes all created content"
+	@echo "\nPossible make targets: ";
+	@echo $(YELLOW)"  make run "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make run_py "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make run_cpp "$(NOCOLOR)"- Runs the C++ example.";
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message";
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Compiles the model to an IR format.";
+	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds the C++ example.";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
+	
 
-clean_caffe_model:
-	@echo "\nmaking clean_caffe_model"
-	rm -f ${PROTOTXT_FILENAME}
-	rm -f ${CAFFEMODEL_FILENAME}
-
-clean: clean_caffe_model
-	@echo "\nmaking clean"
-	rm -f graph
-	rm -f output.gv
-	rm -f output.gv.svg
-	rm -f output_report.html
-	rm -f output_expected.npy
-	rm -f zero_weights.caffemodel
-	rm -f output_result.npy
-	rm -f output_val.csv
-	rm -f cpp/run_cpp
-	rm -f LICENSE.squeezenet
+clean: 
+	@echo $(YELLOW)"\nSqueezeNet: Cleaning up files..."$(NOCOLOR)
+	rm -f ${MODEL_FILE_NAME_BASE}.bin
+	rm -f ${MODEL_FILE_NAME_BASE}.xml
+	rm -f ${MODEL_FILE_NAME_BASE}.mapping

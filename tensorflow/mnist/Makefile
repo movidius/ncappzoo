@@ -1,11 +1,18 @@
+NCCOMPILE = mo.py
 
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
-
+YELLOW='\033[1;33m'
+NOCOLOR='\033[0m'
+RED = '\033[1;31m'
 
 NETWORK_SCRIPT_FILENAME= mnist_deep.py
 GET_NETWORK_SCRIPT = wget -P . https://raw.githubusercontent.com/tensorflow/tensorflow/r1.4/tensorflow/examples/tutorials/mnist/${NETWORK_SCRIPT_FILENAME}
+PATCH_FOR_NCS_FILENAME = orig_2_ncs.patch
+PATCH_FOR_INFERENCE_FILENAME = ncs_2_inference.patch
+
+MNIST_NCS_FILENAME = mnist_deep_mod.py
+MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
+
+GRAPH_FILENAME_BASE = mnist
 
 MODEL_DATA_FILENAME = mnist_model.data-00000-of-00001
 MODEL_INDEX_FILENAME = mnist_model.index
@@ -15,48 +22,35 @@ MODEL_INFERENCE_DATA_FILENAME = mnist_inference.data-00000-of-00001
 MODEL_INFERENCE_INDEX_FILENAME = mnist_inference.index
 MODEL_INFERENCE_META_FILENAME = mnist_inference.meta
 
-
-PATCH_FOR_NCS_FILENAME = orig_2_ncs.patch
-PATCH_FOR_INFERENCE_FILENAME = ncs_2_inference.patch
-
-MNIST_NCS_FILENAME = mnist_deep_mod.py
-MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
-
 GET_MODEL_DATA = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_DATA_FILENAME}
 GET_MODEL_INDEX = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_INDEX_FILENAME}
 GET_MODEL_META =  wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/neural_nets/master/tensorflow/mnist/${MODEL_INFERENCE_META_FILENAME}
 
-GRAPH_FILENAME = mnist_inference.graph
+GRAPH_FILENAME_BASE = mnist_inference
+MODEL_RELATIVE_DIR = .
+
+RUN_PY_RELATIVE_DIR = mnist.py
+TEST_IMAGE_RELATIVE_DIR = ../../data/digit_images
+TEST_IMAGE_FILENAME = one.png
+INPUT_SHAPE = [1,784]
 
 .PHONY: all
-all: deps compile
+all: deps data compile_model
+
 
 .PHONY: deps
-deps: model
-	@echo "\nmaking deps"
-
-.PHONY: network_code
-network_code:
-	@echo "\making network_code"
-	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
-	then \
-		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
-	else \
-		echo "Downloading ${NETWORK_SCRIPT_FILENAME} file"; \
-		${GET_NETWORK_SCRIPT}; \
-		if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
-		then \
-			echo "download ${NETWORK_SCRIPT_FILENAME} done."; \
-		else \
-			echo "***\nError - Could not download ${NETWORK_SCRIPT_FILENAME}. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi
+deps: get_model
+	@echo $(YELLOW)"\nMnist: Making dependencies..."$(NOCOLOR)
 
 
-.PHONY: model
-model:
-	@echo "\nmaking model"
+.PHONY: data
+data:
+	@echo $(YELLOW)"\nMnist: Downloading required data - No data needed."$(NOCOLOR)
+
+
+.PHONY: get_model
+get_model:
+	@echo $(YELLOW)"\nMnist: Downloading model files..."$(NOCOLOR)
 	@if [ -e ${MODEL_INFERENCE_DATA_FILENAME} ] ; \
 	then \
 		echo "model file ${MODEL_INFERENCE_DATA_FILENAME} already exists, skipping download"; \
@@ -99,11 +93,11 @@ model:
 			exit 1; \
 		fi ; \
 	fi
-
-
+	
+	
 .PHONY: train
 train:
-	@echo "\nmaking train";
+	@echo $(YELLOW) "\nMnist: Training model..." $(NOCOLOR);
 	@echo "\nTo train the network the following steps will be taken:";
 	@echo "  - Download the TensorFlow mnist_deep.py example";
 	@echo "  - Modify the mnist_deep.py -> mnist_deep_mod.py for NCS compatibility";
@@ -114,15 +108,15 @@ train:
 	@echo "  - modify mnist_deep_mod.py -> mnist_deep_inference.py for inference only version";
 	@echo "    of the network (no training code)."
 	@echo "  - run mnist_deep_inference.py to read the saved network and write an inference";
-	@echo "    only version of the network that the NCSDK can compile in these files:";
+	@echo "    only version of the network that the OpenVINO Model Optimizer can compile in these files:";
 	@echo "      ${MODEL_INFERENCE_DATA_FILENAME}";
 	@echo "      ${MODEL_INFERENCE_INDEX_FILENAME}";
 	@echo "      ${MODEL_INFERENCE_META_FILENAME}";
 	@echo "  "
-	@echo "After complete, you will be able to compile the network you just trained with:"
-	@echo "make compile"
+	@echo "After complete, you will be able to compile the network you just trained with:";
+	@echo "make compile_model";
 	@echo ""
-	@read -p"Press ENTER to continue the steps above (this will take about 20 min) or Ctrl-C to cancel" variable_nps;echo;
+	@read -p"Press ENTER to continue the steps above (this will take about 20 min) or Ctrl-C to cancel" variable_nps; echo;
 
 	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
 	then \
@@ -139,89 +133,73 @@ train:
 		fi ; \
 	fi ;
 
-
-	@echo "patching example for NCSDK";
+	@echo "patching example for the OpenVINO Toolkit";
 	patch ${NETWORK_SCRIPT_FILENAME} -i ${PATCH_FOR_NCS_FILENAME} -o ${MNIST_NCS_FILENAME};
 	patch ${MNIST_NCS_FILENAME} -i ${PATCH_FOR_INFERENCE_FILENAME} -o ${MNIST_INFERENCE_FILENAME};
 	@echo "Running patched code to start training";
 	python3 ./${MNIST_NCS_FILENAME}
-	@echo "Running code to save for NCSDK";
+	@echo "Running code to save for the OpenVINO Toolkit";
 	python3 ./${MNIST_INFERENCE_FILENAME}
+	@echo $(YELLOW)"\nMnist model training complete."$(NOCOLOR)
+	@echo "Model name: "${MODEL_INFERENCE_META_FILENAME} 
+	@echo $(NOCOLOR)"\nRun the command "$(YELLOW)"make compile_model"$(NOCOLOR)" to compile your model or "$(YELLOW)"make run"$(NOCOLOR)" to run the sample with your trained model.\n"
 
 
-.PHONY: profile
-profile: model
-	@echo "\nmaking profile"
-	@echo "No profile for this network yet"
-
-.PHONY: browse_profile
-browse_profile: profile
-	@echo "\nmaking browse_profile"
-	@if [ -e output_report.html ] ; \
+.PHONY: compile_model
+compile_model: get_model
+	@echo $(YELLOW)"\nMnist: Compiling model to IR..."$(NOCOLOR)
+	@if [ -e ${GRAPH_FILENAME_BASE}.xml ] ; \
 	then \
-		firefox output_report.html & \
+		echo "compiled model file already exists, skipping compile."; \
 	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
-
-
-.PHONY: compile
-compile: model
-	@echo "\nmaking compile"
-	@if [ -e ${GRAPH_FILENAME} ] ; \
-	then \
-		echo "graph file ${GRAPH_FILENAME} already exists, skipping compile"; \
-	else \
-		echo "Compiling to create ${GRAPH_FILENAME}"; \
-		${NCCOMPILE} ${MODEL_INFERENCE_META_FILENAME} -w mnist_inference -s 12 -in input -on output -o ${GRAPH_FILENAME}; \
-		if [ -e ${GRAPH_FILENAME} ] ; \
-		then \
-			echo "compile done, created ${GRAPH_FILENAME}."; \
-		else \
-			echo "***\nError - Could not compile, not able to create ${GRAPH_FILENAME} \n***\n"; \
-			exit 1; \
-		fi ; \
+		${NCCOMPILE} --data_type=FP16 --input_meta_graph=${MODEL_INFERENCE_META_FILENAME} --input_shape=${INPUT_SHAPE} || (echo $(RED)"Make sure to set the OpenVINO environment variables using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
 
-.PHONY: check
-check: model
-	@echo "\nmaking check"
-	@echo "\No check for this network yet."
-
-
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nMnist: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+	
 .PHONY: run
-run: deps compile
-	@echo "\nmaking run"
-	python3 ./run.py
+run: run_py
+
+
+.PHONY: run_py
+run_py: install-reqs deps data compile_model
+	@echo $(YELLOW) "\nMnist: Running Python sample..." $(NOCOLOR)
+	python3 $(RUN_PY_RELATIVE_DIR) --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=categories.txt
+
 
 .PHONY: help
 help:
-	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: deps, compile";
-	@echo "  make browse_profile - (TBD) runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make check - (TBD) runs SDK checker tool to verify an NCS graph file";
-	@echo "  make clean - removes all created content"
-	@echo "  make compile - runs SDK compiler tool to compile the graph file for the network";
-	@echo "  make deps - downloads and prepares the trained network";
-	@echo "  make profile - (TBD) runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make run - runs the run.py python example program";
-	@echo "  make train - creates NCSDK compatible version of TF network and trains it.";
-
+	@echo "\nPossible make targets"
+	@echo $(YELLOW)"  make help " $(NOCOLOR) "- Shows this message.";
+	@echo $(YELLOW)"  make run " $(NOCOLOR) "- Runs the Python example.";
+	@echo $(YELLOW)"  make run_py " $(NOCOLOR) "- Runs the Python example.";
+	@echo $(YELLOW)"  make all " $(NOCOLOR) "- Makes everything needed to run, but doesn't run the sample.";
+	@echo $(YELLOW)"  make compile_model " $(NOCOLOR) "- Runs model compiler for the network.";
+	@echo $(YELLOW)"  make model " $(NOCOLOR) "- Downloads the model files.";
+	@echo $(YELLOW)"  make data " $(NOCOLOR) "- Downloads required data.";
+	@echo $(YELLOW)"  make deps " $(NOCOLOR) "- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
+	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a mnist model.";
 
 clean: clean
-	@echo "\nmaking clean"
-	rm -f ${GRAPH_FILENAME}
+	@echo $(YELLOW)"\nMnist: Cleaning up files..."$(NOCOLOR)
+	rm -f ${GRAPH_FILENAME_BASE}.bin
+	rm -f ${GRAPH_FILENAME_BASE}.mapping.json
+	rm -f ${GRAPH_FILENAME_BASE}.mapping
+	rm -f ${GRAPH_FILENAME_BASE}.xml
 	rm -f ${MODEL_INFERENCE_META_FILENAME}
 	rm -f ${MODEL_INFERENCE_INDEX_FILENAME}
 	rm -f ${MODEL_INFERENCE_DATA_FILENAME}
-	rm -f ${NETWORK_SCRIPT_FILENAME}
-	rm -f ${MODEL_META_FILENAME}
-	rm -f ${MODEL_INDEX_FILENAME}
-	rm -f ${MODEL_DATA_FILENAME}
-	rm -f checkpoint
 	rm -f ${MNIST_NCS_FILENAME}
 	rm -f ${MNIST_INFERENCE_FILENAME}
-	rm -f output_expected.npy
-
+	rm -f ${NETWORK_SCRIPT_FILENAME}
+	rm -f ${MODEL_DATA_FILENAME}
+	rm -f ${MODEL_INDEX_FILENAME}
+	rm -f ${MODEL_META_FILENAME}
+	rm -f checkpoint
+	
