@@ -1,25 +1,32 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
+GREEN = '\033[1;32m'
+YELLOW = '\033[1;33m'
+NOCOLOR = '\033[0m'
+OPEN_MODEL_ZOO = omz
 
-TOPTARGETS := all clean check profile compile run
+TOPTARGETS := all clean compile_model
 
 SUBDIRS := $(wildcard */.)
+INSTALL_PARAM := "yes"
+EXIT_PARAM := "no"
 
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
-	$(MAKE) -C $@ $(MAKECMDGOALS)
+	@if [ "$(MAKECMDGOALS)" != "clean" ] || [ "$(MAKECMDGOALS)" = "all" ] || [ -z $(MAKECMDGOALS) ]; \
+	then \
+		$(MAKE) -C ${OPEN_MODEL_ZOO} INSTALL=${INSTALL_PARAM} EXIT_ON_REQ_NOT_MET=${EXIT_PARAM}; \
+	fi; \
+	$(eval INSTALL_PARAM = "no")
+	@$(MAKE) -C $@ $(MAKECMDGOALS) INSTALL=${INSTALL_PARAM} EXIT_ON_REQ_NOT_MET=${EXIT_PARAM}; \
+	echo $(GREEN)"\nAppZoo: "$(YELLOW)"Finished: making "$@ $(MAKECMDGOALS)"\n"$(NOCOLOR)
 
 .PHONY: $(TOPTARGETS) $(SUBDIRS)
 
 .PHONY: help
 help:
-	@echo "Possible Make targets"
-	@echo "  make help - shows this message"
-	@echo "  make all - Makes all targets"
-	@echo "  make clean - Removes all temp files from all directories"
-	@echo "  make check - Runs check on all caffe/tensorflow models"
-	@echo "  make profile - Runs profile on all caffe/tensorflow models"
-	@echo "  make compile - Runs compile on all caffe/tensorflow models"
-	@echo "  make run - Runs all caffe/tensorflow/apps"
+	@echo "\nPossible Make targets"
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message"
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes all targets"
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temp files from all directories"
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Runs compile on all caffe/tensorflow models"
+
