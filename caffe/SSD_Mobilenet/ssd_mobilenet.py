@@ -136,12 +136,11 @@ def infer():
             quit()
 	    ####################### 2. Preprocessing #######################
         # Image preprocessing
-        
         frame = cv2.flip(frame, 1)
         image_to_classify = cv2.resize(frame, (w, h))
         image_to_classify = numpy.transpose(image_to_classify, (2, 0, 1))
         image_to_classify = image_to_classify.reshape((n, c, h, w))
-        
+        # get the capture dimensions, these will be used to scale the bounding box for displaying purposes
         image_w = cap.get(3)
         image_h = cap.get(4)
         # Prepare labels
@@ -187,10 +186,10 @@ def infer():
                     if key != -1:
                         cap.release()
                         break
-                        
+    # Clean up all windows
     cv2.destroyAllWindows()
     
-
+# main entrypoint for the script
 if __name__ == "__main__":
     infer()
     print(" Finished.")
