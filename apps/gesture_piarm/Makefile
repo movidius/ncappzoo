@@ -27,10 +27,14 @@ data:
 .PHONY: deps
 deps:
 	@echo $(YELLOW)"\ngesture_piarm: Making dependencies..."$(NOCOLOR)
-	@(cd ${MODEL_RELATIVE_DIR}; \
-	make compile_model; \
-	cd ${PROJECT_RELATIVE_DIR}; \
-	cp -a ${MODEL_FP16_RELATIVE_DIR} . ;)
+	@echo "Downloading .xml, .bin, and .mapping files..."
+	@if [ -e ${SSD_GESTURE_DIR}/${SSD_GESTURE_BIN_FILENAME} ] ; \
+	then \
+		echo "SSD Inception V2 for Gesture Detection exists, skipping network request." ; \
+	else \
+		mkdir ${SSD_GESTURE_DIR} ; \
+		python3 download_ir_model.py ; \
+	fi
 
 
 .PHONY: install-reqs
