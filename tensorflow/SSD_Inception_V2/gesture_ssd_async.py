@@ -23,7 +23,6 @@ import cv2
 import time
 import logging as log
 from openvino.inference_engine import IENetwork, IEPlugin
-from mearm_control import MeArmController
 
 
 def build_argparser():
@@ -107,9 +106,6 @@ def main():
     log.info("To stop the demo execution press Esc button")
     is_async_mode = True
     render_time = 0
-    
-    # Mearm Controller Init
-    mearm = MeArmController()
     ret, frame = cap.read()
 
     print("To close the application, press 'CTRL+C' or any key with focus on the output window")
@@ -120,12 +116,10 @@ def main():
             ret, frame = cap.read()
         if not ret:
             break
-        
-        big_w = int(cap.get(3))
-        big_h = int(cap.get(4))
-        
+
         initial_w = cap.get(3)
         initial_h = cap.get(4)
+        
         # Main sync point:
         # in the truly Async mode we start the NEXT infer request, while waiting for the CURRENT to complete
         # in the regular mode we start the CURRENT request and immediately wait for it's completion
@@ -145,82 +139,25 @@ def main():
             det_time = inf_end - inf_start
 
             # Parse detection results of the current request, only need one so choose max prob
-            proposals = []
             res = exec_net.requests[cur_request_id].outputs[out_blob]
             for obj in res[0][0]:
                 # Draw only objects when probability more than specified threshold
                 if obj[2] > args.prob_threshold:
                     best_proposal = obj
-                
+
                     xmin = int(best_proposal[3] * initial_w)
                     ymin = int(best_proposal[4] * initial_h)
                     xmax = int(best_proposal[5] * initial_w)
                     ymax = int(best_proposal[6] * initial_h)
                     class_id = int(best_proposal[1])
-                    
+
                     # Draw box and label\class_id
                     color = (min(class_id * 12.5, 255), min(class_id * 7, 255), min(class_id * 5, 255))
-                    color = (255, 255, 255)
-                    # cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color, 2)
-                    
-                    # Draw inner and outer box
-                    xmid = int(abs(xmin + xmax) / 2)
-                    ymid = int(abs(ymin + ymax) / 2)
-                    cv2.circle(frame, (xmid, ymid), 4, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
-                    cv2.rectangle(frame, (xmid - 100, ymid - 100), (xmid + 99, ymid + 99), color, 2)
-                    
+                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color, 2)
+
                     det_label = labels_map[class_id] if labels_map else str(class_id)
-                    cv2.putText(frame, det_label, (xmid, ymid - 7), cv2.FONT_HERSHEY_COMPLEX, 0.6, color, 1)
-                    proposals.append({'pred': class_id, 'pt1': (xmid - 100, ymid - 100), 'pt2': (xmid + 99, ymid + 99)})
-            
-            # Robot control
-            fives = 0
-            sixes = 0
-            if len(proposals) > 0:
-                for proposal in proposals:
-                    xmin = proposal['pt1'][0]
-                    ymin = proposal['pt1'][1]
-                    xmax = proposal['pt2'][0]
-                    ymax = proposal['pt2'][1]
-                    
-                    if xmin <= 50 and ymin > 50 and ymax < big_h - 50:
-                        mearm.move('base', 3) # check left
-                        print('left')
-                    elif xmin >= 50 and ymin <= 50:
-                        mearm.move('upper', 1) # check up
-                        print('up')
-                    elif xmax >= big_w - 50 and ymin > 50 and ymax < big_h - 50:
-                        mearm.move('base', 4) # check right
-                        print('right')
-                    elif xmin >= 50 and ymax >= big_h - 50:
-                        mearm.move('upper', 2) # check down
-                        print('down')
-                    elif proposal['pred'] == 5:
-                        fives = fives + 1
-                    elif proposal['pred'] == 6:
-                        sixes = sixes + 1
-                
-                if fives > 0:
-                    if fives == 1:
-                        mearm.move('grip', 5) # check open
-                        print('open')
-                    else:
-                        mearm.move('lower', 7)
-                        print('out')
-                elif sixes > 0:
-                    if sixes == 1:
-                        mearm.move('grip', 6) # check close
-                        print('close')
-                    else:
-                        mearm.move('lower', 8)
-                        print('in')
-            
-            # Regions for commands
-            cv2.rectangle(frame, (0, 50), (50, big_h - 50), (255, 255, 255), 2)
-            cv2.rectangle(frame, (50, 0), (big_w - 50, 50), (0, 0, 255), 2)
-            cv2.rectangle(frame, (50, big_h - 50), (big_w -50, big_h - 1), (255, 0, 0), 2)
-            cv2.rectangle(frame, (big_w - 50, 50), (big_w - 1, big_h - 50), (0, 255, 0), 2)
-            
+                    label_and_prob = det_label + ", " + str(obj[2] * 100) + "%"
+                    cv2.putText(frame, label_and_prob, (xmin, ymin - 7), cv2.FONT_HERSHEY_COMPLEX, 0.6, color, 1)
 
             # Draw performance stats
             inf_time_message = "Inference time: N\A for async mode" if is_async_mode else \
