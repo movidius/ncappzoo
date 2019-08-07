@@ -1,13 +1,35 @@
-# face-detection-retail-0004
+# ssd mobilenet
 ## Introduction
-The [face-detection-retail-0004](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) network can be used for face detection. 
+The [ssd mobilenet](https://github.com/chuanqi305/MobileNet-SSD) network can be used for object detection and can detect 20 different types of objects. This model was pretrained and more information can be found at: https://github.com/chuanqi305/MobileNet-SSD. The list of objects that it can detect are:
+
+```
+aeroplane
+bicycle
+bird
+boat
+bottle
+bus
+car
+cat
+chair
+cow
+diningtable
+dog
+horse
+motorbike
+person
+pottedplant
+sheep
+sofa
+train
+tvmonitor
+```
 
 The provided Makefile does the following
 
-1. Downloads the IR files from the [Open Model Zoo](https://github.com/opencv/open_model_zoo)
-2. Takes an image and runs an inference on the face-detection-retail-0004 model.
+1. Downloads the prototxt and caffe weight files using the model downloader from the [Open Model Zoo](https://github.com/opencv/open_model_zoo)
+2. Takes an image and runs an inference using the ssd mobilenet model.
 
-The sample can also be used to crop images and write them to file. 
 
 ## Running this Example
 ~~~

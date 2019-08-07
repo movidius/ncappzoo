@@ -7,76 +7,64 @@ NOCOLOR = '\033[0m'
 
 DATA_RELATIVE_DIR = ../../data
 TEST_IMAGE_RELATIVE_DIR = .
-MODEL_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
+MODEL_RELATIVE_DIR = ../../caffe/SSD_Mobilenet
+MEAN_VALUES = [127.5,127.5,127.5]
+SCALE_VALUES = [127.50223128904757]
 
-TEST_IMAGE_FILENAME = image.jpg
+INPUT = ../../data/images/nps_chair.png
 
 ZOO_RELATIVE_DIR = ../../omz
 MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
 MODEL_DOWNLOADER_FILENAME = downloader.py
-FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP16
-MODEL_FILE_NAME_BASE = face-detection-retail-0004
-
-GET_TEST_IMAGE = wget -O image.jpg -N http://vis-www.cs.umass.edu/lfw/images/Talisa_Bratt/Talisa_Bratt_0001.jpg
-
-CROP = 
-CROPPED_FACES_DIR = 
-SHOW = --show=yes
+SSD_MODEL_ZOO_DIR = object_detection/common/mobilenet-ssd/caffe
+MODEL_FILE_NAME_BASE = mobilenet-ssd
+DEV = MYRIAD
 
 .PHONY: all
 all: deps data
 
 
 .PHONY: deps
-deps: get_ir
-	@echo $(YELLOW)"\nface-detection-retail-0004: Making dependencies..."$(NOCOLOR)
+deps: compile_model
+	@echo $(YELLOW)"\nssd_mobilenet: Making dependencies..."$(NOCOLOR)
 	
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nface-detection-retail-0004: Downloading required data..."$(NOCOLOR)
-	test -f ${TEST_IMAGE_FILENAME} || ${GET_TEST_IMAGE}
+	@echo $(YELLOW)"\nssd_mobilenet: Downloading required data..."$(NOCOLOR)
 
 
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)"\nface-detection-retail-0004: Cloning model zoo..."$(NOCOLOR)
+	@echo $(YELLOW)"\nssd_mobilenet: Cloning model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 
 
-.PHONY: get_ir
-get_ir:	model_zoo
-	@echo $(YELLOW)"\nface-detection-retail-0004: Downloading IRs..."$(NOCOLOR);
-	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin ]; \
+.PHONY: download_model_files
+download_model_files: model_zoo
+	@echo $(YELLOW)"\nssd_mobilenet: Checking zoo model files..."$(NOCOLOR)
+	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SSD_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SSD_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt ] ;\
 	then \
-		echo " - Model files already exists in open model directory."; \
+		echo " - Model files already exists." ; \
 	else \
-		echo " - Model files do not exist in open model directory. ";\
-		echo " - Using Model downloader to download the model..."; \
+		echo " - Model files do not exist. Using Model downloader to download the model..." ; \
 		(cd ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}; python3 ${MODEL_DOWNLOADER_FILENAME} --name ${MODEL_FILE_NAME_BASE};); \
-	fi
-	
-	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ]; \
-	then \
-		echo " - IR files already exist in project directory. No need to copy IRs."; \
-	else \
-		echo " - IR files do not exist in project directory.";\
-		echo " - Copying IR files to current folder..."; \
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml .; \
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin .; \
 	fi
 
 
 .PHONY: compile_model
-compile_model: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Compiling model to IR..."$(NOCOLOR)
-	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
-
-
+compile_model: download_model_files
+	@echo $(YELLOW)"\nssd_mobilenet: Compiling model to IR..."$(NOCOLOR)
+	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ]; \
+	then \
+		echo " - IR files already exist. Skipping compile step."; \
+	else \
+		${NCCOMPILE} --data_type=FP16 --input_model=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SSD_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel --input_proto=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SSD_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt --mean_values=${MEAN_VALUES} --scale_values=${SCALE_VALUES} || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+	fi 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nface-detecton-retail-0004: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)"\nssd_mobilenet: Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 	
 	
@@ -86,8 +74,8 @@ run: run_py
 
 .PHONY: run_py
 run_py: install-reqs deps data
-	@echo $(YELLOW)"\nface-detection-retail-0004: Running Python sample..."$(NOCOLOR)
-	python3 face_detect.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_FILENAME} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
+	@echo $(YELLOW)"\nssd_mobilenet: Running Python sample..."$(NOCOLOR)
+	python3 ssd_mobilenet.py --ir=${MODEL_FILE_NAME_BASE}.xml --input=${INPUT} -d ${DEV};
 	
 
 .PHONY: help
@@ -104,10 +92,9 @@ help:
 	
 
 clean: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)"\nssd_mobilenet: Cleaning up files..."$(NOCOLOR)
 	@rm -f image.jpg
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
 	rm -f ${MODEL_FILE_NAME_BASE}.mapping
-	rm -rf ${CROPPED_FACES_DIR}
 	
