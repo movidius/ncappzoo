@@ -24,6 +24,8 @@ The provided code does the following:
 ### Running Application with Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 - **make run**: Runs the sample application.
+- **make run_wout_arm_CPU**: Runs the sample application without robot on CPU
+- **make run_wout_arm_MYRIAD**: Runs the sample application without robot using MYRIAD plugin
 - **make help**: Shows available targets.
 - **make all**:Builds and/or gathers all the required files needed to run the application.
 - **make data**: Gathers all of the required data need to run the sample.

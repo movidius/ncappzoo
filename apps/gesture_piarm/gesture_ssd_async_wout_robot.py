@@ -23,7 +23,6 @@ import cv2
 import time
 import logging as log
 from openvino.inference_engine import IENetwork, IEPlugin
-from mearm_control import MeArmController
 
 
 def build_argparser():
@@ -48,6 +47,40 @@ def build_argparser():
                       default=0.5, type=float)
 
     return parser
+
+def robot_control(proposals, big_w, big_h):
+    fives = 0
+    sixes = 0
+
+    for proposal in proposals:
+        xmin = proposal['pt1'][0]
+        ymin = proposal['pt1'][1]
+        xmax = proposal['pt2'][0]
+        ymax = proposal['pt2'][1]
+
+        if xmin <= 50 and ymin > 50 and ymax < big_h - 50:
+            print('left')
+        elif xmin >= 50 and ymin <= 50:
+            print('up')
+        elif xmax >= big_w - 50 and ymin > 50 and ymax < big_h - 50:
+            print('right')
+        elif xmin >= 50 and ymax >= big_h - 50:
+            print('down')
+        elif proposal['pred'] == 5:
+            fives = fives + 1
+        elif proposal['pred'] == 6:
+            sixes = sixes + 1
+
+    if fives > 0:
+        if fives == 1:
+            print('open')
+        else:
+            print('out')
+    elif sixes > 0:
+        if sixes == 1:
+            print('close')
+        else:
+            print('in')
 
 
 def main():
@@ -109,8 +142,6 @@ def main():
     render_time = 0
 
     # Mearm Controller Init
-
-    mearm = MeArmController()
     ret, frame = cap.read()
 
     print("To close the application, press 'CTRL+C' or any key with focus on the output window")
@@ -175,46 +206,8 @@ def main():
                     proposals.append({'pred': class_id, 'pt1': (xmid - 100, ymid - 100), 'pt2': (xmid + 99, ymid + 99)})
 
             # Robot control
-            fives = 0
-            sixes = 0
             if len(proposals) > 0:
-                for proposal in proposals:
-                    xmin = proposal['pt1'][0]
-                    ymin = proposal['pt1'][1]
-                    xmax = proposal['pt2'][0]
-                    ymax = proposal['pt2'][1]
-
-                    if xmin <= 50 and ymin > 50 and ymax < big_h - 50:
-                        mearm.move('base', 3) # check left
-                        print('left')
-                    elif xmin >= 50 and ymin <= 50:
-                        mearm.move('upper', 1) # check up
-                        print('up')
-                    elif xmax >= big_w - 50 and ymin > 50 and ymax < big_h - 50:
-                        mearm.move('base', 4) # check right
-                        print('right')
-                    elif xmin >= 50 and ymax >= big_h - 50:
-                        mearm.move('upper', 2) # check down
-                        print('down')
-                    elif proposal['pred'] == 5:
-                        fives = fives + 1
-                    elif proposal['pred'] == 6:
-                        sixes = sixes + 1
-
-                if fives > 0:
-                    if fives == 1:
-                        mearm.move('grip', 5) # check open
-                        print('open')
-                    else:
-                        mearm.move('lower', 7)
-                        print('out')
-                elif sixes > 0:
-                    if sixes == 1:
-                        mearm.move('grip', 6) # check close
-                        print('close')
-                    else:
-                        mearm.move('lower', 8)
-                        print('in')
+                robot_control(proposals, big_w, big_h)
 
             # Regions for commands
             cv2.rectangle(frame, (0, 50), (50, big_h - 50), (255, 255, 255), 2)
@@ -245,7 +238,7 @@ def main():
             frame = next_frame
 
         key = cv2.waitKey(1)
-        if key == 27:
+        if (key & 0xFF) == ord('q'):
             break
         if (9 == key):
             is_async_mode = not is_async_mode

@@ -14,6 +14,9 @@ MODEL_RELATIVE_DIR = ../../tensorflow/SSD_Inception_V2/
 MODEL_FP16_RELATIVE_DIR = ${MODEL_RELATIVE_DIR}/ssd_inception_v2_mo_fp16
 PROJECT_RELATIVE_DIR = ../../apps/gesture_piarm/.
 
+CPU_EXTENSION = /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
+
+
 .PHONY: all
 all: deps data
 
@@ -24,10 +27,10 @@ data:
 .PHONY: deps
 deps:
 	@echo $(YELLOW)"\ngesture_piarm: Making dependencies..."$(NOCOLOR)
-	(cd ${MODEL_RELATIVE_DIR}; \
+	@(cd ${MODEL_RELATIVE_DIR}; \
 	make compile_model; \
 	cd ${PROJECT_RELATIVE_DIR}; \
-	cp -a ${MODEL_FP16_RELATIVE_DIR}/${SSD_GESTURE_BIN_FILENAME} . ;)
+	cp -a ${MODEL_FP16_RELATIVE_DIR} . ;)
 
 
 .PHONY: install-reqs
@@ -38,11 +41,29 @@ install-reqs:
 	sudo pip3 install pigpio
 
 
+.PHONY: run_wout_arm_CPU
+run_wout_arm_CPU: deps data
+	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot on CPU..."$(NOCOLOR)
+	@echo "Setting up OpenVINO environment..."
+	@/opt/intel/openvino/bin/setupvars.sh
+	@echo "Starting Gesture SSD Python Demo..."
+	python3 gesture_ssd_async_wout_robot.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
+
+
+.PHONY: run_wout_arm_MYRIAD
+run_wout_arm_MYRIAD: install-reqs deps data
+	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot using MYRIAD plugin..."$(NOCOLOR)
+	@echo "Setting up OpenVINO environment..."
+	@/opt/intel/openvino/bin/setupvars.sh
+	@echo "Starting Gesture SSD Python Demo..."
+	python3 gesture_ssd_async_wout_robot.py -i 'cam' -d MYRIAD -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME}
+
+
 .PHONY: run
 run: install-reqs deps data
 	@echo $(YELLOW)"\ngesture_piarm: Running the sample..."$(NOCOLOR)
 	@echo "Setting up OpenVINO environment..."
-	source /opt/intel/openvino/bin/setupvars.sh
+	/opt/intel/openvino/bin/setupvars.sh
 	@echo "Initializing Pigpio daemon..."
 	sudo pigpiod
 	@echo "Starting Gesture SSD Python Demo..."
