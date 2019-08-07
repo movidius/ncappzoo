@@ -1,4 +1,5 @@
 NCCOMPILE = mo.py
+CPU_EXTENSION = /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
 
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
@@ -10,12 +11,14 @@ GET_NETWORK_SCRIPT = wget -P . https://raw.githubusercontent.com/tensorflow/tens
 MNIST_NCS_FILENAME = mnist_deep_mod.py
 MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
 
-
 GRAPH_FILENAME_BASE = ssd_inception_v2
 GRAPH_DIR_FP32 = ssd_inception_v2_mo_fp32
 GRAPH_DIR_FP16 = ssd_inception_v2_mo_fp16
 GRAPH_FILENAME_BASE_IN_DIR_FP32 = ssd_inception_v2_mo_fp32/frozen_inference_graph.xml
 GRAPH_FILENAME_BASE_IN_DIR_FP16 = ssd_inception_v2_mo_fp16/frozen_inference_graph.xml
+MO_LABELS = frozen_inference_graph.labels
+MO_LABELS_IN_DIR_FP32	= ssd_inception_v2_mo_fp32/frozen_inference_graph.labels
+MO_LABELS_IN_DIR_FP16 = ssd_inception_v2_mo_fp16/frozen_inference_graph.labels
 MO_INPUT_GRAPH_ARG = --input_model tensorflow_model/frozen_inference_graph.pb
 MO_INPUT_PIPELINE = --tensorflow_object_detection_api_pipeline_config tensorflow_model/pipeline.config
 MO_INPUT_CUSTOM_OPS = --tensorflow_use_custom_operations_config ssd_v2_support_inception.json
@@ -29,12 +32,11 @@ MODEL_INFERENCE_PIPELINE_CONFIG = pipeline.config
 MODEL_INFERENCE_PB = frozen_inference_graph.pb
 
 GET_MODEL_PIPELINE = wget -c --no-cache -P ./tensorflow_model https://raw.githubusercontent.com/fcr3/gesture_detection/master/tensorflow_model/${MODEL_INFERENCE_PIPELINE_CONFIG}
+GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp32/${MO_LABELS}
+GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp16/${MO_LABELS}
 GET_MODEL_PB = python3 download_weights.py
 
-GRAPH_FILENAME_BASE = mnist_inference
-MODEL_RELATIVE_DIR = .
-
-RUN_PY_RELATIVE_DIR = mnist.py
+RUN_PY_RELATIVE_DIR = ssd_inception_v2.py
 TEST_IMAGE_RELATIVE_DIR = ../../data/digit_images
 TEST_IMAGE_FILENAME = gesture.jpg
 
@@ -153,6 +155,20 @@ compile_model: get_model
 		mkdir ssd_inception_v2_mo_fp16 ; \
 		${NCCOMPILE} --data_type=FP16 --reverse_input_channels ${MO_INPUT_GRAPH_ARG} ${MO_INPUT_PIPELINE} ${MO_INPUT_CUSTOM_OPS} ${MO_OUTPUT_DIR_FP16} || (echo $(RED)"Make sure to set the OpenVINO environment variables using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
+	@if [ -e ${MO_LABELS_IN_DIR_FP32} ] ; \
+	then \
+		echo "compiled FP32 model labels already exist, skipping network request."; \
+	else \
+		echo "Grabbing labels for FP32 model..."; \
+		${GET_MO_MODEL_FP32_LABELS}; \
+	fi
+	@if [ -e ${MO_LABELS_IN_DIR_FP16} ] ; \
+	then \
+		echo "compiled FP16 model labels already exist, skipping network request."; \
+	else \
+		echo "Grabbing labels for FP16 model..."; \
+		${GET_MO_MODEL_FP16_LABELS} ;\
+	fi
 
 
 .PHONY: install-reqs
@@ -161,14 +177,22 @@ install-reqs:
 	@echo "No requirements needed."
 
 
-.PHONY: run
-run: run_py
+.PHONY: run_FP16
+run_FP16: install-reqs deps data compile_model
+	@echo $(YELLOW) "\nSSD Inception V2: Running Python sample..." $(NOCOLOR)
+	python3 $(RUN_PY_RELATIVE_DIR) -i 'cam' -m ${GRAPH_FILENAME_BASE_IN_DIR_FP32} --labels ${MO_LABELS_IN_DIR_FP16} -d MYRIAD
+
+
+.PHONY: run_FP32
+run_FP32: install-reqs deps data compile_model
+	@echo $(YELLOW) "\nSSD Inception V2: Running Python sample..." $(NOCOLOR)
+	python3 $(RUN_PY_RELATIVE_DIR) -i 'cam' -m ${GRAPH_FILENAME_BASE_IN_DIR_FP32} -l ${CPU_EXTENSION} --labels ${MO_LABELS_IN_DIR_FP32}
 
 
 .PHONY: run_py
 run_py: install-reqs deps data compile_model
 	@echo $(YELLOW) "\nSSD Inception V2: Running Python sample..." $(NOCOLOR)
-	python3 $(RUN_PY_RELATIVE_DIR) --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=categories.txt
+	python3 $(RUN_PY_RELATIVE_DIR) -i 'cam' ${GRAPH_FILENAME_BASE_IN_DIR_FP32} --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=categories.txt
 
 
 .PHONY: help
