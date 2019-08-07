@@ -149,7 +149,7 @@ run: run_py
 
 
 .PHONY: run_py
-run_py: install-reqs deps data compile_model run_FP32
+run_py: install-reqs deps data compile_model run_FP16
 
 
 .PHONY: help
