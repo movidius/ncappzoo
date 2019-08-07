@@ -1,5 +1,5 @@
 NCCOMPILE = mo.py
-CPU_EXTENSION = /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
+CPU_EXTENSION = $(INTEL_OPENVINO_DIR)/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
 
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
