@@ -1,6 +1,6 @@
 # ssd mobilenet
 ## Introduction
-The [ssd mobilenet](https://github.com/chuanqi305/MobileNet-SSD) network can be used for object detection and can detect 20 different types of objects. This model was pretrained and more information can be found at: https://github.com/chuanqi305/MobileNet-SSD. The list of objects that it can detect are:
+The [SSD Mobilenet](https://github.com/chuanqi305/MobileNet-SSD) network can be used for object detection and can detect 20 different types of objects (This model was pre-trained with the Pascal VOC dataset). More information can be found at: https://github.com/chuanqi305/MobileNet-SSD. The list of objects that it can detect are:
 
 ```
 aeroplane
@@ -28,7 +28,8 @@ tvmonitor
 The provided Makefile does the following
 
 1. Downloads the prototxt and caffe weight files using the model downloader from the [Open Model Zoo](https://github.com/opencv/open_model_zoo)
-2. Takes an image and runs an inference using the ssd mobilenet model.
+2. Compiles an IR (Intermediate Representation) for the model.
+3. Takes an image, loads the IR file, and runs an inference using the SSD Mobilenet model.
 
 
 ## Running this Example
@@ -36,6 +37,10 @@ The provided Makefile does the following
 make run
 ~~~
 
+**Note**: This sample can also be used with a web cam. To run with a webcam, use the following command: ```make run INPUT=cam```
+
+
+ 
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
@@ -43,7 +48,7 @@ Provided Makefile describes various targets that help with the above mentioned t
 Runs a sample application with the network.
 
 ### make run_py
-Runs the face_detect.py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
+Runs the ssd_mobilenet.py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
 
 ### make help
 Shows makefile possible targets and brief descriptions. 
