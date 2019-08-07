@@ -65,7 +65,7 @@ The python scripts provided in the repository, specifically the `servo.py` and t
 $ sudo pigpiod
 $ cd <REPO_INSTALL_DIR>/gesture_piarm
 $ python3
->>> from mearm_pi import MeArmPi()
+>>> from mearm_pi import MeArmPi
 >>> mearm = MeArmPi() # set pins will be printed
 >>> mearm.moveBaseTo(0) # set pin will be printed
 >>> mearm.moveLowerTo(90) # set pin will be printed
