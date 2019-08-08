@@ -11,10 +11,11 @@ This directory should be a preferred location for neural networks rather than th
 # Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
 |---------------------|-------------|
-|TBD |TBD |
+|[ssd_inception_v2_gesture](ssd_inception_v2_gesture/README.md) |Single Shot Detector with inception v2 that was trained on 7 different 7 different hand gestures.  |
+
 
 
 # Misc Networks for Neural Compute devices
-|Object Detection Network| Description |
+|Network| Description |
 |---------------------|-------------|
 |TBD |TBD |
