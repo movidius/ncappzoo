@@ -1,7 +1,7 @@
 # SSD Inception V2
 
 ## Introduction
-The SSD Inception V2 network can be used to detect a number of objects specified by a particular training set. This model in particular can detection the following gestures:
+The SSD Inception V2 network can be used to detect a number of objects specified by a particular training set. This model in particular can detect the following gestures:
 - point up
 - point down
 - point left
@@ -34,13 +34,13 @@ Provided Makefile describes various targets that help with the above mentioned t
 Runs a sample application with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make run_py
-Runs the `ssd_inception_v2.py` script which takes in a video stream from an existing camera, runs inference on each frame, and renders the output to the user.
+Runs the `ssd_inception_v2_gesture.py` script which takes in a video stream from an existing camera, runs inference on each frame, and renders the output to the user.
 
 ### make run_FP32
-Runs the `ssd_inception_v2.py` script with the FP32 network. Note that this application will only run successfully on CPUs that OpenVINO supports.
+Runs the `ssd_inception_v2_gesture.py` script with the FP32 network. Note that this application will only run successfully on CPUs that OpenVINO supports.
 
 ### make run_FP16
-Runs the `ssd_inception_v2.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
+Runs the `ssd_inception_v2_gesture.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make train
 **TO BE IMPLEMENTED.** Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
