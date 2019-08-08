@@ -5,29 +5,23 @@ YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
-NETWORK_SCRIPT_FILENAME= mnist_deep.py
-GET_NETWORK_SCRIPT = wget -P . https://raw.githubusercontent.com/tensorflow/tensorflow/r1.4/tensorflow/examples/tutorials/mnist/${NETWORK_SCRIPT_FILENAME}
-
-MNIST_NCS_FILENAME = mnist_deep_mod.py
-MNIST_INFERENCE_FILENAME = mnist_deep_inference.py
-
 GRAPH_FILENAME_BASE = ssd_inception_v2
 GRAPH_DIR_FP32 = ssd_inception_v2_mo_fp32
 GRAPH_DIR_FP16 = ssd_inception_v2_mo_fp16
-GRAPH_FILENAME_BASE_IN_DIR_FP32 = ssd_inception_v2_mo_fp32/frozen_inference_graph.xml
-GRAPH_FILENAME_BASE_IN_DIR_FP16 = ssd_inception_v2_mo_fp16/frozen_inference_graph.xml
+GRAPH_FILENAME_BASE_IN_DIR_FP32 = ${GRAPH_DIR_FP32}/frozen_inference_graph.xml
+GRAPH_FILENAME_BASE_IN_DIR_FP16 = ${GRAPH_DIR_FP16}/frozen_inference_graph.xml
 MO_LABELS = frozen_inference_graph.labels
-MO_LABELS_IN_DIR_FP32	= ssd_inception_v2_mo_fp32/frozen_inference_graph.labels
+MO_LABELS_IN_DIR_FP32 = ${GRAPH_DIR_FP32}/frozen_inference_graph.labels
 MO_LABELS_IN_DIR_FP16 = ssd_inception_v2_mo_fp16/frozen_inference_graph.labels
 MO_INPUT_GRAPH_ARG = --input_model tensorflow_model/frozen_inference_graph.pb
 MO_INPUT_PIPELINE = --tensorflow_object_detection_api_pipeline_config tensorflow_model/pipeline.config
 MO_INPUT_CUSTOM_OPS = --tensorflow_use_custom_operations_config ssd_v2_support_inception.json
-MO_OUTPUT_DIR_FP32 = --output_dir ssd_inception_v2_mo_fp32
-MO_OUTPUT_DIR_FP16 = --output_dir ssd_inception_v2_mo_fp16
+MO_OUTPUT_DIR_FP32 = --output_dir ${GRAPH_DIR_FP32}
+MO_OUTPUT_DIR_FP16 = --output_dir ${GRAPH_DIR_FP16}
 
 MODEL_DIR = tensorflow_model
-MODEL_PIPELINE_CONFIG = tensorflow_model/pipeline.config
-MODEL_PB = tensorflow_model/frozen_inference_graph.pb
+MODEL_PIPELINE_CONFIG = ${MODEL_DIR}/pipeline.config
+MODEL_PB = ${MODEL_DIR}/frozen_inference_graph.pb
 MODEL_INFERENCE_PIPELINE_CONFIG = pipeline.config
 MODEL_INFERENCE_PB = frozen_inference_graph.pb
 
@@ -36,26 +30,25 @@ GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 http
 GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp16/${MO_LABELS}
 GET_MODEL_PB = python3 download_weights.py
 
-RUN_PY_RELATIVE_DIR = ssd_inception_v2.py
-TEST_IMAGE_RELATIVE_DIR = ../../data/digit_images
-TEST_IMAGE_FILENAME = gesture.jpg
+RUN_PY_RELATIVE_DIR = ssd_inception_v2_gesture.py
+
 
 .PHONY: all
 all: deps data compile_model
 
 .PHONY: deps
 deps: get_model
-	@echo $(YELLOW)"\nMnist: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Making dependencies..."$(NOCOLOR)
 
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nMnist: Downloading required data - No data needed."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading required data - No data needed."$(NOCOLOR)
 
 
 .PHONY: get_model
 get_model:
-	@echo $(YELLOW)"\nSSD Inception V2: Downloading model files..."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading model files..."$(NOCOLOR)
 	@if [ -e ${MODEL_PIPELINE_CONFIG} ] ; \
 	then \
 		echo "model file ${MODEL_PIPELINE_CONFIG} already exists, skipping download"; \
@@ -88,12 +81,12 @@ get_model:
 
 .PHONY: train
 train:
-	@echo $(YELLOW) "\nSSD Inception V2: Training model... NOT YET IMPLEMENTED" $(NOCOLOR);
+	@echo $(YELLOW) "\nSSD Inception V2 Geseture: Training model... NOT YET IMPLEMENTED" $(NOCOLOR);
 
 
 .PHONY: compile_model
 compile_model: get_model
-	@echo $(YELLOW)"\nSSD Inception V2: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Compiling model to IR..."$(NOCOLOR)
 	@if [ -e ${GRAPH_FILENAME_BASE_IN_DIR_FP32} ] ; \
 	then \
 		echo "compiled FP32 model file already exists, skipping compile."; \
@@ -128,7 +121,7 @@ compile_model: get_model
 
 .PHONY: install-reqs
 install-reqs:
-	@echo $(YELLOW)"\nSSD Inception V2: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 
 
@@ -167,7 +160,7 @@ help:
 	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a mnist model.";
 
 clean: clean
-	@echo $(YELLOW)"\nSSD Inception V2: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Cleaning up files..."$(NOCOLOR)
 	rm -rf ${GRAPH_DIR_FP32}
 	rm -rf ${GRAPH_DIR_FP16}
 	rm -rf ${MODEL_DIR}
