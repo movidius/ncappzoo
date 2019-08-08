@@ -31,13 +31,13 @@ The example runs inference using a video stream taken from an existing camera de
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
 ### make run
-Runs a sample application with the FP32 network.
+Runs a sample application with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make run_py
 Runs the `ssd_inception_v2.py` script which takes in a video stream from an existing camera, runs inference on each frame, and renders the output to the user.
 
 ### make run_FP32
-Runs the `ssd_inception_v2.py` script with the FP32 network.
+Runs the `ssd_inception_v2.py` script with the FP32 network. Note that this application will only run successfully on CPUs that OpenVINO supports.
 
 ### make run_FP16
 Runs the `ssd_inception_v2.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
