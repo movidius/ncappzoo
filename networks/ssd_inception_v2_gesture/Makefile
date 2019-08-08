@@ -5,7 +5,7 @@ YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
-GRAPH_FILENAME_BASE = ssd_inception_v2
+GRAPH_FILENAME_BASE = ssd_inception_v2_food
 GRAPH_DIR_FP32 = ssd_inception_v2_mo_fp32
 GRAPH_DIR_FP16 = ssd_inception_v2_mo_fp16
 GRAPH_FILENAME_BASE_IN_DIR_FP32 = ${GRAPH_DIR_FP32}/frozen_inference_graph.xml
@@ -38,12 +38,12 @@ all: deps data compile_model
 
 .PHONY: deps
 deps: get_model
-	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Making dependencies... No extra dependencies needed."$(NOCOLOR)
 
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading required data - No data needed."$(NOCOLOR)
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading required data... No data needed."$(NOCOLOR)
 
 
 .PHONY: get_model
@@ -151,13 +151,15 @@ help:
 	@echo $(YELLOW)"  make help " $(NOCOLOR) "- Shows this message.";
 	@echo $(YELLOW)"  make run " $(NOCOLOR) "- Runs the Python example.";
 	@echo $(YELLOW)"  make run_py " $(NOCOLOR) "- Runs the Python example.";
+	@echo $(YELLOW)"  make run_FP16 "  $(NOCOLOR) "- Runs the Python example with FP16 model.";
+	@echo $(YELLOW)"  make run_FP32 " $(NOCOLOR) "- Runs the Python example with FP32 model.";
 	@echo $(YELLOW)"  make all " $(NOCOLOR) "- Makes everything needed to run, but doesn't run the sample.";
 	@echo $(YELLOW)"  make compile_model " $(NOCOLOR) "- Runs model compiler for the network.";
-	@echo $(YELLOW)"  make model " $(NOCOLOR) "- Downloads the model files.";
+	@echo $(YELLOW)"  make get_model " $(NOCOLOR) "- Downloads the model files.";
 	@echo $(YELLOW)"  make data " $(NOCOLOR) "- Downloads required data.";
 	@echo $(YELLOW)"  make deps " $(NOCOLOR) "- Makes dependencies for project, prepares model etc.";
 	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
-	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a mnist model.";
+	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a SSD Inception V2  model.";
 
 clean: clean
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Cleaning up files..."$(NOCOLOR)

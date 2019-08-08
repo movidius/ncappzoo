@@ -16,7 +16,7 @@ The provided Makefile does the following:
 3. Compiles the network using the OpenVINO Model Optimizer
 4. There is a python example (run.py) which runs an inference for all of the test images to show how to use the network with the OpenVINO toolkit.
 
-This network is based on the [TensorFlow Object Detection API  SSD Inception V2 model.](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) The model was modified, trained, and saved in order to be compatible with the OpenVINO toolkit.
+This network is based on the [TensorFlow Object Detection API SSD Inception V2 model.](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) The model was modified, trained, and saved in order to be compatible with the OpenVINO toolkit.
 
 
 ## Running this example
@@ -65,5 +65,5 @@ Removes all the temporary and target files that are created by the Makefile.
 
 ## Credits
 
-## Attributions
+### Attributions
 `ssd_inception_v2_gesture.py` is provided per the ATTRIBUTIONS.md file. The rest of the project is provided via the license in the ncappzoo repository's base directory.
