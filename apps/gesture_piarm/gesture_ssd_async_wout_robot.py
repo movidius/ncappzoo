@@ -13,6 +13,8 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+
+ NOTICES: notices are commented on the line of
 """
 
 from __future__ import print_function
@@ -48,6 +50,8 @@ def build_argparser():
 
     return parser
 
+
+# NOTICE: Funtion for robot control
 def robot_control(proposals, big_w, big_h):
     fives = 0
     sixes = 0
@@ -135,13 +139,8 @@ def main():
     cur_request_id = 0
     next_request_id = 1
 
-    log.info("Starting inference in async mode...")
-    log.info("To switch between sync and async modes press Tab button")
-    log.info("To stop the demo execution press Esc button")
+    log.info("Starting inference in async mode...") # NOTICE: Deleted uneeded logs
     is_async_mode = True
-    render_time = 0
-
-    # Mearm Controller Init
     ret, frame = cap.read()
 
     print("To close the application, press 'CTRL+C' or any key with focus on the output window")
@@ -153,11 +152,12 @@ def main():
         if not ret:
             break
 
+        # NOTICE: Provide integer values for camera view space
         big_w = int(cap.get(3))
         big_h = int(cap.get(4))
-
         initial_w = cap.get(3)
         initial_h = cap.get(4)
+
         # Main sync point:
         # in the truly Async mode we start the NEXT infer request, while waiting for the CURRENT to complete
         # in the regular mode we start the CURRENT request and immediately wait for it's completion
@@ -176,14 +176,13 @@ def main():
             inf_end = time.time()
             det_time = inf_end - inf_start
 
-            # Parse detection results of the current request, only need one so choose max prob
+            # NOTICE: Parse detection results of the current request, only need one so choose max prob
             proposals = []
             res = exec_net.requests[cur_request_id].outputs[out_blob]
             for obj in res[0][0]:
                 # Draw only objects when probability more than specified threshold
                 if obj[2] > args.prob_threshold:
                     best_proposal = obj
-
                     xmin = int(best_proposal[3] * initial_w)
                     ymin = int(best_proposal[4] * initial_h)
                     xmax = int(best_proposal[5] * initial_w)
@@ -192,10 +191,8 @@ def main():
 
                     # Draw box and label\class_id
                     color = (min(class_id * 12.5, 255), min(class_id * 7, 255), min(class_id * 5, 255))
-                    color = (255, 255, 255)
-                    # cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color, 2)
 
-                    # Draw inner and outer box
+                    # NOTICE: Draw box based on center of original bounding box
                     xmid = int(abs(xmin + xmax) / 2)
                     ymid = int(abs(ymin + ymax) / 2)
                     cv2.circle(frame, (xmid, ymid), 4, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
@@ -205,7 +202,7 @@ def main():
                     cv2.putText(frame, det_label, (xmid, ymid - 7), cv2.FONT_HERSHEY_COMPLEX, 0.6, color, 1)
                     proposals.append({'pred': class_id, 'pt1': (xmid - 100, ymid - 100), 'pt2': (xmid + 99, ymid + 99)})
 
-            # Robot control
+            # NOTICE: Robot control
             if len(proposals) > 0:
                 robot_control(proposals, big_w, big_h)
 
@@ -215,34 +212,19 @@ def main():
             cv2.rectangle(frame, (50, big_h - 50), (big_w -50, big_h - 1), (255, 0, 0), 2)
             cv2.rectangle(frame, (big_w - 50, 50), (big_w - 1, big_h - 50), (0, 255, 0), 2)
 
+            # NOTICE: Deletion of performance statsDraw performance stats
 
-            # Draw performance stats
-            inf_time_message = "Inference time: N\A for async mode" if is_async_mode else \
-                "Inference time: {:.3f} ms".format(det_time * 1000)
-            render_time_message = "OpenCV rendering time: {:.3f} ms".format(render_time * 1000)
-            async_mode_message = "Async mode is on. Processing request {}".format(cur_request_id) if is_async_mode else \
-                "Async mode is off. Processing request {}".format(cur_request_id)
-
-            cv2.putText(frame, inf_time_message, (15, 15), cv2.FONT_HERSHEY_COMPLEX, 0.5, (200, 10, 10), 1)
-            cv2.putText(frame, render_time_message, (15, 30), cv2.FONT_HERSHEY_COMPLEX, 0.5, (10, 10, 200), 1)
-            cv2.putText(frame, async_mode_message, (10, int(initial_h - 20)), cv2.FONT_HERSHEY_COMPLEX, 0.5,
-                        (10, 10, 200), 1)
-
-        render_start = time.time()
+        # NOTICE: Deletion of time stats
         cv2.imshow("Detection Results", frame)
-        render_end = time.time()
-        render_time = render_end - render_start
 
         if is_async_mode:
             cur_request_id, next_request_id = next_request_id, cur_request_id
             frame = next_frame
 
         key = cv2.waitKey(1)
-        if (key & 0xFF) == ord('q'):
+        if key & 0xFF == ord('q'): # NOTICE: Exit key is q, not CTRL + C
             break
-        if (9 == key):
-            is_async_mode = not is_async_mode
-            log.info("Switched to {} mode".format("async" if is_async_mode else "sync"))
+        # NOTICE: Delection of option to do inference in synchronous mode
 
     cv2.destroyAllWindows()
 

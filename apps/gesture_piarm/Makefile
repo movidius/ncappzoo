@@ -51,7 +51,7 @@ run_wout_arm_CPU: deps data
 	@echo "Setting up OpenVINO environment..."
 	@/opt/intel/openvino/bin/setupvars.sh
 	@echo "Starting Gesture SSD Python Demo..."
-	python3 gesture_ssd_async_wout_robot.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
+	python3 gesture_ssd_async_wout_robot2.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
 
 
 .PHONY: run_wout_arm_MYRIAD
