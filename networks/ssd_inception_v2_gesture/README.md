@@ -62,3 +62,8 @@ Downloads and prepares a trained network for compilation with the OpenVINO toolk
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.
+
+## Credits
+
+## Attributions
+`ssd_inception_v2_gesture.py` is provided per the ATTRIBUTIONS.md file. The rest of the project is provided via the license in the ncappzoo repository's base directory.

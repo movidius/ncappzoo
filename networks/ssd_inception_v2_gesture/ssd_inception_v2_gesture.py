@@ -14,9 +14,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- NOTICE:
- The exit key to terminate the program has been changed from CTRL+C to 'q'.
- In addition, spacings/variables may have changed but maintain the same functionality as before.
+ NOTICE: (all notices will be listed here and found as NOTICE comments in the line of.)
+ Line 187: The exit key to terminate the program has been changed from CTRL+C to 'q'.
 """
 
 from __future__ import print_function
@@ -185,7 +184,7 @@ def main():
             frame = next_frame
 
         key = cv2.waitKey(1)
-        if (key & 0xFF) == ord('q'):
+        if (key & 0xFF) == ord('q'): # NOTICE: Changed exit key to 'q', not 'CTRL + C'
             break
         if (9 == key):
             is_async_mode = not is_async_mode
