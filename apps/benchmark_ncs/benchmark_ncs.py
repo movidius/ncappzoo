@@ -39,8 +39,6 @@ cv_window_name = "benchmark_ncs"
 
 # how long to wait for queues
 QUEUE_WAIT_SECONDS = 10
-DEFAULT_DISPLAY_IMAGE_WIDTH = 448
-DEFAULT_DISPLAY_IMAGE_HEIGHT = 448
 
 # set some global parameters to initial values that may get overriden with arguments to the application.
 inference_device = INFERENCE_DEV
@@ -59,9 +57,6 @@ simultaneous_infer_per_thread = 6  # Each thread will start this many async infe
 report_interval = int(number_of_inferences / 10) #report out the current FPS every this many inferences
 show_device_count = False
 
-display_image_width = DEFAULT_DISPLAY_IMAGE_WIDTH
-display_image_height = DEFAULT_DISPLAY_IMAGE_HEIGHT
-
 text_scale = 1.0
 
 model_xml_fullpath = DEFAULT_MODEL_XML
@@ -79,7 +74,7 @@ def handle_args():
     """
     global number_of_devices, number_of_inferences, model_xml_fullpath, model_bin_fullpath, run_async, \
            time_threads, time_main, num_ncs_devs, threads_per_dev, simultaneous_infer_per_thread, report_interval, \
-           image_dir, display_image_width, display_image_height, inference_device
+           image_dir, inference_device
 
     have_model_xml = False
     have_model_bin = False
