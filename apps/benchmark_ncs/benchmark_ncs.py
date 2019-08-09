@@ -55,9 +55,6 @@ simultaneous_infer_per_thread = 6  # Each thread will start this many async infe
                                    # it should be at least the number of NCEs on board.  The Myriad X has 2
                                    # seem to get slightly better results more. Myriad X does well with 4
 report_interval = int(number_of_inferences / 10) #report out the current FPS every this many inferences
-show_device_count = False
-
-text_scale = 1.0
 
 model_xml_fullpath = DEFAULT_MODEL_XML
 model_bin_fullpath = DEFAULT_MODEL_BIN
@@ -274,7 +271,9 @@ def print_arg_vals():
 
 def print_usage():
     print('\nusage: ')
-    print('python3 classifier_flash [help][num_devices=<number of devices to use>] [num_inference=<number of inferences per device>]')
+    print('python3 benchmark_ncs [help][nd=<number of devices to use>] [ni=<number of inferences per device>]')
+    print('                      [report_interval=<num inferences between reporting>] [ntpd=<number of threads to use per device>]')
+    print('                      [nsipt=<simultaneous inference on each thread>] [mx=<path to model xml file> mb=<path to model bin file>]')
     print('')
     print('options:')
     print("  num_devices or nd - The number of devices to use for inferencing  ")
@@ -310,34 +309,11 @@ def preprocess_image(n:int, c:int, h:int, w:int, image_filename:str) :
     return preprocessed_image
 
 
-def handle_keys(raw_key:int):
-    """Handles key presses by adjusting global thresholds etc.
-    :param raw_key: is the return value from cv2.waitkey
-    :return: False if program should end, or True if should continue
-    """
-    global show_fps, pause_flag
-
-    ascii_code = raw_key & 0xFF
-    if ((ascii_code == ord('q')) or (ascii_code == ord('Q'))):
-        return False
-
-    elif (ascii_code == ord('f')):
-        show_fps = not (show_fps)
-        print('New value for show_fps: ' + str(show_fps))
-
-    elif (ascii_code == ord('p')):
-        pause_flag = not pause_flag
-        print('New value for pause_flag: ' + str(pause_flag))
-
-    return True
-
-
 def main():
     """Main function for the program.  Everything starts here.
 
     :return: None
     """
-    global total_paused_time
 
     if (handle_args() != True):
         print_usage()
@@ -364,8 +340,6 @@ def main():
     # Threading barrier to sync all thread processing
     start_barrier = threading.Barrier(total_number_threads + 1)
     end_barrier = threading.Barrier(total_number_threads + 1)
-
-    total_paused_time = 0.0
 
     ie = IECore()
     
@@ -466,7 +440,7 @@ def main():
                 accum_duration = cur_time - main_start_time
                 cur_duration = cur_time - interval_start_time
                 cur_fps = frames_since_last_report / cur_duration
-                accum_fps = result_counter / (accum_duration - total_paused_time)
+                accum_fps = result_counter / accum_duration
                 print(str(result_counter) + " inferences completed. Current fps: " + '{0:.1f}'.format(accum_fps))
                 frames_since_last_report = 0
                 interval_start_time = time.time()
@@ -489,8 +463,8 @@ def main():
     total_thread_time = 0.0
     # Calculate total time and fps
     for thread_index in range(0, (num_ncs_devs*threads_per_dev)):
-        total_thread_time += (infer_time_list[thread_index] - total_paused_time)
-        total_thread_fps += (inferences_per_thread / (infer_time_list[thread_index] - total_paused_time))
+        total_thread_time += infer_time_list[thread_index]
+        total_thread_fps += (inferences_per_thread / infer_time_list[thread_index])
 
     devices_count = str(number_of_devices)
 
@@ -504,7 +478,7 @@ def main():
         print("---------------------------------------------------------")
 
 
-    main_time = (main_end_time - main_start_time) - total_paused_time
+    main_time = main_end_time - main_start_time
 
     if (time_main):
         main_fps = result_counter / main_time
