@@ -5,7 +5,7 @@ This example program that shows how to determine the fps (frames per second or i
 The example uses 3 threads per NCS device and creates 6 async inference requests per thread by default. The sample will also run 1k inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet) by default.
 
 The provided Makefile does the following:
-1. Builds the IR files for the model (if using default network.  Note: To run on other networks use the commandline arguments mx and mb to specify an IR model that has already been built.
+1. Builds the IR files for the default model.  Note: To run on other networks use the commandline arguments mx and mb to specify an IR model that has already been built.
 2. Copies the IR files from the model directory to the project base directory.  
 3. Runs the sample.
 
