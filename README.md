@@ -6,6 +6,26 @@ Welcome to the Intel<sup><sup><sup>®</sup></sup></sup> Neural Compute Applicati
  
 The ncappzoo is a community repository with many content owners and maintainers. All ncappzoo content is open source and being made available in this central location for others to download, experiment with, modify, build upon, and learn from.
 
+## ncappzoo Quick Start
+If you have an  Intel<sup><sup><sup>®</sup></sup></sup> NCS 2 (or the first generation Intel<sup><sup><sup>®</sup></sup></sup> Movidus<sup><sup><sup>™</sup></sup></sup> NCS) device and want to jump into the ncappzoo its easy!  There are only a few steps to get going with the ncappzoo projects fast.
+1. clone the repo with the following command
+```bash
+git clone https://github.com/movidius/ncappzoo.git
+```
+2. Explore apps by opening a terminal window navigating to any directory under **ncappzoo/apps** and execute this command
+```bash
+make run
+```
+3. Explore the neural networks by navigating to any network directory under **ncappzoo/networks**, **ncappzoo/caffe**, or **ncappzoo/tensorflow** and execute the same command
+```bash
+make run
+```
+Thats it! All of the network and app directories have simple consistant makefiles. To see other make targets supported from these directories just execute this command 
+```bash
+make help
+```
+
+
 ## ncappzoo Repository Branches
 There are three branches in the repository; their discriptions are below.  **The master branch is the one most developers will want.**  The others are provided only for legacy reasons.
 
