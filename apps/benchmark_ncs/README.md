@@ -2,11 +2,11 @@
 ## Introduction
 This example program that shows how to determine the fps (frames per second or inferences per second) that you are achieving with your current configuration for a specified network and image set. 
 
-The example uses 3 threads per NCS device and by default creates 6 async inference requests per thread. By default, the sample will run 1k inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet).
+The example uses 3 threads per NCS device and creates 6 async inference requests per thread by default. The sample will also run 1k inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet) by default.
 
 The provided Makefile does the following:
-1. Builds the IR files using the model files from [Open Model Zoo](https://github.com/opencv/open_model_zoo).
-2. Copies the IR files from the model directory to the project base directory.
+1. Builds the IR files for the model (if using default network.  Note: To run on other networks use the commandline arguments mx and mb to specify an IR model that has already been built.
+2. Copies the IR files from the model directory to the project base directory.  
 3. Runs the sample.
 
 ## Running the Example
@@ -18,9 +18,9 @@ To get a list of commandline options type the following command: ```python3 benc
 
 **Note**: The CPU device can be used with the example using the command: ```make run DEV=CPU```
 
-**Note**: Other models can be used with the example.  
+**Note**: Other models can be used with the example by using the mx and mb commandline options.  
 
-*Example of running benchmark_ncs on AlexNet:* ```make run XML=../../caffe/AlexNet/alexnet.xml BIN=../../caffe/AlexNet/alexnet.bin```
+*Example of running benchmark_ncs on AlexNet:* ```make run mx=../../caffe/AlexNet/alexnet.xml mb=../../caffe/AlexNet/alexnet.bin```
 
 ## Prerequisites
 This code example requires that the following components are available:
