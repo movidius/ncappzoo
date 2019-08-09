@@ -16,8 +16,8 @@ NOCOLOR = '\033[0m'
 .PHONY: all
 all: data deps
 
-.PHONY: googlenet_compile_model
-googlenet_compile_model: 
+.PHONY: compile_default_model
+compile_default_model:
 	@echo $(YELLOW)"\nbenchmark_ncs: Compiling the model"$(NOCOLOR)
 	@if [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.xml ] && [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.bin ] ; \
 	then \
@@ -27,13 +27,19 @@ googlenet_compile_model:
 	fi  
 
 
+
+.PHONY: default_model
+default_model: compile_default_model
+	@echo $(YELLOW)"\nbenchmark_ncs: Making the default model..."$(NOCOLOR)
+
+
 .PHONY: data
 data: 
 	@echo $(YELLOW)"\nbenchmark_ncs: Making the required data..."$(NOCOLOR)
 
 
 .PHONY: deps
-deps: googlenet_compile_model
+deps: default_model
 	@echo $(YELLOW)"\nbenchmark_ncs: Making dependencies..."$(NOCOLOR)
 
 
@@ -57,12 +63,8 @@ help:
 	@echo "Possible make targets: ";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes everything needed to run but doesn't run";
-	@echo $(YELLOW)"  make classifier_model "$(NOCOLOR)"- compiles a classifier model to use when running";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the application";
-	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements on your system."
-	@echo "                      Will remove pip3 opencv and build from source and install a new version." ;
-	@echo "                      Only needed once on your system and only if the its not already installed.";
-	@echo "                      This may take a long time depending on your system.";
+	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
+	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the application with the default model";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
 
 .PHONY: clean
