@@ -43,7 +43,6 @@ DEFAULT_SHOW_FPS = True
 DEFAULT_USE_INTERVAL_FPS = False
 DEFAULT_DISPLAY_IMAGE_WIDTH = 448
 DEFAULT_DISPLAY_IMAGE_HEIGHT = 448
-DEFAULT_FRAMES_TO_SKIP = 100
 
 # set some global parameters to initial values that may get overriden with arguments to the application.
 inference_device = INFERENCE_DEV
@@ -72,7 +71,6 @@ model_xml_fullpath = DEFAULT_MODEL_XML
 model_bin_fullpath = DEFAULT_MODEL_BIN
 
 use_interval_fps = DEFAULT_USE_INTERVAL_FPS
-frames_to_skip = DEFAULT_FRAMES_TO_SKIP
 
 net_config = {'HW_STAGES_OPTIMIZATION': 'YES', 'COMPUTE_LAYOUT':'VPU_NCHW', 'RESHAPE_OPTIMIZATION':'NO'}
 
@@ -86,7 +84,7 @@ def handle_args():
     """
     global number_of_devices, number_of_inferences, model_xml_fullpath, model_bin_fullpath, run_async, \
            time_threads, time_main, num_ncs_devs, threads_per_dev, simultaneous_infer_per_thread, report_interval, \
-           image_dir, show_fps, display_image_width, display_image_height, use_interval_fps, frames_to_skip, inference_device
+           image_dir, show_fps, display_image_width, display_image_height, use_interval_fps, inference_device
 
     have_model_xml = False
     have_model_bin = False
@@ -137,19 +135,6 @@ def handle_args():
                 print('setting report_interval: ' + str(report_interval))
             except:
                 print('Error - report_interval argument invalid.  It must be greater than or equal to zero')
-                return False;
-
-        elif (lower_arg.startswith('frames_to_skip=') or lower_arg.startswith("fts=")):
-            try:
-                arg, val = str(an_arg).split('=', 1)
-                val_str = val
-                frames_to_skip = int(val_str)
-                if (frames_to_skip < 0):
-                    print('Error - frames_to_skip must be greater than or equal to 0')
-                    return False
-                print('setting frames_to_skip: ' + str(frames_to_skip))
-            except:
-                print('Error - frames_to_skip argument invalid.  It must be greater than or equal to zero')
                 return False;
 
         elif (lower_arg.startswith('num_inferences=') or lower_arg.startswith('ni=')):
@@ -329,7 +314,6 @@ def print_arg_vals():
     print('show_fps: ' + str(show_fps))
     print('use_interval_fps: ' + str(use_interval_fps))
     print('display_image_size = ' + str(display_image_width) + "x" + str(display_image_height))
-    print('frames_to_skip = ' + str(frames_to_skip))
     print("--------------------------------------------------------")
 
 
@@ -369,9 +353,6 @@ def print_usage():
     print("  display_image_size or dis - Set to size the images should be in the GUI in pixels. Use format WIDTHxHEIGHT")
     print("                              for example dis=1280x720")
     print("                     Default is " + str(DEFAULT_DISPLAY_IMAGE_WIDTH) + "x" + str(DEFAULT_DISPLAY_IMAGE_HEIGHT))
-    print("  frames_to_skip or fts - The number of frames to skip when there are frames available to render")
-    print("                      The value must be greater than 0. ")
-    print("                      Default is to skip " + str(DEFAULT_FRAMES_TO_SKIP) + " frames. ")
 
 
 def preprocess_image(n:int, c:int, h:int, w:int, image_filename:str) :
@@ -524,12 +505,6 @@ def main():
     while (result_counter < total_number_inferences):
         # Get the number of completed inferences
         infer_res = infer_result_queue.get(True, QUEUE_WAIT_SECONDS)
-        if (infer_result_queue.qsize() > (frames_to_skip)):
-            for extra_res_counter in range(0, frames_to_skip):
-                infer_result_queue.task_done()
-                result_counter += 1
-                frames_since_last_report += 1
-                infer_res = infer_result_queue.get(True, QUEUE_WAIT_SECONDS)
 
         infer_res_index = infer_res[0]
         infer_res_probability = infer_res[1]
