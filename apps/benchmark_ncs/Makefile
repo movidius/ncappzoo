@@ -19,13 +19,17 @@ all: data deps
 .PHONY: compile_default_model
 compile_default_model:
 	@echo $(YELLOW)"\nbenchmark_ncs: Compiling the model"$(NOCOLOR)
-	@if [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.xml ] && [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.bin ] ; \
+	@if [ ${XML} != "googlenet-v1.xml" ] && [ ${BIN} != "googlenet-v1.bin" ]; \
 	then \
-		echo "${CLASSIFIER_GRAPH_BASE_FILENAME}.xml file already exists, skipping compiliation"; \
+		echo " - User has provided IR. Skipping compiling Googlenet."; \
 	else \
-		(cd ${CLASSIFIER_RELATIVE_DIR}; make compile_model; cd ../../apps/${APP_NAME}; cp ${CLASSIFIER_RELATIVE_DIR}/${CLASSIFIER_GRAPH_BASE_FILENAME}.xml . ; cp ${CLASSIFIER_RELATIVE_DIR}/${CLASSIFIER_GRAPH_BASE_FILENAME}.bin . ; ); \
-	fi  
-
+		if [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.xml ] && [ -e ${CLASSIFIER_GRAPH_BASE_FILENAME}.bin ] ; \
+		then \
+			echo "${CLASSIFIER_GRAPH_BASE_FILENAME}.xml file already exists, skipping compiliation"; \
+		else \
+			(cd ${CLASSIFIER_RELATIVE_DIR}; make compile_model; cd ../../apps/${APP_NAME}; cp ${CLASSIFIER_RELATIVE_DIR}/${CLASSIFIER_GRAPH_BASE_FILENAME}.xml . ; cp ${CLASSIFIER_RELATIVE_DIR}/${CLASSIFIER_GRAPH_BASE_FILENAME}.bin . ; ); \
+		fi \
+	fi
 
 
 .PHONY: default_model
