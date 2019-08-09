@@ -66,6 +66,12 @@ caffemodel:
 	fi  
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nTiny Yolo v1: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+	
 .PHONY: compile_model
 compile_model: prototxt caffemodel
 	@echo $(YELLOW)"\nTiny Yolo v1: Compiling model to IR..."$(NOCOLOR)
@@ -78,7 +84,7 @@ compile_model: prototxt caffemodel
 	
 
 .PHONY: run_py
-run_py: data deps compile_model
+run_py: install-reqs data deps compile_model
 	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
 	python3 ./tiny_yolo_v1.py --image=${IMG} --ir=${IR}
 

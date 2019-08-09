@@ -1,0 +1,575 @@
+<?xml version="1.0" ?>
+<mapping>
+	<map>
+		<framework name="data" out_port_id="data"/>
+		<IR id="1" name="ScaleShift/Add_" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="conv1/relu_7x7" out_port_id="conv1/7x7_s2"/>
+		<IR id="3" name="conv1/relu_7x7" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="pool1/3x3_s2" out_port_id="pool1/3x3_s2"/>
+		<IR id="4" name="pool1/3x3_s2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="pool1/norm1" out_port_id="pool1/norm1"/>
+		<IR id="5" name="pool1/norm1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="conv2/3x3_reduce" out_port_id="conv2/3x3_reduce"/>
+		<IR id="6" name="conv2/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="conv2/relu_3x3_reduce" out_port_id="conv2/3x3_reduce"/>
+		<IR id="7" name="conv2/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="conv2/3x3" out_port_id="conv2/3x3"/>
+		<IR id="8" name="conv2/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="conv2/relu_3x3" out_port_id="conv2/3x3"/>
+		<IR id="9" name="conv2/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="conv2/norm2" out_port_id="conv2/norm2"/>
+		<IR id="10" name="conv2/norm2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="pool2/3x3_s2" out_port_id="pool2/3x3_s2"/>
+		<IR id="11" name="pool2/3x3_s2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/1x1" out_port_id="inception_3a/1x1"/>
+		<IR id="12" name="inception_3a/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_1x1" out_port_id="inception_3a/1x1"/>
+		<IR id="13" name="inception_3a/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/3x3_reduce" out_port_id="inception_3a/3x3_reduce"/>
+		<IR id="14" name="inception_3a/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_3x3_reduce" out_port_id="inception_3a/3x3_reduce"/>
+		<IR id="15" name="inception_3a/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/3x3" out_port_id="inception_3a/3x3"/>
+		<IR id="16" name="inception_3a/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_3x3" out_port_id="inception_3a/3x3"/>
+		<IR id="17" name="inception_3a/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/5x5_reduce" out_port_id="inception_3a/5x5_reduce"/>
+		<IR id="18" name="inception_3a/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_5x5_reduce" out_port_id="inception_3a/5x5_reduce"/>
+		<IR id="19" name="inception_3a/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/5x5" out_port_id="inception_3a/5x5"/>
+		<IR id="20" name="inception_3a/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_5x5" out_port_id="inception_3a/5x5"/>
+		<IR id="21" name="inception_3a/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/pool" out_port_id="inception_3a/pool"/>
+		<IR id="22" name="inception_3a/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/pool_proj" out_port_id="inception_3a/pool_proj"/>
+		<IR id="23" name="inception_3a/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3a/relu_pool_proj" out_port_id="inception_3a/pool_proj"/>
+		<IR id="24" name="inception_3a/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3a/output" out_port_id="inception_3a/output"/>
+		<IR id="25" name="inception_3a/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_3b/1x1" out_port_id="inception_3b/1x1"/>
+		<IR id="26" name="inception_3b/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/3x3_reduce" out_port_id="inception_3b/3x3_reduce"/>
+		<IR id="28" name="inception_3b/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/3x3" out_port_id="inception_3b/3x3"/>
+		<IR id="30" name="inception_3b/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_3x3" out_port_id="inception_3b/3x3"/>
+		<IR id="31" name="inception_3b/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/5x5_reduce" out_port_id="inception_3b/5x5_reduce"/>
+		<IR id="32" name="inception_3b/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_5x5_reduce" out_port_id="inception_3b/5x5_reduce"/>
+		<IR id="33" name="inception_3b/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/5x5" out_port_id="inception_3b/5x5"/>
+		<IR id="34" name="inception_3b/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_5x5" out_port_id="inception_3b/5x5"/>
+		<IR id="35" name="inception_3b/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/pool" out_port_id="inception_3b/pool"/>
+		<IR id="36" name="inception_3b/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/pool_proj" out_port_id="inception_3b/pool_proj"/>
+		<IR id="37" name="inception_3b/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_pool_proj" out_port_id="inception_3b/pool_proj"/>
+		<IR id="38" name="inception_3b/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/output" out_port_id="inception_3b/output"/>
+		<IR id="39" name="inception_3b/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="pool3/3x3_s2" out_port_id="pool3/3x3_s2"/>
+		<IR id="40" name="pool3/3x3_s2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/1x1" out_port_id="inception_4a/1x1"/>
+		<IR id="41" name="inception_4a/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_1x1" out_port_id="inception_4a/1x1"/>
+		<IR id="42" name="inception_4a/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/3x3_reduce" out_port_id="inception_4a/3x3_reduce"/>
+		<IR id="43" name="inception_4a/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_3x3_reduce" out_port_id="inception_4a/3x3_reduce"/>
+		<IR id="44" name="inception_4a/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/3x3" out_port_id="inception_4a/3x3"/>
+		<IR id="45" name="inception_4a/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_3x3" out_port_id="inception_4a/3x3"/>
+		<IR id="46" name="inception_4a/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/5x5_reduce" out_port_id="inception_4a/5x5_reduce"/>
+		<IR id="47" name="inception_4a/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_5x5_reduce" out_port_id="inception_4a/5x5_reduce"/>
+		<IR id="48" name="inception_4a/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/5x5" out_port_id="inception_4a/5x5"/>
+		<IR id="49" name="inception_4a/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_5x5" out_port_id="inception_4a/5x5"/>
+		<IR id="50" name="inception_4a/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/pool" out_port_id="inception_4a/pool"/>
+		<IR id="51" name="inception_4a/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/pool_proj" out_port_id="inception_4a/pool_proj"/>
+		<IR id="52" name="inception_4a/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4a/relu_pool_proj" out_port_id="inception_4a/pool_proj"/>
+		<IR id="53" name="inception_4a/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4a/output" out_port_id="inception_4a/output"/>
+		<IR id="54" name="inception_4a/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_4b/1x1" out_port_id="inception_4b/1x1"/>
+		<IR id="55" name="inception_4b/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_1x1" out_port_id="inception_4b/1x1"/>
+		<IR id="56" name="inception_4b/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/3x3_reduce" out_port_id="inception_4b/3x3_reduce"/>
+		<IR id="57" name="inception_4b/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_3x3_reduce" out_port_id="inception_4b/3x3_reduce"/>
+		<IR id="58" name="inception_4b/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/3x3" out_port_id="inception_4b/3x3"/>
+		<IR id="59" name="inception_4b/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_3x3" out_port_id="inception_4b/3x3"/>
+		<IR id="60" name="inception_4b/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/5x5_reduce" out_port_id="inception_4b/5x5_reduce"/>
+		<IR id="61" name="inception_4b/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_5x5_reduce" out_port_id="inception_4b/5x5_reduce"/>
+		<IR id="62" name="inception_4b/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/5x5" out_port_id="inception_4b/5x5"/>
+		<IR id="63" name="inception_4b/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_5x5" out_port_id="inception_4b/5x5"/>
+		<IR id="64" name="inception_4b/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/pool" out_port_id="inception_4b/pool"/>
+		<IR id="65" name="inception_4b/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/pool_proj" out_port_id="inception_4b/pool_proj"/>
+		<IR id="66" name="inception_4b/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4b/relu_pool_proj" out_port_id="inception_4b/pool_proj"/>
+		<IR id="67" name="inception_4b/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4b/output" out_port_id="inception_4b/output"/>
+		<IR id="68" name="inception_4b/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_4c/1x1" out_port_id="inception_4c/1x1"/>
+		<IR id="69" name="inception_4c/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_1x1" out_port_id="inception_4c/1x1"/>
+		<IR id="70" name="inception_4c/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/3x3_reduce" out_port_id="inception_4c/3x3_reduce"/>
+		<IR id="71" name="inception_4c/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_3x3_reduce" out_port_id="inception_4c/3x3_reduce"/>
+		<IR id="72" name="inception_4c/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/3x3" out_port_id="inception_4c/3x3"/>
+		<IR id="73" name="inception_4c/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_3x3" out_port_id="inception_4c/3x3"/>
+		<IR id="74" name="inception_4c/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/5x5_reduce" out_port_id="inception_4c/5x5_reduce"/>
+		<IR id="75" name="inception_4c/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_5x5_reduce" out_port_id="inception_4c/5x5_reduce"/>
+		<IR id="76" name="inception_4c/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/5x5" out_port_id="inception_4c/5x5"/>
+		<IR id="77" name="inception_4c/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_5x5" out_port_id="inception_4c/5x5"/>
+		<IR id="78" name="inception_4c/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/pool" out_port_id="inception_4c/pool"/>
+		<IR id="79" name="inception_4c/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/pool_proj" out_port_id="inception_4c/pool_proj"/>
+		<IR id="80" name="inception_4c/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4c/relu_pool_proj" out_port_id="inception_4c/pool_proj"/>
+		<IR id="81" name="inception_4c/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4c/output" out_port_id="inception_4c/output"/>
+		<IR id="82" name="inception_4c/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_4d/1x1" out_port_id="inception_4d/1x1"/>
+		<IR id="83" name="inception_4d/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_1x1" out_port_id="inception_4d/1x1"/>
+		<IR id="84" name="inception_4d/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/3x3_reduce" out_port_id="inception_4d/3x3_reduce"/>
+		<IR id="85" name="inception_4d/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_3x3_reduce" out_port_id="inception_4d/3x3_reduce"/>
+		<IR id="86" name="inception_4d/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/3x3" out_port_id="inception_4d/3x3"/>
+		<IR id="87" name="inception_4d/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_3x3" out_port_id="inception_4d/3x3"/>
+		<IR id="88" name="inception_4d/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/5x5_reduce" out_port_id="inception_4d/5x5_reduce"/>
+		<IR id="89" name="inception_4d/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_5x5_reduce" out_port_id="inception_4d/5x5_reduce"/>
+		<IR id="90" name="inception_4d/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/5x5" out_port_id="inception_4d/5x5"/>
+		<IR id="91" name="inception_4d/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_5x5" out_port_id="inception_4d/5x5"/>
+		<IR id="92" name="inception_4d/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/pool" out_port_id="inception_4d/pool"/>
+		<IR id="93" name="inception_4d/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/pool_proj" out_port_id="inception_4d/pool_proj"/>
+		<IR id="94" name="inception_4d/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4d/relu_pool_proj" out_port_id="inception_4d/pool_proj"/>
+		<IR id="95" name="inception_4d/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4d/output" out_port_id="inception_4d/output"/>
+		<IR id="96" name="inception_4d/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_4e/1x1" out_port_id="inception_4e/1x1"/>
+		<IR id="97" name="inception_4e/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_1x1" out_port_id="inception_4e/1x1"/>
+		<IR id="98" name="inception_4e/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/3x3_reduce" out_port_id="inception_4e/3x3_reduce"/>
+		<IR id="99" name="inception_4e/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_3x3_reduce" out_port_id="inception_4e/3x3_reduce"/>
+		<IR id="100" name="inception_4e/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/3x3" out_port_id="inception_4e/3x3"/>
+		<IR id="101" name="inception_4e/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_3x3" out_port_id="inception_4e/3x3"/>
+		<IR id="102" name="inception_4e/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_5x5_reduce" out_port_id="inception_4e/5x5_reduce"/>
+		<IR id="104" name="inception_4e/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/5x5" out_port_id="inception_4e/5x5"/>
+		<IR id="105" name="inception_4e/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_5x5" out_port_id="inception_4e/5x5"/>
+		<IR id="106" name="inception_4e/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/pool" out_port_id="inception_4e/pool"/>
+		<IR id="107" name="inception_4e/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/pool_proj" out_port_id="inception_4e/pool_proj"/>
+		<IR id="108" name="inception_4e/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_4e/relu_pool_proj" out_port_id="inception_4e/pool_proj"/>
+		<IR id="109" name="inception_4e/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/output" out_port_id="inception_4e/output"/>
+		<IR id="110" name="inception_4e/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="pool4/3x3_s2" out_port_id="pool4/3x3_s2"/>
+		<IR id="111" name="pool4/3x3_s2" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/1x1" out_port_id="inception_5a/1x1"/>
+		<IR id="112" name="inception_5a/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_1x1" out_port_id="inception_5a/1x1"/>
+		<IR id="113" name="inception_5a/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/3x3_reduce" out_port_id="inception_5a/3x3_reduce"/>
+		<IR id="114" name="inception_5a/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_3x3_reduce" out_port_id="inception_5a/3x3_reduce"/>
+		<IR id="115" name="inception_5a/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/3x3" out_port_id="inception_5a/3x3"/>
+		<IR id="116" name="inception_5a/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_3x3" out_port_id="inception_5a/3x3"/>
+		<IR id="117" name="inception_5a/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/5x5_reduce" out_port_id="inception_5a/5x5_reduce"/>
+		<IR id="118" name="inception_5a/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_5x5_reduce" out_port_id="inception_5a/5x5_reduce"/>
+		<IR id="119" name="inception_5a/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/5x5" out_port_id="inception_5a/5x5"/>
+		<IR id="120" name="inception_5a/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_5x5" out_port_id="inception_5a/5x5"/>
+		<IR id="121" name="inception_5a/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/pool" out_port_id="inception_5a/pool"/>
+		<IR id="122" name="inception_5a/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/pool_proj" out_port_id="inception_5a/pool_proj"/>
+		<IR id="123" name="inception_5a/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5a/relu_pool_proj" out_port_id="inception_5a/pool_proj"/>
+		<IR id="124" name="inception_5a/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5a/output" out_port_id="inception_5a/output"/>
+		<IR id="125" name="inception_5a/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="inception_5b/1x1" out_port_id="inception_5b/1x1"/>
+		<IR id="126" name="inception_5b/1x1" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_1x1" out_port_id="inception_5b/1x1"/>
+		<IR id="127" name="inception_5b/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/3x3_reduce" out_port_id="inception_5b/3x3_reduce"/>
+		<IR id="128" name="inception_5b/3x3_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_3x3_reduce" out_port_id="inception_5b/3x3_reduce"/>
+		<IR id="129" name="inception_5b/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/3x3" out_port_id="inception_5b/3x3"/>
+		<IR id="130" name="inception_5b/3x3" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_3x3" out_port_id="inception_5b/3x3"/>
+		<IR id="131" name="inception_5b/relu_3x3" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/5x5_reduce" out_port_id="inception_5b/5x5_reduce"/>
+		<IR id="132" name="inception_5b/5x5_reduce" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_5x5_reduce" out_port_id="inception_5b/5x5_reduce"/>
+		<IR id="133" name="inception_5b/relu_5x5_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/5x5" out_port_id="inception_5b/5x5"/>
+		<IR id="134" name="inception_5b/5x5" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_5x5" out_port_id="inception_5b/5x5"/>
+		<IR id="135" name="inception_5b/relu_5x5" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/pool" out_port_id="inception_5b/pool"/>
+		<IR id="136" name="inception_5b/pool" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/pool_proj" out_port_id="inception_5b/pool_proj"/>
+		<IR id="137" name="inception_5b/pool_proj" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_5b/relu_pool_proj" out_port_id="inception_5b/pool_proj"/>
+		<IR id="138" name="inception_5b/relu_pool_proj" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_5b/output" out_port_id="inception_5b/output"/>
+		<IR id="139" name="inception_5b/output" out_port_id="4"/>
+	</map>
+	<map>
+		<framework name="pool5/drop_7x7_s1" out_port_id="pool5/7x7_s1"/>
+		<IR id="140" name="pool5/7x7_s1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="pool5/7x7_s1" out_port_id="pool5/7x7_s1"/>
+		<IR id="140" name="pool5/7x7_s1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="loss3/classifier" out_port_id="loss3/classifier"/>
+		<IR id="141" name="loss3/classifier" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="prob" out_port_id="0"/>
+		<IR id="142" name="prob" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="conv1/7x7_s2" out_port_id="conv1/7x7_s2"/>
+		<IR id="2" name="conv1/7x7_s2" out_port_id="3"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_1x1" out_port_id="inception_3b/1x1"/>
+		<IR id="27" name="inception_3b/relu_1x1" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_3b/relu_3x3_reduce" out_port_id="inception_3b/3x3_reduce"/>
+		<IR id="29" name="inception_3b/relu_3x3_reduce" out_port_id="1"/>
+	</map>
+	<map>
+		<framework name="inception_4e/5x5_reduce" out_port_id="inception_4e/5x5_reduce"/>
+		<IR id="103" name="inception_4e/5x5_reduce" out_port_id="3"/>
+	</map>
+</mapping>
