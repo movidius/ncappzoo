@@ -8,18 +8,17 @@
 import os
 
 import cv2
-import mvnc.mvncapi as mvnc
 import numpy as np
 
 from mnist_processor import MnistProcessor
 import calcui
-
+from openvino.inference_engine import IENetwork, IEPlugin
 
 class TouchCalc:
     def __init__(self, window_title='MNIST DrawCalc', width=1400, height=500):
         # Initialize mvncapi objects
-        self._device, self._net_processor = None, None
-        self._do_mvnc_initialize()
+        self._net_processor = None
+        self._do_ncs_initialize()
 
         # Save these for use later
         self._height = height
@@ -180,36 +179,28 @@ class TouchCalc:
             self._drawing = False
             self._last_point = None
 
-    def _do_mvnc_initialize(self):
+    def _do_ncs_initialize(self):
         """Create and opens the Neural Compute device and create a MnistProcessor."""
-        # Get a list of all devices
-        devices = mvnc.enumerate_devices()
-        if len(devices) == 0:
-            raise Exception('No neural compute devices found.')
-
-        # Use the first device to run the network
-        self._device = mvnc.Device(devices[0])
-        self._device.open()
 
         file_folder = os.path.dirname(os.path.realpath(__file__))
-        graph_filename = file_folder + '/mnist_inference.graph'
-
+        graph_filename = file_folder + '/mnist_inference'
+        
+        self._plugin = IEPlugin(device="MYRIAD")
         # Create processor object for this network
-        self._net_processor = MnistProcessor(graph_filename, self._device)
+        self._net_processor = MnistProcessor(graph_filename, self._plugin)
 
-    def _do_mvnc_cleanup(self):
+    def _do_ncs_cleanup(self):
         """Clean up the NCAPI resources."""
+        del self._plugin
         self._net_processor.cleanup()
-        self._device.close()
-        self._device.destroy()
 
-    def _do_mvnc_infer(self, operand, img_label=None):
+    def _do_ncs_infer(self, operand, img_label=None):
         """Detect and classify digits. If you provide an img_label the cropped digit image will be written to file."""
         # Get a list of rectangles for objects detected in this operand's box
         op_img = self._canvas[operand.top: operand.bottom, operand.left: operand.right]
         gray_img = cv2.cvtColor(op_img, cv2.COLOR_BGR2GRAY)
         _, binary_img = cv2.threshold(gray_img, 127, 255, cv2.THRESH_BINARY_INV)
-        _, contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = [cv2.boundingRect(contour) for contour in contours]
 
         if len(digits) > 0:
@@ -222,7 +213,8 @@ class TouchCalc:
                 cv2.imwrite(img_label + ".png", digit_img)
 
             # Classify the digit and return the most probable result
-            value, probability = self._net_processor.do_sync_inference(digit_img)[0]
+            value, probability = self._net_processor.do_async_inference(digit_img)[0]
+            print("value: " + str(value) + " probability: " + str(probability))
             return value, probability
         else:
             return None, None
@@ -230,7 +222,7 @@ class TouchCalc:
     def close(self):
         """Close and destroy the window."""
         cv2.destroyWindow(self._window_name)
-        self._do_mvnc_cleanup()
+        self._do_ncs_cleanup()
 
     def is_window_closed(self):
         """Try to determine if the user closed the window (by clicking the x).
@@ -259,8 +251,8 @@ class TouchCalc:
     def submit(self):
         """Process the calculation when the submit button is clicked."""
         # Detect and classify digits
-        self._op1, self._op1_prob = self._do_mvnc_infer(self._operand1)
-        self._op2, self._op2_prob = self._do_mvnc_infer(self._operand2)
+        self._op1, self._op1_prob = self._do_ncs_infer(self._operand1)
+        self._op2, self._op2_prob = self._do_ncs_infer(self._operand2)
 
         # Calculate the answer (must do "is None" instead of "not" because 0 evaluates as False)
         if self._op1 is None or self._op2 is None:
