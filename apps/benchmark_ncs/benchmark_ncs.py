@@ -427,7 +427,8 @@ def main():
                                                                                     start_barrier, end_barrier, simultaneous_infer_per_thread,
                                                                                     infer_result_queue, input_blob, output_blob], daemon = True)
             else:
-                pass
+                print("run_async=false not yet supported")
+                exit(-1)
 
     del net
 
