@@ -1,4 +1,3 @@
-#! /usr/bin/env python3
 
 # Copyright(c) 2017 Intel Corporation. 
 # License: MIT See LICENSE file in root directory.
@@ -19,17 +18,26 @@ except:
 import sys
 import numpy as np
 import cv2
+import argparse
 
 
-# Assume running in examples/caffe/TinyYolo and graph file is in current directory.
-input_image_file= '../../data/images/dog_cat.jpg'
-ir= 'tiny-yolo-v1_53000.xml'
-
-
-# Tiny Yolo assumes input images are these dimensions.
-NETWORK_IMAGE_WIDTH = 448
-NETWORK_IMAGE_HEIGHT = 448
-
+def parse_args():
+    parser = argparse.ArgumentParser(description = 'Image classifier using \
+                         Intel® Neural Compute Stick 2.' )
+    parser.add_argument( '--ir', metavar = 'IR_File',
+                        type=str, default = 'tiny-yolo-v1_53000.xml', 
+                        help = 'Absolute path to the neural network IR xml file.')
+    parser.add_argument( '-l', '--labels', metavar = 'LABEL_FILE', 
+                        type=str, default = 'labels.txt',
+                        help='Absolute path to labels file.')
+    parser.add_argument( '-i', '--image', metavar = 'IMAGE_FILE', 
+                        type=str, default = '../../data/images/nps_chair.png',
+                        help = 'Absolute path to image file.')
+    parser.add_argument( '--threshold', metavar = 'FLOAT', 
+                        type=float, default = 0.10,
+                        help = 'Threshold for detection.')
+                      
+    return parser
 
 
 # Interpret the output from a single inference of TinyYolo (GetResult)
@@ -46,17 +54,14 @@ NETWORK_IMAGE_HEIGHT = 448
 #    float value for box width in pixels within source image
 #    float value for box height in pixels within source image
 #    float value that is the probability for the network classification.
-def filter_objects(inference_result, input_image_width, input_image_height):
-
+def filter_objects(inference_result, input_image_width, input_image_height, labels, threshold):
 
     # tiny yolo v1 was trained using a 7x7 grid and 2 anchor boxes per grid box with 
     # 20 detection classes
     # the 20 classes this network was trained on
-    labels = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car",
-              "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike",
-              "person", "pottedplant", "sheep", "sofa", "train","tvmonitor"]
 
     num_classes = len(labels) # should be 20
+
     grid_size = 7 # the image is a 7x7 grid.  Each box in the grid is 64x64 pixels
     anchor_boxes_per_grid_cell = 2 # the number of anchor boxes returned for each grid cell
     num_coordinates = 4 # number of coordinates
@@ -65,13 +70,13 @@ def filter_objects(inference_result, input_image_width, input_image_height):
     num_inference_results = len(inference_result)
 
     # only keep boxes with probabilities greater than this
-    probability_threshold = 0.1
+    probability_threshold = threshold
    
     # -------------------- Inference result preprocessing --------------------
-    # Split the inference result into 3 arrays: class_probabilities, box_confidence_scores, box_coordinates
-    # then reshape them into the appropriate shapes
+    # Split the Inference result into 3 arrays: class_probabilities, box_confidence_scores, box_coordinates
+    # then Reshape them into the appropriate shapes.
     
-    # Splitting up Inference result
+    # -- Splitting up Inference result
     
     # Class probabilities: 
     # 7x7 = 49 grid cells. 
@@ -86,18 +91,18 @@ def filter_objects(inference_result, input_image_width, input_image_height):
     # 98 boxes * 4 box coordinates each = 392
     box_coordinates = inference_result[1078:]
     
-    # Reshaping
+    # -- Reshaping 
     
     # These values are the class probabilities for each grid
-    # reshape probabilities to 7x7x20 (980 total values)
+    # Reshape the probabilities to 7x7x20 (980 total values)
     class_probabilities = np.reshape(class_probabilities, (grid_size, grid_size, num_classes))
 
     # These values are how likely each box contains an object
-    # reshape box confidence scores to 7x7x2 (98 total values)
+    # Reshape the box confidence scores to 7x7x2 (98 total values)
     box_confidence_scores = np.reshape(box_confidence_scores, (grid_size, grid_size, anchor_boxes_per_grid_cell))
 
     # These values are the box coordinates for each box
-    # reshape the boxes coordinates to 7x7x2x4 (392 total values)
+    # Reshape the boxes coordinates to 7x7x2x4 (392 total values)
     box_coordinates = np.reshape(box_coordinates, (grid_size, grid_size, anchor_boxes_per_grid_cell, num_coordinates))
     
     # -------------------- Scale the box coordinates to the input image size --------------------
@@ -107,7 +112,7 @@ def filter_objects(inference_result, input_image_width, input_image_height):
     # -------------------- Calculate class confidence scores --------------------
     # Find the class confidence scores for each grid. 
     # This is done by multiplying the class probabilities by the box confidence scores 
-    # shape of class confidence scores: 7x7x2x20 (1960 values)
+    # Shape of class confidence scores: 7x7x2x20 (1960 values)
     class_confidence_scores = np.zeros((grid_size, grid_size, anchor_boxes_per_grid_cell, num_classes))
     for box_index in range(anchor_boxes_per_grid_cell): # loop over boxes
         for class_index in range(num_classes): # loop over classifications
@@ -116,9 +121,9 @@ def filter_objects(inference_result, input_image_width, input_image_height):
     
     # -------------------- Filter object scores/coordinates/indexes >= threshold --------------------
     # Find all scores that are larger than or equal to the threshold using a mask.
-    # array of 1960 bools. true if >= threshold. otherwise false. 
+    # Array of 1960 bools: True if >= threshold. otherwise False. 
     score_threshold_mask = np.array(class_confidence_scores>=probability_threshold, dtype='bool')
-    # using the array of bools, filter all scores >= threshold
+    # Using the array of bools, filter all scores >= threshold
     filtered_scores = class_confidence_scores[score_threshold_mask]
     
     # Get tuple of arrays of indexes from the bool array that have a >= score than the threshold
@@ -128,23 +133,24 @@ def filter_objects(inference_result, input_image_width, input_image_height):
     # tuple 3 is the class indexes (labels) (values = 0-19)
     box_threshold_mask = np.nonzero(score_threshold_mask)
     
-    # use those indices to find the coordinates for box confidence scores >= than the threshold
+    # Use those indexes to find the coordinates for box confidence scores >= than the threshold
     filtered_box_coordinates = box_coordinates[box_threshold_mask[0], box_threshold_mask[1], box_threshold_mask[2]]
     
-    # use those indices to find the class indexes that have a score >= threshold 
+    # Use those indexes to find the class indexes that have a score >= threshold 
     filtered_class_indexes = np.argmax(class_confidence_scores, axis=3)[box_threshold_mask[0], box_threshold_mask[1], box_threshold_mask[2]]
     
     # -------------------- Sort the filtered scores/coordinates/indexes --------------------
-    # Sort the score indexes from highest to lowest. 
-    # Grab the indexes and then use to sort box coordinates, scores, class indexes
+    # Sort the indexes from highest score to lowest 
+    # and then use those indexes to sort box coordinates, scores, class indexes
     sort_by_highest_score = np.array(np.argsort(filtered_scores))[::-1]
-    # sort the box coordinates, scores, and class indexes to match 
+    # Sort the box coordinates, scores, and class indexes to match 
     filtered_box_coordinates = filtered_box_coordinates[sort_by_highest_score]
     filtered_scores = filtered_scores[sort_by_highest_score]    
     filtered_class_indexes = filtered_class_indexes[sort_by_highest_score]
 
     # -------------------- Filter out duplicates --------------------
     # Get mask for boxes that seem to be the same object by calculating iou (intersection over union)
+    # these will filter out duplicate objects
     duplicate_box_mask = get_duplicate_box_mask(filtered_box_coordinates)
     # Update the boxes, probabilities and classifications removing duplicates.
     filtered_box_coordinates = filtered_box_coordinates[duplicate_box_mask]
@@ -266,24 +272,18 @@ def get_intersection_over_union(box_1, box_2):
 #    float value for box width in pixels within source image
 #    float value for box height in pixels within source image
 #    float value that is the probability for the network classification.
-def display_objects_in_gui(source_image, filtered_objects):
+def display_objects_in_gui(source_image, filtered_objects, network_input_w, network_input_h):
     # copy image so we can draw on it. Could just draw directly on source image if not concerned about that.
     display_image = source_image.copy()
     source_image_width = source_image.shape[1]
     source_image_height = source_image.shape[0]
 
-    x_ratio = float(source_image_width) / NETWORK_IMAGE_WIDTH
-    y_ratio = float(source_image_height) / NETWORK_IMAGE_HEIGHT
+    x_ratio = float(source_image_width) / network_input_w
+    y_ratio = float(source_image_height) / network_input_h
 
     # loop through each box and draw it on the image along with a classification label
-    print('Found this many objects in the image: ' + str(len(filtered_objects)))
+    print('\n Found this many objects in the image: ' + str(len(filtered_objects)))
     for obj_index in range(len(filtered_objects)):
-        print("0. ", filtered_objects[obj_index][0])
-        print("1. ", filtered_objects[obj_index][1])
-        print("2. ", filtered_objects[obj_index][2])
-        print("3. ", filtered_objects[obj_index][3])
-        print("4. ", filtered_objects[obj_index][4])
-        print("5. ", filtered_objects[obj_index][5])
         center_x = int(filtered_objects[obj_index][1] * x_ratio) 
         center_y = int(filtered_objects[obj_index][2] * y_ratio)
         half_width = int(filtered_objects[obj_index][3] * x_ratio)//2
@@ -295,7 +295,7 @@ def display_objects_in_gui(source_image, filtered_objects):
         box_right = min(center_x + half_width, source_image_width)
         box_bottom = min(center_y + half_height, source_image_height)
 
-        print('box at index ' + str(obj_index) + ' is... left: ' + str(box_left) + ', top: ' + str(box_top) + ', right: ' + str(box_right) + ', bottom: ' + str(box_bottom))  
+        print(' - object: ' + YELLOW + str(filtered_objects[obj_index][0]) + NOCOLOR + ' is at left: ' + str(box_left) + ', top: ' + str(box_top) + ', right: ' + str(box_right) + ', bottom: ' + str(box_bottom))  
 
         #draw the rectangle on the image.  This is hopefully around the object
         box_color = (0, 255, 0)  # green box
@@ -310,7 +310,8 @@ def display_objects_in_gui(source_image, filtered_objects):
 
     window_name = 'TinyYolo (hit key to exit)'
     cv2.imshow(window_name, display_image)
-
+    cv2.moveWindow(window_name, 10, 10)
+    
     while (True):
         raw_key = cv2.waitKey(1)
 
@@ -321,11 +322,32 @@ def display_objects_in_gui(source_image, filtered_objects):
             # the user hit a key or closed the window (in that order)
             break
 
+def display_info(input_shape, output_shape, image, ir, labels):
+    print()
+    print(YELLOW + 'Tiny Yolo v1: Starting application...' + NOCOLOR)
+    print('   - ' + YELLOW + 'Plugin:       ' + NOCOLOR + 'Myriad')
+    print('   - ' + YELLOW + 'IR File:     ' + NOCOLOR, ir)
+    print('   - ' + YELLOW + 'Input Shape: ' + NOCOLOR, input_shape)
+    print('   - ' + YELLOW + 'Output Shape:' + NOCOLOR, output_shape)
+    print('   - ' + YELLOW + 'Labels File: ' + NOCOLOR, labels)
+    print('   - ' + YELLOW + 'Image File:   ' + NOCOLOR, image)
+    
 
 # This function is called from the entry point to do
 # all the work.
 def main():
-    print('Running NCS Caffe TinyYolo example')
+    ARGS = parse_args().parse_args()
+    image = ARGS.image
+    labels = ARGS.labels
+    ir = ARGS.ir
+    threshold = ARGS.threshold
+    
+    # Prepare Categories
+    with open(labels) as labels_file:
+	    label_list = labels_file.read().splitlines()
+    
+	    
+    print(YELLOW + 'Running NCS Caffe TinyYolo example...')
 
     ####################### 1. Setup Plugin and Network #######################
     # Select the myriad plugin and IRs to be used
@@ -339,21 +361,17 @@ def main():
     output_shape = net.outputs[output_blob].shape
     
     # Display model information
-    #display_info(input_shape, output_shape, image, ir, labels, mean)
+    display_info(input_shape, output_shape, image, ir, labels)
     
     # Load the network and get the network shape information
     exec_net = ie.load_network(network = net, device_name = DEVICE)
     n, c, h, w = input_shape
 
-    # Prepare Categories for age and gender networks
-    with open(labels) as labels_file:
-	    label_list = labels_file.read().splitlines()
-
 
     # Read image from file, resize it to network width and height
     # save a copy in display_image for display, then convert to float32, normalize (divide by 255),
     # and finally convert to convert to float16 to pass to LoadTensor as input for an inference
-    input_image = cv2.imread(input_image_file)
+    input_image = cv2.imread(image)
     display_image = input_image
     input_image = cv2.resize(input_image, (w, h), cv2.INTER_LINEAR)
     input_image = input_image.astype(np.float32)
@@ -363,14 +381,14 @@ def main():
     output = output[output_blob][0].flatten()
 
 
-    filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[2 ])
+    filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[2], label_list, threshold)
 
-    print('Displaying image with objects detected in GUI')
-    print('Click in the GUI window and hit any key to exit')
+    print('\n Displaying image with objects detected in GUI...')
+    print(' Click in the GUI window and hit any key to exit.')
     # display the filtered objects/boxes in a GUI window
-    display_objects_in_gui(display_image, filtered_objs)
+    display_objects_in_gui(display_image, filtered_objs, input_image.shape[1], input_image.shape[2])
 
-    print('Finished')
+    print('\n Finished.')
 
 
 # main entry point for program. we'll call main() to do what needs to be done.

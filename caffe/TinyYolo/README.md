@@ -1,28 +1,40 @@
-# Introduction
-The TinyYolo network can be used for object recognition and classification.  See [https://pjreddie.com/darknet/yolov1/](https://pjreddie.com/darknet/yolov1/) for more information on this network. 
+# Tiny yolo v1
+## Introduction
+The TinyYolo network can be used for object recognition and classification. This model was trained with the Pasval VOC data set and can detect up to 20 classes. See [https://pjreddie.com/darknet/yolov1/](https://pjreddie.com/darknet/yolov1/) for more information on this network. 
+
+The provided Makefile does the following
+
 The provided Makefile does the following
 1. Downloads the Caffe prototxt file 
-3. Downloads the .caffemodel file which was trained.
-3. Profiles and Compiles the network using the Neural Compute SDK.
-4. Runs the provided run.py program that does a single inference on a provided image as an example on how to use the network using the Neural Compute API
+3. Downloads the .caffemodel weights file.
+3. Compiles the IR (intermediate representation) files using the Model Optimizer.
+4. Runs the provided run.py program that does a single inference on a provided image as an example on how to use the network using the Inference Engine Python API.
 
-# Makefile
-Provided Makefile has various targets that help with the above mentioned tasks.
+## Running this Example
+~~~
+make run
+~~~
 
-## make help
-Shows available targets
+## Makefile
+Provided Makefile describes various targets that help with the above mentioned tasks.
 
-## make all
-Runs profile, compile.
+### make run
+Runs a sample application with the network.
 
-## make profile
-Runs the provided network on the NCS and generates per layer statistics that are helpful for understanding the performance of the network on the Neural Compute Stick.
+### make run_py
+Runs the tiny_yolo_v1.py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
 
-## make compile
-Uses the network description and the trained weights files to generate a Movidius internal 'graph' format file.  This file is later used for loading the network on to the Neural Compute Stick and executing the network.
+### make help
+Shows makefile possible targets and brief descriptions. 
 
-## make run_py
-Runs the provided run.py python program which sends a single image to the Neural Compute Stick and receives and displays the inference results along with a GUI window showing the identified objects in the image.
+### make all
+Makes the follow items: deps, data, compile_model.
 
-## make clean
-Removes all the temporary files that are created by the Makefile
+### make compile_model
+Uses the network description and the trained weights files to generate an IR (intermediate representation) format file.  This file is later loaded on the Neural Compute Stick where the inferences on the network can be executed.  
+
+### make clean
+Removes all the temporary and target files that are created by the Makefile.
+
+
+

@@ -14,33 +14,35 @@ GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/nc
 CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
 GET_CAFFEMODEL = wget --no-cache -P . -N http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${CAFFEMODEL_FILENAME}
 
+IR = tiny-yolo-v1_53000.xml
+IMG = ../../data/images/nps_chair.png
 
 .PHONY: all
-all: data deps
+all: data deps compile_model
 
 
 .PHONY: deps
 deps: prototxt caffemodel
-	@echo $(YELLOW)"\nTiny yolo v1: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Making dependencies..."$(NOCOLOR)
 
 	
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nTiny yolo v1: Downloading required data... No data needed."$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading required data... No data needed."$(NOCOLOR)
 
 
 .PHONY: prototxt
 prototxt: 
-	@echo $(YELLOW)"\nTiny yolo v1: making prototxt"$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading prototxt file..."$(NOCOLOR)
 	@if [ -e ${PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo " - Prototxt file already exists"; \
 	else \
 		echo "Downloading Prototxt file"; \
 		${GET_PROTOTXT}; \
 		if [ -e ${PROTOTXT_FILENAME} ] ; \
 		then \
-			echo "got prototext file." ; \
+			echo " - Got prototext file." ; \
 		else \
 			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
 			exit 1; \
@@ -49,12 +51,12 @@ prototxt:
 
 .PHONY: caffemodel
 caffemodel: 
-	@echo $(YELLOW)"\nTiny yolo v1: making caffemodel"$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading caffemodel file..."$(NOCOLOR)
 	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo " - Caffemodel file already exists"; \
 	else \
-		echo "Downloading caffemodel file"; \
+		echo " - Downloading caffemodel file"; \
 		${GET_CAFFEMODEL}; \
 		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
 		then \
@@ -66,48 +68,48 @@ caffemodel:
 
 .PHONY: compile_model
 compile_model: prototxt caffemodel
-	@echo $(YELLOW)"\nTiny yolo v1: compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Compiling model to IR..."$(NOCOLOR)
 	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ] ; \
 	then \
-		echo "no need to compile." ; \
+		echo " - IR files exist. No need to compile." ; \
 	else \
-	    ${NCCOMPILE} --input_model=${CAFFEMODEL_FILENAME} --input_proto=${PROTOTXT_FILENAME} --data_type=FP16 --scale_values=[255] --reverse_input_channels; \
+	    ${NCCOMPILE} --input_model=${CAFFEMODEL_FILENAME} --input_proto=${PROTOTXT_FILENAME} --data_type=FP16 --scale_values=[255] --reverse_input_channels || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 	
 
 .PHONY: run_py
-run_py: compile_model
-	@echo $(YELLOW)"\nTiny yolo v1:making run_py"$(NOCOLOR)
-	python3 ./run.py
+run_py: data deps compile_model
+	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
+	python3 ./tiny_yolo_v1.py --image=${IMG} --ir=${IR}
 
 
 .PHONY: run
-run: compile_model
-	@echo $(YELLOW)"\nTiny yolo v1:making run"$(NOCOLOR)
-	python3 ./run.py
+run: run_py
+	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
 
 
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo "  make help "$(NOCOLOR)"- shows this message";
-	@echo "  make run "$(NOCOLOR)"- runs the run.py python example program";
-	@echo "  make all "$(NOCOLOR)"- makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
-	@echo "  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
-	@echo "  make compile "$(NOCOLOR)"- runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make clean "$(NOCOLOR)"- removes all created content"
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
+	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the run.py python example program";
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
+	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
+	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
+	@echo $(YELLOW)"  make compile "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
+
 
 clean_caffe_model:
-	@echo $(YELLOW)"\nTiny yolo v1: making clean_caffe_model..."$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: making clean_caffe_model..."$(NOCOLOR)
 	rm -f ${PROTOTXT_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
+
 clean: clean_caffe_model
-	@echo $(YELLOW)"\nTiny yolo v1: making clean..."$(NOCOLOR)
-	rm -f ${GRAPH_FILENAME}
-	rm -f *.xml
-	rm -f *.bin
-	rm -f *.mapping
+	@echo $(YELLOW)"\nTiny Yolo v1: making clean..."$(NOCOLOR)
+	rm -f ${MODEL_BASE_NAME}.xml
+	rm -f ${MODEL_BASE_NAME}.bin
+	rm -f ${MODEL_BASE_NAME}.mapping
 	
 
