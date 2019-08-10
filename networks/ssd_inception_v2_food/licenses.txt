@@ -1,0 +1,7 @@
+Licenses and attributions (when needed) for the image files in this directory are listed below.
+
+---
+Files: test_images/test1.JPG, test_images/test2.JPG, test_images/test3.JPG
+From: Original creation of Flaviano Christian Reyes
+License: CC0 (https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt)
+---
