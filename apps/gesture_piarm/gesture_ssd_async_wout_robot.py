@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- NOTICES: notices are commented on the line of
+ NOTICES: notices are commented on the line of, signifying changes to the original Apache 2.0 code provided by Intel Corporation
 """
 
 from __future__ import print_function
