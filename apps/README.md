@@ -26,6 +26,7 @@ Object detection applications make use of one of the [object detection networks]
 
 |Object Detection Application| Description |+++++Thumbnail+++++ |
 |---------------------|-------------|-------|
+|[birds](birds/README.md) | Python<br>Caffe Tiny Yolo, GoogLeNet<br>Detects and identifies birds in photos by using Yolo Tiny to identify birds in general and then GoogLeNet to further classify them. Displays images with overlayed rectangles bird classification. |![](birds/screen_shot.jpg)|
 |TBD                  |TBD          |TBD    |
 
 
