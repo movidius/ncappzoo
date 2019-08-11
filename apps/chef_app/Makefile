@@ -4,27 +4,25 @@ NOCOLOR = '\033[0m'
 
 
 # Filename for the graph file
-SSD_FOOD_DIR = ssd_inception_v2_mo_fp16
-SSD_FOOD_DIR_CPU = ssd_inception_v2_mo_fp32
+SSD_FOOD_DIR = food_model_fp16
+SSD_FOOD_DIR_CPU = food_model_fp32
 SSD_FOOD_BIN_FILENAME = frozen_inference_graph.bin
 SSD_FOOD_MAPPING_FILENAME = frozen_inference_graph.mapping
 SSD_FOOD_XML_FILENAME = frozen_inference_graph.xml
 SSD_FOOD_LABELS_FILENAME = frozen_inference_graph.labels
 
-MODEL_RELATIVE_DIR = ../../tensorflow/SSD_Inception_V2/
-MODEL_FP16_RELATIVE_DIR = ${MODEL_RELATIVE_DIR}/ssd_inception_v2_mo_fp16
-PROJECT_RELATIVE_DIR = ../../apps/gesture_piarm/.
+GET_MO_MODEL_FP32_XML = wget -c --no-cache -P ./food_model_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_XML_FILENAME}
+GET_MO_MODEL_FP16_XML = wget -c --no-cache -P ./food_model_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_XML_FILENAME}
+GET_MO_MODEL_FP32_BIN = wget -c --no-cache -P ./food_model_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_BIN_FILENAME}
+GET_MO_MODEL_FP16_BIN = wget -c --no-cache -P ./food_model_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_BIN_FILENAME}
+GET_MO_MODEL_FP32_MAPPING = wget -c --no-cache -P ./food_model_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_MAPPING_FILENAME}
+GET_MO_MODEL_FP16_MAPPING = wget -c --no-cache -P ./food_model_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_MAPPING_FILENAME}
+GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./food_model_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_LABELS_FILENAME}
+GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./food_model_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_LABELS_FILENAME}
 
-CPU_EXTENSION = /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
-
-GET_MO_MODEL_FP32_XML = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_XML_FILENAME}
-GET_MO_MODEL_FP16_XML = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_XML_FILENAME}
-GET_MO_MODEL_FP32_BIN = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_BIN_FILENAME}
-GET_MO_MODEL_FP16_BIN = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_BIN_FILENAME}
-GET_MO_MODEL_FP32_MAPPING = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_MAPPING_FILENAME}
-GET_MO_MODEL_FP16_MAPPING = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_MAPPING_FILENAME}
-GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp32/${SSD_FOOD_LABELS_FILENAME}
-GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/chef_devmesh/master/food_model_fp16/${SSD_FOOD_LABELS_FILENAME}
+TEST_IMG1 = test_images/test1.JPG
+TEST_IMG2 = test_images/test2.JPG
+TEST_IMG3 = test_images/test3.JPG
 
 GET_TEST_IMG1 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test1.JPG
 GET_TEST_IMG2 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test2.JPG
@@ -36,8 +34,8 @@ all: deps data
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\Chef App: Making data..."$(NOCOLOR)
-	@echo $(YELLOW)"\nChef App: Downloading required data..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef App: Making data..."$(NOCOLOR)
+	@echo "Downloading required data..."
 	@if [ -e ${TEST_IMG1} ] ; \
 	then \
 		echo "test file ${TEST_IMG1} already exists, skipping download"; \
@@ -126,46 +124,19 @@ deps_FP16:
 .PHONY: install-reqs
 install-reqs:
 	@echo $(YELLOW)"\ngesture_piarm: Checking application requirements...\n"$(NOCOLOR)
-	@echo "Installing Node.js and npm into the root..."
-	curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-	sudo apt install nodejs
-	@echo "Verifying Installation of node and npm..."
-	@echo "Node version:"
-	node --version
-	@echo "NPM version:"
-	npm --version
-	@echo "Note: make clean will delete Node.js and npm completely. Please use make clean_light if you would like to keep Node.js or npm." 
-
-
-.PHONY: run_wout_arm_CPU
-run_wout_arm_CPU: deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot on CPU..."$(NOCOLOR)
-	@echo "Setting up OpenVINO environment..."
-	@/opt/intel/openvino/bin/setupvars.sh
-	@echo "Starting Gesture SSD Python Demo..."
-	python3 gesture_ssd_async_wout_robot2.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
-
-
-.PHONY: run_wout_arm_MYRIAD
-run_wout_arm_MYRIAD: install-reqs deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot using MYRIAD plugin..."$(NOCOLOR)
-	@echo "Setting up OpenVINO environment..."
-	@/opt/intel/openvino/bin/setupvars.sh
-	@echo "Starting Gesture SSD Python Demo..."
-	python3 gesture_ssd_async_wout_robot.py -i 'cam' -d MYRIAD -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME}
+	@echo "Installing Flask and Pillow (PIL - Python Imaging Library)..."
+	pip3 install flask Pillow
 
 
 .PHONY: run
 run: install-reqs deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef App: Running the sample..."$(NOCOLOR)
 	@echo "Setting up OpenVINO environment..."
 	/opt/intel/openvino/bin/setupvars.sh
-	@echo "Initializing Pigpio daemon..."
-	sudo pigpiod
-	@echo "Starting Gesture SSD Python Demo..."
-	python3 gesture_ssd_async.py -i 'cam' -d MYRIAD -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME}
-	@echo "Stopping Pigpio daemon..."
-	sudo killall pigpiod
+	@echo "Starting backend server..."
+	@gnome-terminal -e "python3 chef_ai_server.py"
+	@echo "Opening up webpage..."
+	@xdg-open http://127.0.0.1:5000
 
 
 .PHONY: help
@@ -177,14 +148,20 @@ help:
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content in this directory."
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed"
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies"
+	@echo $(YELLOW)"  make deps_FP16 "$(NOCOLOR)"- makes/prepares dependencies for the FP16 model"
+	@echo $(YELLOW)"  make deps_FP32 "$(NOCOLOR)"- makes/prepares dependencies for the FP32 model"
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- install required packages"
 
 
-.PHONY: clean_lite
-clean:
-	@echo $(YELLOW)"\ngesture_piarm: Cleaning up files..."$(NOCOLOR)
+.PHONY: clean-lite
+clean-lite:
+	@echo $(YELLOW)"\nChef App: Cleaning up files..."$(NOCOLOR)
 	rm -rf ${SSD_FOOD_DIR}
 	rm -rf ${SSD_FOOD_DIR_CPU}
+	rm -rf __pycache__
 	rm -rf test_images
 
 .PHONY: clean
-clean: 
+clean: clean-lite
+	@echo "Uninstalling flask and PIL..."
+	pip3 uninstall flask Pillow
