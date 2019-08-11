@@ -10,7 +10,7 @@ The SSD Inception V2 network can be used to detect a number of objects specified
 - closed fist with exposed bottom palm
 - fist with exposed knuckles.
 
-![](hand_gesture_5.mp4)
+![](hand_gesture_5.gif)
 
 The provided Makefile does the following:
 1. Downloads a trained model
