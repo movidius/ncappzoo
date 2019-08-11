@@ -28,7 +28,7 @@ all: data deps compile_model
 
 
 .PHONY: deps
-deps: 
+deps: compile_model
 	@echo $(YELLOW)"\n"$(APP_NAME)": Making the required dependencies... None needed."$(NOCOLOR)
 	
 
