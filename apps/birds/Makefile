@@ -24,8 +24,18 @@ GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
 
 
 .PHONY: all
-all: prereqs ilsvrc12 compile images
+all: data deps compile_model
 
+
+.PHONY: deps
+deps: 
+	@echo $(YELLOW)"\n"$(APP_NAME)": Making the required dependencies... None needed."$(NOCOLOR)
+	
+
+.PHONY: data
+data: images ilsvrc12
+	@echo $(YELLOW)"\n"$(APP_NAME)": Getting the required data..."$(NOCOLOR)
+	
 
 .PHONY: images
 images:
@@ -62,7 +72,7 @@ compile_model: googlenet tiny_yolo
 	
 
 .PHONY: run_py
-run_py: install-reqs ilsvrc12 images compile_model
+run_py: install-reqs deps data compile_model
 	@echo $(YELLOW)"\n"$(APP_NAME)": Running the Python sample..."$(NOCOLOR)
 	python3 ./birds.py
 
@@ -77,7 +87,7 @@ help:
 	@echo "\n Possible make targets: ";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes everything needed to run but doesn't run";
-	@echo $(YELLOW)"  make compile "$(NOCOLOR)"- compiles required networks with Model Optimizer tool to create graph files";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- compiles required networks with Model Optimizer tool to create graph files";
 	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the birds.py python example program";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content in this directory.";
 	@echo ""
