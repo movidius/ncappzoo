@@ -13,10 +13,11 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # Caffe Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
 |---------------------|-------------|
+|[face-detection-retail-0004](face-detection-retail-0004/README.md) |This is a nework that is trained to find faces in general.  [More information specific to this network is available.](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) |
 |[SSD_Mobilenet](SSD_Mobilenet/README.md)|MobileNet Single Shot Detector takes an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications. |
-
+|[TinyYolo](TinyYolo/README.md) |This Tiny You Only Look Once model is based on [tiny-yolo DarkNet model ](https://pjreddie.com/darknet/yolov1/).  Given an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications.  Requires some post processing of results to narrow down relevant boxes.  |
 
 # Caffe Misc Networks for Neural Compute devices
 |Network| Description |
 |---------------------|-------------|
-|[face-detection-retail-0004](face-detection-retail-0004/README.md) |This is a nework that is trained to find faces in general.  [More information specific to this network is available.](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) |
+|TBD | TBD|
