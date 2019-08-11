@@ -1,4 +1,4 @@
-# SSD Inception V2
+# SSD Inception V2 Gesture Network
 
 ## Introduction
 The SSD Inception V2 network can be used to detect a number of objects specified by a particular training set. This model in particular can detect the following gestures:
@@ -9,6 +9,8 @@ The SSD Inception V2 network can be used to detect a number of objects specified
 - exposed palm
 - closed fist with exposed bottom palm
 - fist with exposed knuckles.
+
+![](hand_gesture_5.mp4)
 
 The provided Makefile does the following:
 1. Downloads a trained model
