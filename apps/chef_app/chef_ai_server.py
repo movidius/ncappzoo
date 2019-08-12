@@ -10,6 +10,15 @@ import os
 
 app = Flask(__name__)
 
+def build_argparser():
+    parser = ArgumentParser(add_help=False)
+    args = parser.add_argument_group('Options')
+    args.add_argument("-e", "--cpu_extension",
+                      help="Optional. Required for CPU custom layers. Absolute path to a shared library with the "
+                           "kernels implementations.", type=str, default=None)
+
+    return parser
+
 # CORS Agreement Code Snippet
 @app.after_request
 def after_request(response):
