@@ -31,6 +31,7 @@ GET_TEST_IMG3 = wget -c --no-cache -P ./test_images https://raw.githubuserconten
 
 .PHONY: all
 all: deps data
+	@echo "Please install requirements by entering 'make install-reqs'"
 
 .PHONY: data
 data:
@@ -125,14 +126,31 @@ deps_FP16:
 install-reqs:
 	@echo $(YELLOW)"\ngesture_piarm: Checking application requirements...\n"$(NOCOLOR)
 	@echo "Installing Flask and Pillow (PIL - Python Imaging Library)..."
-	pip3 install flask Pillow
+	pip3 install --user flask Pillow
+	@echo "If you would like to uninstall the required packages, please enter 'make uninstall-reqs'"
 
 
 .PHONY: run
-run: install-reqs deps data
+run: deps data
 	@echo $(YELLOW)"\nChef App: Running the sample..."$(NOCOLOR)
+	@echo "Please make sure to fill in the config values for the Edamam API!"
 	@echo "Setting up OpenVINO environment..."
 	/opt/intel/openvino/bin/setupvars.sh
+	@echo "Checking requirements..."
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
+	then \
+		echo 'Flask found.' ; \
+	else \
+		echo "Flask not found. Please install requirements by entering 'make install-reqs'." ; \
+		exit 1 ; \
+	fi
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("PIL"))' ; \
+	then \
+		echo 'PIL found.' ; \
+	else \
+		echo "PIL not found. Please install requirements by entering 'make install-reqs'." ; \
+		exit 1; \
+	fi
 	@echo "Starting backend server..."
 	@gnome-terminal -e "python3 chef_ai_server.py"
 	@echo "Opening up webpage..."
@@ -151,17 +169,31 @@ help:
 	@echo $(YELLOW)"  make deps_FP16 "$(NOCOLOR)"- makes/prepares dependencies for the FP16 model"
 	@echo $(YELLOW)"  make deps_FP32 "$(NOCOLOR)"- makes/prepares dependencies for the FP32 model"
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- install required packages"
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- uninstall required packages"
 
 
-.PHONY: clean-lite
-clean-lite:
+.PHONY: clean
+clean:
 	@echo $(YELLOW)"\nChef App: Cleaning up files..."$(NOCOLOR)
 	rm -rf ${SSD_FOOD_DIR}
 	rm -rf ${SSD_FOOD_DIR_CPU}
 	rm -rf __pycache__
 	rm -rf test_images
 
-.PHONY: clean
-clean: clean-lite
-	@echo "Uninstalling flask and PIL..."
-	pip3 uninstall flask Pillow
+.PHONY: uninstall-reqs
+uninstall-reqs:
+	@echo $(YELLO)"\nChef App: Uninstalling flask and PIL..."$(NOCOLOR)
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
+	then \
+		echo 'Flask found. Uninstalling now...' ; \
+		pip3 uninstall Flask ; \
+	else \
+		echo 'Flask not found. Not uninstalling package due to missing requirement.' ; \
+	fi
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("PIL"))' ; \
+	then \
+		echo 'PIL found. Uninstalling now...' ; \
+		pip3 uninstall Pillow; \
+	else \
+		echo 'PIL not found. Not uninstalling package due to missing requirement.' ; \
+	fi

@@ -26,9 +26,9 @@ All setup/startup is streamlined through the make commands!
   - **make deps_FP16** and **make deps_FP32** are subroutines of **make deps**
   - Commands download their respective models based on precision
 - **make run** - runs the flask backend and opens the webpage. Plug in your Intel NCS 2 in order to use `Detect (MYRIAD)`!
-- **make install-reqs** - downloads required packages
-- **make clean-lite** - deletes data/models
-- **make clean** - deletes data/models and required packages
+- **make install-reqs** - downloads required packages and installs them
+- **make uninstall-reqs** - uninstalls required packages
+- **make clean** - deletes data/models
 - **make help** - lists what the commands above do
 
 ### How to set up Edamam Account to use API
