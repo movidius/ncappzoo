@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, Response
+from argparse import ArgumentParser, SUPPRESS
+import logging as log
 from openvino.inference_engine import IEPlugin, IENetwork
 import cv2
 import numpy as np
