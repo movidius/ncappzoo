@@ -126,7 +126,7 @@ deps_FP16:
 install-reqs:
 	@echo $(YELLOW)"\ngesture_piarm: Checking application requirements...\n"$(NOCOLOR)
 	@echo "Installing Flask and Pillow (PIL - Python Imaging Library)..."
-	pip3 install --user flask Pillow
+	sudo pip3 install flask Pillow
 	@echo "If you would like to uninstall the required packages, please enter 'make uninstall-reqs'"
 
 
@@ -186,14 +186,14 @@ uninstall-reqs:
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
 	then \
 		echo 'Flask found. Uninstalling now...' ; \
-		pip3 uninstall Flask ; \
+		sudo pip3 uninstall Flask ; \
 	else \
 		echo 'Flask not found. Not uninstalling package due to missing requirement.' ; \
 	fi
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("PIL"))' ; \
 	then \
 		echo 'PIL found. Uninstalling now...' ; \
-		pip3 uninstall Pillow; \
+		sudo pip3 uninstall Pillow; \
 	else \
 		echo 'PIL not found. Not uninstalling package due to missing requirement.' ; \
 	fi
