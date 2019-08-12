@@ -28,7 +28,7 @@ GET_TEST_IMG1 = wget -c --no-cache -P ./test_images https://raw.githubuserconten
 GET_TEST_IMG2 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test2.JPG
 GET_TEST_IMG3 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test3.JPG
 
-CPU_EXT = 
+CPU_EXT = $(INTEL_OPENVINO_DIR)/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
 
 
 .PHONY: all
@@ -137,7 +137,7 @@ run: deps data
 	@echo $(YELLOW)"\nChef App: Running the sample..."$(NOCOLOR)
 	@echo "Please make sure to fill in the config values for the Edamam API!"
 	@echo "Setting up OpenVINO environment..."
-	/opt/intel/openvino/bin/setupvars.sh
+	@$(INTEL_OPENVINO_DIR)/bin/setupvars.sh
 	@echo "Checking requirements..."
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
 	then \
@@ -151,10 +151,10 @@ run: deps data
 		echo 'PIL found.' ; \
 	else \
 		echo "PIL not found. Please install requirements by entering 'make install-reqs'." ; \
-		exit 1; \
+		exit 1 ; \
 	fi
 	@echo "Starting backend server..."
-	@gnome-terminal -e "python3 chef_ai_server.py"
+	@gnome-terminal -e "python3 chef_ai_server.py -e ${CPU_EXT}"
 	@echo "Opening up webpage..."
 	@xdg-open http://127.0.0.1:5000
 

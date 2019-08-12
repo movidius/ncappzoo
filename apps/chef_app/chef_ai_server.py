@@ -103,7 +103,7 @@ def object_detection(uri, model, dev):
             preds.append(class_id)
             # Draw box and label\class_id
             color = (min(class_id * 12.5, 255), min(class_id * 7, 255), min(class_id * 5, 255))
-            cv2.rectangle(obj_frame, (xmin, ymin), (xmax, ymax), color, 2)
+            cv2.rectangle(obj_frame, (xmin, ymin), (xmax, ymax), (255, 255, 255), thickness=24)
 
     out_frame = cv2.cvtColor(obj_frame, cv2.COLOR_BGR2RGB)
 
