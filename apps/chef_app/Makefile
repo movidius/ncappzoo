@@ -28,6 +28,8 @@ GET_TEST_IMG1 = wget -c --no-cache -P ./test_images https://raw.githubuserconten
 GET_TEST_IMG2 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test2.JPG
 GET_TEST_IMG3 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test3.JPG
 
+CPU_EXT = 
+
 
 .PHONY: all
 all: deps data

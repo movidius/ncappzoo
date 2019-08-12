@@ -46,6 +46,10 @@ def test():
 
 # Backend for detections
 def object_detection(uri, model, dev):
+    # Getting cpu extension just in case from arg parser
+    args = build_argparser().parse_args()
+    extension = args.cpu_extension
+
     # Pre processing base64 encoded picture
     encoded_data = uri.split(',')[1]
     decoded_data = base64.b64decode(encoded_data)
@@ -78,9 +82,7 @@ def object_detection(uri, model, dev):
 
     obj_plugin = IEPlugin(device=dev.upper())
     if dev.lower() == 'cpu':
-        ext = '/opt/intel/openvino/deployment_tools/inference_engine/'
-        ext = ext + 'lib/intel64/libcpu_extension_avx2.so'
-        obj_plugin.add_cpu_extension(ext)
+        obj_plugin.add_cpu_extension(extension)
     obj_exec_net = obj_plugin.load(network=net, num_requests=1)
     del net
 
