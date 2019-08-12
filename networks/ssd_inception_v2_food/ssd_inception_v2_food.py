@@ -65,7 +65,7 @@ def main(path_to_objxml, path_to_objbin, dev, ext, input, labels_map=None):
             # Draw box and label\class_id
             color = (min(class_id * 12.5, 255), min(class_id * 7, 255), min(class_id * 5, 255))
             det_label = labels_map[class_id - 1] if labels_map else str(class_id)
-            cv2.rectangle(obj_frame, (xmin, ymin), (xmax, ymax), color, 2)
+            cv2.rectangle(obj_frame, (xmin, ymin), (xmax, ymax), color, thickness=16)
             label_and_prob = det_label + ", " + str(obj[2] * 100) + "%"
             log.info('Detection: ' + label_and_prob)
             #cv2.putText(obj_frame, label_and_prob, (xmin, ymin - 7), cv2.FONT_HERSHEY_COMPLEX, 0.6, color, 1)

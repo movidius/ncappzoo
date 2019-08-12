@@ -31,6 +31,7 @@ GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 http
 GET_TEST_IMG1 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test1.JPG
 GET_TEST_IMG2 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test2.JPG
 GET_TEST_IMG3 = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/test3.JPG
+GET_TEST_LICENSE = wget -c --no-cache -P ./test_images https://raw.githubusercontent.com/fcr3/chef_devmesh/master/test_images/license.txt
 GET_MODEL_PB = python3 download_weights.py
 
 RUN_PY_RELATIVE_DIR = ssd_inception_v2_food.py
@@ -38,6 +39,7 @@ TEST_IMG_DIR = test_images
 TEST_IMG1 = test_images/test1.JPG
 TEST_IMG2 = test_images/test2.JPG
 TEST_IMG3 = test_images/test3.JPG
+TEST_LICENSE = test_images/license.txt
 
 
 .PHONY: all
@@ -71,6 +73,13 @@ data:
 	else \
 		echo "Downloading ${TEST_IMG3} file"; \
 		${GET_TEST_IMG3}; \
+	fi
+	@if [ -e ${TEST_LICENSE} ] ; \
+	then \
+		echo "license file ${TEST_LICENSE} already exists, skipping download"; \
+	else \
+		echo "Downloading ${TEST_LICENSE} file"; \
+		${GET_TEST_LICENSE}; \
 	fi
 
 
