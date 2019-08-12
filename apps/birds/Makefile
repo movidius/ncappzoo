@@ -3,8 +3,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
+
 APP_NAME = birds
 
 # filenames for the graph files that we'll copy to this directory.
