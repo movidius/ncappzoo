@@ -12,6 +12,7 @@ App Makefiles build source code, download or copy (from other repo subdirectorie
   - **make run** : Runs the application with some set of default parameters/settings/configuration.  'make run' must always execute the program without the need for other parameters.  Users expect to see some working output by just typing 'make run'
   - **make clean** : Removes all the files in this project directory that get created when making or running this project.  Should not clean other projects in the repository.  After running 'make clean' the only files in the directory should be those that are in the repository.
   - **make install-reqs**: Installs any required components for the application or gives instructions for installing those components.  If no other components are required then this target may be empty.  
+  - **make uninstall-reqs**: if the `make install-reqs` installs any components, then this target should uninstall those components or give instructions for uninstalling them.  If not applicable then this target may be empty.  
  
  ## Makefiles for neural networks
  Makefiles for neural networks (in the **networks**, **caffe**, or **tensorflow**  directories) should optimize, and demonstrate the neural network in the directory.  You can use the ncappzoo/caffe/GoogLeNet/Makefile as the pattern to follow.
@@ -24,4 +25,4 @@ App Makefiles build source code, download or copy (from other repo subdirectorie
   - **make run** : Run a simple program demonstrating the use of the optimized network.  This may invoke an application under the ncappzoo/apps directory hierarchy or from within this project's directory
   - **make clean** : Removes all the files in this project directory that may get created when making or running this project.  Should not clean other projects in the repository. After running 'make clean' the only files in the directory should be those that are in the repository.
 - **make install-reqs**: Installs any required components for the neural network or gives instructions for installing those components.  If no other components are required then this target may be empty.
-
+- **make uninstall-reqs**: if the `make install-reqs` installs any components, then this target should uninstall those components or give instructions for uninstalling them.  If not applicable then this target may be empty.  
