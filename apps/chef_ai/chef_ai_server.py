@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, Response
 from argparse import ArgumentParser, SUPPRESS
 import logging as log
+import webbrowser, threading
 from openvino.inference_engine import IEPlugin, IENetwork
 import cv2
 import numpy as np
@@ -133,4 +134,5 @@ def detect():
     return jsonify(task), 202
 
 if __name__ == '__main__':
+    threading.Timer(2.25, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
     app.run(debug=True)

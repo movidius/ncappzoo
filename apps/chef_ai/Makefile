@@ -37,7 +37,7 @@ all: deps data
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nChef App: Making data..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef Ai: Making data..."$(NOCOLOR)
 	@echo "Downloading required data..."
 	@if [ -e ${TEST_IMG1} ] ; \
 	then \
@@ -67,7 +67,7 @@ deps: deps_FP32 deps_FP16
 
 .PHONY: deps_FP32
 deps_FP32:
-	@echo $(YELLOW)"\nChef App: Making FP32 dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef Ai: Making FP32 dependencies..."$(NOCOLOR)
 	@echo "Downloading .xml, .bin, and .mapping files..."
 	@if [ -e ${SSD_FOOD_DIR_CPU}/${SSD_FOOD_BIN_FILENAME} ] ; \
 	then \
@@ -97,7 +97,7 @@ deps_FP32:
 
 .PHONY: deps_FP16
 deps_FP16:
-	@echo $(YELLOW)"\nChef App: Making FP16 dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef Ai: Making FP16 dependencies..."$(NOCOLOR)
 	@echo "Downloading .xml, .bin, and .mapping files..."
 	@if [ -e ${SSD_FOOD_DIR}/${SSD_FOOD_BIN_FILENAME} ] ; \
 	then \
@@ -134,7 +134,7 @@ install-reqs:
 
 .PHONY: run
 run: deps data
-	@echo $(YELLOW)"\nChef App: Running the sample..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef Ai: Running the sample..."$(NOCOLOR)
 	@echo "Please make sure to fill in the config values for the Edamam API!"
 	@echo "Setting up OpenVINO environment..."
 	@$(INTEL_OPENVINO_DIR)/bin/setupvars.sh
@@ -154,9 +154,7 @@ run: deps data
 		exit 1 ; \
 	fi
 	@echo "Starting backend server..."
-	@gnome-terminal -e "python3 chef_ai_server.py -e ${CPU_EXT}"
-	@echo "Opening up webpage..."
-	@xdg-open http://127.0.0.1:5000
+	@python3 chef_ai_server.py -e ${CPU_EXT}
 
 
 .PHONY: help
@@ -176,7 +174,7 @@ help:
 
 .PHONY: clean
 clean:
-	@echo $(YELLOW)"\nChef App: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)"\nChef Ai: Cleaning up files..."$(NOCOLOR)
 	rm -rf ${SSD_FOOD_DIR}
 	rm -rf ${SSD_FOOD_DIR_CPU}
 	rm -rf __pycache__
