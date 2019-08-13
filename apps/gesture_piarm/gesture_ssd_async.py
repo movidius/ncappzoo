@@ -155,7 +155,7 @@ def main():
     mearm = MeArmController()
     ret, frame = cap.read()
 
-    print("To close the application, press 'CTRL+C' or any key with focus on the output window")
+    print("To close the application, press 'q' or 'esc'.")
     while cap.isOpened():
         if is_async_mode:
             ret, next_frame = cap.read()
@@ -235,9 +235,11 @@ def main():
             frame = next_frame
 
         key = cv2.waitKey(1)
-        if key & 0xFF == ord('q'): # NOTICE: Exit key is q, not CTRL + C
+        if key & 0xFF == ord('q'): # NOTICE: Exit key is q and esc
             break
-        # NOTICE: Delection of option to do inference in synchronous mode
+        if key == 27:
+            break
+        # NOTICE: Deletion of option to do inference in synchronous mode
 
     cv2.destroyAllWindows()
 

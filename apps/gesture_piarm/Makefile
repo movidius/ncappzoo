@@ -14,7 +14,7 @@ MODEL_RELATIVE_DIR = ../../tensorflow/SSD_Inception_V2/
 MODEL_FP16_RELATIVE_DIR = ${MODEL_RELATIVE_DIR}/ssd_inception_v2_mo_fp16
 PROJECT_RELATIVE_DIR = ../../apps/gesture_piarm/.
 
-CPU_EXTENSION = /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
+CPU_EXTENSION = $(INTEL_OPENVINO_DIR)/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
 
 
 .PHONY: all
@@ -35,6 +35,14 @@ deps:
 		mkdir ${SSD_GESTURE_DIR} ; \
 		python3 download_ir_model.py ; \
 	fi
+	@echo "Checking if OpenVINO environment is set..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 
 
 .PHONY: install-reqs
@@ -48,17 +56,13 @@ install-reqs:
 .PHONY: run_wout_arm_CPU
 run_wout_arm_CPU: deps data
 	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot on CPU..."$(NOCOLOR)
-	@echo "Setting up OpenVINO environment..."
-	@/opt/intel/openvino/bin/setupvars.sh
 	@echo "Starting Gesture SSD Python Demo..."
-	python3 gesture_ssd_async_wout_robot2.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
+	python3 gesture_ssd_async_wout_robot.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
 
 
 .PHONY: run_wout_arm_MYRIAD
 run_wout_arm_MYRIAD: install-reqs deps data
 	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot using MYRIAD plugin..."$(NOCOLOR)
-	@echo "Setting up OpenVINO environment..."
-	@/opt/intel/openvino/bin/setupvars.sh
 	@echo "Starting Gesture SSD Python Demo..."
 	python3 gesture_ssd_async_wout_robot.py -i 'cam' -d MYRIAD -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME}
 
@@ -66,8 +70,6 @@ run_wout_arm_MYRIAD: install-reqs deps data
 .PHONY: run
 run: install-reqs deps data
 	@echo $(YELLOW)"\ngesture_piarm: Running the sample..."$(NOCOLOR)
-	@echo "Setting up OpenVINO environment..."
-	/opt/intel/openvino/bin/setupvars.sh
 	@echo "Initializing Pigpio daemon..."
 	sudo pigpiod
 	@echo "Starting Gesture SSD Python Demo..."
