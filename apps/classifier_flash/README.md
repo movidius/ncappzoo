@@ -35,7 +35,7 @@ Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 mac
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_py
 Runs the sample application.
 
 ### make help

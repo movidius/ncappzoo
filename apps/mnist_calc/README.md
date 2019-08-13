@@ -7,7 +7,7 @@ This project uses the TensorFlow mnist_deep network trained on the MNIST dataset
 The provided Makefile does the following:
 1. Builds tensorflow MNIST graph file from the tensorflow/mnist directory in the repository.
 2. Copies the IR files from the mnist directory to the project base directory.
-3. Runs touchcalc.py, which creates a GUI window for calculator input and handles calculator control. 
+3. Runs mnist_calc.py, which creates a GUI window for calculator input and handles calculator control. 
 
 ## Running the Example
 To run the example code do the following :
@@ -39,6 +39,9 @@ Gathers all of the required data need to run the sample.
 
 ### make deps
 Builds all of the dependencies needed to run the sample.
+
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
 
 ### make install_reqs
 Checks the requirements needed to run the sample.

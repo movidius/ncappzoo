@@ -2,14 +2,12 @@ GREEN = '\033[1;32m'
 YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
-NCCOMPILE = mvNCCompile
 
 APP_NAME = birds
 
 # filenames for the graph files that we'll copy to this directory.
 YOLO_TINY_IR = tiny-yolo-v1_53000
 GOOGLENET_IR = googlenet-v1
-DOG_FILENAME = dog.jpg
 IMAGE_DIR = ./images
 
 GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
@@ -23,12 +21,12 @@ GET_IMAGES = mkdir -p ${IMAGE_DIR}; \
 
 
 .PHONY: all
-all: data deps compile_model
+all: data deps
 
 
 .PHONY: deps
-deps: compile_model
-	@echo $(YELLOW)"\n"$(APP_NAME)": Making the required dependencies... None needed."$(NOCOLOR)
+deps: default_model
+	@echo $(YELLOW)"\n"$(APP_NAME)": Making the required dependencies..."$(NOCOLOR)
 	
 
 .PHONY: data
@@ -50,8 +48,9 @@ ilsvrc12:
 
 .PHONY: install-reqs
 install-reqs:
-	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements...None needed."$(NOCOLOR)
-
+	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."
+	
 
 .PHONY: googlenet
 googlenet: 
@@ -65,13 +64,13 @@ tiny_yolo:
 	(cd ../../caffe/TinyYolo; make compile_model; cd ../../apps/birds; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.xml .; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.bin .;)
 
 
-.PHONY: compile_model
-compile_model: googlenet tiny_yolo
+.PHONY: default_model
+default_model: googlenet tiny_yolo
 	@echo $(YELLOW)"\n"$(APP_NAME)": Compiling models to IR..."$(NOCOLOR)
 	
 
 .PHONY: run_py
-run_py: install-reqs deps data compile_model
+run_py: install-reqs deps data
 	@echo $(YELLOW)"\n"$(APP_NAME)": Running the Python sample..."$(NOCOLOR)
 	python3 ./birds.py
 
@@ -83,12 +82,15 @@ run: run_py
 
 .PHONY: help
 help:
-	@echo "\n Possible make targets: ";
+	@echo "\nPossible make targets: ";
+	@echo $(YELLOW)"  make run or run_py"$(NOCOLOR)"- runs the application";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes everything needed to run but doesn't run";
-	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- compiles required networks with Model Optimizer tool to create graph files";
-	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the birds.py python example program";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content in this directory.";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content";
 	@echo ""
     
     
