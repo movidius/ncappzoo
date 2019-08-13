@@ -76,7 +76,7 @@ compile_model:
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nface-detecton-retail-0004: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)"\nface-detection-retail-0004: Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 	
 	

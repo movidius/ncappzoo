@@ -34,7 +34,7 @@ Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 mac
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_cpp
 Runs the sample application.
 
 ### make help
@@ -49,10 +49,12 @@ Gathers all of the required data need to run the sample.
 ### make deps
 Builds all of the dependencies needed to run the sample.
 
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
+
 ### make install_reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.
-
 

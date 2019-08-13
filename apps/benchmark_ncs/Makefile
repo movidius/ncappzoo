@@ -18,7 +18,7 @@ all: data deps
 
 .PHONY: compile_default_model
 compile_default_model:
-	@echo $(YELLOW)"\nbenchmark_ncs: Compiling the model"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Compiling the model"$(NOCOLOR)
 	@if [ ${XML} != "googlenet-v1.xml" ] && [ ${BIN} != "googlenet-v1.bin" ]; \
 	then \
 		echo " - User has provided IR. Skipping compiling Googlenet."; \
@@ -34,22 +34,22 @@ compile_default_model:
 
 .PHONY: default_model
 default_model: compile_default_model
-	@echo $(YELLOW)"\nbenchmark_ncs: Making the default model..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Making the default model..."$(NOCOLOR)
 
 
 .PHONY: data
 data: 
-	@echo $(YELLOW)"\nbenchmark_ncs: Making the required data..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": No data needed."$(NOCOLOR)
 
 
 .PHONY: deps
 deps: default_model
-	@echo $(YELLOW)"\nbenchmark_ncs: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 
 
 .PHONY: run_py
 run_py: install-reqs data deps
-	@echo $(YELLOW)"\nbenchmark_ncs: Running the sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	python3 ./${APP_NAME}.py dev=${DEV} mx=${XML} mb=${BIN}
 
 
@@ -59,21 +59,26 @@ run: run_py
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nbenchmark_ncs: Checking application requirements..."$(NOCOLOR)
-	
+	@echo $(YELLOW)'\n'${APP_NAME}": No installation requirements needed."$(NOCOLOR)
+	@echo "No requirements needed."
 
 .PHONY: help
 help:
-	@echo "Possible make targets: ";
+	@echo "\nPossible make targets: ";
+	@echo $(YELLOW)"  make run or run_py"$(NOCOLOR)"- runs the application";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes everything needed to run but doesn't run";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the application with the default model";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content";
+	@echo ""
+	
 
 .PHONY: clean
 clean: 
-	@echo $(YELLOW)"\nbenchmark_ncs: Cleaning up files...""$(NOCOLOR)"
+	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files...""$(NOCOLOR)"
 	rm -f ${CLASSIFIER_GRAPH_BASE_FILENAME}.*
 
 

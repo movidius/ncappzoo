@@ -22,14 +22,26 @@ There are a few thresholds in the code you may want to tweek if you aren't getti
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 
+### make run
+Runs the sample application.
+
 ### make help
-Shows available targets
+Shows available targets.
 
 ### make all
-builds and/or gathers all the required files needed to run the application
+Builds and/or gathers all the required files needed to run the application.
 
-### make run_py
-Runs the provided birds.py python program which does the bird classification
+### make data
+Gathers all of the required data need to run the sample.
 
+### make deps
+Builds all of the dependencies needed to run the sample.
+
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
+
+### make install_reqs
+Checks required packages that aren't installed as part of the OpenVINO installation. 
+ 
 ### make clean
-Removes all the temporary files that are created by the Makefile
+Removes all the temporary files that are created by the Makefile.
