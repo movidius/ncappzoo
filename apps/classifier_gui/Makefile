@@ -13,7 +13,7 @@ APP_NAME = classifier_gui
 all: deps data
 
 .PHONY: deps
-deps: make_default_model
+deps: default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 
 
