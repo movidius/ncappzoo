@@ -129,6 +129,13 @@ train:
 
 .PHONY: compile_model
 compile_model: get_model
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "mo.py path is already set!" ; \
+	fi
 	@echo $(YELLOW)"\nSSD Inception V2 Food: Compiling model to IR..."$(NOCOLOR)
 	@if [ -e ${GRAPH_FILENAME_BASE_IN_DIR_FP32} ] ; \
 	then \
