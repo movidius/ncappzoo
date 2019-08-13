@@ -47,8 +47,14 @@ all: deps data compile_model
 
 .PHONY: deps
 deps: get_model
-	@echo $(YELLOW)"\nSSD Inception V2 Food: Making dependencies... No extra dependencies needed."$(NOCOLOR)
-
+	@echo $(YELLOW)"\nSSD Inception V2 Food: Making dependencies... "$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 
 .PHONY: data
 data:
@@ -165,14 +171,12 @@ install-reqs:
 .PHONY: run_FP16
 run_FP16: install-reqs deps data compile_model
 	@echo $(YELLOW) "\nSSD Inception V2 Food: Running Python sample..." $(NOCOLOR)
-	$(INTEL_OPENVINO_DIR)/bin/setupvars.sh
 	python3 $(RUN_PY_RELATIVE_DIR) -i ${TEST_IMG1} -m ${GRAPH_FILENAME_BASE_IN_DIR_FP16} -l ${MO_LABELS_IN_DIR_FP16} -d MYRIAD
 
 
 .PHONY: run_FP32
 run_FP32: install-reqs deps data compile_model
 	@echo $(YELLOW) "\nSSD Inception V2 Food: Running Python sample..." $(NOCOLOR)
-	$(INTEL_OPENVINO_DIR)/bin/setupvars.sh
 	python3 $(RUN_PY_RELATIVE_DIR) -i ${TEST_IMG1} -m ${GRAPH_FILENAME_BASE_IN_DIR_FP32} -e ${CPU_EXTENSION} --l ${MO_LABELS_IN_DIR_FP32}
 
 
