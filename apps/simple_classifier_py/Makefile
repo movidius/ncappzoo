@@ -84,6 +84,7 @@ help:
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content";
 	@echo ""
