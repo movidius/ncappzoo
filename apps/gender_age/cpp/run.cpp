@@ -318,29 +318,27 @@ int main (int argc, char** argv) {
                 }
                 // Run the inference for age-gender
                 ageGenInferRequest->Infer();                
-                // get the result for age
+                // Get the result for age
                 auto ageOutput = ageGenInferRequest->GetBlob(ageOutputLayerName);
                 auto ageOutputData = ageOutput->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
-                // get the result for gender
+                // Get the result for gender
                 auto genOutput = ageGenInferRequest->GetBlob(genOutputLayerName);
                 auto genOutputData = genOutput->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
                 
-                // age-gender output processing //
-                // we are only taking the top result from age/gender
+                // Age-gender output processing //
+                // Find the top result for age and gender
                 unsigned int results_to_display = 1;
                 std::vector<unsigned> ageResults;
                 std::vector<unsigned> genResults;
-                
-                // find the top results for age-gender
                 TopResults(results_to_display, *ageOutput, ageResults);
                 TopResults(results_to_display, *genOutput, genResults);
                 
-                // calculate the confidence scores for age gender
+                // Calculate the confidence scores for age gender
                 auto ageConf = ageOutputData[ageResults[0]]*100; // for age, the confidence score is the age. ex: if the age confidence = 19.01, the age is 19.
                 auto genConf = genOutputData[genResults[0]]*100; 
                 
-                // determine which color the displayed text will be. 
-                // pink = female. blue = male. green = unknown.
+                // Determine which color the displayed text will be. 
+                // PINK = Female. Blue = Male. Green = Unknown.
                 if (genConf > GENDER_CONF_THRESHOLD && genResults.at(0) == FEMALE_LABEL)
                 {
                     resultColor.push_back(PINK);
@@ -353,7 +351,7 @@ int main (int argc, char** argv) {
                 {
                     resultColor.push_back(GREEN);
                 }
-                // put the age confidence (which is the actual age) in the result vector
+                // Add the age confidence to the results text vector
                 resultText.push_back("Age: " + std::to_string((int)(ageConf)));
                 elapsed_time = clock() - start_time;
 
@@ -362,7 +360,7 @@ int main (int argc, char** argv) {
         }
         
         // -----------------Display the results ---------------
-        // go through all of the faces that we detected and set up the display text and bounding boxes to show gender and age
+        // go through all of the faces that we detected and set up the display text and bounding boxes to display gender and age
         for (unsigned int i = 0; i < detectedFaces.size(); i++)
         {
             cv::putText(imgIn, resultText.at(i), cv::Point2f(detectedFaces.at(i).xmin, detectedFaces.at(i).ymin) , FONT, FONT_SIZE, resultColor.at(i), 2);
@@ -371,7 +369,6 @@ int main (int argc, char** argv) {
         
         // Show the image in the window
         imshow(WINDOW_NAME, imgIn);
-        
         // If the user presses any key, exit the loop
         key = waitKey(1);
         if (key != -1) {
