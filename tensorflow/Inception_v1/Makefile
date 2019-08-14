@@ -180,6 +180,8 @@ help:
 	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds C++ example to demonstrate the network.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.";
 	@echo "  "
 
