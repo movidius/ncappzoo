@@ -104,7 +104,7 @@ uninstall-reqs:
 help:
 	@echo "\nPossible make targets: ";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the run.py python example program";
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the run.py python example program";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
 	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
 	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
