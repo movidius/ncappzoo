@@ -60,9 +60,8 @@ struct detectionResults{
     float ymin;      // coordinate of bounding box
     float xmax;      // coordinate of bounding box
     float ymax;      // coordinate of bounding box
-    int age = 18;
-    int ageConf = 0.0;
-    float genderConf = 0.0;
+    int ageConf = 0; // age confidence aka age of the person
+    float genderConf = 0.0; // gender confidence
 
 };
 
