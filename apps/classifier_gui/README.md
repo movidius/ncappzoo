@@ -47,9 +47,12 @@ This program requires:
 
 **Note:** To install PIL with ImageTk, use the following command: ```pip3 install scikit-image --user```
 
+**Note:** To install scikit-image, you may need to upgrade your pip version to pip version => 9.0.1. You can try using the command ```pip3 install --upgrade pip==9.0.1``` to upgrade to pip version 9.0.1. 
+
+**Note:** All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
+ 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
-Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
@@ -72,8 +75,12 @@ Builds all of the dependencies needed to run the sample.
 ### make default_model
 Compiles an IR file from a default model to be used when running the sample.
 
-### make install_reqs
+### make install-reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+**Note:** python3-pil.imagetk and scikit-image will need to be installed to run this sample.
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program. This command will uninstall python3-pil.imagetk and scikit-image.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.

@@ -51,12 +51,6 @@ compile_default_model:
 .PHONY: default_model
 default_model: compile_default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making default models..."$(NOCOLOR)
-
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
-	@echo "No requirements needed."
 	
 
 .PHONY: run
@@ -68,6 +62,18 @@ run_py: install-reqs deps data
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	python3 run.py --ir=${MODEL_FILE_NAME_BASE}.xml --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} 
 
+
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."
+
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
 
 .PHONY: help
 help:

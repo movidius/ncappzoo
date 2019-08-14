@@ -85,6 +85,15 @@ install-reqs:
 	fi
 	
 	
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	echo $(YELLOW)"\nUninstalling python3-pil.imagetk..."$(NOCOLOR)
+	sudo apt-get remove python3-pil.imagetk; \
+	echo $(YELLOW)"\nUninstalling scikit-image..."$(NOCOLOR)
+	pip3 uninstall scikit-image
+		
+	
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
@@ -96,6 +105,7 @@ help:
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"                      python3-pil.imagetk";
 	@echo $(YELLOW)"                      scikit-image(aka skimage)";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
 	@echo ""

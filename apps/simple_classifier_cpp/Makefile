@@ -52,11 +52,6 @@ default_model: compile_default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making default models..."$(NOCOLOR)
 
 
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
-	@echo "No requirements needed."	
-
 .PHONY: run
 run: run_cpp
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
@@ -74,6 +69,17 @@ run_cpp: install-reqs deps data compile_cpp
 	./build/${APP_NAME} ${GOOGLENET_BASE_NAME}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME}
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."	
+
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
