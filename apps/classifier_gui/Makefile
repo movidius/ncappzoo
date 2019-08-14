@@ -18,7 +18,7 @@ deps: default_model
 
 
 .PHONY: data
-deps:
+data:
 	@echo $(YELLOW)'\n'${APP_NAME}": Making required data..."$(NOCOLOR)
 	(cd ../../data/ilsvrc12; make)
 
@@ -64,7 +64,7 @@ run_py: install-reqs deps googlenet alexnet squeezenet
 .PHONY: install-reqs
 install-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements...\n"$(NOCOLOR)
-	@echo "Checking python3-pil.imagetk..."
+	@echo "\n Checking python3-pil.imagetk..."
 	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
 	then \
 		echo " - python3-pil.imagetk already installed.\n"; \
@@ -74,7 +74,7 @@ install-reqs:
 		exit 1;\
 	fi; \
 	
-	@echo "Checking scikit-image..."
+	@echo "\n Checking scikit-image..."
 	@if ${shell} ${CHECK_SKIMAGE} 2> /dev/null; \
 	then \
 	    echo " - scikit-image already installed.\n" ; \
@@ -88,11 +88,25 @@ install-reqs:
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
-	echo $(YELLOW)"\nUninstalling python3-pil.imagetk..."$(NOCOLOR)
-	sudo apt-get remove python3-pil.imagetk; \
-	echo $(YELLOW)"\nUninstalling scikit-image..."$(NOCOLOR)
-	pip3 uninstall scikit-image
-		
+	@echo $(YELLOW)"\n Checking python3-pil.imagetk..."$(NOCOLOR)
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo $(YELLOW)"\n - Uninstalling python3-pil.imagetk..."$(NOCOLOR); \
+		sudo apt-get remove python3-pil.imagetk; \
+		sudo apt autoremove -y; \
+	else \
+		echo " - Uninstall cancelled. Requirement is not installed."; \
+	fi; \
+	
+	@echo $(YELLOW)"\n Checking scikit-image..."$(NOCOLOR)
+	@if ${shell} ${CHECK_SKIMAGE} 2> /dev/null; \
+	then \
+		echo $(YELLOW)"\n - Uninstalling scikit-image..."$(NOCOLOR); \
+		pip3 uninstall scikit-image; \
+	else \
+		echo " - Uninstall cancelled. Requirement is not installed.."; \
+	fi
+	
 	
 .PHONY: help
 help:
