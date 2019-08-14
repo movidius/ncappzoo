@@ -64,12 +64,6 @@ caffemodel:
 			exit 1; \
 		fi ; \
 	fi  
-
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nTiny Yolo v1: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
 	
 	
 .PHONY: compile_model
@@ -94,6 +88,18 @@ run: run_py
 	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nTiny Yolo v1: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nTiny YOlo v1: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+	
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
@@ -102,7 +108,9 @@ help:
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
 	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
 	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
-	@echo $(YELLOW)"  make compile "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
 
 

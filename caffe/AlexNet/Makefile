@@ -82,24 +82,29 @@ run_cpp: install-reqs deps data compile_cpp compile_model
 	@echo $(YELLOW)"\nAlexNet: Running C++ sample..."$(NOCOLOR)
 	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
 
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nAlexNet: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
 	
-
 .PHONY: run_py
 run_py: install-reqs deps data compile_model
 	@echo $(YELLOW)"\nAlexNet: Running Python sample..."$(NOCOLOR)
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nAlexNet: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nAlexNet: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+	
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- Runs the Python example.";
-	@echo $(YELLOW)"  make run_py "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- Runs the Python example.";
 	@echo $(YELLOW)"  make run_cpp "$(NOCOLOR)"- Runs the C++ example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message.";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
@@ -107,6 +112,8 @@ help:
 	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds the C++ example.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
 	
 
