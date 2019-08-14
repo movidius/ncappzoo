@@ -135,12 +135,6 @@ compile_model: freeze
 	fi;
 
 
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nInception_v1: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
-
 .PHONY: run
 run: run_py
 
@@ -163,11 +157,22 @@ run_py: install-reqs data deps compile_model
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}; 
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nInception_v1: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nInception_v1: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+		
+
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- Runs Python example.";
-	@echo $(YELLOW)"  make run_py "$(NOCOLOR)"- Runs Python example.";
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- Runs Python example.";
 	@echo $(YELLOW)"  make run_cpp "$(NOCOLOR)"- Runs C++ example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message.";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
