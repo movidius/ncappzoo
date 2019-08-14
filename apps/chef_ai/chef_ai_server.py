@@ -11,7 +11,8 @@ import io
 import os
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
+app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 def build_argparser():
     parser = ArgumentParser(add_help=False)

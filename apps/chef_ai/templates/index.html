@@ -20,7 +20,7 @@
     .container {
       display: flex;
       flex-direction: column;
-      margin-left: 16px;
+      margin-left: 32px;
     }
     #comparison {
       display: flex;
@@ -49,7 +49,7 @@
   </style>
   <body>
     <div class="container">
-      <h2>Let's see what you have!</h3>
+      <h2>Step 1: Let's see what you have!</h3>
       <video autoplay="true" id="webcam"></video>
       <button onclick="handleUpload()" id="capture_button">
         Capture Image
@@ -57,26 +57,27 @@
     </div>
 
     <div class="container">
-      <h2>Upload a photo of your groceries!</h3>
+      <h2>Or Step 1: Upload a photo of your groceries!</h3>
       <input name="uploded" id="uploaded_file" type="file">
+      <h3>You can see your uploaded or captured image in Ooo Pretty!</h3>
     </div>
 
     <canvas id="can" style="display: none;"></canvas>
 
     <div class="container">
-      <h2>Let me do some smart stuff!</h2>
+      <h2>Step 2: Let me do some smart stuff!</h2>
       <div id="comparison">
         <button onclick="handleInference('c')">Detect (CPU)</button>
         <button onclick="handleInference('m')" id="last-compare">Detect (MYRIAD)</button>
       </div>
-      <h2>Predictions!</h2>
+      <h2>Step 3: Let's see what I detected!</h2>
       <div id="predictions">
 
       </div>
     </div>
 
     <div class="container">
-      <h2>Ooo Pretty!</h2>
+      <h2>Ooo Pretty! (Just a display, but you get to see what's what!)</h2>
       <div id="comparison">
         <div>
           <h3>Input Photo</h3>
@@ -90,7 +91,7 @@
     </div>
 
     <div class="container" id="display-recipes" style="display: none;">
-      <h2>Let's see what we can make!</h2>
+      <h2>Step 4: Let's see what we can make!</h2>
       <button onclick="handleRecipes()" style="max-width: 200px">Get Recipes!</button>
       <h3>Recipes</h3>
       <div id="recipes">
