@@ -18,7 +18,7 @@ deps: default_model
 
 
 .PHONY: data
-deps:
+data:
 	@echo $(YELLOW)'\n'${APP_NAME}": Making required data..."$(NOCOLOR)
 	(cd ../../data/ilsvrc12; make)
 
