@@ -91,7 +91,7 @@ install-reqs:
 		echo " - python3-pil.imagetk already installed.\n"; \
 	else \
 		echo $(YELLOW)"Installing python3-pil.imagetk... "$(NOCOLOR); \
-		sudo apt-get install -y python3-pil.imagetk; \
+		sudo apt-get install python3-pil.imagetk; \
 	fi; \
 	
 	@echo "Checking scikit-image..."
