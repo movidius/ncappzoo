@@ -152,13 +152,13 @@ compile_cpp:
 
 
 .PHONY: run_cpp
-run_cpp: install-reqs data deps compile_cpp compile_model
+run_cpp: data deps compile_cpp compile_model
 	@echo $(YELLOW)"\nInception_v3: Running C++ sample..."$(NOCOLOR)
 	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_FILE}; 
 
 
 .PHONY: run_py
-run_py: install-reqs data deps compile_model
+run_py: data deps compile_model
 	@echo $(YELLOW) "\nInception_v3: Running Python sample..." $(NOCOLOR)
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}; 
 

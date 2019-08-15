@@ -70,7 +70,7 @@ default_model: googlenet tiny_yolo
 	
 
 .PHONY: run_py
-run_py: install-reqs deps data
+run_py: deps data
 	@echo $(YELLOW)"\n"$(APP_NAME)": Running the Python sample..."$(NOCOLOR)
 	python3 ./birds.py
 

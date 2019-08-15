@@ -95,7 +95,7 @@ install-reqs:
 	
 
 .PHONY: run_py
-run_py: install-reqs deps data compile_model run_face_detect
+run_py: deps data compile_model run_face_detect
 	@echo $(YELLOW)"\nAgeGenderNet: Running Python sample..."$(NOCOLOR)
 	python3 age_gender_net.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${CROPPED_IMAGE_FILENAME};
 

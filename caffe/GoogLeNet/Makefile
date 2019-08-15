@@ -84,13 +84,13 @@ compile_cpp:
 
 
 .PHONY: run_cpp
-run_cpp: install-reqs data deps compile_cpp compile_model
+run_cpp: data deps compile_cpp compile_model
 	@echo $(YELLOW)"\nGoogLeNet: Running C++ sample..."$(NOCOLOR)
 	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml  ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
 
 
 .PHONY: run_py
-run_py: install-reqs data deps compile_model
+run_py: data deps compile_model
 	@echo $(YELLOW)"\nGoogLeNet: Running Python sample..."$(NOCOLOR)
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
 
