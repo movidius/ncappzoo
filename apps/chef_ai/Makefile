@@ -136,8 +136,14 @@ install-reqs:
 run: deps data
 	@echo $(YELLOW)"\nChef Ai: Running the sample..."$(NOCOLOR)
 	@echo "Please make sure to fill in the config values for the Edamam API!"
-	@echo "Setting up OpenVINO environment..."
-	@$(INTEL_OPENVINO_DIR)/bin/setupvars.sh
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	@echo "Checking requirements..."
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
 	then \

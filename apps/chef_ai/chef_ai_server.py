@@ -78,6 +78,8 @@ def object_detection(uri, model, dev):
     input_layer = next(iter(net.inputs))
     output_layer = next(iter(net.outputs))
     n, c, h, w = net.inputs[input_layer].shape
+
+    # Pre-processing data
     obj_in_frame = cv2.resize(obj_frame, (w, h))
     obj_in_frame = obj_in_frame.transpose((2, 0, 1))
     obj_in_frame = obj_in_frame.reshape((n, c, h, w))
@@ -85,6 +87,7 @@ def object_detection(uri, model, dev):
     obj_plugin = IEPlugin(device=dev.upper())
     if dev.lower() == 'cpu':
         obj_plugin.add_cpu_extension(extension)
+    # Loading into network plugin
     obj_exec_net = obj_plugin.load(network=net, num_requests=1)
     del net
 

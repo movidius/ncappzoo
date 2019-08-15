@@ -8,6 +8,9 @@
 ### Original [Chef.ai](https://github.com/fcr3/chef_devmesh) Webapp with React.js
 ![Chef.ai in action!](./chef_ai.gif)
 
+## Introduction
+This app demonstrates how to use the food ssd inception v2 model featured in the ncappzoo's networks directory. This app features a frontend and backend, and the OpenVINO inference code is plugged into the backend. Once users upload the data such that the frontend holds the data in memory, users can then run inference on the data, spit out a prediction on what food is available in the image data, and use an external API to generate recipes using those foods.
+
 ## How to use the app:
 1. Take a picture of the ingredients that you have or upload a picture
 2. Detect the food

@@ -48,6 +48,8 @@
     }
   </style>
   <body>
+    <!-- This section is for users to upload data via webcam capture or
+    photo upload -->
     <div class="container">
       <h2>Step 1: Let's see what you have!</h3>
       <video autoplay="true" id="webcam"></video>
@@ -62,8 +64,10 @@
       <h3>You can see your uploaded or captured image in Ooo Pretty!</h3>
     </div>
 
+    <!-- Used mainly for drawing jpgs to be uploaded to the backend -->
     <canvas id="can" style="display: none;"></canvas>
 
+    <!-- User can call inference from this section here -->
     <div class="container">
       <h2>Step 2: Let me do some smart stuff!</h2>
       <div id="comparison">
@@ -76,6 +80,8 @@
       </div>
     </div>
 
+    <!-- The purpose of this section is to show differences between their input data
+    and data processed by running inference and rendering a bounding box -->
     <div class="container">
       <h2>Ooo Pretty! (Just a display, but you get to see what's what!)</h2>
       <div id="comparison">
@@ -90,6 +96,8 @@
       </div>
     </div>
 
+    <!-- Here, users will be able to see what kind of recipes that the user can
+    use with the ingredients they have at their disposal -->
     <div class="container" id="display-recipes" style="display: none;">
       <h2>Step 4: Let's see what we can make!</h2>
       <button onclick="handleRecipes()" style="max-width: 200px">Get Recipes!</button>
@@ -106,6 +114,7 @@
         'APP_KEY': ''
       }
 
+      // Next two functions handle capturing/uploading of data
       document.getElementById("uploaded_file").onchange = (e) => {
         var reader = new FileReader()
         reader.onload = (e) => {
