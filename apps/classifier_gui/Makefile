@@ -63,8 +63,8 @@ run_py: deps googlenet alexnet squeezenet
 	then \
 		echo " - python3-pil.imagetk already installed.\n"; \
 	else \
-		echo $(YELLOW)"ATTENTION! "$(NOCOLOR)"python3-pil.imagetk is required to run this sample.";\
-		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement"; \		
+		echo $(YELLOW)"ATTENTION! "$(NOCOLOR)"python3-pil.imagetk is required to run this sample.\n";\
+		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
 		echo "or use the command:" $(YELLOW)"sudo apt-get install -y python3-pil.imagetk"$(NOCOLOR)" to manually install requirement.\n"; \
 		exit 1;\
 	fi; \
@@ -74,11 +74,11 @@ run_py: deps googlenet alexnet squeezenet
 	then \
 	    echo " - scikit-image already installed.\n" ; \
 	else \
-		echo $(YELLOW)"\nATTENTION! "$(NOCOLOR)"scikit-image is required to run this sample."; \
-		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement"; \	
-		echo "or use the command: " $(YELLOW)"pip3 install scikit-image --user"$(NOCOLOR)" to manually install requirement."; \
+		echo $(YELLOW)"\nATTENTION! "$(NOCOLOR)"scikit-image is required to run this sample.\n"; \
+		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
+		echo "or use the command: " $(YELLOW)"pip3 install scikit-image --user"$(NOCOLOR)" to manually install requirement.\n"; \
 		exit 1; \
-	fi
+	fi; \
 	python3 ${APP_NAME}.py
 
 
@@ -90,7 +90,7 @@ install-reqs:
 	then \
 		echo " - python3-pil.imagetk already installed.\n"; \
 	else \
-		echo $(YELLOW)"Installing python3-pil.imagetk... "$(NOCOLOR)".";\
+		echo $(YELLOW)"Installing python3-pil.imagetk... "$(NOCOLOR); \
 		sudo apt-get install -y python3-pil.imagetk; \
 	fi; \
 	
@@ -99,7 +99,7 @@ install-reqs:
 	then \
 	    echo " - scikit-image already installed.\n" ; \
 	else \
-		echo $(YELLOW)"Installing scikit-image..."; \
+		echo $(YELLOW)"Installing scikit-image..."$(NOCOLOR); \
 		pip3 install scikit-image --user; \
 		exit 1; \
 	fi
