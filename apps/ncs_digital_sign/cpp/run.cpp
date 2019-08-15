@@ -172,7 +172,7 @@ void calculateAdvertisement(int maleTotal, int femaleTotal, int avgAge){
         std::cout << "Female Percentage : " << fpercent << "%" << std::endl << "FEMALE ADVERTISEMENT" << std::endl;
         showImg(avgAge,0);
     } else {
-        std::cout << "[INFO] Need more data.." << std::endl;
+        flag = true;
     }
 }
 
@@ -471,6 +471,13 @@ int main (int argc, char** argv) {
 
 
 	if (true) {
+		if (genCount == 100){
+			cv::namedWindow("Advertisement", 0);
+			cv::moveWindow("General Advertisement", 20, 20);
+			cv::setWindowProperty("Advertisement", 0, 1);
+			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::imshow("Advertisement", ad);
+		}
 		if (flag == true) {
 			cv::namedWindow("Advertisement", 0);
 			cv::moveWindow("General Advertisement", 20, 20);
@@ -492,6 +499,13 @@ int main (int argc, char** argv) {
 			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
 			cv::imshow("Advertisement", ad);
 			flag = false;
+		}
+		if (genCount == 100){
+			cv::namedWindow("Advertisement", 0);
+			cv::moveWindow("General Advertisement", 20, 20);
+			cv::setWindowProperty("Advertisement", 0, 1);
+			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::imshow("Advertisement", ad);
 		}
 	}
 	genCount = genCount + 1;
