@@ -22,11 +22,11 @@ all: deps data
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\ngesture_piarm: Making data - no data needed."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Making data - no data needed."$(NOCOLOR)
 
 .PHONY: deps
 deps:
-	@echo $(YELLOW)"\ngesture_piarm: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Making dependencies..."$(NOCOLOR)
 	@echo "Downloading .xml, .bin, and .mapping files..."
 	@if [ -e ${SSD_GESTURE_DIR}/${SSD_GESTURE_BIN_FILENAME} ] ; \
 	then \
@@ -47,7 +47,7 @@ deps:
 
 .PHONY: install-reqs
 install-reqs:
-	@echo $(YELLOW)"\ngesture_piarm: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture Piarm: Checking application requirements...\n"$(NOCOLOR)
 	@echo "Installing Pigpio and it's python library..."
 	sudo apt-get install pigpio
 	sudo pip3 install pigpio
@@ -55,21 +55,21 @@ install-reqs:
 
 .PHONY: run_wout_arm_CPU
 run_wout_arm_CPU: deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot on CPU..."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Running the sample without robot on CPU..."$(NOCOLOR)
 	@echo "Starting Gesture SSD Python Demo..."
 	python3 gesture_ssd_async_wout_robot.py -i 'cam' -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME} -l ${CPU_EXTENSION}
 
 
 .PHONY: run_wout_arm_MYRIAD
 run_wout_arm_MYRIAD: install-reqs deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample without robot using MYRIAD plugin..."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Running the sample without robot using MYRIAD plugin..."$(NOCOLOR)
 	@echo "Starting Gesture SSD Python Demo..."
 	python3 gesture_ssd_async_wout_robot.py -i 'cam' -d MYRIAD -m ${SSD_GESTURE_DIR}/${SSD_GESTURE_XML_FILENAME}
 
 
 .PHONY: run
 run: install-reqs deps data
-	@echo $(YELLOW)"\ngesture_piarm: Running the sample..."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Running the sample..."$(NOCOLOR)
 	@echo "Initializing Pigpio daemon..."
 	sudo pigpiod
 	@echo "Starting Gesture SSD Python Demo..."
@@ -91,5 +91,5 @@ help:
 
 .PHONY: clean
 clean:
-	@echo $(YELLOW)"\ngesture_piarm: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)"\nGesture PiArm: Cleaning up files..."$(NOCOLOR)
 	rm -rf ${SSD_GESTURE_DIR}
