@@ -60,8 +60,13 @@ compile_cpp:
 
 .PHONY: run
 run: run_cpp
-	
 
+
+.PHONY: compile_model
+compile_model:
+	@echo $(YELLOW)"\nncs_digital_sign: Not applicable..."$(NOCOLOR)
+	
+	
 .PHONY: run_cpp
 run_cpp: install-reqs deps data compile_cpp
 	@echo $(YELLOW)"\nncs_digital_sign: Running the sample..."$(NOCOLOR)
