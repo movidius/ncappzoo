@@ -87,7 +87,8 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- download and prepare networks";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Not applicable";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Not applicable";
-	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Not applicable";
+	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds application";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Not applicable";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content and temporary files";
 
 
