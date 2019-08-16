@@ -84,8 +84,7 @@ help:
 	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the gender_age executable example program";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: deps, compile_cpp, run";
-	@echo $(YELLOW)"  make agenet "$(NOCOLOR)"- compile agenet xml/bin files";
-	@echo $(YELLOW)"  make gendernet "$(NOCOLOR)"- compile gendernet xml/bin files";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- download and prepare networks";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content and temporary files";
 
 
