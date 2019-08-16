@@ -85,6 +85,9 @@ help:
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: deps, compile_cpp, run";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- download and prepare networks";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Not applicable";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Not applicable";
+	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Not applicable";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content and temporary files";
 
 
