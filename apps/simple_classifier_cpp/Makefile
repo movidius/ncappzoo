@@ -64,7 +64,7 @@ compile_cpp:
 
 
 .PHONY: run_cpp
-run_cpp: install-reqs deps data compile_cpp
+run_cpp: deps data compile_cpp
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	./build/${APP_NAME} ${GOOGLENET_BASE_NAME}.xml ${IMAGES_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME}
 

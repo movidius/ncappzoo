@@ -53,7 +53,7 @@ default_model: compile_default_model
 
 
 .PHONY: run_py
-run_py: install-reqs data deps
+run_py: data deps
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the Python sample..."$(NOCOLOR)
 	python3 ./${APP_NAME}.py dev=${DEV} mx=${XML} mb=${BIN} 
 

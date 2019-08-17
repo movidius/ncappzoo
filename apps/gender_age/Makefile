@@ -74,7 +74,7 @@ run: run_cpp
 	
 
 .PHONY: run_cpp
-run_cpp: install-reqs deps data compile_cpp
+run_cpp: deps data compile_cpp
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	(cd build; ./${APP_NAME}; cd ..;)
 

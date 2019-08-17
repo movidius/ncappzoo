@@ -78,7 +78,7 @@ run: run_py
 
 
 .PHONY: run_py
-run_py: install-reqs deps data
+run_py: deps data
 	@echo $(YELLOW)"\nface-detection-retail-0004: Running Python sample..."$(NOCOLOR)
 	python3 face_detect.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_FILENAME} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
 

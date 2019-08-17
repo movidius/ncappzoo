@@ -56,8 +56,29 @@ run: run_py
 	
 	
 .PHONY: run_py
-run_py: install-reqs data deps googlenet alexnet squeezenet  
+run_py: data data deps googlenet alexnet squeezenet 
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
+	@echo "Checking python3-pil.imagetk..."
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo " - python3-pil.imagetk already installed.\n"; \
+	else \
+		echo $(YELLOW)"ATTENTION! "$(NOCOLOR)"python3-pil.imagetk is required to run this sample.\n";\
+		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
+		echo "or use the command:" $(YELLOW)"sudo apt-get install -y python3-pil.imagetk"$(NOCOLOR)" to manually install requirement.\n"; \
+		exit 1;\
+	fi; \
+	
+	@echo "Checking scikit-image..."
+	@if ${shell} ${CHECK_SKIMAGE} 2> /dev/null; \
+	then \
+	    echo " - scikit-image already installed.\n" ; \
+	else \
+		echo $(YELLOW)"\nATTENTION! "$(NOCOLOR)"scikit-image is required to run this sample.\n"; \
+		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
+		echo "or use the command: " $(YELLOW)"pip3 install scikit-image --user"$(NOCOLOR)" to manually install requirement.\n"; \
+		exit 1; \
+	fi; \
 	python3 ${APP_NAME}.py
 
 
@@ -69,9 +90,8 @@ install-reqs:
 	then \
 		echo " - python3-pil.imagetk already installed.\n"; \
 	else \
-		echo $(YELLOW)"ATTENTION! "$(NOCOLOR)"python3-pil.imagetk is required to run this sample.";\
-		echo "Use the command:" $(YELLOW)"sudo apt-get install -y python3-pil.imagetk"$(NOCOLOR)" to install requirement.\n"; \
-		exit 1;\
+		echo $(YELLOW)"Installing python3-pil.imagetk... "$(NOCOLOR); \
+		sudo apt-get install python3-pil.imagetk; \
 	fi; \
 	
 	@echo "\n Checking scikit-image..."
@@ -79,8 +99,8 @@ install-reqs:
 	then \
 	    echo " - scikit-image already installed.\n" ; \
 	else \
-		echo $(YELLOW)"\nATTENTION! "$(NOCOLOR)"scikit-image is required to run this sample."; \
-		echo "Use the command: " $(YELLOW)"pip3 install scikit-image --user"$(NOCOLOR)" to install requirement."; \
+		echo $(YELLOW)"Installing scikit-image..."$(NOCOLOR); \
+		pip3 install scikit-image --user; \
 		exit 1; \
 	fi
 	

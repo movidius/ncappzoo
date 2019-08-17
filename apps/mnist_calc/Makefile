@@ -46,7 +46,7 @@ install-reqs:
 	
 
 .PHONY: run
-run: install-reqs deps data
+run: deps data
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	python3 ./$(APP_NAME).py
 

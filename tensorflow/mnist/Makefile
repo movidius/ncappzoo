@@ -161,7 +161,7 @@ run: run_py
 
 
 .PHONY: run_py
-run_py: install-reqs deps data compile_model
+run_py: deps data compile_model
 	@echo $(YELLOW) "\nMnist: Running Python sample..." $(NOCOLOR)
 	python3 $(RUN_PY_RELATIVE_DIR) --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=categories.txt
 

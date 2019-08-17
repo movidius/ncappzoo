@@ -78,7 +78,7 @@ compile_model: prototxt caffemodel
 	
 
 .PHONY: run_py
-run_py: install-reqs data deps compile_model
+run_py: data deps compile_model
 	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
 	python3 ./tiny_yolo_v1.py --image=${IMG} --ir=${IR}
 

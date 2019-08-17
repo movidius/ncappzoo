@@ -58,7 +58,7 @@ run: run_py
 
 
 .PHONY: run_py
-run_py: install-reqs deps data
+run_py: deps data
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	python3 run.py --ir=${MODEL_FILE_NAME_BASE}.xml --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} 
 
