@@ -56,7 +56,7 @@ run: run_py
 	
 	
 .PHONY: run_py
-run_py: deps googlenet alexnet squeezenet 
+run_py: data deps googlenet alexnet squeezenet 
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 	@echo "Checking python3-pil.imagetk..."
 	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
