@@ -133,20 +133,6 @@ install-reqs:
 	@echo "Installing Flask and Pillow (PIL - Python Imaging Library)..."
 	sudo pip3 install flask Pillow
 	@echo "If you would like to uninstall the required packages, please enter 'make uninstall-reqs'"
-
-
-.PHONY: run
-run: deps data
-	@echo $(YELLOW)"\nChef Ai: Running the sample..."$(NOCOLOR)
-	@echo "Please make sure to fill in the config values for the Edamam API!"
-	@echo "Checking OpenVINO environment..."
-	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
-	then \
-		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
-		exit 1 ; \
-	else \
-		echo "Intel OpenVINO environment is already set!" ; \
-	fi
 	@echo "Checking if there a non-empty Edamam API app ID and app key..."
 	@if [ -z "$(APP_KEY)" ] ; \
 	then \
@@ -161,6 +147,20 @@ run: deps data
 		exit 1 ; \
 	else \
 		echo "Provided a non-empty app ID." ; \
+	fi
+
+
+.PHONY: run
+run: deps data
+	@echo $(YELLOW)"\nChef Ai: Running the sample..."$(NOCOLOR)
+	@echo "Please make sure to fill in the config values for the Edamam API!"
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
 	fi
 	@echo "Checking requirements..."
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
