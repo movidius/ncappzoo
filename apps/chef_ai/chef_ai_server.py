@@ -12,7 +12,7 @@ import os
 
 
 app = Flask(__name__, template_folder='templates')
-app.config['EXPLAIN_TEMPLATE_LOADING'] = True
+# app.config['EXPLAIN_TEMPLATE_LOADING'] = True
 
 def build_argparser():
     parser = ArgumentParser(add_help=False)
@@ -139,4 +139,4 @@ def detect():
 
 if __name__ == '__main__':
     threading.Timer(2.25, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
-    app.run(debug=True)
+    app.run(debug=False)
