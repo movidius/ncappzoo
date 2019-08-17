@@ -108,10 +108,10 @@
     </div>
 
     <script>
-      // CONFIGS: CHANGE THESE VARIABLES
+      // CONFIGS: CHANGE THESE VARIABLES IN MAKEFILE
       const configs = {
-        'APP_ID': '',
-        'APP_KEY': ''
+        'APP_ID': '{{ key }}',
+        'APP_KEY': '{{ id }}'
       }
 
       // Next two functions handle capturing/uploading of data
@@ -181,7 +181,7 @@
       }
 
       // Handling Edamam API request
-      const handleRecipes = () => {
+      const handleRecipes = (key, id) => {
         var ingredients = document.getElementById("predictions").innerHTML.split(",")
         var q = ""
         ingredients.forEach((val, index) => {

@@ -2,6 +2,9 @@ GREEN = '\033[1;32m'
 YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
+# EDIT THESE EDAMAM API VARIABLES
+APP_ID =
+APP_KEY =
 
 # Filename for the graph file
 SSD_FOOD_DIR = food_model_fp16
@@ -144,6 +147,21 @@ run: deps data
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
+	@echo "Checking if there a non-empty Edamam API app ID and app key..."
+	@if [ -z "$(APP_KEY)" ] ; \
+	then \
+		echo "APP_KEY = $(APP_KEY)... Please paste or type in your Edamam app key into the APP_KEY variable located at the top of the Makefile." ; \
+		exit 1 ; \
+	else \
+		echo "Provided a non-empty app key." ; \
+	fi
+	@if [ -z "$(APP_ID)" ] ; \
+	then \
+		echo "Please paste or type in your Edamam app ID into the APP_ID variable located at the top of the Makefile." ; \
+		exit 1 ; \
+	else \
+		echo "Provided a non-empty app ID." ; \
+	fi
 	@echo "Checking requirements..."
 	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("flask"))' ; \
 	then \
@@ -160,7 +178,7 @@ run: deps data
 		exit 1 ; \
 	fi
 	@echo "Starting backend server..."
-	@python3 chef_ai_server.py -e ${CPU_EXT}
+	@python3 chef_ai_server.py -e ${CPU_EXT} -k ${APP_KEY} -i ${APP_ID}
 
 
 .PHONY: help

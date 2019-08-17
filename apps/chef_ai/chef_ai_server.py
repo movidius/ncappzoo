@@ -20,7 +20,10 @@ def build_argparser():
     args.add_argument("-e", "--cpu_extension",
                       help="Optional. Required for CPU custom layers. Absolute path to a shared library with the "
                            "kernels implementations.", type=str, default=None)
-
+    args.add_argument("-i", "--app_id",
+                      help="Optional. Required for Edamam API.", type=str, default=None)
+    args.add_argument("-k", "--app_key",
+                      help="Optional. Required for Edamam API.", type=str, default=None)
     return parser
 
 # CORS Agreement Code Snippet
@@ -36,10 +39,14 @@ def after_request(response):
 # Front end rendering
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'GET':
-        return render_template('index.html')
+    args = build_argparser().parse_args()
+    i = args.app_id
+    k = args.app_key
 
-    return redirect(url_for('index'))
+    if request.method == 'GET':
+        return render_template('index.html', id=i, key=k)
+
+    return redirect(url_for('index'), key=k, id=i)
 
 # Backend Test Route
 @app.route('/test')

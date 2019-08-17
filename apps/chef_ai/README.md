@@ -22,6 +22,14 @@ This app demonstrates how to use the food ssd inception v2 model featured in the
 ## Setup
 All setup/startup is streamlined through the make commands!
 
+### Start the application
+```
+$ # Set the OpenVINO environment
+$ make all
+$ make install-reqs
+$ make run
+```
+
 ### Makefile
 - **make all** - does **make data** and **make deps**
 - **make data** - downloads test data
