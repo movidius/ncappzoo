@@ -137,14 +137,12 @@ install-reqs:
 	@if [ -z "$(APP_KEY)" ] ; \
 	then \
 		echo "APP_KEY = $(APP_KEY)... Please paste or type in your Edamam app key into the APP_KEY variable located at the top of the Makefile." ; \
-		exit 1 ; \
 	else \
 		echo "Provided a non-empty app key." ; \
 	fi
 	@if [ -z "$(APP_ID)" ] ; \
 	then \
-		echo "Please paste or type in your Edamam app ID into the APP_ID variable located at the top of the Makefile." ; \
-		exit 1 ; \
+		echo "APP_ID = $(APP_ID)... Please paste or type in your Edamam app ID into the APP_ID variable located at the top of the Makefile." ; \
 	else \
 		echo "Provided a non-empty app ID." ; \
 	fi
@@ -172,7 +170,7 @@ run: deps data
 	fi
 	@if [ -z "$(APP_ID)" ] ; \
 	then \
-		echo "Please paste or type in your Edamam app ID into the APP_ID variable located at the top of the Makefile." ; \
+		echo "APP_ID = $(APP_ID)... Please paste or type in your Edamam app ID into the APP_ID variable located at the top of the Makefile." ; \
 		exit 1 ; \
 	else \
 		echo "Provided a non-empty app ID." ; \
