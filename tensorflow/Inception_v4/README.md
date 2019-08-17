@@ -28,11 +28,8 @@ make compile_model
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_py
 Runs a sample application with the network.
-
-### make run_py
-Runs the simple_classifier_py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
 
 ### make cpp
 Builds the C++ example program run_cpp which can be executed with make run_cpp. 

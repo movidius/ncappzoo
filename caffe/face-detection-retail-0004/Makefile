@@ -72,13 +72,6 @@ compile_model:
 	@echo $(YELLOW)"\nface-detection-retail-0004: Compiling model to IR..."$(NOCOLOR)
 	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
 
-
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
 	
 .PHONY: run
 run: run_py
@@ -88,18 +81,31 @@ run: run_py
 run_py: deps data
 	@echo $(YELLOW)"\nface-detection-retail-0004: Running Python sample..."$(NOCOLOR)
 	python3 face_detect.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_FILENAME} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
+
+
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nface-detection-retail-0004: Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."
+
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nface-detection-retail-0004: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
 	
 
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- Runs the Python example.";
-	@echo $(YELLOW)"  make run_py "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make run or make run_py "$(NOCOLOR)"- Runs the Python example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
 	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Compiles the model to an IR format.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
 	
 

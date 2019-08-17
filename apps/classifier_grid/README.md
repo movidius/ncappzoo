@@ -2,9 +2,13 @@
 ## Introduction
 This sample displays a visual representation of simultaneous inferences being performed by multiple threads and devices. 
 
-The sample starts by loading several images and displaying them in a grid pattern. As the NCS device completes an inference on an image in the grid, the image will light up to signal that the inference was complete. 
+The sample starts by loading several images and displaying them in a grid pattern. As the NCS device completes an inference on an image in the grid, the image will light up to signal that the inference on that image is complete as seen in the animation below
 
-The example uses 3 threads per NCS device and by default creates 6 async inference requests per thread. By default, the sample will run 500 inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet).
+![](classifier_grid.gif)
+
+By default, the example uses 3 threads per NCS device and creates 6 async inference requests per thread. Also by default, the sample will run 500 inferences using the [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet) network.
+
+This application provides many configurable options on the commandline when running directly with the python interpreter rather than through the Makefile.  To see the supported options run `python3 classifier_grid.py help`.
 
 The provided Makefile does the following:
 1. Builds the IR files using the model files from [Open Model Zoo](https://github.com/opencv/open_model_zoo).
@@ -55,8 +59,11 @@ Builds all of the dependencies needed to run the sample.
 ### make default_model
 Compiles an IR file from a default model to be used when running the sample.
 
-### make install_reqs
+### make install-reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.

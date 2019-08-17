@@ -1,8 +1,14 @@
 # classifier_flash
 ## Introduction
-This project makes use of the OpenVINO async api and is a good example of both how to scale and thread an OpenVINO application.
+This app repeated does classification inferences on images from the filesystem and shows each image along with the classification and current FPS.  It makes use of the OpenVINO async api and is a good example of both how to scale and thread an OpenVINO application.  It looks like the following while running.
 
-The example uses 3 threads per NCS device and by default creates 6 async inference requests per thread. By default, the sample will run 500 inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet).
+![](classifier_flash.gif)
+
+The FPS number shown will vary depending on the host system's ability to update the graphical window as well as other variables such as the display image size (window size).  This application shouldn't be used to benchmark the NCS performance for this reason.  
+
+By default this example uses 3 threads per NCS device and creates 6 async inference requests per thread. Also by default, the application will run 500 inferences using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet).
+
+There are lots of commandline arguments that can be used to override the defaults.  To see the supported commandline arguments run the program directly through the python interpreter rather than through the Makefile and pass "help" as the only argument like this `python3 classifier_flash.py help`. 
 
 The provided Makefile does the following:
 1. Builds the IR files using the model files from [Open Model Zoo](https://github.com/opencv/open_model_zoo).
@@ -52,6 +58,9 @@ Builds all of the dependencies needed to run the sample.
 
 ### make install_reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.

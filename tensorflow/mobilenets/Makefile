@@ -131,12 +131,6 @@ compile_model: freeze
 		${NCCOMPILE} --data_type=FP16 --reverse_input_channels --scale=${SCALE} --mean_values=${MEAN_VALUES} --input_model=$(MODEL_CKPT)_frozen.pb || (echo $(RED)"Make sure to set the OpenVINO environment variables using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nMobilenet: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
 	
 .PHONY: run
 run: run_py 
@@ -160,6 +154,18 @@ run_py: data deps compile_model
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}
 	
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nMobilenet: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nMobilenet: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
@@ -172,6 +178,8 @@ help:
 	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Uses the Model Optimizer to compile the model files to IR.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all created content."
 	@echo "  ";
 	@echo $(YELLOW)"  Note"$(NOCOLOR)": by default will use Mobilenet v1: depth multiplier: 1.0, image size: 224";

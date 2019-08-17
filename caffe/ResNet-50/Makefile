@@ -65,12 +65,6 @@ compile_model: download_model_files
 	else \
 		${NCCOMPILE} --data_type=FP16 --input_model=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${RESNET50_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel --input_proto=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${RESNET50_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt --mean_values=${MEAN_VALUES} || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi 
-
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nResNet-50: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
 	
 	
 .PHONY: run
@@ -95,12 +89,23 @@ run_py: deps data compile_model
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
 	
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nResNet-50: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+	
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nResNet-50: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+
+
 .PHONY: help
 help:
 	@echo $(NOCOLOR)"\nPossible make targets: ";
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- Runs the Python example.";
-	@echo $(YELLOW)"  make run_py "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- Runs the Python example.";
 	@echo $(YELLOW)"  make run_cpp "$(NOCOLOR)"- Runs the C++ example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
@@ -108,6 +113,8 @@ help:
 	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds the C++ example.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
 	
 

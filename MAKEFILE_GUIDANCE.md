@@ -9,9 +9,9 @@ App Makefiles build source code, download or copy (from other repo subdirectorie
   - **make data** : Download data (images, etc.) If no data is required this may be an empty target.
   - **make deps** : Download/Prepare/optimize networks.  If not needed create empty target.
   - **make all** : Prepares everything needed to run the application including other projects in the repository. Should not run application, should not popup GUI.
-  - **make run** : Runs the application with some set of default parameters/settings/configuration.  'make run' must always execute the program without the need for other parameters.  Users expect to see some working output by just typing 'make run'
+  - **make run** : Runs the application with some set of default parameters/settings/configuration.  'make run' must always execute the program without the need for other parameters.  Users expect to see some working output by just typing `make run`. This Makefile target should also detect the case of missing required components and if it detects such a case it should diret the user to run `make install-reqs` to remedy the situation.
   - **make clean** : Removes all the files in this project directory that get created when making or running this project.  Should not clean other projects in the repository.  After running 'make clean' the only files in the directory should be those that are in the repository.
-  - **make install-reqs**: Installs any required components for the application or gives instructions for installing those components.  If no other components are required then this target may be empty.  
+  - **make install-reqs**: Installs any required system/OS components for the application or gives instructions for installing those components.  If no other components are required then this target may be empty.  This is the only place that the users installed components/packages should be modified.
   - **make uninstall-reqs**: if the `make install-reqs` installs any components, then this target should uninstall those components or give instructions for uninstalling them.  If not applicable then this target may be empty.  
  
  ## Makefiles for neural networks
@@ -22,7 +22,7 @@ App Makefiles build source code, download or copy (from other repo subdirectorie
   - **make all** : makes the following targets: deps, compile_model
   - **make deps** : Download/Prepare networks to be optimized.  If not needed this may be an empty target
   - **make compile_model** : Run the OpenVINO toolkit's Model Optimizer tool to create an optimized OpenVINO IR neural network (.bin and .xml) for the network
-  - **make run** : Run a simple program demonstrating the use of the optimized network.  This may invoke an application under the ncappzoo/apps directory hierarchy or from within this project's directory
+  - **make run** : Run a simple program demonstrating the use of the optimized network.  This may invoke an application under the ncappzoo/apps directory hierarchy or from within this project's directory.  This Makefile target should also detect the case of missing required components and if it detects such a case it should diret the user to run `make install-reqs` to remedy the situation.
   - **make clean** : Removes all the files in this project directory that may get created when making or running this project.  Should not clean other projects in the repository. After running 'make clean' the only files in the directory should be those that are in the repository.
-- **make install-reqs**: Installs any required components for the neural network or gives instructions for installing those components.  If no other components are required then this target may be empty.
+- **make install-reqs**: Installs any required components for the neural network or gives instructions for installing those components.  If no other components are required then this target may be empty.  This is the only place that the users installed components/packages should be modified.
 - **make uninstall-reqs**: if the `make install-reqs` installs any components, then this target should uninstall those components or give instructions for uninstalling them.  If not applicable then this target may be empty.  

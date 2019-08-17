@@ -10,7 +10,7 @@ The SSD Inception V2 network can be used to detect a number of objects specified
 - closed fist with exposed bottom palm
 - fist with exposed knuckles.
 
-![](hand_gesture_5.gif)
+![](hand_gesture_6.gif)
 
 The provided Makefile does the following:
 1. Downloads a trained model
@@ -59,8 +59,14 @@ Compiles the trained model to generate a OpenVINO IR file.  This file can be loa
 ### make get_model
 Downloads the trained model.
 
-### deps
+### make deps
 Downloads and prepares a trained network for compilation with the OpenVINO toolkit.
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation.
+ 
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.
