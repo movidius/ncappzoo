@@ -51,12 +51,7 @@ compile_default_model:
 .PHONY: default_model
 default_model: compile_default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making default models..."$(NOCOLOR)
-
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
-	@echo "No requirements needed."	
+	
 	
 .PHONY: run
 run: run_py
@@ -68,6 +63,18 @@ run_py: install-reqs deps data
 	python3 run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} 
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."
+	
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+	
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
@@ -77,6 +84,7 @@ help:
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content";
 	@echo ""

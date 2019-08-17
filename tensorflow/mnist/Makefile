@@ -155,12 +155,6 @@ compile_model: get_model
 		${NCCOMPILE} --data_type=FP16 --input_meta_graph=${MODEL_INFERENCE_META_FILENAME} --input_shape=${INPUT_SHAPE} || (echo $(RED)"Make sure to set the OpenVINO environment variables using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nMnist: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
 	
 .PHONY: run
 run: run_py
@@ -172,6 +166,18 @@ run_py: install-reqs deps data compile_model
 	python3 $(RUN_PY_RELATIVE_DIR) --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=categories.txt
 
 
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nMnist: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+	
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nMnist: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+		
 .PHONY: help
 help:
 	@echo "\nPossible make targets"
@@ -183,6 +189,8 @@ help:
 	@echo $(YELLOW)"  make model " $(NOCOLOR) "- Downloads the model files.";
 	@echo $(YELLOW)"  make data " $(NOCOLOR) "- Downloads required data.";
 	@echo $(YELLOW)"  make deps " $(NOCOLOR) "- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
 	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a mnist model.";
 

@@ -18,11 +18,8 @@ make run
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_py
 Runs a sample application with the network.
-
-### make run_py
-Runs the simple_classifier_py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
 
 ### make cpp
 Builds the C++ example program run_cpp which can be executed with make run_cpp. 
@@ -38,6 +35,12 @@ Makes the follow items: deps, data, compile_model, compile_cpp.
 
 ### make compile_model
 Uses the network description and the trained weights files to generate an IR (intermediate representation) format file.  This file is later loaded on the Neural Compute Stick where the inferences on the network can be executed.  
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation.
+ 
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.

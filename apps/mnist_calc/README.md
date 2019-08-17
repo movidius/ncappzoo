@@ -43,9 +43,12 @@ Builds all of the dependencies needed to run the sample.
 ### make default_model
 Compiles an IR file from a default model to be used when running the sample.
 
-### make install_reqs
+### make install-reqs
 Checks the requirements needed to run the sample.
- 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
+  
 ### make clean
 Removes all the temporary files that are created by the Makefile.
 

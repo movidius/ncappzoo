@@ -60,8 +60,14 @@ Compiles the trained model to generate a OpenVINO IR file.  This file can be loa
 ### make get_model
 Downloads the trained model.
 
-### deps
+### make deps
 Downloads and prepares a trained network for compilation with the OpenVINO toolkit.
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation.
+ 
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.

@@ -18,15 +18,11 @@ The example runs an inference with the image one.png. Other digit images can be 
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_py
 Runs a sample application with the network.
-
-### make run_py
-Runs the simple_classifier_py python script which sends a single image to the Neural Compute Stick and receives and displays the inference results.
 
 ### make train
 Trains a Mnist model for use with the sample. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the Mnist model if they so desire. 
-
 
 ### make help
 Shows makefile possible targets and brief descriptions. 
@@ -40,8 +36,14 @@ Compiles the trained model to generate a OpenVINO IR file.  This file can be loa
 ### make model
 Downloads the trained model.
 
-### deps 
+### make deps 
 Downloads and prepares a trained network for compilation with the OpenVINO toolkit.
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation.
+ 
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.

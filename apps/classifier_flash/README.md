@@ -58,6 +58,9 @@ Builds all of the dependencies needed to run the sample.
 
 ### make install_reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.
