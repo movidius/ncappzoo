@@ -16,7 +16,7 @@ AGE_GEN_FILE_NAME_BASE = age-gender-recognition-retail-0013
 APP_NAME = gender_age
 
 .PHONY: all
-all: deps data
+all: deps data compile_cpp
 
 
 .PHONY: data
