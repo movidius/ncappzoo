@@ -101,7 +101,6 @@ install-reqs:
 	else \
 		echo $(YELLOW)"Installing scikit-image..."$(NOCOLOR); \
 		pip3 install scikit-image --user; \
-		exit 1; \
 	fi
 	
 	
