@@ -1,0 +1,241 @@
+<html>
+  <head>
+    <Title>Chef.ai</Title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  </head>
+  <style>
+    body {
+      margin-right: 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      font-family: 'Roboto', sans-serif;
+    }
+    button {
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      margin-left: 32px;
+    }
+    #comparison {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    #last-compare {
+      margin-left: 16px;
+    }
+    #webcam {
+      width: 500px;
+      height: 375px;
+      background-color: #666;
+    }
+    #recipe-list {
+      list-style: none;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    #recipe-box {
+      border: 2px solid black;
+      margin: 16px;
+      padding: 16px;
+    }
+  </style>
+  <body>
+    <!-- This section is for users to upload data via webcam capture or
+    photo upload -->
+    <div class="container">
+      <h2>Step 1: Let's see what you have!</h3>
+      <video autoplay="true" id="webcam"></video>
+      <button onclick="handleUpload()" id="capture_button">
+        Capture Image
+      </button>
+    </div>
+
+    <div class="container">
+      <h2>Or Step 1: Upload a photo of your groceries!</h3>
+      <input name="uploded" id="uploaded_file" type="file">
+      <h3>You can see your uploaded or captured image in Ooo Pretty!</h3>
+    </div>
+
+    <!-- Used mainly for drawing jpgs to be uploaded to the backend -->
+    <canvas id="can" style="display: none;"></canvas>
+
+    <!-- User can call inference from this section here -->
+    <div class="container">
+      <h2>Step 2: Let me do some smart stuff!</h2>
+      <div id="comparison">
+        <button onclick="handleInference('c')">Detect (CPU)</button>
+        <button onclick="handleInference('m')" id="last-compare">Detect (MYRIAD)</button>
+      </div>
+      <h2>Step 3: Let's see what I detected!</h2>
+      <div id="predictions">
+
+      </div>
+    </div>
+
+    <!-- The purpose of this section is to show differences between their input data
+    and data processed by running inference and rendering a bounding box -->
+    <div class="container">
+      <h2>Ooo Pretty! (Just a display, but you get to see what's what!)</h2>
+      <div id="comparison">
+        <div>
+          <h3>Input Photo</h3>
+          <img id="display" src="" alt="Take or Upload a Photo!" width="300"/>
+        </div>
+        <div id="last-compare">
+          <h3>Result Photo</h3>
+          <img id="result" src="" alt="The result will be displayed here!" width="300"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Here, users will be able to see what kind of recipes that the user can
+    use with the ingredients they have at their disposal -->
+    <div class="container" id="display-recipes" style="display: none;">
+      <h2>Step 4: Let's see what we can make!</h2>
+      <button onclick="handleRecipes()" style="max-width: 200px">Get Recipes!</button>
+      <h3>Recipes</h3>
+      <div id="recipes">
+        <ul id="recipe-list"></ul>
+      </div>
+    </div>
+
+    <script>
+      // CONFIGS: CHANGE THESE VARIABLES IN MAKEFILE
+      const configs = {
+        'APP_ID': '{{ key }}',
+        'APP_KEY': '{{ id }}'
+      }
+
+      // Next two functions handle capturing/uploading of data
+      document.getElementById("uploaded_file").onchange = (e) => {
+        var reader = new FileReader()
+        reader.onload = (e) => {
+          document.getElementById("display").src = e.target.result;
+        }
+        if (e.target.files[0] !== null && e.target.files[0] !== undefined) {
+          reader.readAsDataURL(e.target.files[0])
+        }
+      }
+
+      const handleUpload = () => {
+        var canvas = document.getElementById('can')
+        const webcam = document.getElementById('webcam')
+
+        canvas.width = webcam.videoWidth
+        canvas.height = webcam.videoHeight
+        canvas.getContext('2d').drawImage(webcam, 0, 0)
+
+        canvas = document.getElementById('can')
+        document.getElementById("display").src = canvas.toDataURL('image/jpeg')
+      }
+
+      // Handling inference, sending post to Backend
+      const handleInference = (option) => {
+        var ops = {
+          method: 'POST',
+          body: JSON.stringify({
+            'img': document.getElementById("display").src,
+            'model_type': 'food',
+            'device': 'cpu'
+          }),
+          headers: {'Content-Type': 'application/json'}
+        }
+
+        if (option === 'm') {
+          ops = {
+            method: 'POST',
+            body: JSON.stringify({
+              'img': document.getElementById("display").src,
+              'model_type': 'food',
+              'device': 'myriad'
+            }),
+            headers: {'Content-Type': 'application/json'}
+          }
+        }
+
+        fetch("/detect", ops).then((data) => {
+          return data.json()
+        }).then((res) => {
+          const conversion_map = {
+            1: 'banana', 2: 'bellpepper', 3: 'tomato', 4: 'broccoli', 5: 'cheese',
+            6: 'beef', 7: 'steak', 8: 'olive oil', 9: 'corn', 10: 'eggs'
+          }
+          var labels = ""
+          res.info_state.split(',').forEach((val, index) => {
+            var label = conversion_map[val]
+            labels = index === 0 ? label : labels + "," + label
+          })
+
+          document.getElementById("predictions").innerHTML = labels
+          document.getElementById("result").src = res.result
+          document.getElementById("display-recipes").style.display = 'flex'
+        })
+      }
+
+      // Handling Edamam API request
+      const handleRecipes = (key, id) => {
+        var ingredients = document.getElementById("predictions").innerHTML.split(",")
+        var q = ""
+        ingredients.forEach((val, index) => {
+          q = index === 0 ? val : q + "+" + val
+        })
+
+        if (ingredients.length === 0) {
+          console.log(ingredients)
+          console.log(q)
+          return
+        }
+
+        var API_URL = 'https://api.edamam.com/search?' + "q=" + q
+        API_URL = API_URL + "&app_id=" + configs['APP_ID']
+        API_URL = API_URL + "&app_key=" + configs["APP_KEY"]
+        fetch(API_URL).then((data) => {
+          return data.json()
+        }).then((res) => {
+          const {hits} = res
+          document.getElementById('recipe-list').innerHTML = ""
+          var recipes = hits.map((val, index) => {
+            const {recipe} = val
+            const {url, ingredientLines, calories, healthLabels, label, source, image} = recipe
+            var li = document.createElement('li')
+            li.setAttribute('id', 'recipe-box')
+            healthLabellist = ""
+            healthLabels.forEach((val, index) => {
+              healthLabellist = index === 0 ? val : healthLabellist + " " + val
+            })
+
+            inglist = "<ul>"
+            ingredientLines.forEach((val, index) => {inglist = inglist + `<li>${val}</li>`})
+            inglist = inglist + "</ul>"
+
+            li.innerHTML = "<div>"
+            li.innerHTML = li.innerHTML + `<h3>${label} by ${source}</h3>`
+            li.innerHTML = li.innerHTML + `<p><a href=${url}>Link to Recipe</a></p>`
+            li.innerHTML = li.innerHTML + `<img src=${image} alt="pic" />`
+            li.innerHTML = li.innerHTML + `<p>Calories: ${calories}</p>`
+            li.innerHTML = li.innerHTML + `<p>Health Labels: ${healthLabellist}</p>`
+            li.innerHTML = li.innerHTML + `<h3>Ingredients</h3>${inglist}`
+            li.innerHTML = li.innerHTML + "</div>"
+            document.getElementById("recipe-list").appendChild(li)
+          })
+        })
+      }
+
+      // Script for running cam feed in javascript
+      var webcam = document.getElementById("webcam")
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({video: true}).then((feed) => {
+          webcam.srcObject = feed
+        }).catch((err) => console.log(err))
+      }
+    </script>
+  </body>
+</html>
