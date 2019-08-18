@@ -24,8 +24,7 @@ All setup/startup is streamlined through the make commands!
 
 ### Start the application
 ```
-$ # Set the OpenVINO environment
-$ make all
+$ # Set the OpenVINO environment by sourcing <openvino install dir>/bin/setupvars.sh
 $ make install-reqs
 $ make run
 ```
