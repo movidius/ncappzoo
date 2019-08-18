@@ -208,13 +208,12 @@ help:
 	@echo $(YELLOW)"  make run or run_py " $(NOCOLOR) "- Runs the Python example.";
 	@echo $(YELLOW)"  make all " $(NOCOLOR) "- Makes everything needed to run, but doesn't run the sample.";
 	@echo $(YELLOW)"  make compile_model " $(NOCOLOR) "- Runs model compiler for the network.";
-	@echo $(YELLOW)"  make model " $(NOCOLOR) "- Downloads the model files.";
 	@echo $(YELLOW)"  make data " $(NOCOLOR) "- Downloads required data.";
 	@echo $(YELLOW)"  make deps " $(NOCOLOR) "- Makes dependencies for project, prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
-	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a mnist model.";
+	@echo $(YELLOW)"  make train " $(NOCOLOR) "- (TBD) Train the mnist model.";
 
 clean: clean
 	@echo $(YELLOW)"\nSSD Inception V2 Food: Cleaning up files..."$(NOCOLOR)
