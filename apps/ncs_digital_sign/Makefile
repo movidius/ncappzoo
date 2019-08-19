@@ -13,9 +13,12 @@ AGE_GEN_RELATIVE_DIR = ../../caffe/AgeGenderNet
 AGE_GEN_MODEL_ZOO_DIR = Retail/object_attributes/age_gender/dldt/FP16
 AGE_GEN_FILE_NAME_BASE = age-gender-recognition-retail-0013
 
+@echo $(YELLOW)"\nncs_digital_sign: Building the sample..."$(NOCOLOR)
+	(mkdir -p build; cd build; cmake ..; make;)
+
 
 .PHONY: data
-deps: 
+data: 
 	@echo $(YELLOW)"\nncs_digital_sign: Downloading the required data..."$(NOCOLOR)
 
 
