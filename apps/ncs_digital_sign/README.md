@@ -6,6 +6,8 @@ The example does face detection on a camera frame using face-detection-retail.00
 
 ![](updated_gif.gif)
 
+Images in the advertisement_images directory are subject to the licenses.txt file within the directory.
+
 ## Building the Example
 
 To run the example code do the following :
