@@ -263,21 +263,28 @@ def main():
         input_image = input_image.astype(np.float32)
         input_image = np.transpose(input_image, (2,0,1))
         reshaped_image = input_image.reshape((n, c, network_input_h, network_input_w))
-        
+	    ####################### 3. Perform Inference #######################
         # Perform the inference asynchronously
         req_handle = exec_net.start_async(request_id=0, inputs={input_blob: reshaped_image})
         status = req_handle.wait()
+	    ####################### 4. Get results #######################
         all_output_results = req_handle.outputs
-                
-        # Post-processing for tiny yolo v3
-        # Tiny yolo v3 has two outputs and we check/parse both outputs
+        
+	    ####################### 5. Post processing for results #######################
+        # Post-processing for tiny yolo v3 
+        # The post process consists of the following steps:
+        # 1. Parse the output and filter out low scores
+        # 2. Filter out duplicates using intersection over union
+        # 3. Draw boxes and text
+        
+        ## 1. Tiny yolo v3 has two outputs and we check/parse both outputs
         filtered_objects = []
         for output_node_results in all_output_results.values():
             parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold)
         
-        # filter out duplicate objects from all detected objects
+        ## 2. Filter out duplicate objects from all detected objects
         filtered_mask = get_duplicate_box_mask(filtered_objects)
-        # draw rectangles and set up display texts
+        ## 3. Draw rectangles and set up display texts
         for object_index in range(len(filtered_objects)):
             if filtered_mask[object_index] == True:
                 # get all values from the filtered object list
@@ -287,17 +294,17 @@ def main():
                 ymax = filtered_objects[object_index][3]
                 confidence = filtered_objects[object_index][4]
                 class_id = filtered_objects[object_index][5]
-                # set up the text for display
+                # Set up the text for display
                 cv2.rectangle(display_image,(xmin, ymin), (xmax, ymin+20), LABEL_BG_COLOR, -1)
                 cv2.putText(display_image, label_list[class_id] + ': %.2f' % confidence, (xmin+5, ymin+15), TEXT_FONT, 0.5, TEXT_COLOR, 1)
-                # set up the bounding box
+                # Set up the bounding box
                 cv2.rectangle(display_image, (xmin, ymin), (xmax, ymax), BOX_COLOR, 1)
         
-        # display results
+        # Now we can display the results!
         cv2.imshow("OpenVINO Tiny yolo v3 - Press any key to quit", display_image)
         
-        # handle key presses
-        # get another frame from camera if using camera input
+        # Handle key presses
+        # Get another frame from camera if using camera input
         if input_stream == 0:
             key = cv2.waitKey(1)
             if key != -1:  # if used pressed a key, release the capture stream and break
@@ -312,7 +319,7 @@ def main():
                     cap.release()
                     break
                     
-    # clean up
+    # Clean up
     cv2.destroyAllWindows()
     del net
     del exec_net
