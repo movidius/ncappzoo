@@ -104,44 +104,44 @@ void showImg(int age, int gender) {
 	if (genCount > 50){
 	if (gender == 1) {
 		if (age < 17) {
-			cv::Mat image = cv::imread("../advertisement_images/young_boy_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_young_boy.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
-			cv::Mat image = cv::imread("../advertisement_images/male_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
-			cv::Mat image = cv::imread("../advertisement_images/male_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else {
-			cv::Mat image = cv::imread("../advertisement_images/male_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 	}
 	else {
 		if (age < 17) {
-			cv::Mat image = cv::imread("../advertisement_images/young_girl_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_young_girl.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
-			cv::Mat image = cv::imread("../advertisement_images/woman_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
-			cv::Mat image = cv::imread("../advertisement_images/woman_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
 		else {
-			cv::Mat image = cv::imread("../advertisement_images/woman_AD.png");
+			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
 			cv::imshow("Advertisement", image);
 			cv::waitKey(1);
 		}
@@ -475,14 +475,14 @@ int main (int argc, char** argv) {
 			cv::namedWindow("Advertisement", 0);
 			cv::moveWindow("General Advertisement", 20, 20);
 			cv::setWindowProperty("Advertisement", 0, 1);
-			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::Mat ad = cv::imread("../advertisement_images/AD_gender_neutral.jpg");
 			cv::imshow("Advertisement", ad);
 		}
 		if (flag == true) {
 			cv::namedWindow("Advertisement", 0);
 			cv::moveWindow("General Advertisement", 20, 20);
 			cv::setWindowProperty("Advertisement", 0, 1);
-			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::Mat ad = cv::imread("../advertisement_images/AD_gender_neutral.jpg");
 			cv::imshow("Advertisement", ad);
 			flag = false;
 		}
@@ -496,7 +496,7 @@ int main (int argc, char** argv) {
 			cv::namedWindow("Advertisement", 0);
 			//cv::moveWindow("General Advertisement", 20, 20);
 			cv::setWindowProperty("Advertisement", 0, 1);
-			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::Mat ad = cv::imread("../advertisement_images/AD_gender_neutral.jpg");
 			cv::imshow("Advertisement", ad);
 			flag = false;
 		}
@@ -504,7 +504,7 @@ int main (int argc, char** argv) {
 			cv::namedWindow("Advertisement", 0);
 			cv::moveWindow("General Advertisement", 20, 20);
 			cv::setWindowProperty("Advertisement", 0, 1);
-			cv::Mat ad = cv::imread("../advertisement_images/gender_neutral_AD.png");
+			cv::Mat ad = cv::imread("../advertisement_images/AD_gender_neutral.jpg");
 			cv::imshow("Advertisement", ad);
 		}
 	}
