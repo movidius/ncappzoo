@@ -1,6 +1,6 @@
 # Tiny yolo v3
 ## Introduction
-The TinyYolo network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
+The TinyYolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
 
 The provided Makefile does the following
 
@@ -28,7 +28,7 @@ Runs a sample application with the network.
 Shows makefile possible targets and brief descriptions. 
 
 ### make all
-Makes the follow items: deps, data, compile_model, compile_cpp.
+Makes the follow items: deps, data, compile_model.
 
 ### make compile_model
 Uses the network description and the trained weights files to generate an IR (intermediate representation) format file.  This file is later loaded on the Neural Compute Stick where the inferences on the network can be executed.  
