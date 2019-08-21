@@ -8,15 +8,15 @@ NOCOLOR = '\033[0m'
 
 
 DARKNET_MODEL_BASE_NAME = frozen_darknet_yolov3_model
-MODEL_BASE_NAME = tiny_yolo_v3
+
 
 INPUT = ../../data/images/nps_chair.png
 TF_YOLO_REPO_NAME = tensorflow-yolo-v3
 CLONE_REPO = git clone https://github.com/mystic123/tensorflow-yolo-v3.git
 LABELS = coco.names
 WEIGHTS_FILE = yolov3-tiny.weights
-IR = ${MODEL_BASE_NAME}.xml
 APP_NAME = tiny_yolo_v3
+IR = ${APP_NAME}.xml
 
 
 .PHONY: all
@@ -52,17 +52,17 @@ clone_repo:
 convert_weights: clone_repo data
 	@echo $(YELLOW)'\n'${APP_NAME}": Converting weights...\n"$(NOCOLOR)
 	wget -nc -c https://pjreddie.com/media/files/yolov3-tiny.weights; \
-	cd tensorflow-yolo-v3; python3 convert_weights_pb.py --class_names ../coco.names --data_format NHWC --weights_file ../yolov3-tiny.weights --tiny; mv ${DARKNET_MODEL_BASE_NAME}.pb ../${MODEL_BASE_NAME}.pb;
+	cd tensorflow-yolo-v3; python3 convert_weights_pb.py --class_names ../coco.names --data_format NHWC --weights_file ../yolov3-tiny.weights --tiny; mv ${DARKNET_MODEL_BASE_NAME}.pb ../${APP_NAME}.pb;
 
 
 .PHONY: compile_model
 compile_model: convert_weights
 	@echo $(YELLOW)'\n'${APP_NAME}": Compiling model to IR..."$(NOCOLOR)
-	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ] ; \
+	@if [ -e ${APP_NAME}.xml ] && [ -e ${APP_NAME}.bin ] ; \
 	then \
 		echo " - IR files exist. No need to compile." ; \
 	else \
-	    ${NCCOMPILE} --input_model=${MODEL_BASE_NAME}.pb --data_type=FP16 --batch=1 --tensorflow_use_custom_operations_config=$(INTEL_OPENVINO_DIR)/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3_tiny.json || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+	    ${NCCOMPILE} --input_model=${APP_NAME}.pb --data_type=FP16 --batch=1 --tensorflow_use_custom_operations_config=$(INTEL_OPENVINO_DIR)/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3_tiny.json || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
 
@@ -107,12 +107,12 @@ help:
 
 clean:
 	@echo $(YELLOW)'\n'${APP_NAME}": CLeaning up files..."$(NOCOLOR)
-	rm -f ${MODEL_BASE_NAME}.xml
-	rm -f ${MODEL_BASE_NAME}.bin
-	rm -f ${MODEL_BASE_NAME}.mapping
+	rm -f ${APP_NAME}.xml
+	rm -f ${APP_NAME}.bin
+	rm -f ${APP_NAME}.mapping
 	rm -f ${LABELS}
 	rm -f ${WEIGHTS_FILE}
 	rm -rf ${TF_YOLO_REPO_NAME}
-	rm -f ${MODEL_BASE_NAME}.pb
+	rm -f ${APP_NAME}.pb
 	
 	

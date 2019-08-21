@@ -213,7 +213,7 @@ def main():
 	    label_list = labels_file.read().splitlines()
     
 	    
-    print(YELLOW + 'Running NCS Tensorflow TinyYolo v3 example...' + NOCOLOR)
+    print(YELLOW + 'Running OpenVINO NCS Tensorflow TinyYolo v3 example...' + NOCOLOR)
     print('\n Displaying image with objects detected in GUI...')
     print(' Click in the GUI window and hit any key to exit.')
 
@@ -294,7 +294,7 @@ def main():
                 cv2.rectangle(display_image, (xmin, ymin), (xmax, ymax), BOX_COLOR, 1)
         
         # display results
-        cv2.imshow("Tiny yolo v3 - Press any key to quit", display_image)
+        cv2.imshow("OpenVINO Tiny yolo v3 - Press any key to quit", display_image)
         
         # handle key presses
         # get another frame from camera if using camera input
