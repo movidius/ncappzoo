@@ -10,7 +10,7 @@ NOCOLOR = '\033[0m'
 DARKNET_MODEL_BASE_NAME = frozen_darknet_yolov3_model
 MODEL_BASE_NAME = tiny_yolo_v3
 
-IMG = ../../data/images/nps_chair.png
+INPUT = ../../data/images/nps_chair.png
 TF_YOLO_REPO_NAME = tensorflow-yolo-v3
 CLONE_REPO = git clone https://github.com/mystic123/tensorflow-yolo-v3.git
 LABELS = coco.names
@@ -31,7 +31,7 @@ deps: convert_weights
 .PHONY: data
 data: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data..."$(NOCOLOR)
-	@echo "No data needed."
+	wget -nc -c https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names
 
 
 .PHONY: clone_repo
@@ -49,9 +49,8 @@ clone_repo:
 
 
 .PHONY: convert_weights
-convert_weights: clone_repo
+convert_weights: clone_repo data
 	@echo $(YELLOW)'\n'${APP_NAME}": Converting weights...\n"$(NOCOLOR)
-	wget -nc -c https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names; \
 	wget -nc -c https://pjreddie.com/media/files/yolov3-tiny.weights; \
 	cd tensorflow-yolo-v3; python3 convert_weights_pb.py --class_names ../coco.names --data_format NHWC --weights_file ../yolov3-tiny.weights --tiny; mv ${DARKNET_MODEL_BASE_NAME}.pb ../${MODEL_BASE_NAME}.pb;
 
@@ -70,7 +69,7 @@ compile_model: convert_weights
 .PHONY: run_py
 run_py: data deps compile_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the python sample..."$(NOCOLOR)
-	python3 ./tiny_yolo_v3.py --image=${IMG} --ir=${IR}
+	python3 ./tiny_yolo_v3.py --input=${INPUT} --ir=${IR}
 
 
 .PHONY: run
@@ -81,13 +80,13 @@ run: run_py
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements..."$(NOCOLOR)
 	@echo "No requirements needed."
 	
 
 .PHONY: uninstall-reqs
-uinstall-reqs: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements...\n"$(NOCOLOR)
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 
 
@@ -107,7 +106,7 @@ help:
 
 
 clean:
-	@echo $(YELLOW)'\n'${APP_NAME}": making clean..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": CLeaning up files..."$(NOCOLOR)
 	rm -f ${MODEL_BASE_NAME}.xml
 	rm -f ${MODEL_BASE_NAME}.bin
 	rm -f ${MODEL_BASE_NAME}.mapping

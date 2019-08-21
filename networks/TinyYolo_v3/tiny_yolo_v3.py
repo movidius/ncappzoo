@@ -21,8 +21,16 @@ import cv2
 import argparse
 
 anchors = [10,14, 23,27, 37,58, 81,82, 135,169, 344,319]
+IOU_THRESHOLD = 0.25
+BOX_COLOR = (0,255,0)
+LABEL_BG_COLOR = (70, 120, 70) # greyish green background for text
+TEXT_COLOR = (255, 255, 255)   # white text
+TEXT_FONT = cv2.FONT_HERSHEY_SIMPLEX
+WINDOW_SIZE_W = 640
+WINDOW_SIZE_H = 480
 
 
+# Parses arguments for the application
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Image classifier using \
                          Intel® Neural Compute Stick 2.' )
@@ -32,15 +40,14 @@ def parse_args():
     parser.add_argument( '-l', '--labels', metavar = 'LABEL_FILE', 
                         type=str, default = 'coco.names',
                         help='Absolute path to labels file.')
-    parser.add_argument( '-i', '--image', metavar = 'IMAGE_FILE', 
+    parser.add_argument( '-i', '--input', metavar = 'IMAGE_FILE or cam', 
                         type=str, default = '../../data/images/nps_chair.png',
-                        help = 'Absolute path to image file.')
+                        help = 'Absolute path to image file or cam for camera stream.')
     parser.add_argument( '--threshold', metavar = 'FLOAT', 
-                        type=float, default = 0.10,
+                        type=float, default = 0.1,
                         help = 'Threshold for detection.')
                       
     return parser
-
 
 
 
@@ -52,7 +59,7 @@ def get_duplicate_box_mask(box_list):
     # The intersection-over-union threshold to use when determining duplicates.
     # objects/boxes found that are over this threshold will be
     # considered the same object
-    max_iou = 0.25
+    max_iou = IOU_THRESHOLD
 
     box_mask = np.ones(len(box_list))
 
@@ -67,8 +74,6 @@ def get_duplicate_box_mask(box_list):
     filter_iou_mask = np.array(box_mask > 0.0, dtype='bool')
     return filter_iou_mask
     
-
-
 
 # Evaluate the intersection-over-union for two boxes
 # The intersection-over-union metric determines how close
@@ -107,186 +112,212 @@ def get_intersection_over_union(box_1, box_2):
     return iou
 
 
+# displays basic information regarding the model
+def display_info(input_shape, net_outputs, image, ir, labels):
+    
+    output_nodes = []
+    output_iter = iter(net_outputs)
+    for i in range(len(net_outputs)):
+        output_nodes.append(next(output_iter))
 
-def display_info(input_shape, output_shape, image, ir, labels):
     print()
-    print(YELLOW + 'Tiny Yolo v1: Starting application...' + NOCOLOR)
+    print(YELLOW + 'Tiny Yolo v3: Starting application...' + NOCOLOR)
     print('   - ' + YELLOW + 'Plugin:       ' + NOCOLOR + 'Myriad')
     print('   - ' + YELLOW + 'IR File:     ' + NOCOLOR, ir)
     print('   - ' + YELLOW + 'Input Shape: ' + NOCOLOR, input_shape)
-    print('   - ' + YELLOW + 'Output Shape:' + NOCOLOR, output_shape)
+    print('   - ' + YELLOW + 'Output Shapes:' + NOCOLOR)
+    for j in range(len(output_nodes)):
+        print('      - '+YELLOW+'output #' + str(j) + ' name: ' + NOCOLOR + output_nodes[j])
+        print('         - output size: ' + NOCOLOR + str(net_outputs[output_nodes[j]].shape))
     print('   - ' + YELLOW + 'Labels File: ' + NOCOLOR, labels)
     print('   - ' + YELLOW + 'Image File:   ' + NOCOLOR, image)
     
 
+# This function parses the output results from tiny yolo v3.
+# The results are transposed so the output shape is (1, 13, 13, 255) or (1, 26, 26, 255). Original will be (1, 255, w, h).
+# Tiny yolo does detection on two different scales using 13x13 grid and 26x26 grid.
+# This is how the output is parsed:
+# Imagine the image being split up into 13x13 or 26x26 grid. Each grid cell contains 3 anchor boxes. 
+# For each of those 3 anchor boxes, there are 85 values. 
+# 80 class probabilities + 4 coordinate values + 1 box confidence score = 85 values 
+# So that results in each grid cell having 255 values (85 values x 3 anchor boxes = 255 values)
+def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold):
+    # transpose the output node results
+    output_node_results = output_node_results.transpose(0,2,3,1)
+    output_h = output_node_results.shape[1]
+    output_w = output_node_results.shape[2]
 
-def parseTinyYoloV3Output(output, objects, source_image_width, source_image_height, scaled_w, scaled_h):
-    
-    output = output.transpose(0,2,3,1)
-    output_h = output.shape[1]
-    output_w = output.shape[2]
-    #print("output 0,0: ", output[0][0][0].size)
     # 80 class scores + 4 coordinate values + 1 objectness score = 85 values
-    # 85 values * 3 prior box scores = 255 values 
-    # 255 * either 26 or 13 scale 
-    classes = 80
+    # 85 values * 3 prior box scores per grid cell= 255 values 
+    # 255 values * either 26 or 13 grid cells
+    num_of_classes = 80
     num_anchor_boxes_per_cell = 3
     
+    # Set the anchor offset depending on the output result shape
     anchor_offset = 0
     if output_w == 13:
         anchor_offset = 2 * 3
     elif output_w == 26:
         anchor_offset = 2 * 0
 
+	# used to calculate approximate coordinates of bounding box
     x_ratio = float(source_image_width) / scaled_w
     y_ratio = float(source_image_height) / scaled_h
 
+	# Filter out low scoring results
     output_size = output_w * output_h
-    for result_counter in range(output_size):
+    for result_counter in range(output_size): 
         row = int(result_counter / output_w)
         col = int(result_counter % output_h)
-        for anchor_boxes in range(num_anchor_boxes_per_cell):
-            x = (col + output[0][row][col][anchor_boxes * 85 + 0]) / output_w * scaled_w
-            y = (row + output[0][row][col][anchor_boxes * 85 + 1]) / output_h * scaled_h
-            width = np.exp(output[0][row][col][anchor_boxes * 85 + 2]) * anchors[anchor_offset + 2 * anchor_boxes]
-            height = np.exp(output[0][row][col][anchor_boxes * 85 + 3]) * anchors[anchor_offset + 2 * anchor_boxes + 1]
-
-            obj_score = output[0][row][col][anchor_boxes * 85 + 4]
-            #print("objectness score: " + str(obj_score))
-            if obj_score < 0.1:
+        for anchor_boxes in range(num_anchor_boxes_per_cell): 
+        	# check the box confidence score of the anchor box. This is how likely the box contains an object
+            box_confidence_score = output_node_results[0][row][col][anchor_boxes * 85 + 4]
+            if box_confidence_score < detection_threshold:
                 continue
-            #print("\ngrid " + str(row) + " " + str(col) + " - anchor box: " + str(anchor_boxes))
-            #print("output xmin: " + str(x))
-            #print("output ymin: " + str(y))
-            #print("output width: " + str(width))
-            #print("output height: " + str(height))
-            #print("objectness score: " + str(output[0][row][col][anchor_boxes * 85 + 4]))
-            
-            for class_id in range(classes):
-                #print("class_index: ", result_counter)
-                class_score = output[0][row][col][anchor_boxes * 85 + 5 + class_id]
-                
-                if (class_score * obj_score) < 0.25:
+            # Calculate the x, y, width, and height of the box
+            x_center = (col + output_node_results[0][row][col][anchor_boxes * 85 + 0]) / output_w * scaled_w
+            y_center = (row + output_node_results[0][row][col][anchor_boxes * 85 + 1]) / output_h * scaled_h
+            width = np.exp(output_node_results[0][row][col][anchor_boxes * 85 + 2]) * anchors[anchor_offset + 2 * anchor_boxes]
+            height = np.exp(output_node_results[0][row][col][anchor_boxes * 85 + 3]) * anchors[anchor_offset + 2 * anchor_boxes + 1]
+            # Now we check for anchor box for the highest class probabilities.
+            # If the probability exceeds the threshold, we save the box coordinates, class score and class id
+            for class_id in range(num_of_classes): 
+                class_probability = output_node_results[0][row][col][anchor_boxes * 85 + 5 + class_id]
+                # Calculate the class's confidence score by multiplying the box_confidence score by the class probabiity
+                class_confidence_score = class_probability * box_confidence_score
+                if (class_confidence_score) < detection_threshold:
                     continue
-                xmin = max(int((x - width / 2) * x_ratio), 0)
-                ymin = max(int((y - height / 2) * y_ratio), 0)
-                xmax = min(int(x + width * x_ratio), source_image_width-1)
-                ymax = min(int(y + height * y_ratio), source_image_height-1)
-                objects.append((xmin, ymin, xmax, ymax, obj_score*class_score, class_id))
-                    #objects.append(ymin)
-                    #objects.append(xmin)
-                    #objects.append(ymax)
-                    #objects.append(obj_score*class_score)
-                    #objects.append(class_id)
+                # Calculate the bounding box top left and bottom right vertexes
+                xmin = max(int((x_center - width / 2) * x_ratio), 0)
+                ymin = max(int((y_center - height / 2) * y_ratio), 0)
+                xmax = min(int(xmin + width * x_ratio), source_image_width-1)
+                ymax = min(int(ymin + height * y_ratio), source_image_height-1)
+                filtered_objects.append((xmin, ymin, xmax, ymax, class_confidence_score, class_id))
     
 
 
 # This function is called from the entry point to do
 # all the work.
 def main():
+	# Argument parsing and parameter setting
     ARGS = parse_args().parse_args()
-    input_stream = ARGS.image
+    input_stream = ARGS.input
     labels = ARGS.labels
-    if ARGS.image.lower() == "cam":
+    if ARGS.input.lower() == "cam" or ARGS.input.lower() == "camera":
         input_stream = 0
     ir = ARGS.ir
-    threshold = ARGS.threshold
+    detection_threshold = ARGS.threshold
     
     # Prepare Categories
     with open(labels) as labels_file:
 	    label_list = labels_file.read().splitlines()
     
 	    
-    print(YELLOW + 'Running NCS Tensorflow TinyYolo v3 example...')
+    print(YELLOW + 'Running NCS Tensorflow TinyYolo v3 example...' + NOCOLOR)
+    print('\n Displaying image with objects detected in GUI...')
+    print(' Click in the GUI window and hit any key to exit.')
 
-    ####################### 1. Setup Plugin and Network #######################
+    ####################### 1. Create ie core and network #######################
     # Select the myriad plugin and IRs to be used
     ie = IECore()
     net = IENetwork(model = ir, weights = ir[:-3] + 'bin')
 
-    # Set up the input and output blobs
+    # Set up the input blobs
     input_blob = next(iter(net.inputs))
-    output_blob = next(iter(net.outputs))
     input_shape = net.inputs[input_blob].shape
-    output_shape = net.outputs[output_blob].shape
-    
+
     # Display model information
-    display_info(input_shape, output_shape, input_stream, ir, labels)
+    display_info(input_shape, net.outputs, input_stream, ir, labels)
     
-    # Load the network and get the network shape information
+    # Load the network and get the network input shape information
     exec_net = ie.load_network(network = net, device_name = DEVICE)
-    n, c, h, w = input_shape
+    n, c, network_input_h, network_input_w = input_shape
     
+    # Prepare the input stream
     cap = cv2.VideoCapture(input_stream)
     cap.set(cv2.CAP_PROP_FPS, 30)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
-    ret, input_image = cap.read()
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, WINDOW_SIZE_W)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, WINDOW_SIZE_H)
+    
+    # Read a frame
+    ret, frame = cap.read()
+    # Width and height calculations. These will be used to scale the bounding boxes
+    source_image_width = frame.shape[1]
+    source_image_height = frame.shape[0]
+    scaled_w = int(source_image_width * min(network_input_w/source_image_width, network_input_w/source_image_height))
+    scaled_h = int(source_image_height * min(network_input_h/source_image_width, network_input_h/source_image_height))
 
-    #print("output h:", output_h)
-    #print("output w:", output_w)
     while cap.isOpened():
-        # Read image from file, resize it to network width and height
+        # Make a copy of the original frame. Get the frame's width and height.
+        if frame is None:
+            print(RED + "\nUnable to read the input." + NOCOLOR)
+            quit()
+	    ####################### 2. Preprocessing #######################
+        # Image preprocessing
+        frame = cv2.flip(frame, 1)
 
-        display_image = input_image
-        input_image = cv2.resize(input_image, (w, h), cv2.INTER_LINEAR)
+        display_image = frame
+
+        # Image preprocessing (resize, transpose, reshape)
+        input_image = cv2.resize(frame, (network_input_w, network_input_h), cv2.INTER_LINEAR)
         input_image = input_image.astype(np.float32)
         input_image = np.transpose(input_image, (2,0,1))
-        reshaped_image = input_image.reshape((n, c, h, w))
+        reshaped_image = input_image.reshape((n, c, network_input_h, network_input_w))
         
         # Perform the inference asynchronously
         req_handle = exec_net.start_async(request_id=0, inputs={input_blob: reshaped_image})
         status = req_handle.wait()
-        output = req_handle.outputs
+        all_output_results = req_handle.outputs
+                
+        # Post-processing for tiny yolo v3
+        # Tiny yolo v3 has two outputs and we check/parse both outputs
+        filtered_objects = []
+        for output_node_results in all_output_results.values():
+            parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold)
         
-        # Width and height calculations
-        source_image_width = display_image.shape[1]
-        source_image_height = display_image.shape[0]
-        scaled_w = int(source_image_width * min(w/source_image_width, w/source_image_height))
-        scaled_h = int(source_image_height * min(h/source_image_width, h/source_image_height))
+        # filter out duplicate objects from all detected objects
+        filtered_mask = get_duplicate_box_mask(filtered_objects)
+        # draw rectangles and set up display texts
+        for object_index in range(len(filtered_objects)):
+            if filtered_mask[object_index] == True:
+                # get all values from the filtered object list
+                xmin = filtered_objects[object_index][0]
+                ymin = filtered_objects[object_index][1]
+                xmax = filtered_objects[object_index][2]
+                ymax = filtered_objects[object_index][3]
+                confidence = filtered_objects[object_index][4]
+                class_id = filtered_objects[object_index][5]
+                # set up the text for display
+                cv2.rectangle(display_image,(xmin, ymin), (xmax, ymin+20), LABEL_BG_COLOR, -1)
+                cv2.putText(display_image, label_list[class_id] + ': %.2f' % confidence, (xmin+5, ymin+15), TEXT_FONT, 0.5, TEXT_COLOR, 1)
+                # set up the bounding box
+                cv2.rectangle(display_image, (xmin, ymin), (xmax, ymax), BOX_COLOR, 1)
         
-        # Post-processing for tiny yolo
-        objects = []
-        for output_result in output.values():
-            parseTinyYoloV3Output(output_result, objects, source_image_width, source_image_height, scaled_w, scaled_h)
+        # display results
+        cv2.imshow("Tiny yolo v3 - Press any key to quit", display_image)
         
-        filtered_mask = get_duplicate_box_mask(objects)
-        
-        for num in range((len(objects))):
-            if filtered_mask[num] == True:
-                label_background_color = (70, 120, 70) # greyish green background for text
-                label_text_color = (255, 255, 255)   # white text
-                cv2.rectangle(display_image,(objects[num][0], objects[num][1]), (objects[num][2], objects[num][1]+20), label_background_color, -1)
-                cv2.putText(display_image, label_list[objects[num][5]] + ' : %.2f' % objects[num][4], (objects[num][0]+5, objects[num][1]+15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, label_text_color, 1)
-                cv2.rectangle(display_image, (objects[num][0], objects[num][1]), (objects[num][2], objects[num][3]), (0,255,0), 1)
-
-            
-
-        #filtered_objs = filter_objects(output.astype(np.float32), input_image.shape[1], input_image.shape[2], label_list, threshold)
-        cv2.imshow("tiny yolo v3", display_image)
+        # handle key presses
         # get another frame from camera if using camera input
         if input_stream == 0:
             key = cv2.waitKey(1)
-            if key != -1:
+            if key != -1:  # if used pressed a key, release the capture stream and break
                 cap.release()
                 break
-            ret, frame = cap.read()
+            ret, frame = cap.read() # read another frame
         else: #  or wait for key press if image input
+            print("\n Press any key to quit.")
             while True:
                 key = cv2.waitKey(1)
                 if key != -1:
                     cap.release()
                     break
-
-    print('\n Displaying image with objects detected in GUI...')
-    print(' Click in the GUI window and hit any key to exit.')
-    # display the filtered objects/boxes in a GUI window
-    #display_objects_in_gui(display_image, filtered_objs, input_image.shape[1], input_image.shape[2])
+                    
+    # clean up
     cv2.destroyAllWindows()
-    print('\n Finished.')
     del net
     del exec_net
-
+    print('\n Finished.')
+    
 
 # main entry point for program. we'll call main() to do what needs to be done.
 if __name__ == "__main__":
