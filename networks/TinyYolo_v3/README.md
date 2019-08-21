@@ -15,7 +15,12 @@ The provided Makefile does the following:
 make run
 ~~~
 **Note**: You can also specify the camera using the command: ```make run INPUT=cam```
+**Note**: You may need to adjust some values to better detect objects 
 
+## Algorithm Thresholds
+There are a few thresholds in the code you may want to tweek if you aren't getting results that you expect:
+- <strong>DETECTION_THRESHOLD</strong>: This is the minimum probability allowed for boxes returned from tiny yolo.  This should be between 0.0 and 1.0.  A lower value will allow more boxes to be displayed.
+- <strong>IOU_THRESHOLD</strong>: Determines which boxes from Tiny Yolo should be separate objects vs identifying the same object.  This is based on the intersection-over-union calculation.  The closer this is to 1.0 the more similar the boxes need to be in order to be considered around the same object.
 
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.

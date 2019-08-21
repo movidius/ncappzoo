@@ -20,8 +20,14 @@ import numpy as np
 import cv2
 import argparse
 
-anchors = [10,14, 23,27, 37,58, 81,82, 135,169, 344,319]
+# Adjust these thresholds
+DETECTION_THRESHOLD = 0.1
 IOU_THRESHOLD = 0.25
+
+# Tiny yolo anchor box values
+anchors = [10,14, 23,27, 37,58, 81,82, 135,169, 344,319]
+
+# Used for display
 BOX_COLOR = (0,255,0)
 LABEL_BG_COLOR = (70, 120, 70) # greyish green background for text
 TEXT_COLOR = (255, 255, 255)   # white text
@@ -44,7 +50,7 @@ def parse_args():
                         type=str, default = '../../data/images/nps_chair.png',
                         help = 'Absolute path to image file or cam for camera stream.')
     parser.add_argument( '--threshold', metavar = 'FLOAT', 
-                        type=float, default = 0.1,
+                        type=float, default = DETECTION_THRESHOLD,
                         help = 'Threshold for detection.')
                       
     return parser
