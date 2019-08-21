@@ -40,6 +40,7 @@ The following **should** be included in the networks, caffe, and tensorflow subd
 - Network model definition files (like caffe's .prototxt files): These may be downloaded via the Makefile.
 - Network mean information : These may be downloaded via the Makefile.
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
+- demo.gif : A 2MB max gif file that should be used in the README to demonstrate how to use the app/what the app does (optional. but highly recommended)
 
 The following **should not** typically be stored in the networks, caffe * or tensorflow *  subdirectory:
 - Optimized neural networks (OpenVINO IR files - .bin and .xml) : These are typically created by invoking the OpenVINO Model Optimizer from the Makefile.
