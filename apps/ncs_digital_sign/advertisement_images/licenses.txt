@@ -2,23 +2,23 @@ Licenses and attributions (when needed) for the advertisement images in this dir
 All rights to these images are subject to their respective licenses as indicated below.  
 
 ---
-File: gender_neutral_AD.jpg
+File: AD_gender_neutral.jpg
 From: Pixabay https://pixabay.com/photos/coffee-cup-coffee-beans-coffee-cup-171653/
 License: Pixabay License - https://pixabay.com/service/terms/#license
 ---
-File: young_girl_AD.jpg
+File: AD_young_girl.jpg
 From: Pixabay https://pixabay.com/photos/beauty-barbie-pretty-doll-charming-1265593/
 License: Pixabay License - https://pixabay.com/service/terms/#license
 ---
-File: male_AD.jpg
+File: AD_male.jpg
 From: Unsplash https://unsplash.com/photos/_1bPErRSKco
 License: Unsplash License: https://unsplash.com/license
 ---
-File: woman_AD.jpg
+File: AD_woman.jpg
 From: Unsplash https://unsplash.com/photos/DEuob2v77wI
 License: Unsplash License: https://unsplash.com/license
 ---
-File: young_boy_AD.jpg
+File: AD_young_boy.jpg
 From: Unsplash https://unsplash.com/photos/ksgrnA8fzdU
 License: Unsplash License: https://unsplash.com/license
 ---
