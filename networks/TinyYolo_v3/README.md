@@ -2,9 +2,8 @@
 ## Introduction
 The TinyYolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
 
-The provided Makefile does the following
 
-The provided Makefile does the following
+The provided Makefile does the following:
 1. Clones a [Tensorflow yolo repo](https://github.com/mystic123/tensorflow-yolo-v3) that will help to convert the darknet weights to tensorflow.
 2. Download the labels and weights from the [Tiny Yolo v3 site](https://pjreddie.com/darknet/yolo/).
 3. Converts the weights and generates a Tensorflow frozen pb file.
