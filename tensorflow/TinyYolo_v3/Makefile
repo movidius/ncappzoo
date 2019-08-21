@@ -6,35 +6,38 @@ YELLOW = '\033[1;33m'
 RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
-MODEL_BASE_NAME = frozen_darknet_yolov3_model
+
+DARKNET_MODEL_BASE_NAME = frozen_darknet_yolov3_model
+MODEL_BASE_NAME = tiny_yolo_v3
 
 IMG = ../../data/images/nps_chair.png
-REPO_NAME = tensorflow-yolo-v3
-REPO = tensorflow-yolo-v3
+TF_YOLO_REPO_NAME = tensorflow-yolo-v3
 CLONE_REPO = git clone https://github.com/mystic123/tensorflow-yolo-v3.git
 LABELS = coco.names
 WEIGHTS_FILE = yolov3-tiny.weights
+IR = ${MODEL_BASE_NAME}.xml
+APP_NAME = tiny_yolo_v3
+
 
 .PHONY: all
 all: data deps compile_model
 
 
 .PHONY: deps
-deps: 
-	@echo $(YELLOW)"\nTiny Yolo v3: Making dependencies..."$(NOCOLOR)
+deps: convert_weights
+	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 
 	
 .PHONY: data
-data:
-	@echo $(YELLOW)"\nTiny Yolo v3: Downloading required data..."$(NOCOLOR)
-	wget -nc -c https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names
-	wget -nc -c https://pjreddie.com/media/files/yolov3-tiny.weights
+data: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data..."$(NOCOLOR)
+	@echo "No data needed."
 
 
 .PHONY: clone_repo
 clone_repo: 
-	@echo $(YELLOW)"\nTiny Yolo v3: Downloading prototxt file..."$(NOCOLOR)
-	@if [ -d ${REPO} ] ; \
+	@echo $(YELLOW)'\n'${APP_NAME}": Cloning the tensorflow yolo v3 repo..."$(NOCOLOR)
+	@if [ -d ${TF_YOLO_REPO_NAME} ] ; \
 	then \
 		echo " - tensorflow yolo v3 repo already exists"; \
 	else \
@@ -46,63 +49,71 @@ clone_repo:
 
 
 .PHONY: convert_weights
-convert_weights: data clone_repo
-	@echo $(YELLOW)"\nTiny Yolo v3: Converting weights...\n"$(NOCOLOR)
-	cd tensorflow-yolo-v3; python3 convert_weights_pb.py --class_names ../coco.names --data_format NHWC --weights_file ../yolov3-tiny.weights --tiny; 
+convert_weights: clone_repo
+	@echo $(YELLOW)'\n'${APP_NAME}": Converting weights...\n"$(NOCOLOR)
+	wget -nc -c https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names; \
+	wget -nc -c https://pjreddie.com/media/files/yolov3-tiny.weights; \
+	cd tensorflow-yolo-v3; python3 convert_weights_pb.py --class_names ../coco.names --data_format NHWC --weights_file ../yolov3-tiny.weights --tiny; mv ${DARKNET_MODEL_BASE_NAME}.pb ../${MODEL_BASE_NAME}.pb;
 
 
-
-.PHONY: install-reqs
-install-reqs: 
-	@echo $(YELLOW)"\nTiny Yolo v3: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
-	
 .PHONY: compile_model
 compile_model: convert_weights
-	@echo $(YELLOW)"\nTiny Yolo v3: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Compiling model to IR..."$(NOCOLOR)
 	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ] ; \
 	then \
 		echo " - IR files exist. No need to compile." ; \
 	else \
-	    ${NCCOMPILE} --input_model=tensorflow-yolo-v3/frozen_darknet_yolov3_model.pb --data_type=FP16 --batch=1 --tensorflow_use_custom_operations_config=$(INTEL_OPENVINO_DIR)/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3_tiny.json || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+	    ${NCCOMPILE} --input_model=${MODEL_BASE_NAME}.pb --data_type=FP16 --batch=1 --tensorflow_use_custom_operations_config=$(INTEL_OPENVINO_DIR)/deployment_tools/model_optimizer/extensions/front/tf/yolo_v3_tiny.json || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
 
 .PHONY: run_py
-run_py: install-reqs data deps compile_model
-	@echo $(YELLOW)"\nTiny Yolo v3: Running the python sample..."$(NOCOLOR)
+run_py: data deps compile_model
+	@echo $(YELLOW)'\n'${APP_NAME}": Running the python sample..."$(NOCOLOR)
 	python3 ./tiny_yolo_v3.py --image=${IMG} --ir=${IR}
 
 
 .PHONY: run
 run: run_py
-	@echo $(YELLOW)"\nTiny Yolo v3: Running the python sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Running the python sample..."$(NOCOLOR)
+
+
+
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+
+.PHONY: uninstall-reqs
+uinstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements...\n"$(NOCOLOR)
+	@echo "Nothing to uninstall."
 
 
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
-	@echo $(YELLOW)"  make run "$(NOCOLOR)"- runs the run.py python example program";
-	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
-	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
-	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
-	@echo $(YELLOW)"  make compile "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
-
-
-
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- Runs the Python example.";
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message.";
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Compiles the model to an IR format.";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
+	@echo ""
 
 
 clean:
-	@echo $(YELLOW)"\nTiny Yolo v3: making clean..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": making clean..."$(NOCOLOR)
 	rm -f ${MODEL_BASE_NAME}.xml
 	rm -f ${MODEL_BASE_NAME}.bin
 	rm -f ${MODEL_BASE_NAME}.mapping
 	rm -f ${LABELS}
 	rm -f ${WEIGHTS_FILE}
-	rm -rf ${REPO}
+	rm -rf ${TF_YOLO_REPO_NAME}
+	rm -f ${MODEL_BASE_NAME}.pb
 	
 	
-
