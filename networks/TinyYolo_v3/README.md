@@ -5,7 +5,7 @@ The TinyYolo network can be used for object recognition and classification. This
 The provided Makefile does the following
 
 The provided Makefile does the following
-1. Clones a repo that will help to conver the darknet weights to tensorflow. (https://github.com/mystic123/tensorflow-yolo-v3).
+1. Clones a [Tensorflow yolo repo](https://github.com/mystic123/tensorflow-yolo-v3) that will help to convert the darknet weights to tensorflow.
 2. Download the labels and weights from the [Tiny Yolo v3 site](https://pjreddie.com/darknet/yolo/).
 3. Converts the weights and generates a Tensorflow frozen pb file.
 4. Compiles the Tensorflow frozen pb file to an IR (intermediate representation) using the Model Optimizer.
@@ -15,7 +15,7 @@ The provided Makefile does the following
 ~~~
 make run
 ~~~
-**Note**: You can also specify the camera using the command ~~~make run INPUT=cam~~~
+**Note**: You can also specify the camera using the command: ```make run INPUT=cam```
 
 
 ## Makefile
