@@ -83,6 +83,7 @@ InferenceEngine::CNNNetwork readNetwork(String inputNetworkPath) {
     return network;
 }
 
+// calculate average age
 int calculateAgeAvg(std::vector<int> ageVector){
     int num = ageVector.size();
     //std::cout << "NUM = " << num << std::endl;
