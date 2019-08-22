@@ -59,7 +59,7 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
 int main(int argc, char *argv[]) {
     try {
         if (argc != 4) {
-            std::cout << "Usage : ./hello_classification <path_to_model> <path_to_image> <path_to_labels>" << std::endl;
+            std::cout << "Usage : ./simple_classifier_cpp <path_to_model> <path_to_image> <path_to_labels>" << std::endl;
             return EXIT_FAILURE;
         }
         const std::string input_model{argv[1]};
