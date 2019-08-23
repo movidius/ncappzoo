@@ -76,12 +76,12 @@ run_cpp: install-reqs deps data compile_cpp
 .PHONY: install-reqs
 install-reqs: 
 	@echo $(YELLOW)"\nncs_digital_sign: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
+	@echo "No requirements needed..."
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)"\nncs_digital_sign: Checking application requirements for uninstall...\n"$(NOCOLOR)
-	@echo "No requirements needed to be uninstalled."
+	@echo "No requirements needed to be uninstalled..."
 	
 .PHONY: help
 help:
