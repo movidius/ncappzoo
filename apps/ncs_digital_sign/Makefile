@@ -3,7 +3,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 .PHONY: all
-all: deps data
+all: deps data compile_cpp
 
 FACE_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
 FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP16
