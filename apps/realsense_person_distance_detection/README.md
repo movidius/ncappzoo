@@ -1,10 +1,6 @@
-# gender_age
+# Realsense Person Distance Detection
 ## Introduction
-This app does facial detection and age/gender inference using the Intel Movidius Neural Compute Stick 2. 
-
-The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. When running, the app shows the realtime camera preview while overlaying, a box around faces (color coded for gender), and an estimated age.  All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
-
-![](gender_age_3.gif)
+This app does person detection using the Intel Movidius Neural Compute Stick 2 and detects how far the person is using the Intel Realsense Camera (tested with D415).
 
 ## Building the Example
 
@@ -18,14 +14,15 @@ After building the example you can run the example code by doing the following :
 1. Open a terminal and change directory to the sample base directory
 2. Type the following command in the terminal: ```make run``` 
 
-When the application runs normally, another window should pop up and show the feed from the webcam/usb cam. The program should perform inferences on faces on frames taken from the webcam/usb cam.
+When the application runs normally, another window should pop up and show the feed from the webcam/usb cam. The program should perform inferences on faces on frames taken from the Intel Realsense Camera.
 
 ## Prerequisites
 This program requires:
 - 1 NCS device
 - OpenVINO 2019 R2 Toolkit
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
-- A webcam (laptop or USB)
+- [Intel Realsense SDK 2](https://www.intelrealsense.com/developers#downloads)
+- Intel Realsense Camera (tested with [Intel D415 Realsense Camera](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
 
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
