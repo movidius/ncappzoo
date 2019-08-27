@@ -1,18 +1,8 @@
-"""
- Copyright (C) 2019 Intel Corporation
+#! /usr/bin/env python3
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+# Copyright(c) 2017 Intel Corporation.
+# License: MIT See LICENSE file in root directory.
 
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-"""
 from __future__ import print_function
 from argparse import ArgumentParser, SUPPRESS
 from time import time
@@ -36,9 +26,9 @@ def build_argparser():
     parser = ArgumentParser(add_help=False)
     args = parser.add_argument_group('Options')
     args.add_argument('-h', '--help', action='help', default=SUPPRESS, help='Show this help message and exit.')
-    args.add_argument("-vr", "--verify_road", action="store_true", help="Verify road by detecting road segmentation"
-                                                                        "this option will take few seconds when"
-                                                                        "starting the program, road check once!")
+    args.add_argument("-vr", "--verify_road", action="store_true", help="Optional - Verify road by detecting road "
+                                                                        "segmentation this option will take few seconds "
+                                                                        "when starting the program, road checked once!")
     args.add_argument("-md", "--manual_driving", action="store_true", help="Use: a, w, d, s, x for manual driving")
     args.add_argument("-s", "--show_frame", action="store_true", help="Whether or not to display frame to screen")
     args.add_argument("-m", "--mirror", action="store_true", help="Flip camera")
@@ -83,6 +73,9 @@ def main():
     success, frame = cap.read()
     assert success, "Can't snap image"
 
+    """
+    Verify road-segmentation start here
+    """
     if args.verify_road:
         road_net = IENetwork(model=road_model_xml, weights=road_model_bin)
         log.info("Road-Segmentation network has been loaded:\n\t{}\n\t{}".format(road_model_xml, road_model_bin))
@@ -147,14 +140,17 @@ def main():
         dstr = cv2.inRange(classes_map, RED_MIN, RED_MAX)
         no_red = cv2.countNonZero(dstr)
         frac_red = np.divide(float(no_red), int(size))
-        percent_red = int(np.multiply((frac_red), 100)) + 50 # 50 = black region
+        percent_red = int(np.multiply(frac_red, 100)) + 50  # 50 = black region
         
         log.info("Road-segmentation processing time is: {} sec.".format((time() - t0) * 1000))
         log.info("Road detected {}% of the frame: ".format(str(percent_red)))
         
         if percent_red < 50:
-            raise "Can't detect any road!! please put the car on a road"
+            raise Exception("Can't detect any road!! please put the car on a road")
 
+    """
+    Main function start here - detecting road and traffic light
+    """
     tl_input_blob = next(iter(tl_net.inputs))
     tl_out_blob = next(iter(tl_net.outputs))
 
@@ -231,11 +227,12 @@ def main():
                         det_label = classes_traffic_light_map[class_id - 1] if classes_traffic_light_map else str(class_id)
                         label_and_prob = det_label + ", " + str(confidence) + "%"
                         cv2.putText(orig_frame, label_and_prob, (xmin, ymin - 7), cv2.FONT_HERSHEY_COMPLEX, 0.6, color, 1)
-                        if det_label == 'go':
+                        if str(det_label) == 'go':
                             car.status = CAR_DIRECTION.FWD
+                        elif str(del_label) == 'stop':
+                            car.status = CAR_DIRECTION.STOP
                         else:
                             car.status = CAR_DIRECTION.STOP
-
 
             # Image process - start looking for mid line of the road
             # note that, the following function is looking for the yellow line in the middle
@@ -259,6 +256,7 @@ def main():
                         car.moveCar(CAR_DIRECTION.LEFT)
                         sleep(0.1)
                         car.moveCar(CAR_DIRECTION.FWD)
+                        sleep(0.1)
 
                     if 0 <= slope <= 7:
                         # go right
@@ -266,6 +264,7 @@ def main():
                         car.moveCar(CAR_DIRECTION.RIGHT)
                         sleep(0.1)
                         car.moveCar(CAR_DIRECTION.FWD)
+                        sleep(0.1)
 
                     if slope > 7 or slope == 'inf':
                         # go forward
@@ -296,14 +295,14 @@ def main():
                     # wait 30 frames to make sure that car reached end of road
                     stop_on_u_turn_count += 1
 
-                    if stop_on_u_turn_count == 30 and detecting_traffic_light is False and car.status == CAR_DIRECTION.FWD:
+                    if stop_on_u_turn_count == 20 and detecting_traffic_light is False and car.status == CAR_DIRECTION.FWD:
                         log.debug("Detecting U-Turn")
                         car.moveCar(CAR_DIRECTION.FWD)
                         sleep(2.5)
                         car.moveCar(CAR_DIRECTION.RIGHT)
-                        sleep(5)
+                        sleep(6)
                         car.moveCar(CAR_DIRECTION.REVERSE)
-                        sleep(0.5)
+                        sleep(1)
                         stop_on_u_turn_count = 0
 
             if args.manual_driving:
@@ -331,8 +330,8 @@ def main():
             if args.show_frame:
                 cv2.imshow("Driving Pi", orig_frame)
 
-            if cv2.waitKey(10) & 0xFF == ord('q'):
-                break
+            if cv2.waitKey(1):
+                break  # ESC to quit
 
         # Release everything on finish
         releaseAll()
