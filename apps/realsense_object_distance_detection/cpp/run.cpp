@@ -43,8 +43,8 @@ const cv::Scalar BLUE = cv::Scalar(255, 0, 0, 255);
 const cv::Scalar GREEN = cv::Scalar(0, 255, 0, 255);
 
 // detection thresholds and constants
-const float DETECTION_THRESHOLD = 0.65;
-bool DISTANCE_OVERLAY = false;
+const float DETECTION_THRESHOLD = 0.85;
+bool DISTANCE_OVERLAY = true;
 
 // time to wait between ssd detection/inferences
 const double INFERENCE_INTERVAL = 0.5;
@@ -62,6 +62,10 @@ struct detectionResults{
 };
 
 
+
+/*
+ * read network labels
+ */
 void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVector)
 {
     char filename[MAX_PATH];
@@ -98,8 +102,9 @@ InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath) {
 
 
 
-
-// Convert rs2::frame to cv::Mat
+/*
+ * Convert rs2::frame to cv::Mat
+ */
 cv::Mat frame_to_mat(const rs2::frame& f)
 {
     using namespace cv;
@@ -135,25 +140,33 @@ cv::Mat frame_to_mat(const rs2::frame& f)
     throw std::runtime_error("Frame format is not supported yet!");
 }
 
-float getDistanceToObject(float xmin, float ymin, float xmax, float ymax, rs2::depth_frame depth_frame, cv::Mat flipped_color_mat)
+
+
+/*
+ * get the distance to an object using intel realsense camera
+ */
+float getDistanceToObject(float xmin, float ymin, float xmax, float ymax, rs2::depth_frame depth_frame, cv::Mat flipped_color_mat, int x_scale, int y_scale)
 {
+
     float total_width = xmax - xmin;
     float total_height = ymax - ymin;
-    float width_increment = total_width / 10;
-    float height_increment = total_height / 10;
+    float width_increment = total_width / x_scale;
+    float height_increment = total_height / y_scale;
     float current_distance = 0;
     float current_shortest_distance = 9999.0;
     float shortest_x = 0;
     float shortest_y = 0;
     
-    for (int i = 0; i < 10; i++) 
+    for (int i = 0; i < x_scale; i++) 
     {
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < y_scale; j++)
         {
+        	// get the distance of a point
             current_distance = depth_frame.get_distance(xmin + width_increment/2 + width_increment * i, ymin + height_increment/2 + height_increment * j);
-                            // Draw a red circle to indicate depth sensor focus point
+    		// Draw a red circle to indicate depth sensor focus point
             if (DISTANCE_OVERLAY)
-                cv::circle(flipped_color_mat, cv::Point2f(xmin + width_increment/2 + width_increment * i, ymin + height_increment/2 + height_increment * j), 2, RED, 1);
+                cv::circle(flipped_color_mat, cv::Point2f(xmin + width_increment/2 + width_increment * i, ymin + height_increment/2 + height_increment * j), 2, RED, 2);
+            // Check if the current point is the closest point
             if (current_distance < current_shortest_distance && current_distance > 0)
             {
                 current_shortest_distance = current_distance;
@@ -162,10 +175,13 @@ float getDistanceToObject(float xmin, float ymin, float xmax, float ymax, rs2::d
             }
         }
     }
+    // show the closest point
     if (DISTANCE_OVERLAY)
-        cv::circle(flipped_color_mat, cv::Point2f(shortest_x, shortest_y), 2, GREEN, 1);
+        cv::circle(flipped_color_mat, cv::Point2f(shortest_x, shortest_y), 2, GREEN, 2);
     return current_shortest_distance;
 }
+
+
 
 /*
  * Start.
@@ -327,16 +343,19 @@ int main (int argc, char** argv) {
                 // Save the information for qualifying results
                 if (confidence > DETECTION_THRESHOLD) {
                     // Make sure coordinates are do not exceed image dimensions
-                    //xmin = std::max(0, xmin);
-                    //ymin = std::max(0, ymin);
-                    //xmax = std::min(cap_width, xmax);
-                    //ymax = std::min(cap_height, ymax);
+                    xmin = std::max(0, xmin);
+                    ymin = std::max(0, ymin);
+                    xmax = std::min(cap_width, xmax);
+                    ymax = std::min(cap_height, ymax);
 
                     // Helper for current detection
                     detectionResults currentDetection;
                     // Calculate distance to center of the bounding box using realsense camera
-                    float distance_to_object = getDistanceToObject(xmin, ymin, xmax, ymax, depth_frame, flipped_color_mat);
-                    //std::cout << "Distance to center: " << distance_to_center << "\r";
+					int x_scale = (xmax - xmin) * OVERLAY_SCALE / cap_width + 1;
+					int y_scale = (ymax - ymin) * OVERLAY_SCALE / cap_height + 1;
+                
+                    float distance_to_object = getDistanceToObject(xmin, ymin, xmax, ymax, depth_frame, flipped_color_mat, x_scale, y_scale);
+
                     // Save the current bounding box location, label, distance
                     currentDetection.xmin = xmin;
                     currentDetection.ymin = ymin;
