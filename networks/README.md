@@ -13,6 +13,7 @@ This directory should be a preferred location for neural networks rather than th
 |---------------------|-------------|
 |[ssd_inception_v2_gesture](ssd_inception_v2_gesture/README.md) |Single Shot Detector with inception v2 that was trained on 7 different 7 different hand gestures.  |
 |[ssd_inception_v2_food](ssd_inception_v2_food/README.md) |Single Shot Detector with inception v2 that was trained on 10 different foods.  |
+|[ssd_inception_v2_traffic_light](ssd_inception_v2_traffic_light/README.md) |Single Shot Detector with inception v2 that was trained on 4 different labels on traffic light (green, yellow, red, and back of traffic light).  |
 
 
 
