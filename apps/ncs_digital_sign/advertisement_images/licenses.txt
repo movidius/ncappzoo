@@ -1,0 +1,47 @@
+Licenses and attributions (when needed) for the advertisement images in this directory are listed below.
+All rights to these images are subject to their respective licenses as indicated below.  
+
+---
+File: AD_gender_neutral.jpg
+From: Pixabay https://pixabay.com/photos/coffee-cup-coffee-beans-coffee-cup-171653/
+License: Pixabay License - https://pixabay.com/service/terms/#license
+---
+File: AD_young_girl.jpg
+From: Pixabay https://pixabay.com/photos/beauty-barbie-pretty-doll-charming-1265593/
+License: Pixabay License - https://pixabay.com/service/terms/#license
+---
+File: AD_male.jpg
+From: Unsplash https://unsplash.com/photos/_1bPErRSKco
+License: Unsplash License: https://unsplash.com/license
+---
+File: AD_woman.jpg
+From: Unsplash https://unsplash.com/photos/DEuob2v77wI
+License: Unsplash License: https://unsplash.com/license
+---
+File: AD_young_boy.jpg
+From: Unsplash https://unsplash.com/photos/ksgrnA8fzdU
+License: Unsplash License: https://unsplash.com/license
+---
+
+=================================================================================
+Pixabay License for reference from (https://pixabay.com/service/terms/#license):
+
+License for Images and Videos – Pixabay License
+
+Images and Videos on Pixabay are made available under the Pixabay License on the following terms. Under the Pixabay License you are granted an irrevocable, worldwide, non-exclusive and royalty free right to use, download, copy, modify or adapt the Images and Videos for commercial or non-commercial purposes. Attribution of the photographer or Pixabay is not required but is always appreciated.
+
+The Pixabay License does not allow:
+sale or distribution of Images or Videos as digital stock photos or as digital wallpapers;
+sale or distribution of Images or Videos e.g. as a posters, digital prints or physical products, without adding any additional elements or otherwise adding value;
+depiction of identifiable persons in an offensive, pornographic, obscene, immoral, defamatory or libelous way; or
+any suggestion that there is an endorsement of products and services by depicted persons, brands, and organisations, unless permission was granted.
+Please be aware that while all Images and Videos on Pixabay are free to use for commercial and non-commercial purposes, depicted items in the Images or Videos, such as identifiable people, logos, brands, etc. may be subject to additional copyrights, property rights, privacy rights, trademarks etc. and may require the consent of a third party or the license of these rights - particularly for commercial applications. Pixabay does not represent or warrant that such consents or licenses have been obtained, and expressly disclaims any liability in this respect.
+
+===================================================================================
+Unsplash license for reference from (https://unsplash.com/license):
+
+License
+All photos published on Unsplash can be used for free. You can use them for commercial and noncommercial purposes. You do not need to ask permission from or provide credit to the photographer or Unsplash, although it is appreciated when possible.
+
+More precisely, Unsplash grants you an irrevocable, nonexclusive, worldwide copyright license to download, copy, modify, distribute, perform, and use photos from Unsplash for free, including for commercial purposes, without permission from or attributing the photographer or Unsplash. This license does not include the right to compile photos from Unsplash to replicate a similar or competing service.
+===================================================================================
