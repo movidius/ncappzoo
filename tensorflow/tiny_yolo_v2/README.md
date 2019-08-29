@@ -17,6 +17,12 @@ The provided Makefile does the following
 4. Darkflow (can be installed via the command 'make install-reqs')
 
 
+## Running this Example
+~~~
+make run
+~~~
+**Note**: You can specify images using the INPUT variable. Example: ```make run INPUT=../../data/images/cat.jpg```
+
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
 
