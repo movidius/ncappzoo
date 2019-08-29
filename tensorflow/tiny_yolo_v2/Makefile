@@ -18,6 +18,7 @@ CFG_FILENAME = ${MODEL_BASE_NAME}.cfg
 WEIGHTS_FILENAME = ${MODEL_BASE_NAME}.weights
 TF_MODEL_FILENAME = ${MODEL_BASE_NAME}.pb
 PASCAL_VOC_LABELS = pascal_voc_labels.txt
+INPUT=../../data/images/nps_chair.png
 
 CLONE_DARKFLOW = git clone https://github.com/thtrieu/darkflow.git
 GET_CFG = wget --no-cache -P ./darkflow/cfg/ https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/${CFG_FILENAME}
@@ -113,7 +114,7 @@ compile_model: generate_model
 .PHONY: run_py
 run_py: data deps compile_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Running Python sample..."${NOCOLOR}
-	python3 ./${APP_NAME}
+	python3 ./${APP_NAME}.py --input=${INPUT}
 
 
 .PHONY: run

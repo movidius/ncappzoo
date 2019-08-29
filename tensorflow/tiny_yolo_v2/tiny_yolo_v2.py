@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument( '-l', '--labels', metavar = 'LABEL_FILE', 
                         type=str, default = 'labels.txt',
                         help='Absolute path to labels file.')
-    parser.add_argument( '-i', '--image', metavar = 'IMAGE_FILE', 
+    parser.add_argument( '-i', '--input', metavar = 'INPUT', 
                         type=str, default = '../../data/images/nps_chair.png',
                         help = 'Absolute path to image file.')
     parser.add_argument( '--threshold', metavar = 'FLOAT', 
@@ -235,13 +235,13 @@ def post_processing(output, original_img, label_list, threshold):
 
 def main():
     ARGS = parse_args().parse_args()
-    image = ARGS.image
+    input_image = ARGS.input
     labels = ARGS.labels
     ir = ARGS.ir
     threshold = ARGS.threshold
 
     # read an image in bgr format
-    img = cv2.imread(image)
+    img = cv2.imread(input_image)
     original_img = img
 	
     ie = IECore()
@@ -254,7 +254,7 @@ def main():
     output_shape = net.outputs[output_blob].shape
     
     # Display model information
-    display_info(input_shape, output_shape, image, ir, labels)
+    display_info(input_shape, output_shape, input_image, ir, labels)
     
     # Prepare Categories
     with open(labels) as labels_file:
