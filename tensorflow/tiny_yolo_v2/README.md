@@ -22,6 +22,7 @@ The provided Makefile does the following
 make run
 ~~~
 **Note**: You can specify images using the INPUT variable. Example: ```make run INPUT=../../data/images/cat.jpg```
+**Note**: If you are not seeing the results you desire, you can adjust the IOU_THRESHOLD and default detection threshold.
 
 ## Makefile
 Provided Makefile describes various targets that help with the above mentioned tasks.
