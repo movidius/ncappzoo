@@ -1,14 +1,12 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
+NCCOMPILE = mo.py
 
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
+GREEN = '\033[1;32m'
+YELLOW = '\033[1;33m'
+RED = '\033[1;31m'
+NOCOLOR = '\033[0m'
 
-GRAPH_FILENAME = graph
-GET_GRAPH = wget --no-cache -P . -o ${GRAPH_FILENAME} http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/yolo_tiny.graph
+MODEL_BASE_NAME = tiny-yolo-v1_53000
 
 PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
 GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${PROTOTXT_FILENAME}
@@ -16,22 +14,35 @@ GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/nc
 CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
 GET_CAFFEMODEL = wget --no-cache -P . -N http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${CAFFEMODEL_FILENAME}
 
+IR = tiny-yolo-v1_53000.xml
+IMG = ../../data/images/nps_chair.png
 
 .PHONY: all
-all: profile compile 
+all: data deps compile_model
+
+
+.PHONY: deps
+deps: prototxt caffemodel
+	@echo $(YELLOW)"\nTiny Yolo v1: Making dependencies..."$(NOCOLOR)
+
+	
+.PHONY: data
+data:
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading required data... No data needed."$(NOCOLOR)
+
 
 .PHONY: prototxt
 prototxt: 
-	@echo "\nmaking prototxt"
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading prototxt file..."$(NOCOLOR)
 	@if [ -e ${PROTOTXT_FILENAME} ] ; \
 	then \
-		echo "Prototxt file already exists"; \
+		echo " - Prototxt file already exists"; \
 	else \
 		echo "Downloading Prototxt file"; \
 		${GET_PROTOTXT}; \
 		if [ -e ${PROTOTXT_FILENAME} ] ; \
 		then \
-			echo "got prototext file." ; \
+			echo " - Got prototext file." ; \
 		else \
 			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
 			exit 1; \
@@ -40,12 +51,12 @@ prototxt:
 
 .PHONY: caffemodel
 caffemodel: 
-	@echo "\nmaking caffemodel"
+	@echo $(YELLOW)"\nTiny Yolo v1: Downloading caffemodel file..."$(NOCOLOR)
 	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
 	then \
-		echo "caffemodel file already exists"; \
+		echo " - Caffemodel file already exists"; \
 	else \
-		echo "Downloading caffemodel file"; \
+		echo " - Downloading caffemodel file"; \
 		${GET_CAFFEMODEL}; \
 		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
 		then \
@@ -53,78 +64,66 @@ caffemodel:
 			exit 1; \
 		fi ; \
 	fi  
-
-.PHONY: profile
-profile: prototxt
-	@echo "\nmaking profile"
-	${NCPROFILE} ${PROTOTXT_FILENAME} -s 12
-
-.PHONY: browse_profile
-browse_profile: profile
-	@echo "\nmaking browse_profile"
-	@if [ -e output_report.html ] ; \
+	
+	
+.PHONY: compile_model
+compile_model: prototxt caffemodel
+	@echo $(YELLOW)"\nTiny Yolo v1: Compiling model to IR..."$(NOCOLOR)
+	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ] ; \
 	then \
-		firefox output_report.html & \
+		echo " - IR files exist. No need to compile." ; \
 	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
-
-.PHONY: compile
-compile: prototxt caffemodel
-	@echo "\nmaking compile"
-	${NCCOMPILE} -o ${GRAPH_FILENAME} -w ${CAFFEMODEL_FILENAME} -s 12 ${PROTOTXT_FILENAME}
-
-.PHONY: graph
-graph: 
-	@echo "\nmaking (downloading) graph"
-	@if [ -e ${GRAPH_FILENAME} ] ; \
-	then \
-		echo "graph file already exists"; \
-	else \
-		${GET_GRAPH}; \
-		if ! [ -e ${GRAPH_FILENAME} ] ; \
-		then \
-			echo "***\nError - Could not download graph file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi ;
+	    ${NCCOMPILE} --input_model=${CAFFEMODEL_FILENAME} --input_proto=${PROTOTXT_FILENAME} --data_type=FP16 --scale_values=[255] --reverse_input_channels || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+	fi
+	
 
 .PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	python3 ./run.py
+run_py: data deps compile_model
+	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
+	python3 ./tiny_yolo_v1.py --image=${IMG} --ir=${IR}
+
 
 .PHONY: run
-run: compile
-	@echo "\nmaking run"
-	python3 ./run.py
+run: run_py
+	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
 
+
+.PHONY: install-reqs
+install-reqs: 
+	@echo $(YELLOW)"\nTiny Yolo v1: Checking application requirements...\n"$(NOCOLOR)
+	@echo "No requirements needed."
+	
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nTiny YOlo v1: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+	
+	
 .PHONY: help
 help:
-	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: prototxt, profile, compile, check, cpp, run_py, run_cpp";
-	@echo "  make prototxt - downloads and adds input shape to Caffe prototxt file";
-	@echo "  make caffemodel - downloads the caffemodel for the network"
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make run - runs the run.py python example program";
-	@echo "  make clean - removes all created content"
+	@echo "\nPossible make targets: ";
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
+	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the run.py python example program";
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
+	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
+	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
+
 
 clean_caffe_model:
-	@echo "\nmaking clean_caffe_model"
+	@echo $(YELLOW)"\nTiny Yolo v1: making clean_caffe_model..."$(NOCOLOR)
 	rm -f ${PROTOTXT_FILENAME}
 	rm -f ${CAFFEMODEL_FILENAME}
 
+
 clean: clean_caffe_model
-	@echo "\nmaking clean"
-	rm -f ${GRAPH_FILENAME}
-	rm -f output.gv
-	rm -f output.gv.svg
-	rm -f output_report.html
-	rm -f output_expected.npy
-	rm -f zero_weights.caffemodel
-	rm -f output_result.npy
-	rm -f output_val.csv
+	@echo $(YELLOW)"\nTiny Yolo v1: making clean..."$(NOCOLOR)
+	rm -f ${MODEL_BASE_NAME}.xml
+	rm -f ${MODEL_BASE_NAME}.bin
+	rm -f ${MODEL_BASE_NAME}.mapping
+	
 
