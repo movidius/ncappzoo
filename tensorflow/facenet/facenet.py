@@ -38,11 +38,12 @@ network_input_h = 0
 network_input_w = 0
 
 # Run an inference on the passed image
-# image_to_classify is the image on which an inference will be performed
+# - image_to_classify is the image on which an inference will be performed
 #    upon successful return this image will be overlayed with boxes
 #    and labels identifying the found objects within the image.
-# ssd_mobilenet_graph is the Graph object from the NCAPI which will
+# - facenet_exec_net is the executable network object that will
 #    be used to peform the inference.
+# - input and output blob are the input and output node names
 def run_inference(image_to_classify, facenet_exec_net, input_blob, output_blob):
 
     # ***************************************************************
@@ -55,9 +56,9 @@ def run_inference(image_to_classify, facenet_exec_net, input_blob, output_blob):
 
 
 # overlays the boxes and labels onto the display image.
-# display_image is the image on which to overlay to
-# image info is a text string to overlay onto the image.
-# matching is a Boolean specifying if the image was a match.
+# - display_image is the image on which to overlay to
+# - image info is a text string to overlay onto the image.
+# - matching is a Boolean specifying if the image was a match.
 # returns None
 def overlay_on_image(display_image, image_info, matching):
     rect_width = 10
@@ -76,7 +77,7 @@ def overlay_on_image(display_image, image_info, matching):
                       (0, 0, 255), 10)
 
 
-# whiten an image
+# Whiten an image
 def whiten_image(source_image):
     source_mean = numpy.mean(source_image)
     source_standard_deviation = numpy.std(source_image)
@@ -85,7 +86,7 @@ def whiten_image(source_image):
     return whitened_image
 
 
-# create a preprocessed image from the source image that matches the
+# Create a preprocessed image from the source image that matches the
 # network expectations and return it
 def preprocess_image(src):
     # scale the image
@@ -93,7 +94,7 @@ def preprocess_image(src):
     preprocessed_image = cv2.resize(src, (network_input_w, network_input_h))
     preprocessed_image = numpy.transpose(preprocessed_image)
     preprocessed_image = numpy.reshape(preprocessed_image, (1, 3, network_input_w, network_input_h))
-    #whiten
+    #whiten (not used)
     #preprocessed_image = whiten_image(preprocessed_image)
 
     # return the preprocessed image
@@ -107,10 +108,11 @@ def face_match(face1_output, face2_output):
         print('length mismatch in face_match')
         return False
     total_diff = 0
+    # Sum of all the squared differences
     for output_index in range(0, len(face1_output)):
         this_diff = numpy.square(face1_output[output_index] - face2_output[output_index])
         total_diff += this_diff
-    #print('Total Difference is: ' + str(total_diff))
+	# Now take the sqrt to get the L2 difference
     total_diff = numpy.sqrt(total_diff)
     print(' Total Difference is: ' + str(total_diff))
     if (total_diff < FACE_MATCH_THRESHOLD):
@@ -122,8 +124,9 @@ def face_match(face1_output, face2_output):
     # they didn't match.
     return False
 
-# handles key presses
-# raw_key is the return value from cv2.waitkey
+
+# Handles key presses
+# - raw_key is the return value from cv2.waitkey
 # returns False if program should end, or True if should continue
 def handle_keys(raw_key):
     ascii_code = raw_key & 0xFF
@@ -136,7 +139,7 @@ def handle_keys(raw_key):
 # Test all files in a list for a match against a valided face and display each one.
 # valid_output is inference result for the valid image
 # validated image filename is the name of the valid image file
-# graph is the ncsdk Graph object initialized with the facenet graph file
+# facenet_exec_net is the executable network object
 #   which we will run the inference on.
 # input_image_filename_list is a list of image files to compare against the
 #   valid face output.
@@ -158,7 +161,7 @@ def run_images(valid_output, validated_image_filename, facenet_exec_net, input_i
         
         preprocessed_image = preprocess_image(infer_image)
         test_output = run_inference(preprocessed_image, facenet_exec_net, input_blob, output_blob)
-        # scale the faces
+        # scale the faces so that we can display a large enough image in the window
         infer_image_h = infer_image.shape[0]
         infer_image_w = infer_image.shape[1]
         # h to w ratio of original image
@@ -211,19 +214,19 @@ def main():
     exec_net = ie.load_network(network = net, device_name = DEVICE)
     n, c, network_input_h, network_input_w = net.inputs[input_blob].shape
 
-    # read the image
+    # Read the image
     validated_image = cv2.imread(validated_image_filename)
     if validated_image is None:
     	print("Cannot read image.")
     	exit(1)
     	
-    # preprocess the image
+    # Preprocess the image
     preprocessed_image = preprocess_image(validated_image)
     
     # Run the inference
     valid_output = run_inference(preprocessed_image, exec_net, input_blob, output_blob)
 
-    # get list of all the .jpg files in the image directory
+    # Get list of all the .jpg files in the image directory
     input_image_filename_list = os.listdir(TEST_IMAGES_DIR)
     input_image_filename_list = [i for i in input_image_filename_list if i.endswith('.png')]
     if (len(input_image_filename_list) < 1):
@@ -232,7 +235,8 @@ def main():
         return 1
     else:
         print("images: " + str(input_image_filename_list) + '\n')
-        
+    
+    # Run the inferences and make comparisons 
     run_images(valid_output, validated_image_filename, exec_net, input_image_filename_list, input_blob, output_blob)
     print(" Finished.\n")
 
