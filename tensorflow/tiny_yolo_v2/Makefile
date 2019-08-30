@@ -1,8 +1,4 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
-
 NCCOMPILE = mo.py
 
 GREEN = '\033[1;32m'
