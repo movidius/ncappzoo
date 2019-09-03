@@ -22,7 +22,7 @@ GET_WEIGHTS = wget --no-cache -P ./darkflow/bin/ https://pjreddie.com/media/file
 
 
 .PHONY: all
-all: data deps
+all: data deps compile_model
 
 
 .PHONY: deps
