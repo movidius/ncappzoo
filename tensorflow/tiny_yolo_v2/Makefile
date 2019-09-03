@@ -104,8 +104,14 @@ download_weights:
 .PHONY: compile_model
 compile_model: generate_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Compiling Model to IR..."${NOCOLOR}
-	${NCCOMPILE} --input_model=yolov2-tiny-voc.pb --batch=1 --tensorflow_use_custom_operations_config=${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/extensions/front/tf/yolo_v2_tiny_voc.json --reverse_input_channels --scale_value=[255] --data_type=FP16
+	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ]; \
+	then \
+		echo " - IR files already exist. Skipping compile step."; \
+	else \
+		${NCCOMPILE} --input_model=yolov2-tiny-voc.pb --batch=1 --tensorflow_use_custom_operations_config=${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/extensions/front/tf/yolo_v2_tiny_voc.json --reverse_input_channels --scale_value=[255] --data_type=FP16; \
+	fi
 
+	
 
 .PHONY: run_py
 run_py: data deps compile_model
