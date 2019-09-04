@@ -36,19 +36,19 @@ default_model: compile_default_model
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making googlenet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make compile_model;)
+	(cd ../../networks/GoogLeNet; make compile_model;)
 
 
 .PHONY: alexnet
 alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make compile_model;)
+	(cd ../../networks/AlexNet; make compile_model;)
 
 
 .PHONY: squeezenet
 squeezenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making squeezenet..."$(NOCOLOR)
-	(cd ../../caffe/SqueezeNet; make compile_model;)
+	(cd ../../networks/SqueezeNet; make compile_model;)
 
 
 .PHONY: run
@@ -147,19 +147,19 @@ help:
 .PHONY: clean_googlenet
 clean_googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up googlenet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make clean;)
+	(cd ../../networks/GoogLeNet; make clean;)
 
 
 .PHONY: clean_alexnet
 clean_alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make clean;)
+	(cd ../../networks/AlexNet; make clean;)
 
 
 .PHONY: clean_squeezenet
 clean_squeezenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up squeezenet..."$(NOCOLOR)
-	(cd ../../caffe/SqueezeNet; make clean;)
+	(cd ../../networks/SqueezeNet; make clean;)
 	
 .PHONY: clean
 clean: clean_alexnet clean_squeezenet clean_googlenet

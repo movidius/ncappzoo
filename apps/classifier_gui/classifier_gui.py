@@ -33,9 +33,9 @@ except:
 sys.path.append('../')
 import simple_classifier_py.run as simple_classifier_py
 
-GOOGLENET_IR =  '../../caffe/GoogLeNet/googlenet-v1.xml'
-ALEXNET_IR =  '../../caffe/AlexNet/alexnet.xml'
-SQUEEZENET_IR =  '../../caffe/SqueezeNet/squeezenet1.0.xml'
+GOOGLENET_IR =  '../../networks/GoogLeNet/googlenet-v1.xml'
+ALEXNET_IR =  '../../networks/AlexNet/alexnet.xml'
+SQUEEZENET_IR =  '../../networks/SqueezeNet/squeezenet1.0.xml'
 
 LABELS_FILE = '../../data/ilsvrc12/synset_labels.txt'
 
