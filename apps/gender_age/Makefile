@@ -3,11 +3,11 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 # filenames for the graph files that we'll copy to this directory.
-FACE_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
+FACE_RELATIVE_DIR = ../../networks/face-detection-retail-0004
 FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP16
 FACE_FILE_NAME_BASE = face-detection-retail-0004
 
-AGE_GEN_RELATIVE_DIR = ../../caffe/AgeGenderNet
+AGE_GEN_RELATIVE_DIR = ../../networks/AgeGenderNet
 AGE_GEN_MODEL_ZOO_DIR = Retail/object_attributes/age_gender/dldt/FP16
 AGE_GEN_FILE_NAME_BASE = age-gender-recognition-retail-0013
 
