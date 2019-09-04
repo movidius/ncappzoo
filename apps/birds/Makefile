@@ -61,13 +61,13 @@ uninstall-reqs:
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling GoogLeNet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make compile_model; cd ../../apps/birds; cp ../../caffe/GoogLeNet/googlenet-v1.xml .; cp ../../caffe/GoogLeNet/googlenet-v1.bin .;) 
+	(cd ../../networks/GoogLeNet; make compile_model; cd ../../apps/birds; cp ../../networks/GoogLeNet/googlenet-v1.xml .; cp ../../networks/GoogLeNet/googlenet-v1.bin .;) 
 
 
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling Tiny Yolo v1..."$(NOCOLOR)
-	(cd ../../caffe/TinyYolo; make compile_model; cd ../../apps/birds; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.xml .; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.bin .;)
+	(cd ../../networks/TinyYolo_v1; make compile_model; cd ../../apps/birds; cp ../../networks/TinyYolo_v1/tiny-yolo-v1_53000.xml .; cp ../../networks/TinyYolo_v1/tiny-yolo-v1_53000.bin .;)
 
 
 .PHONY: default_model
