@@ -85,7 +85,6 @@ help:
 	@echo $(YELLOW)"  make run or run_cpp "$(NOCOLOR)"- Runs the C++ example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message.";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
-	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Compiles the model to an IR format.";
 	@echo $(YELLOW)"  make compile_cpp "$(NOCOLOR)"- Builds the C++ example.";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
