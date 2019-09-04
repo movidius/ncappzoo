@@ -96,7 +96,7 @@ install-reqs:
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nTiny YOlo v1: Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)"\nTiny Yolo v1: Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 	
 	
