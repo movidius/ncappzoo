@@ -38,7 +38,7 @@ SCALE = 128
 all: deps data compile_model compile_cpp
 
 # Checks if TF_MODELS_PATH is set.  If it isn't set then will make the
-# tf_models project in the ncappzoo/tensorflow/tf_models directory.
+# tf_models project in the ncappzoo/networks/tf_models directory.
 check_model:
 ifndef TF_MODELS_PATH
 	@echo $(YELLOW)"TF_MODELS_PATH not set, making tf_models..."$(NOCOLOR);
@@ -50,7 +50,7 @@ else
 endif
 
 # Checks if TF_SRC_PATH is set.  If it isn't set then will make the
-# tf_models project in the ncappzoo/tensorflow/tf_src directory.
+# tf_models project in the ncappzoo/networks/tf_src directory.
 check_tf:
 ifndef TF_SRC_PATH
 	@echo $(YELLOW)"TF_SRC_PATH not set, making tf_src..."$(NOCOLOR);
