@@ -10,7 +10,7 @@ SIMPLE_CLASSIFIER_PY_RELATIVE_DIR = ../../apps/simple_classifier_py
 
 TEST_IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
-MODEL_RELATIVE_DIR = ../../caffe/GoogLeNet
+MODEL_RELATIVE_DIR = ../../networks/GoogLeNet
 
 TEST_IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
