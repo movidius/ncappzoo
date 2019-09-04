@@ -7,7 +7,7 @@ NOCOLOR = '\033[0m'
 
 DATA_RELATIVE_DIR = ../../data
 TEST_IMAGE_RELATIVE_DIR = .
-MODEL_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
+MODEL_RELATIVE_DIR = ../../networks/face-detection-retail-0004
 
 TEST_IMAGE_FILENAME = image.jpg
 
