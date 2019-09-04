@@ -1,4 +1,4 @@
-project(simple_classifier_cpp)
+project(simple_classifier_cpp_camera)
 cmake_minimum_required(VERSION 2.8)
 
 include_directories(
@@ -12,7 +12,7 @@ set(SOURCES
 )
 
         
-add_executable(simple_classifier_cpp ${SOURCES})
+add_executable(simple_classifier_cpp_camera ${SOURCES})
 
 link_directories($ENV{INTEL_CVSDK_DIR}/deployment_tools/inference_engine/lib/intel64 /usr/lib/x86_64-linux-gnu/)
 
@@ -23,6 +23,6 @@ find_library(OPENCV_IMGPROC opencv_imgproc $ENV{INTEL_CVSDK_DIR}/opencv/lib)
 find_library(OPENCV_CODECS opencv_imgcodecs $ENV{INTEL_CVSDK_DIR}/opencv/lib)
 find_library(OPENCV_VIDEOIO opencv_videoio $ENV{INTEL_CVSDK_DIR}/opencv/lib)
 
-target_link_libraries(simple_classifier_cpp ${INFERENCE_ENGINE_LIB} ${OPENCV_CORE} ${OPENCV_HIGHGUI} ${OPENCV_IMGPROC} ${OPENCV_CODECS} ${OPENCV_VIDEOIO})
+target_link_libraries(simple_classifier_cpp_camera ${INFERENCE_ENGINE_LIB} ${OPENCV_CORE} ${OPENCV_HIGHGUI} ${OPENCV_IMGPROC} ${OPENCV_CODECS} ${OPENCV_VIDEOIO})
 
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11")

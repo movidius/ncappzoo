@@ -4,7 +4,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 # name of the directory and the base name of the main python file (minus the .py extension)
-APP_NAME = simple_classifier_cpp
+APP_NAME = simple_classifier_cpp_camera
 
 # filenames for the graph files that we'll copy to this directory.
 CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier_cpp_camera
