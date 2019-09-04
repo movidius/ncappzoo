@@ -5,8 +5,6 @@ NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
 PROJECT_DIR = $(CURDIR)
-ZOO_TF_SRC_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_SRC_PROJ}/tensorflow
-ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
 
 MEAN_VALUES = [127.5,127.5,127.5]
 SCALE = 128
@@ -18,8 +16,8 @@ MODEL_DOWNLOADER_FILENAME = downloader.py
 FACENET_MODEL_ZOO_DIR = face_recognition/facenet/CASIA-WebFace/tf/20180408-102900
 DOWNLOADER_MODEL_NAME = facenet-20180408-102900
 
-FACE_DETECT_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
-MODEL_RELATIVE_DIR = ../../tensorflow/facenet
+FACE_DETECT_RELATIVE_DIR = ../../networks/face-detection-retail-0004
+MODEL_RELATIVE_DIR = ../../networks/facenet
 
 GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/licenses.txt; \
              wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/elvis-presley-401920_640.jpg; \
