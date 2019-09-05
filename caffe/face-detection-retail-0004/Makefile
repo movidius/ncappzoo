@@ -1,3 +1,4 @@
+YELLOW = '\033[1;33m'
 NETWORK_NAME = face-detection-retail-0004
 
 .PHONY: all
