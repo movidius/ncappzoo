@@ -1,4 +1,4 @@
-# AgeGenderNet
+# age_gender_net
 ## Introduction
 The [Age/GenderNet](https://github.com/opencv/open_model_zoo/blob/master/intel_models/age-gender-recognition-retail-0013/description/age-gender-recognition-retail-0013.md) network can be used for image classification. This model was trained to classify ages from 18-75. The model has 2 outputs, one for age: 'age-conv3' and another output for gender: 'prob'. 
 
