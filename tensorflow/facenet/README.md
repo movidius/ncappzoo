@@ -3,7 +3,7 @@
 The OpenVINO Ncappzoo facenet example network is based the work done by David Sandberg here: https://github.com/davidsandberg/facenet.
 Facenet is not a classifier that is trained to classify a face as belonging to a particular individual that it was trained on.  Instead it is trained to find and quantify landmarks on faces in general.  By comparing the face landmark quantification values (network inference output) on two images, it is possible to determine how likely the two faces are of the same person.
 
-By default, the sample uses aligned face images that are cropped using the face-detection-retail-0004 sample.
+By default, the sample uses aligned face images that are cropped using the face-detection-retail-0004 sample. If you use this network, make sure to use a face detection network like face-detection-retail-0004 to align/crop your images for the best results. 
 
 The application then reads a single image file named validated_face/valid_face.png and runs an inference on that "validated" image upon start up.  The results of the valid image are saved and later used for comparison.  Next each image file in the test_faces directory (the test images) is read one by one.  After an image is read in, it is run through the facenet network and the results are compared with the valid image.  When the network results for the valid image is similar to the results for a test image it is considered a match.  That is to say they the two images are of the same person. 
 
