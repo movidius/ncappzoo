@@ -1,60 +1,61 @@
 YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
-NETWORK_NAME = face-detection-retail-0004
+OLD_NETWORK_NAME = face-detection-retail-0004
+NEW_NETWORK_NAME = face_detection_retail_0004
 
 .PHONY: all
 all:
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: deps
 deps: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
 
 .PHONY: data
 data:
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
 
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR) 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR) 
 
 
 .PHONY: get_ir
 get_ir:	
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: compile_model
 compile_model: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
 .PHONY: run
 run: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: run_py
 run_py: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 		
 
 .PHONY: help
 help:
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 clean: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": This network has moved to networks/face_detection_retail_0004"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
