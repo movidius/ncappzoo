@@ -5,12 +5,10 @@ NOCOLOR = '\033[0m'
 .PHONY: all
 all: deps data compile_cpp
 
-FACE_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
-FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP16
+FACE_RELATIVE_DIR = ../../networks/face_detection_retail_0004
 FACE_FILE_NAME_BASE = face-detection-retail-0004
 
-AGE_GEN_RELATIVE_DIR = ../../caffe/AgeGenderNet
-AGE_GEN_MODEL_ZOO_DIR = Retail/object_attributes/age_gender/dldt/FP16
+AGE_GEN_RELATIVE_DIR = ../../networks/age_gender_net
 AGE_GEN_FILE_NAME_BASE = age-gender-recognition-retail-0013
 
 
@@ -55,6 +53,13 @@ get_ir:
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo $(YELLOW)"\nncs_digital_sign: Building the sample..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(mkdir -p build; cd build; cmake ..; make;)
 
 

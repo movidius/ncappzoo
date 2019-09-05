@@ -11,6 +11,13 @@ The provided Makefile does the following
 
 **Note**: The default image used for inference is a CC0 image and was previously cropped/aligned using the face-detection-retail-0004 sample. When using this network, you will have to use a face detection network like face-detection-retail-0004 to align and crop faces to use as input. This will give you the best results.  
 
+## Model Information
+### Inputs
+ - name: 'input', shape: [1x3x62x62], Expected color order is BGR.
+### Outputs 
+ - name: 'age_conv3', shape: [1, 1, 1, 1] - Estimated age divided by 100.
+ - name: 'prob', shape: [1, 2, 1, 1] - Softmax output across 2 type classes [female, male].
+
 ## Running this Example
 ~~~
 make run

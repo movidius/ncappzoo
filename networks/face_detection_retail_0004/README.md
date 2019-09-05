@@ -1,6 +1,8 @@
 # face-detection-retail-0004
 ## Introduction
-The [face-detection-retail-0004](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) network can be used for face detection. 
+The [face-detection-retail-0004](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) network can be used for face detection. This model can be used to align faces for use with face recognition.
+
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
 
 The provided Makefile does the following
 
@@ -8,6 +10,12 @@ The provided Makefile does the following
 2. Takes an image and runs an inference on the face-detection-retail-0004 model.
 
 The sample can also be used to crop images and write them to file. 
+
+## Model Information
+### Inputs
+ - name: 'input', shape: [1x3x300x300], Expected color order is BGR.
+### Outputs 
+ - name: 'detection_out', shape: [1, 1, N, 7] - where N is the number of detected bounding boxes. For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max].
 
 ## Running this Example
 ~~~

@@ -5,11 +5,7 @@ YELLOW = '\033[1;33m'
 RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
-DATA_RELATIVE_DIR = ../../data
-TEST_IMAGE_RELATIVE_DIR = .
-MODEL_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
-
-TEST_IMAGE_FILENAME = image.jpg
+IMAGE = image.jpg
 
 ZOO_RELATIVE_DIR = ../../omz
 MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
@@ -18,6 +14,8 @@ FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP
 MODEL_FILE_NAME_BASE = face-detection-retail-0004
 
 GET_TEST_IMAGE = wget -O image.jpg -N http://vis-www.cs.umass.edu/lfw/images/Talisa_Bratt/Talisa_Bratt_0001.jpg
+
+APP_NAME = face_detection_retail_0004
 
 CROP = 
 CROPPED_FACES_DIR = 
@@ -29,24 +27,24 @@ all: deps data
 
 .PHONY: deps
 deps: get_ir
-	@echo $(YELLOW)"\nface-detection-retail-0004: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 	
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nface-detection-retail-0004: Downloading required data..."$(NOCOLOR)
-	test -f ${TEST_IMAGE_FILENAME} || ${GET_TEST_IMAGE}
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data..."$(NOCOLOR)
+	test -f ${IMAGE} || ${GET_TEST_IMAGE}
 
 
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)"\nface-detection-retail-0004: Cloning model zoo..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Cloning model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 
 
 .PHONY: get_ir
 get_ir:	model_zoo
-	@echo $(YELLOW)"\nface-detection-retail-0004: Downloading IRs..."$(NOCOLOR);
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading IRs..."$(NOCOLOR);
 	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
 		echo " - Model files already exists in open model directory."; \
@@ -69,7 +67,7 @@ get_ir:	model_zoo
 
 .PHONY: compile_model
 compile_model: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Compiling model to IR..."$(NOCOLOR)
 	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
 
 	
@@ -79,25 +77,40 @@ run: run_py
 
 .PHONY: run_py
 run_py: deps data
-	@echo $(YELLOW)"\nface-detection-retail-0004: Running Python sample..."$(NOCOLOR)
-	python3 face_detect.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_FILENAME} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
+	@echo $(YELLOW)'\n'${APP_NAME}": Running Python sample..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
+	python3 ${APP_NAME}.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${IMAGE} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Checking installation requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Checking installation requirements..."$(NOCOLOR)
 	@echo "No requirements needed."
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 	
 
 .PHONY: help
 help:
-	@echo "\nPossible make targets: ";
+	@echo "\n ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does face detection and can be used to align faces.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'input', shape: [1x3x300x300], Expected color order is BGR.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'detection_out', shape: [1, 1, N, 7] - where N is the number of detected bounding boxes. For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max].";
+	@echo "\n Possible make targets: ";
 	@echo $(YELLOW)"  make run or make run_py "$(NOCOLOR)"- Runs the Python example.";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
@@ -110,7 +123,7 @@ help:
 	
 
 clean: 
-	@echo $(YELLOW)"\nface-detection-retail-0004: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."$(NOCOLOR)
 	@rm -f image.jpg
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml

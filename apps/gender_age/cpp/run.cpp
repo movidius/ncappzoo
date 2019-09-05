@@ -109,7 +109,7 @@ int main (int argc, char** argv) {
     setWindowProperty(WINDOW_NAME, WND_PROP_ASPECT_RATIO, WINDOW_KEEPRATIO);
     moveWindow(WINDOW_NAME, 0, 0);
 
-	// Create the inference engine object from the inference engine core api
+    // Create the inference engine object from the inference engine core api
     Core ie;
 
     // -------------------------Read network and check network inputs-----------------------------------------------------------
@@ -360,7 +360,7 @@ int main (int argc, char** argv) {
         }
         
         // -----------------Display the results ---------------
-        // go through all of the faces that we detected and set up the display text and bounding boxes to display gender and age
+        // Go through all of the faces that we detected and set up the display text and bounding boxes to display gender and age
         for (unsigned int i = 0; i < detectedFaces.size(); i++)
         {
             cv::putText(imgIn, resultText.at(i), cv::Point2f(detectedFaces.at(i).xmin, detectedFaces.at(i).ymin) , FONT, FONT_SIZE, resultColor.at(i), 2);
