@@ -99,5 +99,5 @@ help:
 clean: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."$(NOCOLOR)
 	rm -rf build
-	rm -rf ${GOOGLENET_BASE_NAME}.xml
-	rm -rf ${GOOGLENET_BASE_NAME}.bin
+	rm -f ${GOOGLENET_BASE_NAME}.xml
+	rm -f ${GOOGLENET_BASE_NAME}.bin
