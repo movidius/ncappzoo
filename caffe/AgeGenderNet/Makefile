@@ -5,11 +5,7 @@ YELLOW = '\033[1;33m'
 RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
-DATA_RELATIVE_DIR = ../../data
-MODEL_RELATIVE_DIR = ../AgeGenderNet
-
-TEST_IMAGE_FILENAME = image.jpg
-CROPPED_IMAGE_FILENAME = cropped_face_0.png
+IMAGE = image.png
 
 ZOO_RELATIVE_DIR = ../../omz
 MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
@@ -18,12 +14,11 @@ MODEL_DOWNLOADER_FILENAME = downloader.py
 AGE_GENDER_MODEL_ZOO_DIR = Retail/object_attributes/age_gender/dldt/FP16
 MODEL_FILE_NAME_BASE = age-gender-recognition-retail-0013
 
-GET_TEST_IMAGE = wget -O image.jpg -N http://vis-www.cs.umass.edu/lfw/images/Talisa_Bratt/Talisa_Bratt_0001.jpg
+GET_TEST_IMAGE = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/trump.png -O image.png
 
-FACE_DETECT_RELATIVE_DIR = ../face-detection-retail-0004
 
 .PHONY: all
-all: deps data 
+all: deps data
 
 
 .PHONY: deps
@@ -32,9 +27,9 @@ deps: get_ir
 	
 	
 .PHONY: data
-data: face_detect_compile
+data: 
 	@echo $(YELLOW)"\nAgeGenderNet: Downloading required data..."$(NOCOLOR)
-	test -f ${TEST_IMAGE_FILENAME} || ${GET_TEST_IMAGE}
+	test -f ${IMAGE} || ${GET_TEST_IMAGE}
 
 
 .PHONY: model_zoo
@@ -64,18 +59,6 @@ get_ir:	model_zoo
 		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml . ;\
 		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin . ;\
 	fi
-		
-		
-.PHONY: face_detect_compile
-face_detect_compile:
-	@echo $(YELLOW)"\nAgeGenderNet: Compiling face detection IR..."$(NOCOLOR)
-	(cd ${FACE_DETECT_RELATIVE_DIR}; make all;)
-
-
-.PHONY: run_face_detect
-run_face_detect:
-	@echo $(YELLOW)"\nAgeGenderNet: Running face detection sample to get cropped face mat..."$(NOCOLOR)
-	(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR};)
 
 
 .PHONY: compile_model
@@ -89,9 +72,17 @@ run: run_py
 	
 
 .PHONY: run_py
-run_py: deps data compile_model run_face_detect
+run_py: deps data compile_model
 	@echo $(YELLOW)"\nAgeGenderNet: Running Python sample..."$(NOCOLOR)
-	python3 age_gender_net.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${CROPPED_IMAGE_FILENAME};
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
+	python3 age_gender_net.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${IMAGE};
 
 
 .PHONY: install-reqs
@@ -122,9 +113,8 @@ help:
 
 clean: 
 	@echo $(YELLOW)"\nAgeGenderNet: Cleaning up files..."$(NOCOLOR)
-	@rm -f ${TEST_IMAGE_FILENAME}
+	rm -f ${IMAGE}
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
 	rm -f ${MODEL_FILE_NAME_BASE}.mapping
-	@rm -f cropped_face_*.*
     
