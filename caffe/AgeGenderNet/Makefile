@@ -1,4 +1,6 @@
 YELLOW = '\033[1;33m'
+NOCOLOR = '\033[0m'
+
 NETWORK_NAME = AgeGenderNet
 
 .PHONY: all
