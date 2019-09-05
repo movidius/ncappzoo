@@ -9,7 +9,7 @@ The provided Makefile does the following
 1. Downloads the IR files from the [Open Model Zoo](https://github.com/opencv/open_model_zoo)
 2. Downloads an aligned face and runs an inference with the age-gender model using the age and gender outputs.
 
-**Note**: The default image used for inference is a CC0 image and was previously cropped/aligned using the face-detection-retail-0004 sample.
+**Note**: The default image used for inference is a CC0 image and was previously cropped/aligned using the face-detection-retail-0004 sample. When using this network, you will have to use a face detection network like face-detection-retail-0004 to align and crop faces to use as input. This will give you the best results.  
 
 ## Running this Example
 ~~~
