@@ -15,7 +15,7 @@ MODEL_FILE_NAME_BASE = face-detection-retail-0004
 
 GET_TEST_IMAGE = wget -O image.jpg -N http://vis-www.cs.umass.edu/lfw/images/Talisa_Bratt/Talisa_Bratt_0001.jpg
 
-APP_NAME = face_detection_retail_0004
+NETWORK_NAME = face_detection_retail_0004
 
 CROP = 
 CROPPED_FACES_DIR = 
@@ -27,24 +27,24 @@ all: deps data
 
 .PHONY: deps
 deps: get_ir
-	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
 	
 
 .PHONY: data
 data:
-	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading required data..."$(NOCOLOR)
 	test -f ${IMAGE} || ${GET_TEST_IMAGE}
 
 
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)'\n'${APP_NAME}": Cloning model zoo..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cloning model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 
 
 .PHONY: get_ir
 get_ir:	model_zoo
-	@echo $(YELLOW)'\n'${APP_NAME}": Downloading IRs..."$(NOCOLOR);
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading IRs..."$(NOCOLOR);
 	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
 		echo " - Model files already exists in open model directory."; \
@@ -67,7 +67,7 @@ get_ir:	model_zoo
 
 .PHONY: compile_model
 compile_model: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
 	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
 
 	
@@ -77,7 +77,7 @@ run: run_py
 
 .PHONY: run_py
 run_py: deps data
-	@echo $(YELLOW)'\n'${APP_NAME}": Running Python sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running Python sample..."$(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
@@ -86,18 +86,18 @@ run_py: deps data
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
-	python3 ${APP_NAME}.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${IMAGE} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
+	python3 ${NETWORK_NAME}.py --face_ir=${MODEL_FILE_NAME_BASE}.xml --image=${IMAGE} ${CROP}${CROPPED_FACES_DIR} ${SHOW};
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Checking installation requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking installation requirements..."$(NOCOLOR)
 	@echo "No requirements needed."
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 	
 
@@ -123,7 +123,7 @@ help:
 	
 
 clean: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
 	@rm -f image.jpg
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
