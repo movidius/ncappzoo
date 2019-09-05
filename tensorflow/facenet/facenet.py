@@ -17,7 +17,7 @@ YELLOW = '\033[1;33m'
 EXAMPLES_BASE_DIR='../../'
 TEST_IMAGES_DIR = './test_faces/'
 
-VALIDATED_IMAGES_DIR = './validated_faces/'
+VALIDATED_IMAGES_DIR = './validated_face/'
 validated_image_filename = VALIDATED_IMAGES_DIR + 'valid_face.png'
 
 ir = "20180408-102900.xml"
