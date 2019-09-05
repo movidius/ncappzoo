@@ -4,10 +4,6 @@ YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
-PROJECT_DIR = $(CURDIR)
-ZOO_TF_SRC_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_SRC_PROJ}/tensorflow
-ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
-
 MEAN_VALUES = [127.5,127.5,127.5]
 SCALE = 128
 MODEL_FILE_NAME_BASE = 20180408-102900
@@ -18,13 +14,12 @@ MODEL_DOWNLOADER_FILENAME = downloader.py
 FACENET_MODEL_ZOO_DIR = face_recognition/facenet/CASIA-WebFace/tf/20180408-102900
 DOWNLOADER_MODEL_NAME = facenet-20180408-102900
 
-FACE_DETECT_RELATIVE_DIR = ../../caffe/face-detection-retail-0004
-MODEL_RELATIVE_DIR = ../../tensorflow/facenet
 
-GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/licenses.txt; \
-             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/elvis-presley-401920_640.jpg; \
-             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/trump.jpg; \
-             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/president-67550_640.jpg
+GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/licenses.txt; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/elvis.png; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/trump.png; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/reagan.png
+
 
 .PHONY: all
 all: deps data compile_model
@@ -37,15 +32,13 @@ deps: download_model_files
 
 .PHONY: data
 data: pictures
-	mkdir -p validated_faces
-	mkdir -p test_faces
 	@echo $(YELLOW)"\nfacenet: Downloading required data for model..."$(NOCOLOR)
 
 
 .PHONY: pictures
 pictures:
 	@echo "\nfacenet: Downloading images..."
-	${GET_PICTURES};
+	(cd test_faces; ${GET_PICTURES};)
 
 .PHONY: model_zoo
 model_zoo:
@@ -68,6 +61,13 @@ download_model_files: model_zoo
 .PHONY: compile_model
 compile_model: download_model_files 
 	@echo $(YELLOW)"\nfacenet: Compiling model to IR..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ] ; \
 	then \
 		echo " - Compiled model file already exists, skipping compile."; \
@@ -76,35 +76,12 @@ compile_model: download_model_files
 	fi;
 
 
-.PHONY: run_face_detect
-run_face_detect: pictures
-	@echo $(YELLOW)"\nfacenet: Running face detection sample to get cropped face mat..."$(NOCOLOR)
-	@if [ ! -e validated_faces/valid_face.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/validated_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/valid.jpg; mv ${MODEL_RELATIVE_DIR}/validated_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/validated_faces/valid_face.png;); \
-	fi
-	@if [ ! -e test_faces/valid_face.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/test_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/valid.jpg; mv ${MODEL_RELATIVE_DIR}/test_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/test_faces/valid_face.png;); \
-	fi
-	@if [ ! -e test_faces/elvis.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/test_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/elvis-presley-401920_640.jpg; mv ${MODEL_RELATIVE_DIR}/test_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/test_faces/elvis.png;); \
-	fi
-	@if [ ! -e test_faces/trump.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/test_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/trump.jpg; mv ${MODEL_RELATIVE_DIR}/test_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/test_faces/trump.png;); \
-	fi
-	@if [ ! -e test_faces/reagan.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/test_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/president-67550_640.jpg; mv ${MODEL_RELATIVE_DIR}/test_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/test_faces/reagan.png;); \
-	fi
-	@if [ ! -e test_faces/nealvis.png ]; then \
-		(cd ${FACE_DETECT_RELATIVE_DIR}; make run SHOW="--show=no" CROP="--crop=" CROPPED_FACES_DIR=${MODEL_RELATIVE_DIR}/test_faces TEST_IMAGE_FILENAME=${MODEL_RELATIVE_DIR}/neal_2017-12-19-155037.jpg; mv ${MODEL_RELATIVE_DIR}/test_faces/cropped_face_0.png ${MODEL_RELATIVE_DIR}/test_faces/nealvis.png;); \
-	fi
-
-
 .PHONY: run
 run: run_py
 
 
 .PHONY: run_py
-run_py: data deps compile_model run_face_detect
+run_py: data deps compile_model
 	@echo $(YELLOW) "\nfacenet: Running Python sample..." $(NOCOLOR)
 	python3 facenet.py;
 
@@ -138,12 +115,10 @@ help:
 .PHONY: clean
 clean:
 	@echo $(YELLOW)"\nfacenet: Cleaning up files..."$(NOCOLOR);
-	rm -rf test_faces
-	rm -rf validated_faces
-	rm -f licenses.txt
-	rm -f trump.jpg
-	rm -f elvis-presley-401920_640.jpg
-	rm -f president-67550_640.jpg
+	rm -f test_faces/licenses.txt
+	rm -f test_faces/trump.png
+	rm -f test_faces/elvis.png
+	rm -f test_faces/reagan.png
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.mapping
