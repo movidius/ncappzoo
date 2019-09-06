@@ -36,7 +36,7 @@ default_model: compile_default_model
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making googlenet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make compile_model;)
+	(cd ../../networks/googlenet; make compile_model;)
 
 
 .PHONY: alexnet
@@ -147,7 +147,7 @@ help:
 .PHONY: clean_googlenet
 clean_googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up googlenet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make clean;)
+	(cd ../../networks/googlenet; make clean;)
 
 
 .PHONY: clean_alexnet
