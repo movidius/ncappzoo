@@ -65,6 +65,8 @@ def infer(image = '../../data/images/nps_electric_guitar.png', ir = '../../caffe
     # Set up the input and output blobs
     input_blob = next(iter(net.inputs))
     output_blob = next(iter(net.outputs))
+    print(input_blob)
+    print(output_blob)
     input_shape = net.inputs[input_blob].shape
     output_shape = net.outputs[output_blob].shape
     
