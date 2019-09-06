@@ -23,30 +23,32 @@ SQUEEZENET_MODEL_ZOO_DIR = classification/squeezenet/1.0/caffe
 MODEL_FILE_NAME_BASE = squeezenet1.0
 MEAN_VALUES = [104,117,123]
 
+NETWORK_NAME = squeezenet
+
 .PHONY: all
 all: deps data compile_model compile_cpp
 
 
 .PHONY: deps
 deps: download_model_files
-	@echo $(YELLOW)"\nSqueezeNet: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
 
 	
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nSqueezeNet: Downloading required data..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading required data..."$(NOCOLOR)
 	(cd ../../data/ilsvrc12; make all);
 	
 	
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)"\nSqueezeNet: Making model zoo..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 	
 
 .PHONY: download_model_files
 download_model_files: model_zoo
-	@echo $(YELLOW)"\nSqueezeNet: Checking zoo model files..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking zoo model files..."$(NOCOLOR)
 	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${SQUEEZENET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt ] ;\
 	then \
 		echo " - Model files already exists." ; \
@@ -58,7 +60,7 @@ download_model_files: model_zoo
 
 .PHONY: compile_model
 compile_model: download_model_files
-	@echo $(YELLOW)"\nSqueezeNet: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
@@ -81,7 +83,7 @@ run: run_py
 
 .PHONY:	compile_cpp
 compile_cpp:  
-	@echo $(YELLOW)"\nSqueezeNet: Compiling C++ sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling C++ sample..."$(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
@@ -95,25 +97,25 @@ compile_cpp:
 
 .PHONY: run_cpp
 run_cpp: data deps compile_cpp compile_model
-	@echo $(YELLOW)"\nSqueezeNet: Running C++ sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
 	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml  ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
 
 
 .PHONY: run_py
 run_py: deps data compile_model
-	@echo $(YELLOW)"\nSqueezeNet: Running Python sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running Python sample..."$(NOCOLOR)
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nSqueezeNet: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 	
 	
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nSqueezeNet: Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 
 
@@ -141,7 +143,7 @@ help:
 	
 
 clean: 
-	@echo $(YELLOW)"\nSqueezeNet: Cleaning up files..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
 	rm -f ${MODEL_FILE_NAME_BASE}.mapping
