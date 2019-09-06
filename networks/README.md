@@ -6,7 +6,8 @@ This directory should be a preferred location for neural networks rather than th
 # Image Classification Networks for Neural Compute devices
 |Image Classification Network| Description |
 |---------------------|-------------|
-|TBD |TBD |
+|[googlenet](googlenet_v1/README.md) |BAIR/BLVC GoogleNet is a network based on [googlenet](https://arxiv.org/abs/1409.4842), the winner of ILSVRC 2014, that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
+
 
 # Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
