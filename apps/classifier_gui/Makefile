@@ -48,7 +48,7 @@ alexnet:
 .PHONY: squeezenet
 squeezenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making squeezenet..."$(NOCOLOR)
-	(cd ../../caffe/SqueezeNet; make compile_model;)
+	(cd ../../networks/squeezenet_v1.0; make compile_model;)
 
 
 .PHONY: run
@@ -159,7 +159,7 @@ clean_alexnet:
 .PHONY: clean_squeezenet
 clean_squeezenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up squeezenet..."$(NOCOLOR)
-	(cd ../../caffe/SqueezeNet; make clean;)
+	(cd ../../networks/squeezenet_v1.0; make clean;)
 	
 .PHONY: clean
 clean: clean_alexnet clean_squeezenet clean_googlenet
