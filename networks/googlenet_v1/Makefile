@@ -22,7 +22,7 @@ GOOGLENET_MODEL_ZOO_DIR = classification/googlenet/v1/caffe
 MODEL_FILE_NAME_BASE = googlenet-v1
 MEAN_VALUES = [104,117,123]
 
-NETWORK_NAME = googlenet
+NETWORK_NAME = googlenet_v1
 
 IMAGE = ${TEST_IMAGE_RELATIVE_DIR}/${IMAGE_FILENAME}
 XML = ${MODEL_FILE_NAME_BASE}.xml
