@@ -8,7 +8,7 @@ NOCOLOR = '\033[0m'
 SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR = ../../apps/simple_classifier_cpp
 SIMPLE_CLASSIFIER_PY_RELATIVE_DIR = ../../apps/simple_classifier_py
 
-TEST_IMAGE_RELATIVE_DIR = ../../data/images
+IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
 MODEL_RELATIVE_DIR = ../../caffe/AlexNet
 
@@ -23,7 +23,7 @@ ALEXNET_MODEL_ZOO_DIR = classification/alexnet/caffe
 MODEL_FILE_NAME_BASE = alexnet
 MEAN_VALUES = [104,117,123]
 
-IMAGE = ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}
+IMAGE = ${IMAGE_RELATIVE_DIR}/${IMAGE_FILENAME}
 LABELS = ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME}
 XML = ${MODEL_FILE_NAME_BASE}.xml
 
@@ -102,7 +102,7 @@ compile_cpp:
 .PHONY: run_cpp
 run_cpp: deps data compile_cpp compile_model
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
-	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
+	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${XML} ${IMAGE} ${LABELS};
 
 	
 .PHONY: run_py
