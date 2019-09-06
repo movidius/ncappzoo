@@ -50,7 +50,7 @@ deps: default_model
 .PHONY: run_py
 run_py: data deps
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
-		@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
 		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
 		exit 1 ; \
