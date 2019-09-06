@@ -67,7 +67,7 @@ googlenet:
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling Tiny Yolo v1..."$(NOCOLOR)
-	(cd ../../caffe/TinyYolo; make compile_model; cd ../../apps/birds; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.xml .; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.bin .;)
+	(cd ../../networks/tiny_yolo_v1; make compile_model; cd ../../apps/birds; cp ../../networks/tiny_yolo_v1/tiny-yolo-v1_53000.xml .; cp ../../networks/tiny_yolo_v1/tiny-yolo-v1_53000.bin .;)
 
 
 .PHONY: default_model
