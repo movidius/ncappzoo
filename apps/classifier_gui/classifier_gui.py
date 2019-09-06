@@ -33,7 +33,7 @@ except:
 sys.path.append('../')
 import simple_classifier_py.run as simple_classifier_py
 
-GOOGLENET_IR =  '../../networks/googlenet/googlenet-v1.xml'
+GOOGLENET_IR =  '../../networks/googlenet_v1/googlenet-v1.xml'
 ALEXNET_IR =  '../../caffe/AlexNet/alexnet.xml'
 SQUEEZENET_IR =  '../../caffe/SqueezeNet/squeezenet1.0.xml'
 

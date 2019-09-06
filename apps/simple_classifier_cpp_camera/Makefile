@@ -8,7 +8,7 @@ APP_NAME = simple_classifier_cpp_camera
 
 # filenames for the graph files that we'll copy to this directory.
 CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier_cpp_camera
-GOOGLENET_RELATIVE_DIR = ../../networks/googlenet
+GOOGLENET_RELATIVE_DIR = ../../networks/googlenet_v1
 GOOGLENET_BASE_NAME = googlenet-v1
 
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12

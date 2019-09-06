@@ -1,7 +1,7 @@
 
 # filenames for the graph files that we'll copy to this directory.
 CLASSIFIER_GRAPH_BASE_FILENAME = googlenet-v1
-CLASSIFIER_RELATIVE_DIR = ../../networks/googlenet
+CLASSIFIER_RELATIVE_DIR = ../../networks/googlenet_v1
 XML = ${CLASSIFIER_GRAPH_BASE_FILENAME}.xml
 BIN = ${CLASSIFIER_GRAPH_BASE_FILENAME}.bin
 DEV = MYRIAD

@@ -2,7 +2,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 OLD_NETWORK_NAME = GoogLeNet
-NEW_NETWORK_NAME = googlenet
+NEW_NETWORK_NAME = googlenet_v1
 
 .PHONY: all
 all:

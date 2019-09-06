@@ -61,7 +61,7 @@ uninstall-reqs:
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling GoogLeNet..."$(NOCOLOR)
-	(cd ../../networks/googlenet; make compile_model; cd ../../apps/birds; cp ../../networks/googlenet/googlenet-v1.xml .; cp ../../networks/googlenet/googlenet-v1.bin .;) 
+	(cd ../../networks/googlenet_v1; make compile_model; cd ../../apps/birds; cp ../../networks/googlenet_v1/googlenet-v1.xml .; cp ../../networks/googlenet_v1/googlenet-v1.bin .;) 
 
 
 .PHONY: tiny_yolo

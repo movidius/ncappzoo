@@ -1,1 +1,1 @@
-This network has moved to networks/googlenet.
+This network has moved to networks/googlenet_v1.
