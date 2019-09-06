@@ -1,6 +1,6 @@
-# googlenet
+# googlenet_v1
 ## Introduction
-The [googlenet](https://github.com/opencv/open_model_zoo/blob/master/models/public/googlenet-v1/googlenet-v1.md) network can be used for image classification. 
+The [googlenet_v1](https://github.com/opencv/open_model_zoo/blob/master/models/public/googlenet-v1/googlenet-v1.md) network can be used for image classification. 
 
 This sample utilizes the OpenVINO Inference Engine from the OpenVINO Deep Learning Development Toolkit and was tested with the 2019 R2 release.
 
