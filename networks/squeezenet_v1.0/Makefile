@@ -8,11 +8,11 @@ NOCOLOR = '\033[0m'
 SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR = ../../apps/simple_classifier_cpp
 SIMPLE_CLASSIFIER_PY_RELATIVE_DIR = ../../apps/simple_classifier_py
 
-TEST_IMAGE_RELATIVE_DIR = ../../data/images
+IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
 MODEL_RELATIVE_DIR = ../../caffe/SqueezeNet
 
-TEST_IMAGE_FILENAME = nps_electric_guitar.png
+IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
 
 ZOO_RELATIVE_DIR = ../../omz
@@ -23,7 +23,11 @@ SQUEEZENET_MODEL_ZOO_DIR = classification/squeezenet/1.0/caffe
 MODEL_FILE_NAME_BASE = squeezenet1.0
 MEAN_VALUES = [104,117,123]
 
-NETWORK_NAME = squeezenet
+NETWORK_NAME = squeezenet_v1.0
+
+XML = ${MODEL_FILE_NAME_BASE}.xml 
+IMAGE = ${IMAGE_RELATIVE_DIR}/${IMAGE_FILENAME}
+LABELS = ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME}
 
 .PHONY: all
 all: deps data compile_model compile_cpp
@@ -98,13 +102,13 @@ compile_cpp:
 .PHONY: run_cpp
 run_cpp: data deps compile_cpp compile_model
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
-	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_FILE_NAME_BASE}.xml  ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME};
+	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${XML} ${IMAGE} ${LABELS};
 
 
 .PHONY: run_py
 run_py: deps data compile_model
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running Python sample..."$(NOCOLOR)
-	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
+	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${XML} --image=${IMAGE} --labels=${LABELS} --top=5; 
 
 
 .PHONY: install-reqs

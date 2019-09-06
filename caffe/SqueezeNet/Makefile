@@ -2,7 +2,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 OLD_NETWORK_NAME = SqueezeNet
-NEW_NETWORK_NAME = squeezenet
+NEW_NETWORK_NAME = squeezenet_v1.0
 
 .PHONY: all
 all:

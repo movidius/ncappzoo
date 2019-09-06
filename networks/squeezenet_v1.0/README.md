@@ -1,6 +1,8 @@
-# SqueezeNet
+# squeezenet_v1.0
 ## Introduction
-The [SqueezeNet V1.0](https://github.com/opencv/open_model_zoo/blob/master/models/public/squeezenet1.0/squeezenet1.0.md) network can be used for image classification.  
+The [squeezenet_v1.0](https://github.com/opencv/open_model_zoo/blob/master/models/public/squeezenet1.0/squeezenet1.0.md) network can be used for image classification.  
+
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
 
 The provided Makefile does the following
 
@@ -10,6 +12,13 @@ The provided Makefile does the following
 4. Compiles the network into an IR (intermediate representation) format file (.xml) using the OpenVINO Model Optimizer. 
 5. Runs a single inference on an image as an example of how to use this network with the OpenVINO Python API using the simple_classifier_py app.
 
+## Model Information
+### Inputs
+ - name: 'data', shape: [1x3x227x227], Expected color order is BGR.
+### Outputs 
+ - name: 'prob', shape: [1, 1000] - Output indexes represent each class probability.
+ 
+ 
 ## Running this Example
 ~~~
 make run

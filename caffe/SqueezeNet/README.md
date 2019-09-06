@@ -1,1 +1,1 @@
-This network has moved to networks/squeezenet.
+This network has moved to networks/squeezenet_v1.0.
