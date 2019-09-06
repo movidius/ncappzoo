@@ -42,7 +42,7 @@ googlenet:
 .PHONY: alexnet
 alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make compile_model;)
+	(cd ../../networks/alexnet; make compile_model;)
 
 
 .PHONY: squeezenet
@@ -153,7 +153,7 @@ clean_googlenet:
 .PHONY: clean_alexnet
 clean_alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make clean;)
+	(cd ../../networks/alexnet; make clean;)
 
 
 .PHONY: clean_squeezenet

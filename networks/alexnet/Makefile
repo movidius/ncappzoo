@@ -12,7 +12,7 @@ TEST_IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
 MODEL_RELATIVE_DIR = ../../caffe/AlexNet
 
-TEST_IMAGE_FILENAME = nps_electric_guitar.png
+IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
 
 ZOO_RELATIVE_DIR = ../../omz
@@ -22,6 +22,11 @@ ALEXNET_MODEL_ZOO_DIR = classification/alexnet/caffe
 
 MODEL_FILE_NAME_BASE = alexnet
 MEAN_VALUES = [104,117,123]
+
+IMAGE = ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}
+LABELS = ${LABELS_RELATIVE_DIR}/${LABELS_FILENAME}
+XML = ${MODEL_FILE_NAME_BASE}.xml
+
 
 .PHONY: all
 all: deps data compile_model compile_cpp
@@ -59,11 +64,19 @@ download_model_files: model_zoo
 .PHONY: compile_model
 compile_model: download_model_files
 	@echo $(YELLOW)"\nAlexNet: Compiling model to IR..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
 		echo " - IR files already exist. Skipping compile step."; \
 	else \
-		${NCCOMPILE} --data_type=FP16 --input_model=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${ALEXNET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel --input_proto=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${ALEXNET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt --mean_values=${MEAN_VALUES} || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
+		${NCCOMPILE} --data_type=FP16 --input_model=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${ALEXNET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.caffemodel --input_proto=${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${ALEXNET_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.prototxt --mean_values=${MEAN_VALUES}; \
 	fi 
 
 
@@ -74,6 +87,14 @@ run: run_py
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo $(YELLOW)"\nAlexNet: Compiling C++ sample..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(cd ${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}; make compile_cpp; cd -)
 
 
@@ -86,7 +107,7 @@ run_cpp: deps data compile_cpp compile_model
 .PHONY: run_py
 run_py: deps data compile_model
 	@echo $(YELLOW)"\nAlexNet: Running Python sample..."$(NOCOLOR)
-	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} --top=5; 
+	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${XML} --image=${IMAGE} --labels=${LABELS} --top=5; 
 
 
 .PHONY: install-reqs
@@ -115,6 +136,13 @@ help:
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
+	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does image classification on 1000 different classes.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'data', shape: [1x3x227x227], Expected color order is BGR.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'prob', shape: [1, 1000] - Output indexes represent each class probability.\n";
 	
 
 clean: 

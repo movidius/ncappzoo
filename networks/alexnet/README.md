@@ -2,6 +2,8 @@
 ## Introduction
 The [AlexNet](https://github.com/opencv/open_model_zoo/blob/master/models/public/alexnet/alexnet.md) network can be used for image classification. The model was sourced from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
+
 The provided Makefile does the following
 
 1. Downloads the Caffe prototxt file and makes any changes necessary to work with OpenVINO (tested with 2019 R2) and the Intel Neural Compute Stick (NCS1/NCS2). 
@@ -9,6 +11,13 @@ The provided Makefile does the following
 3. Downloads the .caffemodel file from [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 4. Compiles the network into an IR (intermediate representation) format file (.xml) using the OpenVINO Model Optimizer. 
 5. Runs a single inference on an image as an example of how to use this network with the OpenVINO Python API through the simple_classifier_py app.
+
+## Model Information
+### Inputs
+ - name: 'data', shape: [1x3x227x227], Expected color order is BGR.
+### Outputs 
+ - name: 'prob', shape: [1, 1000] - Output indexes represent each class probability.
+
 
 ## Running this Example
 ~~~
