@@ -114,9 +114,9 @@ help:
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the run.py python example program";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
-	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
-	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
 	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content\n"
