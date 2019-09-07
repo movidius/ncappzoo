@@ -1,120 +1,61 @@
-NCCOMPILE = mo.py
-
-GREEN = '\033[1;32m'
 YELLOW = '\033[1;33m'
-RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
-IMAGE = image.png
-
-ZOO_RELATIVE_DIR = ../../omz
-MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
-MODEL_DOWNLOADER_FILENAME = downloader.py
-
-AGE_GENDER_MODEL_ZOO_DIR = Retail/object_attributes/age_gender/dldt/FP16
-MODEL_FILE_NAME_BASE = age-gender-recognition-retail-0013
-
-GET_TEST_IMAGE = wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics_cropped/trump.png -O image.png
-
+OLD_NETWORK_NAME = AgeGenderNet
+NEW_NETWORK_NAME = age_gender_net
 
 .PHONY: all
-all: deps data
+all:
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: deps
-deps: get_ir
-	@echo $(YELLOW)"\nAgeGenderNet: Making dependencies..."$(NOCOLOR)
+deps: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
-	
-.PHONY: data
-data: 
-	@echo $(YELLOW)"\nAgeGenderNet: Downloading required data..."$(NOCOLOR)
-	test -f ${IMAGE} || ${GET_TEST_IMAGE}
 
+.PHONY: data
+data:
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+	
 
 .PHONY: model_zoo
 model_zoo:
-	@echo $(YELLOW)"\nAgeGenderNet: Making model zoo..."$(NOCOLOR)
-	(cd ${ZOO_RELATIVE_DIR}; make all;) 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR) 
 
 
 .PHONY: get_ir
-get_ir:	model_zoo
-	@echo $(YELLOW)"\nAgeGenderNet: Downloading IRs..."$(NOCOLOR)
-	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin ]; \
-	then \
-		echo " - Model files already exists in the open model zoo."; \
-	else \
-		echo " - Model files do not exist in the open model zoo. ";\
-		echo " - Using Model downloader to download the model..."; \
-		(cd ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}; python3 ${MODEL_DOWNLOADER_FILENAME} --name ${MODEL_FILE_NAME_BASE};); \
-	fi; \
-	
-	@if [ -e ${MODEL_FILE_NAME_BASE}.xml ] && [ -e ${MODEL_FILE_NAME_BASE}.bin ]; \
-	then \
-		echo " - IR files already exist in project directory. No need to copy IRs." ;\
-	else \
-		echo " - IR files do not exist in project directory.";\
-		echo " - Copying IR files to current folder..." ;\
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml . ;\
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${AGE_GENDER_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin . ;\
-	fi
+get_ir:	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: compile_model
 compile_model: 
-	@echo $(YELLOW)"\nAgeGenderNet: Compiling model to IR..."$(NOCOLOR)
-	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
-
-
-.PHONY: run
-run: run_py
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
+.PHONY: run
+run: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+
 
 .PHONY: run_py
-run_py: deps data compile_model
-	@echo $(YELLOW)"\nAgeGenderNet: Running Python sample..."$(NOCOLOR)
-	@echo "Checking OpenVINO environment..."
-	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
-	then \
-		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
-		exit 1 ; \
-	else \
-		echo "Intel OpenVINO environment is already set!" ; \
-	fi
-	python3 age_gender_net.py --ir=${MODEL_FILE_NAME_BASE}.xml --image=${IMAGE};
+run_py: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nAgeGenderNet: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
-	
+
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nAgeGenderNet: Uninstalling requirements..."$(NOCOLOR)
-	@echo "Nothing to uninstall."
-	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+		
 
 .PHONY: help
 help:
-	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- Runs the Python example.";
-	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message";
-	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
-	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Compiles the model to an IR format.";
-	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads the required data.";
-	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
-	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
-	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
-	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 clean: 
-	@echo $(YELLOW)"\nAgeGenderNet: Cleaning up files..."$(NOCOLOR)
-	rm -f ${IMAGE}
-	rm -f ${MODEL_FILE_NAME_BASE}.bin
-	rm -f ${MODEL_FILE_NAME_BASE}.xml
-	rm -f ${MODEL_FILE_NAME_BASE}.mapping
-    
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)

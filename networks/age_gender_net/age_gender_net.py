@@ -31,7 +31,7 @@ def parse_args():
                         type=str, default = './age-gender-recognition-retail-0013.xml',
                         help = 'Absolute path to the AgeGender IR file.')
     parser.add_argument( '-i', '--image', metavar = 'IMAGE_FILE', 
-                        type=str, default = 'cropped_face_0.png',
+                        type=str, default = 'image.png',
                         help = 'Absolute path to image file.')
 
     return parser
@@ -39,7 +39,7 @@ def parse_args():
 
 def display_info(input_shape, age_output_shape, gender_output_shape, image, ir):
     print()
-    print(YELLOW + 'AgeNet: Starting application...' + NOCOLOR)
+    print(YELLOW + 'age_gender_net: Starting application...' + NOCOLOR)
     print('   - ' + YELLOW + 'Plugin:      ' + NOCOLOR + ' Myriad')
     print('   - ' + YELLOW + 'IR File:     ' + NOCOLOR, ir)
     print('   - ' + YELLOW + 'Input Shape: ' + NOCOLOR, input_shape)
