@@ -44,8 +44,7 @@ googlenet:
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
-	(cd ../../caffe/GoogLeNet; make compile_model;)
-
+	(cd ../../networks/googlenet_v1; make compile_model;)
 
 .PHONY: alexnet
 alexnet: 
@@ -91,8 +90,7 @@ run_py: data data deps googlenet alexnet squeezenet
 		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
 		echo "or use the command:" $(YELLOW)"sudo apt-get install -y python3-pil.imagetk"$(NOCOLOR)" to manually install requirement.\n"; \
 		exit 1;\
-	fi; \
-	
+	fi	
 	@echo "Checking scikit-image..."
 	@if ${shell} ${CHECK_SKIMAGE} 2> /dev/null; \
 	then \
@@ -102,7 +100,14 @@ run_py: data data deps googlenet alexnet squeezenet
 		echo "Please use the command: "$(YELLOW)" make install-reqs "$(NOCOLOR)" to install the requirement."; \
 		echo "or use the command: " $(YELLOW)"pip3 install scikit-image --user"$(NOCOLOR)" to manually install requirement.\n"; \
 		exit 1; \
-	fi; \
+	fi
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	python3 ${APP_NAME}.py
 
 
@@ -171,7 +176,7 @@ help:
 .PHONY: clean_googlenet
 clean_googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up googlenet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make clean;)
+	(cd ../../networks/googlenet_v1; make clean;)
 
 
 .PHONY: clean_alexnet

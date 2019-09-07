@@ -10,12 +10,11 @@ APP_NAME = simple_classifier_py
 CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier_py_camera
 TEST_IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
-MODEL_RELATIVE_DIR = ../../caffe/GoogLeNet
+MODEL_RELATIVE_DIR = ../../networks/googlenet_v1
 
 TEST_IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
 
-MODEL_RELATIVE_DIR = ../../caffe/GoogLeNet
 MODEL_FILE_NAME_BASE = googlenet-v1
 
 
@@ -60,6 +59,13 @@ run: run_py
 .PHONY: run_py
 run_py: deps data
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	python3 run.py --ir=${MODEL_FILE_NAME_BASE}.xml --labels=${LABELS_RELATIVE_DIR}/${LABELS_FILENAME} 
 
 

@@ -8,7 +8,7 @@ APP_NAME = simple_classifier_cpp_camera
 
 # filenames for the graph files that we'll copy to this directory.
 CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier_cpp_camera
-GOOGLENET_RELATIVE_DIR = ../../caffe/GoogLeNet
+GOOGLENET_RELATIVE_DIR = ../../networks/googlenet_v1
 GOOGLENET_BASE_NAME = googlenet-v1
 
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
@@ -51,12 +51,18 @@ default_model: compile_default_model
 
 .PHONY: run
 run: run_cpp
-	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
 
 
 .PHONY:	compile_cpp
 compile_cpp:  
 	@echo $(YELLOW)'\n'${APP_NAME}": Building the sample..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(mkdir -p build; cd build; cmake ..; make)
 
 
