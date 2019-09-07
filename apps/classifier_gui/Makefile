@@ -36,18 +36,41 @@ default_model: compile_default_model
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making googlenet..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(cd ../../networks/googlenet_v1; make compile_model;)
-
 
 .PHONY: alexnet
 alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make compile_model;)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
+	(cd ../../networks/alexnet; make compile_model;)
 
 
 .PHONY: squeezenet
 squeezenet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Making squeezenet..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(cd ../../caffe/SqueezeNet; make compile_model;)
 
 
@@ -159,7 +182,7 @@ clean_googlenet:
 .PHONY: clean_alexnet
 clean_alexnet: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up alexnet..."$(NOCOLOR)
-	(cd ../../caffe/AlexNet; make clean;)
+	(cd ../../networks/alexnet; make clean;)
 
 
 .PHONY: clean_squeezenet

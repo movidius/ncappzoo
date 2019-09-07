@@ -4,7 +4,6 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # Caffe Image Classification Networks for Neural Compute devices
 |Image Classification Network| Description |
 |---------------------|-------------|
-|[AlexNet](AlexNet/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[ResNet-50](ResNet-50/README.md) |[Deep Residual network](https://arxiv.org/pdf/1512.03385.pdf)  with 50 layers that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[SqueezeNet](SqueezeNet/README.md) |Accuracy similar to AlexNet with many fewer parameters and small model size as described int the [SqueezeNet paper](https://arxiv.org/abs/1602.07360). Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 
