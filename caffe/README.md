@@ -12,7 +12,6 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 |Object Detection Network| Description |
 |---------------------|-------------|
 |[SSD_Mobilenet](SSD_Mobilenet/README.md)|MobileNet Single Shot Detector takes an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications. |
-|[TinyYolo](TinyYolo/README.md) |This Tiny You Only Look Once model is based on [tiny-yolo DarkNet model ](https://pjreddie.com/darknet/yolov1/).  Given an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications.  Requires some post processing of results to narrow down relevant boxes.  |
 
 # Caffe Misc Networks for Neural Compute devices
 |Network| Description |
