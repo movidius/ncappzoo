@@ -287,7 +287,7 @@ def main():
 
                         car.moveCar(CAR_DIRECTION.FWD)
                 else:
-                    # if we got here, there is 2 options
+                    # if reaching here, there are 2 options:
                     # 1- car stopped on the red light (traffic light)
                     # 2- car stopped because it reached the end of road -> do U-Turn
                     car.moveCar(CAR_DIRECTION.STOP)
@@ -302,6 +302,8 @@ def main():
                         car.moveCar(CAR_DIRECTION.RIGHT)
                         sleep(6)
                         car.moveCar(CAR_DIRECTION.REVERSE)
+                        sleep(1)
+                        car.moveCar(CAR_DIRECTION.RIGHT)
                         sleep(1)
                         stop_on_u_turn_count = 0
 
