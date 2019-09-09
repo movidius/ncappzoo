@@ -19,6 +19,10 @@ The provided Makefile does the following:
  - name: 'detector/yolo-v3-tiny/Conv_9/BiasAdd/YoloRegion', shape: [1, 255, 13, 13].
 
 **Note**: The '26' and '13' values in the output represent the number of grid cells for each output. 
+**Note**: The '255' in each output represents each of the three anchor box class scores, object scores and bounding boxes. 80 class scores + 4 bounding box values + 1 object score = 85 values. 85 values * 3 anchor boxes= 255 values.
+
+All scores will need to be filtered through a score and iou thresold to filter out duplicates.
+
 
 ## Running this Example
 ~~~
