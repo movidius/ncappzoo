@@ -5,7 +5,7 @@ NOCOLOR = '\033[0m'
 
 # filenames for the graph files that we'll copy to this directory.
 CLASSIFIER_GRAPH_BASE_FILENAME = googlenet-v1
-CLASSIFIER_RELATIVE_DIR = ../../caffe/GoogLeNet
+CLASSIFIER_RELATIVE_DIR = ../../networks/googlenet_v1
 XML = ${CLASSIFIER_GRAPH_BASE_FILENAME}.xml
 BIN = ${CLASSIFIER_GRAPH_BASE_FILENAME}.bin
 DEV = MYRIAD
@@ -56,6 +56,13 @@ default_model: compile_default_model
 .PHONY: run_py
 run_py: data deps
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the Python sample..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	python3 ./${APP_NAME}.py dev=${DEV} mx=${XML} mb=${BIN}
 
 

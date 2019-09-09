@@ -61,13 +61,13 @@ uninstall-reqs:
 .PHONY: googlenet
 googlenet: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling GoogLeNet..."$(NOCOLOR)
-	(cd ../../caffe/GoogLeNet; make compile_model; cd ../../apps/birds; cp ../../caffe/GoogLeNet/googlenet-v1.xml .; cp ../../caffe/GoogLeNet/googlenet-v1.bin .;) 
+	(cd ../../networks/googlenet_v1; make compile_model; cd ../../apps/birds; cp ../../networks/googlenet_v1/googlenet-v1.xml .; cp ../../networks/googlenet_v1/googlenet-v1.bin .;) 
 
 
 .PHONY: tiny_yolo
 tiny_yolo: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Downloading and Compiling Tiny Yolo v1..."$(NOCOLOR)
-	(cd ../../caffe/TinyYolo; make compile_model; cd ../../apps/birds; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.xml .; cp ../../caffe/TinyYolo/tiny-yolo-v1_53000.bin .;)
+	(cd ../../networks/tiny_yolo_v1; make compile_model; cd ../../apps/birds; cp ../../networks/tiny_yolo_v1/tiny-yolo-v1_53000.xml .; cp ../../networks/tiny_yolo_v1/tiny-yolo-v1_53000.bin .;)
 
 
 .PHONY: default_model
@@ -78,6 +78,13 @@ default_model: googlenet tiny_yolo
 .PHONY: run_py
 run_py: deps data
 	@echo $(YELLOW)"\n"$(APP_NAME)": Running the Python sample..."$(NOCOLOR)
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	python3 ./birds.py
 
 
