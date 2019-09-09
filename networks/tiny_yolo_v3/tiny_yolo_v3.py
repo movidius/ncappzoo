@@ -21,7 +21,7 @@ import cv2
 import argparse
 
 # Adjust these thresholds
-DETECTION_THRESHOLD = 0.1
+DETECTION_THRESHOLD = 0.60
 IOU_THRESHOLD = 0.25
 
 # Tiny yolo anchor box values
@@ -134,7 +134,7 @@ def display_info(input_shape, net_outputs, image, ir, labels):
     print('   - ' + YELLOW + 'Output Shapes:' + NOCOLOR)
     for j in range(len(output_nodes)):
         print('      - '+YELLOW+'output #' + str(j) + ' name: ' + NOCOLOR + output_nodes[j])
-        print('         - output size: ' + NOCOLOR + str(net_outputs[output_nodes[j]].shape))
+        print('         - output shape: ' + NOCOLOR + str(net_outputs[output_nodes[j]].shape))
     print('   - ' + YELLOW + 'Labels File: ' + NOCOLOR, labels)
     print('   - ' + YELLOW + 'Image File:   ' + NOCOLOR, image)
     
@@ -147,7 +147,7 @@ def display_info(input_shape, net_outputs, image, ir, labels):
 # For each of those 3 anchor boxes, there are 85 values. 
 # 80 class probabilities + 4 coordinate values + 1 box confidence score = 85 values 
 # So that results in each grid cell having 255 values (85 values x 3 anchor boxes = 255 values)
-def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold):
+def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold, num_labels):
     # transpose the output node results
     output_node_results = output_node_results.transpose(0,2,3,1)
     output_h = output_node_results.shape[1]
@@ -156,7 +156,7 @@ def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_wi
     # 80 class scores + 4 coordinate values + 1 objectness score = 85 values
     # 85 values * 3 prior box scores per grid cell= 255 values 
     # 255 values * either 26 or 13 grid cells
-    num_of_classes = 80
+    num_of_classes = num_labels
     num_anchor_boxes_per_cell = 3
     
     # Set the anchor offset depending on the output result shape
@@ -177,18 +177,18 @@ def parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_wi
         col = int(result_counter % output_h)
         for anchor_boxes in range(num_anchor_boxes_per_cell): 
         	# check the box confidence score of the anchor box. This is how likely the box contains an object
-            box_confidence_score = output_node_results[0][row][col][anchor_boxes * 85 + 4]
+            box_confidence_score = output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 4]
             if box_confidence_score < detection_threshold:
                 continue
             # Calculate the x, y, width, and height of the box
-            x_center = (col + output_node_results[0][row][col][anchor_boxes * 85 + 0]) / output_w * scaled_w
-            y_center = (row + output_node_results[0][row][col][anchor_boxes * 85 + 1]) / output_h * scaled_h
-            width = np.exp(output_node_results[0][row][col][anchor_boxes * 85 + 2]) * anchors[anchor_offset + 2 * anchor_boxes]
-            height = np.exp(output_node_results[0][row][col][anchor_boxes * 85 + 3]) * anchors[anchor_offset + 2 * anchor_boxes + 1]
+            x_center = (col + output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 0]) / output_w * scaled_w
+            y_center = (row + output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 1]) / output_h * scaled_h
+            width = np.exp(output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 2]) * anchors[anchor_offset + 2 * anchor_boxes]
+            height = np.exp(output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 3]) * anchors[anchor_offset + 2 * anchor_boxes + 1]
             # Now we check for anchor box for the highest class probabilities.
             # If the probability exceeds the threshold, we save the box coordinates, class score and class id
             for class_id in range(num_of_classes): 
-                class_probability = output_node_results[0][row][col][anchor_boxes * 85 + 5 + class_id]
+                class_probability = output_node_results[0][row][col][anchor_boxes * num_of_classes + 5 + 5 + class_id]
                 # Calculate the class's confidence score by multiplying the box_confidence score by the class probabiity
                 class_confidence_score = class_probability * box_confidence_score
                 if (class_confidence_score) < detection_threshold:
@@ -216,8 +216,7 @@ def main():
     
     # Prepare Categories
     with open(labels) as labels_file:
-	    label_list = labels_file.read().splitlines()
-    
+        label_list = labels_file.read().splitlines()
 	    
     print(YELLOW + 'Running OpenVINO NCS Tensorflow TinyYolo v3 example...' + NOCOLOR)
     print('\n Displaying image with objects detected in GUI...')
@@ -286,7 +285,7 @@ def main():
         ## 1. Tiny yolo v3 has two outputs and we check/parse both outputs
         filtered_objects = []
         for output_node_results in all_output_results.values():
-            parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold)
+            parseTinyYoloV3Output(output_node_results, filtered_objects, source_image_width, source_image_height, scaled_w, scaled_h, detection_threshold, len(label_list))
         
         ## 2. Filter out duplicate objects from all detected objects
         filtered_mask = get_duplicate_box_mask(filtered_objects)

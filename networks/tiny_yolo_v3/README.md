@@ -1,7 +1,8 @@
-# Tiny yolo v3
+# tiny yolo v3
 ## Introduction
-The TinyYolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
+The tiny yolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
 
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
 
 The provided Makefile does the following:
 1. Clones a [Tensorflow yolo repo](https://github.com/mystic123/tensorflow-yolo-v3) that will help to convert the darknet weights to tensorflow.
@@ -9,6 +10,15 @@ The provided Makefile does the following:
 3. Converts the weights and generates a Tensorflow frozen pb file.
 4. Compiles the Tensorflow frozen pb file to an IR (intermediate representation) using the Model Optimizer.
 4. Runs the provided tiny_yolo_v3.py program that does a single inference on a provided image as an example on how to use the network using the Inference Engine Python API.
+
+## Model Information
+### Inputs
+ - name: 'data', shape: [1x3x416x416], Expected color order is RGB.
+### Outputs 
+ - name: 'detector/yolo-v3-tiny/Conv_12/BiasAdd/YoloRegion', shape: [1, 255, 26, 26].
+ - name: 'detector/yolo-v3-tiny/Conv_9/BiasAdd/YoloRegion', shape: [1, 255, 13, 13].
+
+**Note**: The '26' and '13' values in the output represent the number of grid cells for each output. 
 
 ## Running this Example
 ~~~
