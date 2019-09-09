@@ -8,6 +8,7 @@ This directory should be a preferred location for neural networks rather than th
 |---------------------|-------------|
 |[googlenet_v1](googlenet_v1/README.md) |BAIR/BLVC GoogleNet is a network based on [googlenet_v1](https://arxiv.org/abs/1409.4842), the winner of ILSVRC 2014, that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[AgeGenderNet](AgeNet/README.md) |Network that classifies a face image into age ranges. |
+|[mnist](mnist/README.md) |Network that classifies handwritten digits.  This network is based on  tensorflow mnist_deep.  This project also includes an option to train the network yourself.|
 
 # Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
