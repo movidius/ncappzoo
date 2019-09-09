@@ -124,7 +124,7 @@ clean:
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": CLeaning up files..."$(NOCOLOR)
 	rm -f ${NETWORK_NAME}.xml
 	rm -f ${NETWORK_NAME}.bin
-	rm -f ${NETWORK_NAME}.mNETWORKing
+	rm -f ${NETWORK_NAME}.mapping
 	rm -f ${LABELS}
 	rm -f ${WEIGHTS_FILE}
 	rm -rf ${TF_YOLO_REPO_NAME}
