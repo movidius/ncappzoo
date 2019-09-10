@@ -1,4 +1,4 @@
-# Facenet
+# facenet
 ## Introduction
 The OpenVINO Ncappzoo facenet example network is based the work done by David Sandberg here: https://github.com/davidsandberg/facenet.
 Facenet is not a classifier that is trained to classify a face as belonging to a particular individual that it was trained on.  Instead it is trained to find and quantify landmarks on faces in general.  By comparing the face landmark quantification values (network inference output) on two images, it is possible to determine how likely the two faces are of the same person.
@@ -30,7 +30,7 @@ This program requires:
 
 ## Model Information
 ### Inputs
- - name: 'image_batch/placeholder_port_0', shape: [1x3x160x160], Expected color order is BGR.
+ - name: 'image_batch/placeholder_port_0', shape: [1x3x160x160], Expected color order is BGR after optimization. Original network expects RGB, but for this sample, the IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order. 
 ### Outputs 
  - name: 'InceptionResnetV1/Bottleneck/BatchNorm/Reshape_1/Normalize', shape: [1, 512] - row-vector of 512 floating-point values - face embeddings.
 
