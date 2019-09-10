@@ -50,7 +50,7 @@ def parse_args():
 
 def display_info(input_shape, output_shape, image, ir, labels, show):
     print()
-    print(YELLOW + 'Caffe SSD Mobilenet VOC: Starting application...' + NOCOLOR)
+    print(YELLOW + 'SSD Mobilenet Caffe VOC: Starting application...' + NOCOLOR)
     print('   - ' + YELLOW + 'Plugin:      ' + NOCOLOR + ' Myriad')
     print('   - ' + YELLOW + 'IR File:     ' + NOCOLOR, ir)
     print('   - ' + YELLOW + 'Input Shape: ' + NOCOLOR, input_shape)
