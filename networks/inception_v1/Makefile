@@ -203,8 +203,14 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.";
-	@echo "  "
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.\n";
+	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does image classification on 1001 different classes.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'input', shape: [1x3x224x224], Expected color order is BGR after optimization.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'InceptionV1/Logits/Predictions/Softmax', shape: [1, 1001] - Output indexes represent each class probability.\n";
 
 .PHONY: clean
 clean:

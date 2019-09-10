@@ -5,6 +5,8 @@
 
 TensorFlow™ provides different versions of pre-trained inception models trained on <a href="http://www.image-net.org/" target="_blank">ImageNet</a>. The Makefile in this project helps convert these <a href="https://github.com/tensorflow/models/tree/master/research/slim#Pretrained" target="_blank">TensorFlow Inception models</a> to an IR format file (Intermediate Representation), which can be deployed on to the Intel® Neural Compute Stick (NCS1/NCS2) for inference.
 
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
+
 ## Prerequisites
 
 This code example requires that the following components are available:
@@ -12,6 +14,13 @@ This code example requires that the following components are available:
 2. <a href="https://software.intel.com/en-us/openvino-toolkit" target="_blank">Intel OpenVINO 2019 R2 Toolkit</a>
 3. <a href="https://github.com/tensorflow/tensorflow" target="_blank">TensorFlow source repo</a>
 4. <a href="https://github.com/tensorflow/models" target="_blank">TensorFlow models repo</a>
+
+## Model Information
+### Inputs
+ - name: 'data', shape: [1x3x224x224], Expected color order is BGR. The original model expects the RGB color order, but for this sample, the IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order.
+
+### Outputs 
+ - name: 'InceptionV1/Logits/Predictions/Softmax', shape: [1, 1001] - Output indexes represent each class probability.
 
 ## Running this Example
 You can run the sample with the command:
