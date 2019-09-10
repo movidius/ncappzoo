@@ -88,7 +88,7 @@ run: run_py
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking NETWORKlication requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking application requirements..."$(NOCOLOR)
 	@echo "No requirements needed."
 	
 
