@@ -210,10 +210,7 @@ def main():
     net = IENetwork(model = ir, weights = ir[:-3] + 'bin')
     input_blob = next(iter(net.inputs))
     output_blob = next(iter(net.outputs))
-    print(input_blob)
-    print(output_blob)
-    print(net.inputs[input_blob].shape)
-    print(net.outputs[output_blob].shape)
+    
     exec_net = ie.load_network(network = net, device_name = DEVICE)
     n, c, network_input_h, network_input_w = net.inputs[input_blob].shape
 
