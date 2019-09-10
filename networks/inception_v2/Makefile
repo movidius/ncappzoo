@@ -9,7 +9,6 @@ MODEL_CKPT=$(MODEL_NAME)
 
 # Inception model names as defined in https://github.com/tensorflow/models/blob/master/research/slim/nets/nets_factory.py
 MODEL_NAME=inception_$(VERSION)
-LABELS_FILE = categories.txt
 
 IMGSIZE=224
 MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_28.tar.gz
@@ -33,6 +32,11 @@ ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
 
 MEAN_VALUES = [128,128,128]
 SCALE = 128
+
+NETWORK_NAME = inception_v2
+IR = ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml
+IMAGE = ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}
+LABELS = categories.txt
 
 .PHONY: all
 all: deps data compile_model compile_cpp
@@ -64,16 +68,16 @@ endif
 
 .PHONY: deps
 deps: freeze
-	@echo $(YELLOW)"\nInception_v2: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
 
 
 .PHONY: data
 data: 
-	@echo $(YELLOW)"\nInception_v2: Downloading required data for model - No data needed."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading required data for model - No data needed."$(NOCOLOR)
 
 .PHONY: checkpoint
 checkpoint:
-	@echo $(YELLOW)"\nInception_v2: Downloading checkpoint file..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading checkpoint file..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT_AFTER_TAR) ] ; \
 	then \
 		echo "checkpoint file already exists, skipping checkpoint."; \
@@ -88,7 +92,7 @@ checkpoint:
 	
 .PHONY: export
 export: check_model
-	@echo $(YELLOW)"\nInception_v2: Exporting GraphDef file..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Exporting GraphDef file..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT).pb ] ; \
 	then \
 		echo "No export needed."; \
@@ -107,7 +111,7 @@ export: check_model
 
 .PHONY: freeze
 freeze: check_tf checkpoint export
-	@echo $(YELLOW)"\nInception_v2: Freezing model for inference..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Freezing model for inference..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT)_frozen.pb ] ; \
 	then \
 		echo "Frozen model file already exists, skipping freeze."; \
@@ -125,7 +129,15 @@ freeze: check_tf checkpoint export
 
 .PHONY: compile_model
 compile_model: freeze
-	@echo $(YELLOW)"\nInception_v2: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	@if [ -e ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ] && [ -e ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.bin ] ; \
 	then \
 		echo "Compiled model file already exists, skipping compile."; \
@@ -141,31 +153,39 @@ run: run_py
 
 .PHONY:	compile_cpp
 compile_cpp:  
-	@echo $(YELLOW)"\nInception_v2: Compiling C++ sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling C++ sample..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(cd ${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}; make compile_cpp; cd -)
 
 
 .PHONY: run_cpp
 run_cpp: data deps compile_cpp compile_model
-	@echo $(YELLOW)"\nInception_v2: Running C++ sample..."$(NOCOLOR)
-	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_FILE}; 
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
+	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${IR} ${IMAGE} ${LABELS}; 
 
 
 .PHONY: run_py
 run_py: data deps compile_model
-	@echo $(YELLOW) "\nInception_v2: Running Python sample..." $(NOCOLOR)
-	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}; 
+	@echo $(YELLOW) '\n'${NETWORK_NAME}": Running Python sample..." $(NOCOLOR)
+	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${IR} --image=${IMAGE} --labels=${LABELS}; 
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nInception_v2: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nInception_v2: Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 	
 	
@@ -182,11 +202,17 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.";
-	@echo "  "
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.\n";
+	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does image classification on 1000 different classes.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'data', shape: [1x3x224x224], Expected color order is BGR after optimization.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'prob', shape: [1, 1001] - Output indexes represent each class probability.\n";
 
 
 .PHONY: clean
 clean:
-	@echo $(YELLOW)"\nInception_v2: Cleaning up files..."$(NOCOLOR);
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR);
 	rm -rf model
