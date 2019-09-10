@@ -9,7 +9,7 @@ MODEL_CKPT=$(MODEL_NAME)
 
 # Inception model names as defined in https://github.com/tensorflow/models/blob/master/research/slim/nets/nets_factory.py
 MODEL_NAME=inception_$(VERSION)
-LABELS_FILE = categories.txt
+
 
 IMGSIZE=224
 MODEL_CKPT_TAR=$(MODEL_CKPT)_2016_08_28.tar.gz
@@ -35,7 +35,9 @@ MEAN_VALUES = [128,128,128]
 SCALE = 128
 
 NETWORK_NAME = inception_v1
-
+IR = ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml
+IMAGE = ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME}
+LABELS = categories.txt
 
 .PHONY: all
 all: deps data compile_model compile_cpp
@@ -167,13 +169,13 @@ compile_cpp:
 .PHONY: run_cpp
 run_cpp: data deps compile_cpp compile_model
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
-	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_FILE}; 
+	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${IR} ${IMAGE} ${LABELS}
 
 
 .PHONY: run_py
 run_py: data deps compile_model
 	@echo $(YELLOW) '\n'${NETWORK_NAME}": Running Python sample..." $(NOCOLOR)
-	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}; 
+	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${IR} --image=${IMAGE} --labels=${LABELS}
 
 
 .PHONY: install-reqs
