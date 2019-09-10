@@ -206,7 +206,7 @@ help:
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.\n";
 	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
-	@echo "  This network does image classification on 1001 different classes.";
+	@echo "  This network does image classification on 1000 different classes.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
 	@echo "  name: 'input', shape: [1x3x224x224], Expected color order is BGR after optimization.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)

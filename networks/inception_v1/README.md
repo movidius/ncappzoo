@@ -20,7 +20,7 @@ This code example requires that the following components are available:
  - name: 'data', shape: [1x3x224x224], Expected color order is BGR. The original model expects the RGB color order, but for this sample, the IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order.
 
 ### Outputs 
- - name: 'InceptionV1/Logits/Predictions/Softmax', shape: [1, 1001] - Output indexes represent each class probability.
+ - name: 'InceptionV1/Logits/Predictions/Softmax', shape: [1, 1001] - Output indexes represent each class probability. This model includes the background class, but it is not used in this sample.
 
 ## Running this Example
 You can run the sample with the command:
