@@ -17,7 +17,7 @@ This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learn
 
 ## Model Information
 ### Inputs
- - name: 'input', shape: [1x3x299x299], Expected color order is BGR.
+ - name: 'input', shape: [1x3x299x299], Expected color order is BGR. Original model expects RGB, but IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order.
 ### Outputs 
  - name: 'InceptionV3/Predictions/Softmax', shape: [1, 1001] - Output indexes represent each class probability. This model includes the background class but it is not used for this sample.
 
