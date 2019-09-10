@@ -13,15 +13,17 @@ The provided Makefile does the following:
 
 ## Model Information
 ### Inputs
- - name: 'data', shape: [1x3x416x416], Expected color order is RGB.
+ - name: 'inputs', shape: [1x3x416x416], Expected color order is RGB.
 ### Outputs 
  - name: 'detector/yolo-v3-tiny/Conv_12/BiasAdd/YoloRegion', shape: [1, 255, 26, 26].
  - name: 'detector/yolo-v3-tiny/Conv_9/BiasAdd/YoloRegion', shape: [1, 255, 13, 13].
 
-**Note**: The '26' and '13' values in the output represent the number of grid cells for each output. 
+Tiny yolo v3 divides the image into 13x13 and 26x26 grid cells. Each grid cell has 3 anchor boxes and each anchor box has an object score, 20 class scores, and 4 bounding box coordinates. The tiny_yolo_v3.py code reads the number of classes through the --labels argument. If your model has a different amount of classes from the default model, please make sure your labels file has the correct amount of classes.
+
+**Note**: The '26' and '13' values in each of the outputs represent the number of grid cells for each output. 
 **Note**: The '255' in each output represents each of the three anchor box class scores, object scores and bounding boxes. 80 class scores + 4 bounding box values + 1 object score = 85 values. 85 values * 3 anchor boxes= 255 values.
 
-All scores will need to be filtered through a score and iou thresold to filter out duplicates.
+All scores will need to be filtered to achieve desired results. Please see Algorithm Thresholds section. 
 
 
 ## Running this Example

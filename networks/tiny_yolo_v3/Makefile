@@ -77,7 +77,7 @@ compile_model: convert_weights
 .PHONY: run_py
 run_py: data deps compile_model
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running the python sample..."$(NOCOLOR)
-	python3 ./tiny_yolo_v3.py --input=${INPUT} --ir=${IR} --labels=${LABELS}
+	python3 ${NETWORK_NAME}.py --input=${INPUT} --ir=${IR} --labels=${LABELS}
 
 
 .PHONY: run
