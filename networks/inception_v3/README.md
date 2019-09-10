@@ -1,4 +1,4 @@
-# Inception_v3
+# inception_v3
 ## Introduction
 
 <a href="https://research.google.com/pubs/pub43022.html" target="_blank">Inception</a> is a deep convolutional neural network (CNN) architecture designed by Google during the ImageNet Large-Scale Visual Recognition Challenge 2014 (ILSVRC2014). The main goal behind this model is to improve accuracy by increasing depth and width of the network without affecting the computational requirements. However, the latency of inception based models like GoogLeNet, Inception V1, V2, V3 and V4 is much larger than that of MobileNets. 
