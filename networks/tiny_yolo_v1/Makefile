@@ -124,7 +124,7 @@ help:
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
 	@echo "  This network does object detection on 20 different classes.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
-	@echo "  name: 'data', shape: [1x3x448x448], Expected color order is RGB.";
+	@echo "  name: 'data', shape: [1x3x448x448], Expected color order is BGR after optimization.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
 	@echo "  name: 'fc9', shape: [1, 1470]. See README for more output information.\n"
 

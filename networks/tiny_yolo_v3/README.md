@@ -13,7 +13,7 @@ The provided Makefile does the following:
 
 ## Model Information
 ### Inputs
- - name: 'inputs', shape: [1x3x416x416], Expected color order is RGB.
+ - name: 'inputs', shape: [1x3x416x416], Expected color order is BGR. Original network expects RGB, but for this sample, the IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order.
 ### Outputs 
  - name: 'detector/yolo-v3-tiny/Conv_12/BiasAdd/YoloRegion', shape: [1, 255, 26, 26].
  - name: 'detector/yolo-v3-tiny/Conv_9/BiasAdd/YoloRegion', shape: [1, 255, 13, 13].

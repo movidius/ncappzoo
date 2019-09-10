@@ -114,7 +114,7 @@ help:
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
 	@echo "  This network does object detection on 80 different classes.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
-	@echo "  name: 'inputs', shape: [1x3x416x416], Expected color order is RGB.";
+	@echo "  name: 'inputs', shape: [1x3x416x416], Expected color order is BGR after optimization.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
 	@echo "  name: 'detector/yolo-v3-tiny/Conv_12/BiasAdd/YoloRegion', shape: [1, 255, 26, 26]. See Readme for more details on the output.";
 	@echo "  name: 'detector/yolo-v3-tiny/Conv_9/BiasAdd/YoloRegion', shape: [1, 255, 13, 13]. See Readme for more details on the output.\n";
