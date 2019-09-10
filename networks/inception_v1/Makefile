@@ -34,6 +34,9 @@ ZOO_TF_MODELS_PATH = ${PROJECT_DIR}/${ZOO_RELATIVE_TF_MODELS_PROJ}/models
 MEAN_VALUES = [128,128,128]
 SCALE = 128
 
+NETWORK_NAME = inception_v1
+
+
 .PHONY: all
 all: deps data compile_model compile_cpp
 
@@ -64,16 +67,16 @@ endif
 
 .PHONY: deps
 deps: freeze
-	@echo $(YELLOW)"\nInception_v1: Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
 
 
 .PHONY: data
 data: 
-	@echo $(YELLOW)"\nInception_v1: Downloading required data for model - No data needed."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading required data for model - No data needed."$(NOCOLOR)
 
 .PHONY: checkpoint
 checkpoint:
-	@echo $(YELLOW)"\nInception_v1: Downloading checkpoint file..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading checkpoint file..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT_AFTER_TAR) ] ; \
 	then \
 		echo " - Checkpoint file already exists, skipping checkpoint."; \
@@ -88,7 +91,7 @@ checkpoint:
 	
 .PHONY: export
 export: check_model
-	@echo $(YELLOW)"\nInception_v1: Exporting GraphDef file..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Exporting GraphDef file..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT).pb ] ; \
 	then \
 		echo " - No export needed."; \
@@ -107,7 +110,7 @@ export: check_model
 
 .PHONY: freeze
 freeze: check_tf checkpoint export
-	@echo $(YELLOW)"\nInception_v1: Freezing model for inference..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Freezing model for inference..."$(NOCOLOR)
 	@if [ -e $(MODEL_RELATIVE_DIR)/$(MODEL_CKPT)_frozen.pb ] ; \
 	then \
 		echo " - Frozen model file already exists, skipping freeze."; \
@@ -125,7 +128,15 @@ freeze: check_tf checkpoint export
 
 .PHONY: compile_model
 compile_model: freeze 
-	@echo $(YELLOW)"\nInception_v1: Compiling model to IR..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	@if [ -e ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ] && [ -e ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.bin ] ; \
 	then \
 		echo " - Compiled model file already exists, skipping compile."; \
@@ -141,31 +152,39 @@ run: run_py
 
 .PHONY:	compile_cpp
 compile_cpp:  
-	@echo $(YELLOW)"\nInception_v1: Compiling C++ sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Compiling C++ sample..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	(cd ${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}; make compile_cpp; cd -)
 
 
 .PHONY: run_cpp
 run_cpp: data deps compile_cpp compile_model
-	@echo $(YELLOW)"\nInception_v1: Running C++ sample..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running C++ sample..."$(NOCOLOR)
 	${SIMPLE_CLASSIFIER_CPP_RELATIVE_DIR}/build/simple_classifier_cpp ${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml ${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} ${LABELS_FILE}; 
 
 
 .PHONY: run_py
 run_py: data deps compile_model
-	@echo $(YELLOW) "\nInception_v1: Running Python sample..." $(NOCOLOR)
+	@echo $(YELLOW) '\n'${NETWORK_NAME}": Running Python sample..." $(NOCOLOR)
 	python3 ${SIMPLE_CLASSIFIER_PY_RELATIVE_DIR}/run.py --ir=${MODEL_RELATIVE_DIR}/${GRAPH_FILENAME_BASE}.xml --image=${TEST_IMAGE_RELATIVE_DIR}/${TEST_IMAGE_FILENAME} --labels=${LABELS_FILE}; 
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nInception_v1: Checking application requirements...\n"$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Checking application requirements...\n"$(NOCOLOR)
 	@echo "No requirements needed."
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nInception_v1: Uninstalling requirements..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
 		
 
@@ -187,5 +206,5 @@ help:
 
 .PHONY: clean
 clean:
-	@echo $(YELLOW)"\nInception_v1: Cleaning up files..."$(NOCOLOR);
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR);
 	rm -rf model
