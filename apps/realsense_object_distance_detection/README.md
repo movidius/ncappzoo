@@ -1,6 +1,6 @@
 # realsense_object_distance_detection
 ## Introduction
-This app does object detection using the [SSD Mobilenet Caffe model](../../networks/ssd_mobilenet_caffe/README.md) (This model detects up to 20 classes), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R2](https://software.intel.com/en-us/openvino-toolkit) and the Intel Realsense Camera. It first detects an object in the video frame and then uses the depth stream to detect how far the object is using the Intel Realsense Camera (tested with Intel Realsense D415 camera).
+This app does object detection using the [SSD Mobilenet Caffe model](../../networks/ssd_mobilenet_caffe/README.md), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R2](https://software.intel.com/en-us/openvino-toolkit) and the Intel Realsense Camera. It first detects an object in the video frame and then uses the depth stream to detect how far the object is using the Intel Realsense Camera (tested with Intel Realsense D415 camera). The default model used in this sample uses the PASCAL Voc dataset and detects up to 20 classes. Please see the networks/ssd_mobilenet_caffe sample for more information.
 
 
 ![](realsense_object_distance_detection.gif)
