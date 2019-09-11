@@ -154,7 +154,7 @@ def main():
     input_shape, input_blob, output_blob, exec_net = setup_network() 
     
     # Set the camera capture properties
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(ARGS.source)
     CAM_W = ARGS.cap_res[0]
     CAM_H = ARGS.cap_res[1]
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_W);
