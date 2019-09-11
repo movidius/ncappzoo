@@ -1,6 +1,6 @@
-# Realsense Object Distance Detection
+# realsense_object_distance_detection
 ## Introduction
-This app does object detection using the Intel Movidius Neural Compute Stick 2/OpenVINO R2 and detects how far the object is using the Intel Realsense Camera (tested with Intel Realsense D415 camera).
+This app does object detection using the [SSD Mobilenet Caffe model](../../networks/ssd_mobilenet_caffe/README.md), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R2](https://software.intel.com/en-us/openvino-toolkit) and the Intel Realsense Camera. It first detects an object in the video frame and then uses the depth stream to detect how far the object is using the Intel Realsense Camera (tested with Intel Realsense D415 camera).
 
 ## Building the Example
 
@@ -15,6 +15,16 @@ After building the example you can run the example code by doing the following :
 2. Type the following command in the terminal: ```make run``` 
 
 When the application runs normally, another window should pop up and show the feed from the Intel Realsense camera. The program should perform inferences on frames taken from the Intel Realsense Camera.
+
+**Keybindings**
+- q or Q - Quit the application
+- d or D - Show the depth detection overlay. The points that are checked for distance using the depth sensor in the Realsense camera are shown as red dots. The closest point is shown as a green dot.
+- a or A - Add more distance check points to the bounding box. 
+- s or S - Subtract distance check points from the bounding box.
+
+
+**Detection Threshold**
+You may need to adjust the DETECTION_THRESHOLD variable to suit your needs.
 
 ## Prerequisites
 This program requires:
