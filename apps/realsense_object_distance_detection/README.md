@@ -16,14 +16,14 @@ After building the example you can run the example code by doing the following :
 
 When the application runs normally, another window should pop up and show the feed from the Intel Realsense camera. The program should perform inferences on frames taken from the Intel Realsense Camera.
 
-**Keybindings**
+**Keybindings**:
 - q or Q - Quit the application
 - d or D - Show the depth detection overlay. The points that are checked for distance using the depth sensor in the Realsense camera are shown as red dots. The closest point is shown as a green dot.
 - a or A - Add more distance check points to the bounding box. 
 - s or S - Subtract distance check points from the bounding box.
 
 
-**Detection Threshold**
+**Detection Threshold**:
 You may need to adjust the DETECTION_THRESHOLD variable to suit your needs.
 
 ## Prerequisites
