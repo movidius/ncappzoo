@@ -17,19 +17,21 @@ This program requires:
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
-**Note**:
-You can install the Intel Realsense SDK 2 packages by running the command: 'make install-reqs'.
+
+**Realsense SDK Note**:
+You can install the Intel Realsense SDK 2 packages by running the command: **'make install-reqs'**.
 This will install the following packages:
 - **librealsense2-dkms** - Deploys the librealsense2 udev rules, build and activate kernel modules, runtime library.
 - **librealsense2-dev** - Includes the header files and symbolic links for developers.
-
-
 
 ## Building the Example
 
 To run the example code do the following :
 1. Open a terminal and change directory to the sample base directory
-2. Type the following command in the terminal: ```make all```
+2. Connect your Intel Realsense camera and NCS device.
+3. Type the following command in the terminal: ```make all```
+
+**Note**: Make sure your realsense libraries are installed beforehand. 
 
 ## Running the Example
 
