@@ -14,7 +14,7 @@ RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 YELLOW = '\033[1;33m'
 
-SSD_WINDOW_NAME = "SSD Mobilenet Caffe VOC"
+SSD_WINDOW_NAME = "SSD Mobilenet v1 Caffe VOC"
 
 try:
     from openvino.inference_engine import IENetwork, IECore
@@ -50,7 +50,7 @@ def parse_args():
 
 def display_info(input_shape, output_shape, image, ir, labels, show):
     print()
-    print(YELLOW + 'SSD Mobilenet Caffe VOC: Starting application...' + NOCOLOR)
+    print(YELLOW + 'SSD Mobilenet v1 Caffe VOC: Starting application...' + NOCOLOR)
     print('   - ' + YELLOW + 'Plugin:      ' + NOCOLOR + ' Myriad')
     print('   - ' + YELLOW + 'IR File:     ' + NOCOLOR, ir)
     print('   - ' + YELLOW + 'Input Shape: ' + NOCOLOR, input_shape)
