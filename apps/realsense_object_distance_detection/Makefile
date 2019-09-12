@@ -39,6 +39,21 @@ compile_cpp:
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
+	@echo "Checking Realsense prerequisites..."
+	@if dpkg -l | grep librealsense2-dkms >> /dev/null ; \
+	then \
+	    echo "\nlibrealsense2-dkms is installed." ; \
+	else \
+	    echo $(YELLOW)"\nlibrealsense2-dkms is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
+	    exit 1; \
+	fi
+	@if dpkg -l | grep librealsense2-dev >> /dev/null ; \
+	then \
+	    echo "\nlibrealsense2-dev is installed." ; \
+	else \
+	    echo $(YELLOW)"\nlibrealsense2-dev is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
+	    exit 1; \
+	fi
 	(mkdir -p build; cd build; cmake ..; make;)
 
 
@@ -49,19 +64,12 @@ run: run_cpp
 .PHONY: run_cpp
 run_cpp: deps data compile_cpp
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
-	@echo "Checking prerequisites..."
+	@echo "Checking Realsense prerequisites..."
 	@if dpkg -l | grep librealsense2-dkms >> /dev/null ; \
 	then \
 	    echo "\nlibrealsense2-dkms is installed." ; \
 	else \
 	    echo $(YELLOW)"\nlibrealsense2-dkms is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
-	@if dpkg -l | grep librealsense2-utils >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-utils is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-utils is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
 	    exit 1; \
 	fi
 	@if dpkg -l | grep librealsense2-dev >> /dev/null ; \
@@ -71,37 +79,26 @@ run_cpp: deps data compile_cpp
 	    echo $(YELLOW)"\nlibrealsense2-dev is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
 	    exit 1; \
 	fi
-	@if dpkg -l | grep librealsense2-dbg >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-dbg is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-dbg is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
 	(cd build; ./${APP_NAME}; cd ..;)
 
 
 .PHONY: install-reqs
 install-reqs: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
-	@echo "Installing Intel Realsense SDK 2 packages - dkms, utils, dev, dbg..."
+	@echo "Installing Intel Realsense SDK 2 packages - dkms, dev..."
 	@echo 'deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main' | sudo tee /etc/apt/sources.list.d/realsense-public.list; \
 	sudo apt-key adv --keyserver keys.gnupg.net --recv-key 6F3EFCDE; \
 	sudo apt-get update; \
 	sudo apt-get install librealsense2-dkms; \
-	sudo apt-get install librealsense2-utils; \
-	sudo apt-get install librealsense2-dev; \
-	sudo apt-get install librealsense2-dbg
-	
+	sudo apt-get install librealsense2-dev
+
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	sudo apt-get -y purge librealsense2-dkms; \
-	sudo apt-get -y purge librealsense2-utils; \
-	sudo apt-get -y purge librealsense2-dev; \
-	sudo apt-get -y purge librealsense2-dbg
-	
+	sudo apt-get -y purge librealsense2-dev
+		
 
 .PHONY: help
 help:
@@ -112,6 +109,7 @@ help:
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo          "        - This command will install the Realsense SDK 2.0 dkms and dev packages."
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content\n"

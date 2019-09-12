@@ -5,6 +5,26 @@ This app does object detection using the [SSD Mobilenet Caffe model](../../netwo
 
 ![](realsense_object_distance_detection.gif)
 
+## Prerequisites
+This program requires:
+- 1 NCS2/NCS1 device
+- OpenVINO 2019 R2 Toolkit
+- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- [Intel Realsense SDK 2](https://www.intelrealsense.com/developers#downloads)
+- Intel Realsense Camera (tested with [Intel D415 Realsense Camera](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
+
+
+*It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
+
+Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
+**Note**:
+You can install the Intel Realsense SDK 2 packages by running the command: 'make install-reqs'.
+This will install the following packages:
+- **librealsense2-dkms** - Deploys the librealsense2 udev rules, build and activate kernel modules, runtime library.
+- **librealsense2-dev** - Includes the header files and symbolic links for developers.
+
+
+
 ## Building the Example
 
 To run the example code do the following :
@@ -28,19 +48,6 @@ When the application runs normally, another window should pop up and show the fe
 
 **Detection Threshold**:
 You may need to adjust the DETECTION_THRESHOLD variable to suit your needs.
-
-## Prerequisites
-This program requires:
-- 1 NCS2/NCS1 device
-- OpenVINO 2019 R2 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
-- [Intel Realsense SDK 2](https://www.intelrealsense.com/developers#downloads)
-- Intel Realsense Camera (tested with [Intel D415 Realsense Camera](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
-
-
-*It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
-
-Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
