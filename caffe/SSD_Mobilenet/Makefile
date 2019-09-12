@@ -2,7 +2,7 @@ YELLOW = '\033[1;33m'
 NOCOLOR = '\033[0m'
 
 OLD_NETWORK_NAME = SSD_Mobilenet
-NEW_NETWORK_NAME = ssd_mobilenet_caffe
+NEW_NETWORK_NAME = ssd_mobilenet_v1_caffe
 
 .PHONY: all
 all:

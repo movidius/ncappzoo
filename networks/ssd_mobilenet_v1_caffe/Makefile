@@ -6,8 +6,6 @@ RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
 DATA_RELATIVE_DIR = ../../data
-TEST_IMAGE_RELATIVE_DIR = .
-MODEL_RELATIVE_DIR = ../../caffe/SSD_Mobilenet
 MEAN_VALUES = [127.5,127.5,127.5]
 SCALE_VALUES = [127.50223128904757]
 
@@ -20,7 +18,7 @@ SSD_MODEL_ZOO_DIR = object_detection/common/mobilenet-ssd/caffe
 MODEL_FILE_NAME_BASE = mobilenet-ssd
 DEV = MYRIAD
 
-NETWORK_NAME = ssd_mobilenet_caffe
+NETWORK_NAME = ssd_mobilenet_v1_caffe
 IR = ${MODEL_FILE_NAME_BASE}.xml
 LABELS = labels.txt
 
@@ -82,7 +80,7 @@ run: run_py
 .PHONY: run_py
 run_py: deps data
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running Python sample..."$(NOCOLOR)
-	python3 ssd_mobilenet_caffe.py --ir=${IR} --input=${INPUT} -d ${DEV} --labels=${LABELS};
+	python3 ${NETWORK_NAME}.py --ir=${IR} --input=${INPUT} -d ${DEV} --labels=${LABELS};
 	
 
 .PHONY: install-reqs

@@ -1,6 +1,6 @@
-# ssd mobilenet
+# ssd mobilenet_v1_caffe
 ## Introduction
-The [SSD Mobilenet](https://github.com/chuanqi305/MobileNet-SSD) network can be used for object detection and can detect 20 different types of objects (This model was pre-trained with the Pascal VOC dataset). More information can be found at: https://github.com/chuanqi305/MobileNet-SSD. The list of objects that this network can detect are:
+The [ssd mobilenet v1 caffe](https://github.com/chuanqi305/MobileNet-SSD) network can be used for object detection and can detect 20 different types of objects (This model was pre-trained with the Pascal VOC dataset). More information can be found at: https://github.com/chuanqi305/MobileNet-SSD. The list of objects that this network can detect are:
 
 ```
 aeroplane
