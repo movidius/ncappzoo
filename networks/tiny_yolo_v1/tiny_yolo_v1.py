@@ -20,6 +20,8 @@ import numpy as np
 import cv2
 import argparse
 
+IOU_THRESHOLD = 0.25
+DETECTION_THRESHOLD = 0.10
 
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Image classifier using \
@@ -34,7 +36,7 @@ def parse_args():
                         type=str, default = '../../data/images/nps_chair.png',
                         help = 'Absolute path to image file.')
     parser.add_argument( '--threshold', metavar = 'FLOAT', 
-                        type=float, default = 0.10,
+                        type=float, default = DETECTION_THRESHOLD,
                         help = 'Threshold for detection.')
                       
     return parser
@@ -181,7 +183,7 @@ def get_duplicate_box_mask(box_list):
     # The intersection-over-union threshold to use when determining duplicates.
     # objects/boxes found that are over this threshold will be
     # considered the same object
-    max_iou = 0.25
+    max_iou = IOU_THRESHOLD
 
     box_mask = np.ones(len(box_list))
 

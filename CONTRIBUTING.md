@@ -6,7 +6,7 @@ We are glad you want to contribute with a model and/or application for the ncapp
 To contribute a new app or neural network for the ncappzoo, fork the repository and add (commit) any of the following new subdirectories containing your content (your content could contain any or all of the following):
 - apps/(new app name)
 - networks/(new network name)
- 
+
 Note: the caffe, and tensorflow directories are for legacy comptibility and new networks should be placed in the networks directory
 
 
@@ -22,6 +22,7 @@ The following **should** be included in the apps subdirectories:
 - README.md : Markdown file that explains everything needed to build, run, and test your application.
 - Makefile : [See the Makefile Guidence](MAKEFILE_GUIDANCE.md) for details of how your Makefile should build, prepare, test, and run the application.
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
+- demo.gif : A 2MB max gif file that should be used in the README to demonstrate how to use the app/what the app does (optional. but highly recommended)
 - screen_shot.jpg : An image with pixel width of 200 to represent your application (optional.)
 
 The following should **not** typically be stored in the apps subdirectories:
@@ -39,7 +40,8 @@ The following **should** be included in the networks, caffe, and tensorflow subd
 - Network model definition files (like caffe's .prototxt files): These may be downloaded via the Makefile.
 - Network mean information : These may be downloaded via the Makefile.
 - AUTHORS : Text file with names, email addresses, and organizations for all authors of the contribution.
- 
+- demo.gif : A 2MB max gif file that should be used in the README to demonstrate how to use the app/what the app does (optional. but highly recommended)
+
 The following **should not** typically be stored in the networks, caffe * or tensorflow *  subdirectory:
 - Optimized neural networks (OpenVINO IR files - .bin and .xml) : These are typically created by invoking the OpenVINO Model Optimizer from the Makefile.
 - Trained neural network files : These should be downloaded from their Internet home via the Makefile.
@@ -93,4 +95,3 @@ By making a contribution to this project, I certify that:
     maintained indefinitely and may be redistributed consistent with
     this project or the open source license(s) involved.
 ```
-

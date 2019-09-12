@@ -1,129 +1,61 @@
-
-NCCOMPILE = mo.py
-
-GREEN = '\033[1;32m'
 YELLOW = '\033[1;33m'
-RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
-MODEL_BASE_NAME = tiny-yolo-v1_53000
-
-PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
-GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${PROTOTXT_FILENAME}
-
-CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
-GET_CAFFEMODEL = wget --no-cache -P . -N http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${CAFFEMODEL_FILENAME}
-
-IR = tiny-yolo-v1_53000.xml
-IMG = ../../data/images/nps_chair.png
+OLD_NETWORK_NAME = TinyYolo
+NEW_NETWORK_NAME = tiny_yolo_v1
 
 .PHONY: all
-all: data deps compile_model
+all:
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: deps
-deps: prototxt caffemodel
-	@echo $(YELLOW)"\nTiny Yolo v1: Making dependencies..."$(NOCOLOR)
-
+deps: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
+
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nTiny Yolo v1: Downloading required data... No data needed."$(NOCOLOR)
-
-
-.PHONY: prototxt
-prototxt: 
-	@echo $(YELLOW)"\nTiny Yolo v1: Downloading prototxt file..."$(NOCOLOR)
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
-	then \
-		echo " - Prototxt file already exists"; \
-	else \
-		echo "Downloading Prototxt file"; \
-		${GET_PROTOTXT}; \
-		if [ -e ${PROTOTXT_FILENAME} ] ; \
-		then \
-			echo " - Got prototext file." ; \
-		else \
-			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi 
-
-.PHONY: caffemodel
-caffemodel: 
-	@echo $(YELLOW)"\nTiny Yolo v1: Downloading caffemodel file..."$(NOCOLOR)
-	@if [ -e ${CAFFEMODEL_FILENAME} ] ; \
-	then \
-		echo " - Caffemodel file already exists"; \
-	else \
-		echo " - Downloading caffemodel file"; \
-		${GET_CAFFEMODEL}; \
-		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
-		then \
-			echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi  
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
-	
+
+.PHONY: model_zoo
+model_zoo:
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR) 
+
+
+.PHONY: get_ir
+get_ir:	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+
+
 .PHONY: compile_model
-compile_model: prototxt caffemodel
-	@echo $(YELLOW)"\nTiny Yolo v1: Compiling model to IR..."$(NOCOLOR)
-	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ] ; \
-	then \
-		echo " - IR files exist. No need to compile." ; \
-	else \
-	    ${NCCOMPILE} --input_model=${CAFFEMODEL_FILENAME} --input_proto=${PROTOTXT_FILENAME} --data_type=FP16 --scale_values=[255] --reverse_input_channels || (echo $(RED)"Make sure your paths are correct and the OpenVINO environment variables are set using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
-	fi
+compile_model: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 	
+.PHONY: run
+run: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+
 
 .PHONY: run_py
-run_py: data deps compile_model
-	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
-	python3 ./tiny_yolo_v1.py --image=${IMG} --ir=${IR}
-
-
-.PHONY: run
-run: run_py
-	@echo $(YELLOW)"\nTiny Yolo v1: Running the python sample..."$(NOCOLOR)
+run_py: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
 
 .PHONY: install-reqs
 install-reqs: 
-	@echo $(YELLOW)"\nTiny Yolo v1: Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
-	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
-	@echo $(YELLOW)"\nTiny YOlo v1: Uninstalling requirements..."$(NOCOLOR)
-	@echo "Nothing to uninstall."
-	
-	
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
+		
+
 .PHONY: help
 help:
-	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
-	@echo $(YELLOW)"  make run or run_py "$(NOCOLOR)"- runs the run.py python example program";
-	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes the following: data deps compile_model";
-	@echo $(YELLOW)"  make prototxt "$(NOCOLOR)"- downloads and adds input shape to Caffe prototxt file";
-	@echo $(YELLOW)"  make caffemodel "$(NOCOLOR)"- downloads the caffemodel for the network"
-	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- runs Model Optimizer compiler tool to compile an IR file for the network";
-	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
-	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content"
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
 
-
-clean_caffe_model:
-	@echo $(YELLOW)"\nTiny Yolo v1: making clean_caffe_model..."$(NOCOLOR)
-	rm -f ${PROTOTXT_FILENAME}
-	rm -f ${CAFFEMODEL_FILENAME}
-
-
-clean: clean_caffe_model
-	@echo $(YELLOW)"\nTiny Yolo v1: making clean..."$(NOCOLOR)
-	rm -f ${MODEL_BASE_NAME}.xml
-	rm -f ${MODEL_BASE_NAME}.bin
-	rm -f ${MODEL_BASE_NAME}.mapping
-	
-
+clean: 
+	@echo $(YELLOW)'\n'${OLD_NETWORK_NAME}": This network has moved to networks/${NEW_NETWORK_NAME}"$(NOCOLOR)
