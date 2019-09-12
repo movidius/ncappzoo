@@ -4,7 +4,7 @@ NOCOLOR = '\033[0m'
 
 
 APP_NAME = realsense_object_distance_detection
-SSD_RELATIVE_DIRECTORY = ../../networks/ssd_mobilenet_caffe
+SSD_RELATIVE_DIRECTORY = ../../networks/ssd_mobilenet_v1_caffe
 APP_RELATIVE_DIR = ../../apps/realsense_object_distance_detection
 SSD_IR = mobilenet-ssd
 
