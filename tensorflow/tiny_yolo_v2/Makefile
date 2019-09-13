@@ -1,57 +1,85 @@
 
-ifneq ($(findstring movidius, $(PYTHONPATH)), movidius)
-	export PYTHONPATH:=/opt/movidius/caffe/python:/opt/movidius/mvnc/python:$(PYTHONPATH)
-endif
+NCCOMPILE = mo.py
 
-NCCOMPILE = mvNCCompile
-NCPROFILE = mvNCProfile
-NCCHECK   = mvNCCheck
+GREEN = '\033[1;32m'
+YELLOW = '\033[1;33m'
+RED = '\033[1;31m'
+NOCOLOR = '\033[0m'
 
+APP_NAME = tiny_yolo_v2
+MODEL_BASE_NAME = yolov2-tiny-voc
 DARKFLOW_FOLDER = darkflow
 BUILD_FOLDER = built_graph
-CFG_FILENAME = yolov2-tiny-voc.cfg
-WEIGHTS_FILENAME = yolov2-tiny-voc.weights
-TF_MODEL_FILENAME = yolov2-tiny-voc.pb
-GRAPH_FILENAME = tiny_yolo_v2.graph
-
+CFG_FILENAME = ${MODEL_BASE_NAME}.cfg
+WEIGHTS_FILENAME = ${MODEL_BASE_NAME}.weights
+TF_MODEL_FILENAME = ${MODEL_BASE_NAME}.pb
+PASCAL_VOC_LABELS = pascal_voc_labels.txt
+INPUT=../../data/images/nps_chair.png
 
 CLONE_DARKFLOW = git clone https://github.com/thtrieu/darkflow.git
 GET_CFG = wget --no-cache -P ./darkflow/cfg/ https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/${CFG_FILENAME}
 GET_WEIGHTS = wget --no-cache -P ./darkflow/bin/ https://pjreddie.com/media/files/${WEIGHTS_FILENAME}
 
+
 .PHONY: all
-all: profile compile 
+all: data deps compile_model
+
+
+.PHONY: deps
+deps: clone_darkflow_repo
+	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("cython"))' ; \
+	then \
+		echo 'Cython found.' ; \
+	else \
+		echo $(YELLOW)"Cython not found. Please install requirements by entering 'make install-reqs'."$(NOCOLOR) ; \
+		exit 1 ; \
+	fi
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("darkflow"))' ; \
+	then \
+		echo 'Darkflow found.' ; \
+	else \
+		echo $(YELLOW)"Darkflow not found. Please install requirements by entering 'make install-reqs'."$(NOCOLOR) ; \
+		exit 1 ; \
+	fi; \
+	
+
+.PHONY: data
+data:
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data... No data needed."$(NOCOLOR)
+
 
 .PHONY: generate_model
 generate_model: clone_darkflow_repo download_cfg download_weights
-	@echo "\nGenerating model..."
+	@echo $(YELLOW)'\n'${APP_NAME}": Generating model..."${NOCOLOR}
 	@echo "Checking if Tiny Yolo V2 pb file exists..."
 	@if [ -e ${TF_MODEL_FILENAME} ] ; \
 	then \
 		echo "Tiny Yolo V2 Tensorflow pb file already exists." ; \
 	else \
 		echo "Tiny Yolo V2 Tensorflow pb file does not exist. Saving model to built_graph folder.\n" ; \
-		flow --model darkflow/cfg/${CFG_FILENAME} --load darkflow/bin/${WEIGHTS_FILENAME} --savepb --labels labels.txt ; \
+		sed '1d' labels.txt > ${PASCAL_VOC_LABELS} ; \
+		flow --model darkflow/cfg/${CFG_FILENAME} --load darkflow/bin/${WEIGHTS_FILENAME} --savepb --labels pascal_voc_labels.txt ; \
 		cp ${BUILD_FOLDER}/${TF_MODEL_FILENAME} . ; \
 		echo "Tiny Yolo V2 Tensorflow model generation complete." ;\
 	fi
 
+
 .PHONY: clone_darkflow_repo
 clone_darkflow_repo:
-	@echo "\nChecking darkflow..."
+	@echo $(YELLOW)'\n'${APP_NAME}": Checking if darkflow repo is cloned..."${NOCOLOR}
 	@if [ -e ${DARKFLOW_FOLDER} ] ; \
 	then \
 		echo "darkflow folder already exists.\n" ; \
 	else \
 		echo "darkflow folder does not exist.\n" ; \
 		${CLONE_DARKFLOW} ; \
-		cd darkflow ; \
-		pip3 install . ; \
 	fi 
+
 
 .PHONY: download_cfg
 download_cfg:
-	@echo "\nChecking Tiny Yolo V2 cfg file..." 
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading Tiny Yolo v2 cfg file..."${NOCOLOR}
 	@if [ -e darkflow/cfg/${CFG_FILENAME} ] ; \
 	then \
 		echo "cfg file already exist.\n" ; \
@@ -60,9 +88,10 @@ download_cfg:
 		${GET_CFG} ; \
 	fi 
 
+
 .PHONY: download_weights
 download_weights:
-	@echo "\nChecking Tiny Yolo V2 weights file..." 
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading Tiny Yolo v2 weights..."${NOCOLOR}
 	@if [ -e darkflow/bin/${WEIGHTS_FILENAME} ] ; \
 	then \
 		echo "weights file already exists.\n" ; \
@@ -72,70 +101,73 @@ download_weights:
 	fi 
 
 
-.PHONY: profile
-profile: generate_model
-	@echo "\nmaking profile"
-	${NCPROFILE} ${TF_MODEL_FILENAME} -s 12
-
-.PHONY: browse_profile
-browse_profile: profile
-	@echo "\nmaking browse_profile"
-	@if [ -e output_report.html ] ; \
+.PHONY: compile_model
+compile_model: generate_model
+	@echo $(YELLOW)'\n'${APP_NAME}": Compiling Model to IR..."${NOCOLOR}
+	@if [ -e ${MODEL_BASE_NAME}.xml ] && [ -e ${MODEL_BASE_NAME}.bin ]; \
 	then \
-		firefox output_report.html & \
+		echo " - IR files already exist. Skipping compile step."; \
 	else \
-		@echo "***\nError - output_report.html not found" ; \
-	fi ; 
+		${NCCOMPILE} --input_model=yolov2-tiny-voc.pb --batch=1 --tensorflow_use_custom_operations_config=${INTEL_OPENVINO_DIR}/deployment_tools/model_optimizer/extensions/front/tf/yolo_v2_tiny_voc.json --reverse_input_channels --scale_value=[255] --data_type=FP16; \
+	fi
 
-.PHONY: compile
-compile: generate_model
-	@echo "\nmaking compile"
-	${NCCOMPILE} -o ${GRAPH_FILENAME} ${TF_MODEL_FILENAME} -s 12
-
-.PHONY: check
-check: generate_model
-	@echo "\nmaking check"
-	${NCCHECK} ${TF_MODEL_FILENAME} -s 12
+	
 
 .PHONY: run_py
-run_py: compile
-	@echo "\nmaking run_py"
-	python3 ./run.py
+run_py: data deps compile_model
+	@echo $(YELLOW)'\n'${APP_NAME}": Running Python sample..."${NOCOLOR}
+	python3 ./${APP_NAME}.py --input=${INPUT}
+
 
 .PHONY: run
-run: compile
-	@echo "\nmaking run"
-	python3 ./run.py
+run: run_py
+
+
+
+.PHONY: install-reqs
+install-reqs: clone_darkflow_repo
+	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements...\n"$(NOCOLOR)
+	@echo "If you would like to uninstall the required packages, please enter 'make uninstall-reqs'"
+	@echo "Installing Cython..."
+	@pip3 install cython --user ; \
+	echo "Installing Darkflow..."
+	(cd darkflow; pip3 install . --user)
+	
+
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo "Uninstalling darkflow..."; \
+	pip3 uninstall darkflow; \
+	@echo "Uninstalling Cython..."; \
+	pip3 uninstall cython;
+
 
 .PHONY: help
-help:
-	@echo "possible make targets: ";
-	@echo "  make help - shows this message";
-	@echo "  make all - makes the following: profile, compile";
-	@echo "  make generate_model - converts the Tiny Yolo V2 darknet model to a TensorFlow pb file";
-	@echo "  make download_cfg - downloads the Tiny Yolo V2 cfg file";
-	@echo "  make download_weights - downloads the Tiny Yolo V2 weights file";
-	@echo "  make clone_darkflow_repo - clones the darkflow github repo"
-	@echo "  make compile - runs SDK compiler tool to compile the NCS graph file for the network";
-	@echo "  make profile - runs the SDK profiler tool to profile the network creating output_report.html";
-	@echo "  make browse_profile - runs the SDK profiler tool and brings up report in browser.";
-	@echo "  make run - runs the run.py python example program";
-	@echo "  make clean - removes all created content"
+help:    
+	@echo "\nPossible make targets: ";
+	@echo $(YELLOW)"  make run or run_py"$(NOCOLOR)"- Runs Python example.";
+	@echo $(YELLOW)"  make help "$(NOCOLOR)"- Shows this message.";
+	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes everything needed to run, but doesn't run.";
+	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Uses the Model Optimizer to compile the model files to IR.";
+	@echo $(YELLOW)"  make data "$(NOCOLOR)"- Downloads required data.";
+	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all created content."
 
 
-clean:
-	@echo "\nmaking clean"
-	rm -f ${GRAPH_FILENAME}
-	rm -f output.gv
-	rm -f output.gv.svg
-	rm -f output_report.html
-	rm -f output_expected.npy
-	rm -f output_result.npy
-	rm -f output_val.csv
+clean: 
+	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."${NOCOLOR}
 	rm -rf darkflow
 	rm -rf built_graph
 	rm -rf bin
-	rm -rf sample_img
 	rm -rf ckpt
-	rm -f graph
+	rm -rf sample_img
 	rm -f ${TF_MODEL_FILENAME}
+	rm -f ${MODEL_BASE_NAME}.xml
+	rm -f ${MODEL_BASE_NAME}.bin
+	rm -f ${MODEL_BASE_NAME}.mapping
+	rm -f ${PASCAL_VOC_LABELS}
+	
+	

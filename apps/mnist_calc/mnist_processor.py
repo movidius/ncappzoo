@@ -6,20 +6,19 @@
 # Digit classifier using MNIST
 
 import cv2
-from mvnc import mvncapi as mvnc
 import numpy
-
+from openvino.inference_engine import IENetwork, IEPlugin
 
 class MnistProcessor:
     # The network assumes input images are these dimensions
     NETWORK_IMAGE_WIDTH = 28
     NETWORK_IMAGE_HEIGHT = 28
 
-    def __init__(self, network_graph_filename, nc_device=None,
+    def __init__(self, network_graph_filename, plugin=None,
                  prob_thresh=0.0, classification_mask=None):
         """Initialize an instance of the class.
 
-        :param network_graph_filename: the file path and name of the graph file created by the NCSDK compiler
+        :param network_graph_filename: the file path and name of the graph file created by the OpenVINO compiler
         :param nc_device: an open neural compute device object to use for inferences for this graph file
         :param prob_thresh: the probability threshold (between 0.0 and 1.0)... results below this threshold will be
         excluded
@@ -30,10 +29,15 @@ class MnistProcessor:
         """
         # Load graph from disk and allocate graph to device
         try:
-            with open(network_graph_filename, mode='rb') as graph_file:
-                graph_in_memory = graph_file.read()
-            self._graph = mvnc.Graph("MNIST Graph")
-            self._fifo_in, self._fifo_out = self._graph.allocate_with_fifos(nc_device, graph_in_memory)
+            
+            self._net = IENetwork(model=network_graph_filename + ".xml", weights=network_graph_filename + ".bin")
+            self._input_blob = next(iter(self._net.inputs))
+            self._output_blob = next(iter(self._net.outputs))
+            self._exec_net = plugin.load(network=self._net)
+            #print("network shape: ",self._net.inputs[self._input_blob].shape)
+            self._n, self._input_total_size = self._net.inputs[self._input_blob].shape
+            del self._net
+
 
         except IOError as e:
             print('Error - could not load neural network graph file: ' + network_graph_filename)
@@ -44,27 +48,6 @@ class MnistProcessor:
         self._probability_threshold = prob_thresh
         self._end_flag = True
 
-    def _drain_queues(self):
-        """Clear everything from the input and output queues.
-
-        :return: None.
-        """
-
-        # Clear out the input queue
-        while self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL) != 0:
-            # if at least one item to process in the input queue, read one from output queue to make room
-            #print("input FIFO has at least one item")
-            self._fifo_out.read_elem()
-
-        while self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL) != 0:
-            # output FIFO not empty so keep reading from it until it is
-            #print("output FIFO has at least one item")
-            self._fifo_out.read_elem()
-
-        #print("Done draining queues")
-        #print("Input FIFO fill level: " + str(self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)))
-        #print("Output FIFO fill level: " + str(self._fifo_out.get_option(mvnc.FifoOption.RO_READ_FILL_LEVEL)))
-        return
 
     def _process_results(self, inference_result):
         """Interpret the output from a single inference of the neural network and filter out results with
@@ -76,18 +59,10 @@ class MnistProcessor:
 
         """
         results = []
-
         # Get a list of inference_result indexes sorted from highest to lowest probability
-        sorted_indexes = (-inference_result).argsort()
-
-        # Get a list of sub-lists containing the detected digit as an int and the probability
-        for i in sorted_indexes:
-            if inference_result[i] >= self._probability_threshold:
-                results.append([i, inference_result[i]])
-            else:
-                # If this index had a value under the probability threshold, the rest of the indexes will too
-                break
-
+        sorted_indexes = (-inference_result[0]).argsort()
+        results.append([sorted_indexes[0], inference_result[0][sorted_indexes[0]]])
+        
         return results
 
     def cleanup(self):
@@ -95,11 +70,7 @@ class MnistProcessor:
 
         :return: None
         """
-
-        self._drain_queues()
-        self._fifo_in.destroy()
-        self._fifo_out.destroy()
-        self._graph.destroy()
+        del self._exec_net
 
     @staticmethod
     def get_classification_labels():
@@ -109,15 +80,8 @@ class MnistProcessor:
         """
         return ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
-    def is_input_queue_empty(self):
-        """Determine if the input queue for this instance is empty.
 
-        :return: True if input queue is empty or False if not.
-        """
-        count = self._fifo_in.get_option(mvnc.FifoOption.RO_WRITE_FILL_LEVEL)
-        return count == 0
-
-    def start_aysnc_inference(self, input_image):
+    def start_async_inference(self, input_image):
         """Start an asynchronous inference.
 
         When the inference complete the result will go to the output FIFO queue, which can then be read using the
@@ -154,11 +118,11 @@ class MnistProcessor:
 
         # Modify inference_image for network input
         inference_image[:] = ((inference_image[:]) * (1.0 / 255.0))
-
-        # Load tensor and get result.  This executes the inference on the NCS
-        self._graph.queue_inference_with_fifo_elem(self._fifo_in, self._fifo_out,
-                                                   inference_image.astype(numpy.float32), input_image)
-
+        inference_image = inference_image.reshape((self._n, self._input_total_size))
+        
+        # Start the async inference
+        self._req_handle = self._exec_net.start_async(request_id=0, inputs={self._input_blob: inference_image})
+        
     def get_async_inference_result(self):
         """Read the next available result from the output FIFO queue. If there is nothing on the output FIFO,
         this function will block indefinitely until there is something to read.
@@ -167,12 +131,13 @@ class MnistProcessor:
 
         """
         # Get the result from the queue
-        output, input_image = self._fifo_out.read_elem()
-
+        self._status = self._req_handle.wait()
+        output = self._req_handle.outputs[self._output_blob]
+        
         # Get a ranked list of results that meet the probability thresholds
-        return self._process_results(output), input_image
+        return self._process_results(output)
 
-    def do_sync_inference(self, input_image: numpy.ndarray):
+    def do_async_inference(self, input_image: numpy.ndarray):
         """Do a single inference synchronously.
 
         Don't mix this with calls to get_async_inference_result. Use one or the other. It is assumed
@@ -183,8 +148,8 @@ class MnistProcessor:
         :return: filtered results which is a list of lists. The inner lists contain the digit and its probability and
         are sorted from most probable to least probable.
         """
-        self.start_aysnc_inference(input_image)
-        results, original_image = self.get_async_inference_result()
+        self.start_async_inference(input_image)
+        results = self.get_async_inference_result()
 
         return results
 
