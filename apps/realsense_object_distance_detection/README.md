@@ -20,6 +20,8 @@ This will install the following packages:
 - **librealsense2-dkms** - Deploys the librealsense2 udev rules, build and activate kernel modules, runtime library.
 - **librealsense2-dev** - Includes the header files and symbolic links for developers.
 
+Realsense SDK 2 only works with the D400 series and the SR300 Intel Realsense cameras. For more information, please visit https://github.com/IntelRealSense/librealsense. 
+
 ## Building the Example
 
 To run the example code do the following :
