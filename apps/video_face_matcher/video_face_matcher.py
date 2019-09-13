@@ -43,6 +43,7 @@ FACE_DETECTION_THRESHOLD = 0.50
 def run_inference(image_to_classify, exec_net, input_node_name, output_node_name):
     '''
     Runs an inference on an image.
+    
     Returns an inference result (differs for every network).
     '''
     results = exec_net.infer({input_node_name: image_to_classify})
@@ -52,6 +53,7 @@ def run_inference(image_to_classify, exec_net, input_node_name, output_node_name
 def overlay_on_image(display_image, matching, bbox):
     ''' 
     Overlays a bounding box on the display image. Green if a match, Red if not a match. 
+    
     Returns None
     '''
     rect_width = 2
@@ -70,6 +72,7 @@ def overlay_on_image(display_image, matching, bbox):
 def preprocess_image(src, network_input_w, network_input_h):
     '''
     Preprocesses the image by resizing the image, doing a transpose and reshaping the tensor.
+    
     Returns the preprocessed image.
     '''
     # Resize and transposes the image
@@ -83,6 +86,7 @@ def preprocess_image(src, network_input_w, network_input_h):
 def face_match(face1_output, face2_output):
     ''' 
     Compares two feature vectors by taking the sum of the squared differences.
+    
     Returns the total difference between the vectors or 99 if the length of the faces don't match.
     '''
     if (len(face1_output) != len(face2_output)):
@@ -111,7 +115,8 @@ def check_key_exit_event(raw_key):
 def fd_post_processing(fd_results, frame, image_h, image_w):
     ''' 
     Performs face detection retail 0004 network post processing
-    Returns a list of Face_detection_result(s) that include the cropped face OpenCV Mat and bounding box coordinates.
+    
+    Returns a list of Face_detection_result objects that include the cropped face OpenCV Mat and bounding box coordinates.
     '''
     global FACE_DETECTION_THRESHOLD
     detection_threshold = FACE_DETECTION_THRESHOLD
@@ -135,7 +140,8 @@ def fd_post_processing(fd_results, frame, image_h, image_w):
 def read_all_validated_images():
     '''
     Reads in image files of people and saves the OpenCV Mat. Also saves their name.
-    Returns a list of Face_profile(s) that include the person's name, image path, and OpenCV Mat.
+    
+    Returns a list of Face_profile objects that include the person's name, image path, and OpenCV Mat.
     '''
     names_images_mats = []
     for root, sub_dirs, files in os.walk(VALIDATED_IMAGES_DIR):
@@ -152,6 +158,7 @@ def read_all_validated_images():
 def get_validated_faces(fd, fn, validated_person_images):
     '''
     Runs inferences on images to crop out faces using the face_detection_retail_0004 network. Then using those faces as input, run inferences using the facenet network to get a feature vector for each face. 
+    
     Returns a list of Face_profile(s) that include the person's name, image path, and a feature vector.
     '''
     # Preprocess all of the face mats, then run an inference on all of the faces, then save all of the feature vectors
@@ -186,6 +193,7 @@ def get_validated_faces(fd, fn, validated_person_images):
 def get_network_information(ie, xml):
     ''' 
     Reads in xml and bin files and saves all relavent network information for later use.
+    
     Returns a My_network object that includes the ExecutableNetwork object, the network input node name, the network output node name, the network input width, and the network input height.
     '''
     # Read the network xml and bin files
@@ -230,6 +238,8 @@ def run_camera(valid_processed_faces, fd, fn):
         output_node_name - The network's output node/layer name.
         input_w - The network's input shape width.
         input_h - The network's input shape height.
+        
+    Returns None
     '''
     print("------------------ " + YELLOW + "video_face_matcher" + NOCOLOR + " ------------------\n")
     print(" - Face Match Threshold: " + YELLOW + str(FACE_MATCH_THRESHOLD) + NOCOLOR)
@@ -246,7 +256,6 @@ def run_camera(valid_processed_faces, fd, fn):
     
     test_processed_faces = []
     while (True):
-        
         # Read an image frame from camera
         ret_val, vid_image = camera_device.read()
         if (not ret_val):

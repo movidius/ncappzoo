@@ -5,7 +5,9 @@ The video_face_matcher example app uses the TensorFlow [ncappzoo/networks/facene
 The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the person's face to indicate a match was found.   
 
 ## Details
-To make the program recognize your face or any face that you would like, add a sub-folder to the validated_faces folder with the same name as the person you'd like to recognize.  You can easily take pictures using a webcam using the Cheese application on Ubuntu.  When creating the images, please make sure that there is only one face per image.  If there are multiple faces in the validated image, the app will only take the first one it detects.  Afterwards, add the images of that person to the named sub-folder. 
+To make the program recognize your face or any face that you would like, add a sub-folder with images of the person you'd like to recognize to the validated_faces folder.  Make sure to name the sub-folder with the person's name as the application will use the folder's name when referring to the person.
+
+**Tip**: You can easily take pictures using a webcam using the Cheese application on Ubuntu.  When creating the images, please make sure that there is only one face per image.  If there are multiple faces in the validated image, the app will only take the first one it detects. 
 
 The app will detect the face of the person in the images and create a 512 dimensional feature vector for each face.  It will then use these "validated" feature vectors to compare against faces that the app detects in the camera stream.  The app can be used with different people and multiple faces on the camera frame. 
 
