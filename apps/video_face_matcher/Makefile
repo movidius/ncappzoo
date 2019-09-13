@@ -62,6 +62,14 @@ run: run_py
 .PHONY: run_py
 run_py: data deps
 	@echo $(YELLOW) '\n'${APP_NAME}": Running Python sample..." $(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
 	python3 ${APP_NAME}.py;
 
 
