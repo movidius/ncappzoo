@@ -9,12 +9,8 @@ This app does object detection using the [SSD Mobilenet Caffe model](../../netwo
 This program requires:
 - 1 NCS2/NCS1 device
 - OpenVINO 2019 R2 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 - [Intel Realsense SDK 2](https://www.intelrealsense.com/developers#downloads)
 - Intel Realsense Camera (tested with [Intel D415 Realsense Camera](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
-
-
-*It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
