@@ -1,47 +1,57 @@
-# Introduction
-The video_face_matcher example app uses the TensorFlow [ncappzoo/tensorflow/facenet](../../tensorflow/facenet) neural network to find a face in a video camera stream that matches with a known face image.  
+# video_face_matcher
+## Introduction
+The video_face_matcher example app uses the TensorFlow [ncappzoo/networks/facenet](../../networks/facenet) neural network and the [ncappzoo/networks/face_detection_retail_0004](../../networks/face_detection_retail_0004) network to find a face in a video camera stream that matches with a known face image.
 
-The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the window to indicate a match was found.   
+The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the person's face to indicate a match was found.   
 
-# Details
-To make the program recognize your face or any face that you would like replace the video_face_matcher/validated_images/valid.jpg image file with a similar image of the person you would like to recognize.
+## Details
+To make the program recognize your face or any face that you would like, add a sub-folder to the validated_faces folder with the same name as the person you'd like to recognize.  You can easily take pictures using a webcam using the Cheese application on Ubuntu.  When creating the images, please make sure that there is only one face per image.  If there are multiple faces in the validated image, the app will only take the first one it detects.  Afterwards, add the images of that person to the named sub-folder. 
+
+The app will detect the face of the person in the images and create a 512 dimensional feature vector for each face.  It will then use these "validated" feature vectors to compare against faces that the app detects in the camera stream.  The app can be used with different people and multiple faces on the camera frame. 
 
 To determine a match the FACE_MATCH_THRESHOLD value is used.  You might want to adjust this value keeping in mind that the closer this value is to 0.0, the more exact and less forgiving the matching will be.  The initial value for FACE_MATCH_THRESHOLD is 1.2 but you will likely want to play with this value for your own needs.
 
 The provided Makefile does the following:
-1. Makes the facenet graph file from the ncappzoo/tensorflow/facenet example and copies it to the base directory of this project.
+1. Makes the facenet IR file from the ncappzoo/networks/facenet example and copies it to the base directory of this project.
+1. Makes the face_detection_retail_0004 IR file from the ncappzoo/networks/face_detection_retail_0004 example and copies it to the base directory of this project.
 2. Runs the provided video_face_matcher.py program that creates a GUI window which shows the camera stream and match/not match status.
 
-# Prerequisites
+## Prerequisites
 This program requires:
-- 1 NCS device
+- 1 NCS1/NCS2 device
 - A webcam
-- NCSDK 1.12.00 or greater
-- The ncappzoo/tensorflow/facenet make compile command must work.  See [the facenet README.md](../../tensorflow/facenet/README.md) for details
-- opencv 3.3 with video for linux support
+- OpenVINO 2019 R2 or greater
+- OpenCV with video for linux support
 
-Note: The OpenCV version that installs with the some versions of ncsdk does <strong>not</strong> provide V4L support.  To run this application you will need to replace the ncsdk version with a version built from source.  To remove the old opencv and build and install a compatible version you can run the following command from the app's base directory:
-
-```
-   make opencv
-```   
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
-# Makefile
+## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 
-## make help
+### make run or make run_py
+Runs the sample application.
+
+### make help
 Shows available targets.
 
-## make all
-Builds and/or gathers all the required files needed to run the example python program. 
+### make all
+Builds and/or gathers all the required files needed to run the application.
 
-## make compile
-runs make compile in the ncappzoo/tensorflow/facenet project to create the facenet graph file (facenet_celeb_ncs.graph) for the NCS device, and copies it to the base directory.
+### make data
+Gathers all of the required data need to run the sample.
 
-## make run_py
-Runs the provided python program demonstrating the facenet network.
+### make deps
+Builds all of the dependencies needed to run the sample.
 
-## make clean
-Removes all the temporary files that are created by the Makefile.  Also removes 20170512-110547.zip.
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
+ 
+### make clean
+Removes all the temporary files that are created by the Makefile.
 

@@ -5,14 +5,12 @@ NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
 MODEL_FILE_NAME_BASE = 20180408-102900
-MODEL_RELATIVE_DIR = ../../tensorflow/facenet
+MODEL_RELATIVE_DIR = ../../networks/facenet
 
 FD_MODEL_FILE_NAME_BASE = face-detection-retail-0004
 FD_MODEL_RELATIVE_DIR = ../../networks/face_detection_retail_0004
 
-
 APP_RELATIVE_DIR = ../../apps/video_face_matcher
-
 
 APP_NAME = video_face_matcher
 
@@ -47,7 +45,7 @@ compile_default_model:
 		echo "- Face detection IR files found. No need to compile."; \
 	else \
 		echo "- Making Face detection IRs in Facenet project."; \
-		(cd ${MODEL_RELATIVE_DIR}; make compile_model;); \
+		(cd ${FD_MODEL_RELATIVE_DIR}; make get_ir;); \
 		echo "- Copying IRs to project folder..."; \
 		(cd ${FD_MODEL_RELATIVE_DIR}; cp ${FD_MODEL_FILE_NAME_BASE}.bin ${APP_RELATIVE_DIR}; cp ${FD_MODEL_FILE_NAME_BASE}.xml ${APP_RELATIVE_DIR};); \
 	fi
@@ -90,14 +88,15 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.";
-	@echo "  "
+	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes files created in this directory.\n";
+	
 
 .PHONY: clean
 clean:
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."$(NOCOLOR);
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
-	rm -f ${MODEL_FILE_NAME_BASE}.mapping
+	rm -f ${FD_MODEL_FILE_NAME_BASE}.xml
+	rm -f ${FD_MODEL_FILE_NAME_BASE}.bin
 	
 	
