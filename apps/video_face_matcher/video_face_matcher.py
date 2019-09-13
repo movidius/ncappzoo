@@ -9,10 +9,10 @@ import numpy
 import cv2
 import os
 
-import Face_detection_results
-import Face_profile
-import Person_profile
-import My_network
+from Face_detection_results import *
+from Face_profile import *
+from Person_profile import *
+from My_network import *
 
 GREEN = '\033[1;32m'
 RED = '\033[1;31m'
@@ -193,7 +193,6 @@ def get_validated_faces(fd, fn, validated_person_images):
 def get_network_information(ie, xml):
     ''' 
     Reads in xml and bin files and saves all relavent network information for later use.
-    
     Returns a My_network object that includes the ExecutableNetwork object, the network input node name, the network output node name, the network input width, and the network input height.
     '''
     # Read the network xml and bin files

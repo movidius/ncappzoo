@@ -1,5 +1,5 @@
           
-class My_network:
+class My_network():
     '''
     Used to hold various network parameters
     
