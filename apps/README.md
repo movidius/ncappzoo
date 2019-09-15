@@ -19,6 +19,7 @@ For a step by step tutorial on how to build an image classification network look
 |[simple_classifier_cpp](simple_classifier_cpp/README.md) | C++<br>Multiple Networks<br>Application reads a single image from the filesystem and does an image classification inference on that image. Takes the image, the network and a labels file on the commandline|![](simple_classifier_cpp/screen_shot.jpg)|
 |[simple_classifier_py](simple_classifier_py/README.md) | Python<br>Multiple Networks<br>Application reads a single image from the filesystem and does an image classification inference on that image. Takes the image, the network and a labels file on the commandline|![](simple_classifier_py/screen_shot.jpg)|
 |[simple_classifier_py_camera](simple_classifier_py_camera/README.md) | Python<br>Multiple Networks<br>Application reads a video stream from a camera and does image classification inference on the stream continually updating the top result.|![](simple_classifier_py_camera/screen_shot.jpg)|
+|[face_emotion_game](face_emotion_game/README.md) | Python<br>Multiple Networks<br>Application reads a video stream from a camera and does face detection and emotion recognition, the app presented as a game, and user can collect scores by his facial expressions.|![](face_emotion_game/screenshot.jpg)|
 
 
 ## Object Detection Applications

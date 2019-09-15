@@ -12,8 +12,11 @@ FACE_MODEL_ZOO_DIR = Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP
 EMOTION_MODEL_ZOO_DIR = Retail/object_attributes/emotions_recognition/0003/dldt/INT8
 FACE_MODEL_FILE_NAME_BASE = face-detection-retail-0004
 EMOTION_MODEL_FILE_NAME_BASE = emotions-recognition-retail-0003
+FACE_DESTINATION_DIR = src/data/face-detection
+EMOTION_DESTINATION_DIR = src/data/emotions-recognition
 
 FACE_NETWORK_NAME = face_detection_retail_0004
+EMOTION_NETWORK_NAME = emotions_recognition_retail_0003
 GAME_NAME = face_emotion_game
 CROP = 
 CROPPED_FACES_DIR = 
@@ -57,8 +60,28 @@ get_ir:	model_zoo
 	else \
 		echo " - IR files do not exist in project directory.";\
 		echo " - Copying IR files to current folder..."; \
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${FACE_MODEL_FILE_NAME_BASE}.xml .; \
-		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${FACE_MODEL_FILE_NAME_BASE}.bin .; \
+		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${FACE_MODEL_FILE_NAME_BASE}.xml ${FACE_DESTINATION_DIR}; \
+		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${FACE_MODEL_ZOO_DIR}/${FACE_MODEL_FILE_NAME_BASE}.bin ${FACE_DESTINATION_DIR}; \
+	fi
+	
+    @echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Downloading IRs..."$(NOCOLOR);
+	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${EMOTION_MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${EMOTION_MODEL_FILE_NAME_BASE}.bin ]; \
+	then \
+		echo " - Model files already exists in open model directory."; \
+	else \
+		echo " - Model files do not exist in open model directory. ";\
+		echo " - Using Model downloader to download the model..."; \
+		(cd ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}; python3 ${MODEL_DOWNLOADER_FILENAME} --name ${EMOTION_MODEL_FILE_NAME_BASE};); \
+	fi
+
+	@if [ -e ${FACE_MODEL_FILE_NAME_BASE}.xml ] && [ -e ${FACE_MODEL_FILE_NAME_BASE}.bin ]; \
+	then \
+		echo " - IR files already exist in project directory. No need to copy IRs."; \
+	else \
+		echo " - IR files do not exist in project directory.";\
+		echo " - Copying IR files to current folder..."; \
+		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${EMOTION_MODEL_FILE_NAME_BASE}.xml ${EMOTION_DESTINATION_DIR}; \
+		cp ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${EMOTION_MODEL_FILE_NAME_BASE}.bin ${EMOTION_DESTINATION_DIR}; \
 	fi
 
 
