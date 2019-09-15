@@ -29,16 +29,19 @@ all: deps data
 .PHONY: deps
 deps: get_ir
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
 	
 
 .PHONY: data
 data:
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Downloading required data..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Downloading required data..."$(NOCOLOR)
 
 
 .PHONY: model_zoo
 model_zoo:
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Cloning model zoo..."$(NOCOLOR)
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Cloning model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 
 
@@ -89,7 +92,8 @@ get_ir:	model_zoo
 compile_model: 
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
 	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
-
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Compiling model to IR..."$(NOCOLOR)
+	@echo " - No compiling needed. Using Pre-compiled IRs from the open model zoo."
 	
 .PHONY: run
 run: run_py
@@ -113,13 +117,15 @@ run_py: deps data
 install-reqs: 
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Checking installation requirements..."$(NOCOLOR)
 	@echo "No requirements needed."
-
+    @echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Checking installation requirements..."$(NOCOLOR)
+	@echo "No requirements needed."
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
-	
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
 
 .PHONY: help
 help:
@@ -143,7 +149,8 @@ help:
 
 clean: 
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
-	@rm -f image.jpg
-	rm -f ${MODEL_FILE_NAME_BASE}.bin
-	rm -f ${MODEL_FILE_NAME_BASE}.xml
-	rm -f ${MODEL_FILE_NAME_BASE}.mapping
+	rm -f ${FACE_MODEL_FILE_NAME_BASE}.bin
+	rm -f ${FACE_MODEL_FILE_NAME_BASE}.xml
+	@echo $(YELLOW)'\n'${EMOTION_NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
+	rm -f ${EMOTION_MODEL_FILE_NAME_BASE}.bin
+	rm -f ${EMOTION_MODEL_FILE_NAME_BASE}.xml
