@@ -139,13 +139,21 @@ help:
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
-	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo " ----- "$(YELLOW) $(FACE_NETWORK_NAME) "Model information"$(NOCOLOR)" -----"
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
 	@echo "  This network does face detection and can be used to align faces.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
 	@echo "  name: 'input', shape: [1x3x300x300], Expected color order is BGR.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
 	@echo "  name: 'detection_out', shape: [1, 1, N, 7] - where N is the number of detected bounding boxes. For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max].\n";
+	@echo " ----- "$(YELLOW) $(EMOTION_NETWORK_NAME) "Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does emotion recognition and can be used to align faces.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'input', shape: [1x3x64x64], Expected color order is BGR.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'detection_out', shape: [1, 5, 1, 1]  - Softmax output across five emotions ('neutral', 'happy', 'sad', 'surprise', 'anger').\n";
+
 
 clean: 
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
