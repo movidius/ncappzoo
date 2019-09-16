@@ -36,8 +36,11 @@ REQUEST_CAMERA_HEIGHT = 480
 # the same face will return 0.0
 # different faces return higher numbers
 # this is NOT between 0.0 and 1.0
-FACE_MATCH_THRESHOLD = 0.91
+FACE_MATCH_THRESHOLD = 1.10
 FACE_DETECTION_THRESHOLD = 0.50
+
+FONT_SCALE = 1
+FONT_THICKNESS = 2
 
 
 def run_inference(image_to_classify, exec_net, input_node_name, output_node_name):
@@ -50,22 +53,31 @@ def run_inference(image_to_classify, exec_net, input_node_name, output_node_name
     return results[output_node_name]
 
 
-def overlay_on_image(display_image, matching, bbox):
+def overlay_on_image(display_image, matching, box_left, box_top, box_right, box_bottom, match_text):
     ''' 
     Overlays a bounding box on the display image. Green if a match, Red if not a match. 
     
     Returns None
     '''
     rect_width = 2
+    label_background_color = (70, 120, 70)
+    # Draws a rectangle with a greenish background for the text
+    label_size = cv2.getTextSize(match_text, cv2.FONT_HERSHEY_SIMPLEX, FONT_SCALE, FONT_THICKNESS)[0]
+    label_left = box_left
+    label_top = box_top - label_size[1]
+    label_right = label_left + label_size[0]
+    label_bottom = label_top + label_size[1]
+    cv2.rectangle(display_image,(label_left-1, label_top-7),(label_right+1, label_bottom+1), label_background_color, cv2.FILLED)
+    
     if (matching):
         # match, green rectangle
-        cv2.rectangle(display_image, (bbox[0], bbox[1]),
-                      (bbox[2], bbox[3]),
+        cv2.rectangle(display_image, (box_left, box_top),
+                      (box_right, box_bottom),
                       (0, 255, 0), rect_width)
     else:
         # not a match, red rectangle
-        cv2.rectangle(display_image, (bbox[0], bbox[1]),
-                      (bbox[2], bbox[3]),
+        cv2.rectangle(display_image, (box_left, box_top),
+                      (box_right, box_bottom),
                       (0, 0, 255), rect_width)
 
 
@@ -302,12 +314,13 @@ def run_camera(valid_processed_faces, fd, fn):
                 if (best_score > FACE_MATCH_THRESHOLD):
                     matching = False
                     match_text = "Unknown"
-                    text_color = (0, 0, 255)
+                    text_color = (0, 255, 0)
                 
                 # Draw the bounding box for the face
-                overlay_on_image(vid_image, matching, (current_face.box_left, current_face.box_top, current_face.box_right, current_face.box_bottom))
+                overlay_on_image(vid_image, matching, current_face.box_left, current_face.box_top, current_face.box_right, current_face.box_bottom, match_text)
+                
                 # show the display text
-                cv2.putText(vid_image, match_text, (text_left, text_top), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+                cv2.putText(vid_image, match_text, (text_left, text_top-5), cv2.FONT_HERSHEY_SIMPLEX, FONT_SCALE, text_color, FONT_THICKNESS)
         
         # check if the window is visible, this means the user hasn't closed
         # the window via the X button

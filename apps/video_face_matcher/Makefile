@@ -25,8 +25,9 @@ deps: default_model
 
 .PHONY: data
 data: 
-	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data for model... None required."$(NOCOLOR)
-
+	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data for model..."$(NOCOLOR)
+	(cd validated_faces; mkdir -p Trump; cd Trump; wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/trump.jpg)
+	
 
 .PHONY: compile_default_model
 compile_default_model: 
@@ -105,5 +106,6 @@ clean:
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${FD_MODEL_FILE_NAME_BASE}.xml
 	rm -f ${FD_MODEL_FILE_NAME_BASE}.bin
+	rm -rf validated_faces/Trump
 	
 	

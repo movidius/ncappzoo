@@ -1,7 +1,7 @@
           
 class My_network():
     '''
-    Used to hold various network parameters
+    Used to hold various network parameters.
     
     Parameters
     ----------

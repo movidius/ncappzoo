@@ -2,16 +2,20 @@
 ## Introduction
 The video_face_matcher example app uses the TensorFlow [ncappzoo/networks/facenet](../../networks/facenet) neural network and the [ncappzoo/networks/face_detection_retail_0004](../../networks/face_detection_retail_0004) network to find a face in a video camera stream that matches with a known face image.
 
-The provided video_face_matcher.py python program starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the person's face to indicate a match was found.   
+The provided video_face_matcher.py python app starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the person's face to indicate a match was found.  
 
-## Details
-To make the program recognize your face or any face that you would like, add a sub-folder with images of the person you'd like to recognize to the validated_faces folder.  Make sure to name the sub-folder with the person's name as the application will use the folder's name when referring to the person.
+## Important Application details
+To make the program recognize your face or any face that you would like, add a sub-folder with images of the person you'd like to recognize to the validated_faces folder.  Make sure to name the sub-folder with the same name as the person you'd like to identify.  The application will use the folder's name when referring to the person. The names of the files inside of the named folder can be any name.  
+
+**Note**: See the example inside of the validated_faces folder after running the command **make**. 
+
+The application will work better with more validated images.
 
 **Tip**: You can easily take pictures using a webcam using the Cheese application on Ubuntu.  When creating the images, please make sure that there is only one face per image.  If there are multiple faces in the validated image, the app will only take the first one it detects. 
 
 The app will detect the face of the person in the images and create a 512 dimensional feature vector for each face.  It will then use these "validated" feature vectors to compare against faces that the app detects in the camera stream.  The app can be used with different people and multiple faces on the camera frame. 
 
-To determine a match the FACE_MATCH_THRESHOLD value is used.  You might want to adjust this value keeping in mind that the closer this value is to 0.0, the more exact and less forgiving the matching will be.  The initial value for FACE_MATCH_THRESHOLD is 1.2 but you will likely want to play with this value for your own needs.
+To determine a match, the **FACE_MATCH_THRESHOLD** value is used.  You might want to adjust this value keeping in mind that the closer this value is to 0.0, the more exact and less forgiving the matching will be.  The initial value for **FACE_MATCH_THRESHOLD** is **1.10** but you will likely want to play with this value for your own needs.
 
 The provided Makefile does the following:
 1. Makes the facenet IR file from the ncappzoo/networks/facenet example and copies it to the base directory of this project.
@@ -23,7 +27,7 @@ This program requires:
 - 1 NCS1/NCS2 device
 - A webcam
 - OpenVINO 2019 R2 or greater
-- OpenCV with video for linux support
+
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
