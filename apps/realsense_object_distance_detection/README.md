@@ -7,7 +7,7 @@ This app does object detection using the [SSD Mobilenet Caffe model](../../netwo
 
 ## Prerequisites
 This program requires:
-- 1 NCS2/NCS1 device
+- 1 [NCS2](https://store.intelrealsense.com/buy-intel-neural-compute-stick-2.html)/NCS1 device
 - OpenVINO 2019 R2 Toolkit
 - [Intel RealSense SDK 2.0](https://github.com/IntelRealSense/librealsense)
 - Intel RealSense depth camera (tested with [Intel RealSense D415](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
@@ -27,7 +27,7 @@ To run the example code do the following :
 2. Connect your Intel RealSense depth camera and NCS device.
 3. Type the following command in the terminal: ```make all```
 
-**Note**: Make sure your Intell RealSense libraries are installed beforehand. 
+**Note**: Make sure your Intel RealSense libraries are installed beforehand. 
 
 ## Running the Example
 
