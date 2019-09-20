@@ -9,7 +9,7 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # Caffe Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
 |---------------------|-------------|
-|[SSD_Mobilenet](SSD_Mobilenet/README.md)|MobileNet Single Shot Detector takes an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications. |
+
 
 # Caffe Misc Networks for Neural Compute devices
 |Network| Description |
