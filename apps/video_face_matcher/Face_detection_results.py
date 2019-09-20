@@ -11,9 +11,11 @@ class Face_detection_result():
     box_top (int) - Top side of the bounding box for the face.
     box_bottom (int) - Bottom side of the bounding box for the face.
     '''
-    def __init__(self, face_mat=None, box_left=None, box_right=None, box_top=None, box_bottom=None):
+    def __init__(self, face_mat=None, box_left=None, box_right=None, box_top=None, box_bottom=None, match=False, feature_vector=None):
         self.face_mat = face_mat
         self.box_left = box_left
         self.box_right = box_right
         self.box_top = box_top
         self.box_bottom = box_bottom
+        self.match = match
+        self.feature_vector = feature_vector
