@@ -33,6 +33,7 @@ This program requires:
 - 1 NCS1/NCS2 device
 - A webcam
 - OpenVINO 2019 R2 or greater
+- tkinter
 
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
@@ -59,10 +60,10 @@ Builds all of the dependencies needed to run the sample.
 Compiles an IR file from a default model to be used when running the sample.
 
 ### make install-reqs
-Checks required packages that aren't installed as part of the OpenVINO installation. 
+Checks required packages that aren't installed as part of the OpenVINO installation. The only required packages is tkinter.
 
 ### make uninstall-reqs
-Uninstalls requirements that were installed by the sample program.
+Uninstalls requirements that were installed by the sample program. 
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.
