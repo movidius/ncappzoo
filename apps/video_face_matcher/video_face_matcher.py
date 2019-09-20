@@ -8,6 +8,7 @@ import sys
 import numpy
 import cv2
 import os
+from tkinter import *
 
 from Face_detection_results import *
 from Face_profile import *
@@ -41,6 +42,8 @@ FACE_DETECTION_THRESHOLD = 0.50
 
 FONT_SCALE = 1
 FONT_THICKNESS = 2
+mouse_down = False
+entry = None
 
 
 def run_inference(image_to_classify, exec_net, input_node_name, output_node_name):
@@ -265,7 +268,10 @@ def run_camera(valid_processed_faces, fd, fn):
     actual_camera_height = camera_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
     cv2.namedWindow(CV_WINDOW_NAME)
     
+    
     test_processed_faces = []
+    
+
     while (True):
         # Read an image frame from camera
         ret_val, vid_image = camera_device.read()
@@ -281,8 +287,9 @@ def run_camera(valid_processed_faces, fd, fn):
         # Get the original image's file height and width
         image_height = vid_image.shape[0]
         image_width = vid_image.shape[1]
+        frame_from_vid = vid_image.copy()
         # Post processing to get the cropped face OpenCV Mat and bounding box coordinates
-        detected_faces = fd_post_processing(fd_results, vid_image, image_height, image_width)
+        detected_faces = fd_post_processing(fd_results, frame_from_vid, image_height, image_width)
         
         # Run an inference on each cropped face mat and compare it with all known validated feature vectors
         if (len(detected_faces) > 0):
@@ -299,9 +306,9 @@ def run_camera(valid_processed_faces, fd, fn):
                 # Compare the current feature vector to all known validated feature vectors
                 for valid_face in valid_processed_faces:
                     matching = False
-                    current_face_feature_vector = test_face_output[0]
+                    current_face.feature_vector = test_face_output[0]
                     # Get the total difference between both feature vectors
-                    total_difference = face_match( valid_face.feature_vector, current_face_feature_vector)
+                    total_difference = face_match( valid_face.feature_vector, current_face.feature_vector)
                     # Try to get the best match
                     if (total_difference < best_score):
                         match_text = valid_face.name
@@ -309,6 +316,7 @@ def run_camera(valid_processed_faces, fd, fn):
                 # Check to see if the best score was lower than the FACE_MATCH_THRESHOLD. lower is better.
                 if (best_score <= FACE_MATCH_THRESHOLD):
                     matching = True
+                    current_face.match = True
                     text_color = (0, 255, 0)
                         
                 if (best_score > FACE_MATCH_THRESHOLD):
@@ -336,12 +344,78 @@ def run_camera(valid_processed_faces, fd, fn):
             if (check_key_exit_event(raw_key) == False):
                 print('user pressed Q')
                 break
+        # handles mouse click events
+        cv2.setMouseCallback(CV_WINDOW_NAME, register_new_face, param=(detected_faces, valid_processed_faces))
 
+
+def get_name(textentry, tk_window):
+    '''
+    Gets the user input from the tkinter window.
+    Returns None
+    '''
+    global entry
+    # Save the user's entry
+    entry = textentry.get()
+    # Close the window
+    tk_window.destroy()
+    
+
+def register_new_face(event, x, y, flags, param):
+    '''
+    Handles the mouse click event to add a face to the valid faces.
+    '''
+    global mouse_down, entry
+    detected_faces=param[0]
+    validated_faces=param[1]
+    if event == cv2.EVENT_LBUTTONDOWN:
+        mouse_down = True
+    
+    # Check if mouse button was pressed
+    if event == cv2.EVENT_LBUTTONUP and mouse_down:
+        mouse_down = False
+        for face_num, current_face in enumerate(detected_faces):
+            # Checks to see mouse click was within the bounding box of any of the detected faces
+            if x > current_face.box_left and x < current_face.box_right and y > current_face.box_top and y < current_face.box_bottom and current_face.match == False:
+                # tkinter window set up
+                tk_window = Tk()
+                HEIGHT = 100
+                WIDTH = 400
+                # Creates the canvas for the window
+                canvas = Canvas(tk_window, height=HEIGHT, width=WIDTH)
+                canvas.pack()
+                # Creates the frame and places it in the canvas
+                frame = Frame(tk_window)
+                frame.place(relwidth=1.0, relheight=1.0)
+                # Creates the label and places it in the frame
+                label = Label(frame, text="Enter the person's name: ")
+                label.pack(side='left')
+                # Creates the text entry box and places it in the frame
+                textentry = Entry(frame)
+                textentry.pack(side='left')
+                # Creates a button and places it in the frame
+                button = Button(frame, text="Submit", command=lambda: get_name(textentry, tk_window))
+                button.pack(side='right')
+                # Displays window
+                window.mainloop()
+                
+                # Saves the image to disk and adds the feature vector to the valid faces
+                if entry is not None:
+                    os.system("mkdir -p validated_faces/" + entry)
+                    max_images_per_person = 100
+                    for number in range(0, max_images_per_person):
+                        new_file_path = "validated_faces/" + entry + "/" + entry + str(number) + ".jpg"
+                        if not (os.path.exists(new_file_path)):
+                            cv2.imwrite(new_file_path, current_face.face_mat)
+                            validated_faces.append(Face_profile(entry, new_file_path, current_face.feature_vector))
+                            print("New image file and valid face added for:", entry)
+                            break
+        
 
 def main():
     ''' 
     Does all the work!
     '''
+    
     ie = IECore() # Inference Engine Core object
     # get the network parameters for the face detection network    
     my_fd_network = get_network_information(ie, fd_xml)
