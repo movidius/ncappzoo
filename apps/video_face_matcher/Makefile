@@ -4,6 +4,8 @@ YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
+CHECK_IMAGETK = python3 -c "from tkinter import *" 
+
 MODEL_FILE_NAME_BASE = 20180408-102900
 MODEL_RELATIVE_DIR = ../../networks/facenet
 
@@ -26,6 +28,7 @@ deps: default_model
 .PHONY: data
 data: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Downloading required data for model..."$(NOCOLOR)
+	mkdir -p validated_faces; \
 	(cd validated_faces; mkdir -p Trump; cd Trump; wget -c --no-cache -P . https://raw.githubusercontent.com/nealvis/media/master/face_pics/trump.jpg)
 	
 
@@ -71,19 +74,41 @@ run_py: data deps
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
-	python3 ${APP_NAME}.py;
+	@echo "Checking tkinter..."
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo " - tkinter is already installed.\n"; \
+	else \
+		echo $(YELLOW)" - tkinter is not installed. Please run 'make install-reqs' to install all required packages. "$(NOCOLOR); \
+		exit 1; \
+	fi
+	python3 ${APP_NAME}.py
 
 
 .PHONY: install-reqs
 install-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Checking application requirements...\n"$(NOCOLOR)
-	@echo "No requirements needed."
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo " - tkinter already installed.\n"; \
+	else \
+		echo $(YELLOW)"Installing tkinter... "$(NOCOLOR); \
+		sudo apt-get install python3-tk; \
+	fi; \
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
-	@echo "Nothing to uninstall."
+	@echo $(YELLOW)"\n Checking tkinter..."$(NOCOLOR)
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo $(YELLOW)"\n - Uninstalling tkinter..."$(NOCOLOR); \
+		sudo apt-get remove python3-tk; \
+		sudo apt autoremove -y; \
+	else \
+		echo " - Uninstall cancelled. Requirement is not installed."; \
+	fi; \
 		
 
 .PHONY: help
