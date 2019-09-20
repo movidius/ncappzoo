@@ -41,24 +41,27 @@ def parse_args():
 
     parser = argparse.ArgumentParser(description = 'Face recognition using \
                          Intel® Neural Compute Stick 2.' )
-    parser.add_argument( '--fdm', metavar = 'face detection model IR',
+    parser.add_argument( "--fd_model", metavar = 'face detection model IR',
                         type=str, default = 'face-detection-retail-0004.xml', 
                         help = 'Absolute path to the face detection neural network IR file.')
-    parser.add_argument( '--fnm', metavar = 'facenet model IR',
+    parser.add_argument( "--facenet_model",  metavar = 'facenet model IR',
                         type=str, default = '20180408-102900.xml', 
                         help = 'Absolute path to the facenet neural network IR file.')
     parser.add_argument( '--images_dir', '--id',  metavar = 'validated images folder', 
                         type=str, default = './validated_faces/',
                         help = 'Absolute path to the validated root images.')
-    parser.add_argument( '--fmt', '--face_match_threshold', metavar = 'face match threshold', 
+    parser.add_argument( '--face_match_threshold', metavar = 'face match threshold', 
                         type=float, default = 1.10,
                         help = 'Used when comparing face feature vectors. If the difference between all known feature vectors and a new face feature vector is greater than this number, the face is categorized as an unknown face.')
-    parser.add_argument( '--fdt', '--face_detection_threshold', metavar = 'face detection threshold', 
+    parser.add_argument( '--face_detection_threshold', metavar = 'face detection threshold', 
                         type=float, default = 0.50,
                         help = 'Used to filter out all face detection scores lowers than this number.')
     parser.add_argument( '-d', '--device', metavar = 'Device', 
                         type=str, default = 'MYRIAD',
                         help = 'The hardware device plugin to use for inference.')
+    parser.add_argument( '-l', metavar = 'CPU extension', 
+                        type=str, default = None,
+                        help = 'The path of the CPU extension.')
     parser.add_argument( '--cam_width', metavar = 'cam resolution width', 
                         type=int, default = 640,
                         help = 'Camera capture resolution width. default=640.')
@@ -265,11 +268,13 @@ def get_validated_faces(fd, fn, validated_person_images, face_detection_threshol
 
 
 
-def get_network_information(ie, xml, device):
+def get_network_information(ie, xml, device, cpu_ext_path):
     ''' 
     Reads in xml and bin files and saves all relavent network information for later use.
     Returns a My_network object that includes the ExecutableNetwork object, the network input node name, the network output node name, the network input width, and the network input height.
     '''
+    if device == 'CPU' and cpu_ext_path:
+        ie.add_extension(cpu_ext_path, "CPU")
     # Read the network xml and bin files
     net = IENetwork(model = xml, weights = xml[:-3] + 'bin')
     # Get the network input node/layer names
@@ -482,20 +487,21 @@ def main():
     
     ARGS = parse_args().parse_args()
     validated_images_dir = ARGS.images_dir
-    fd_xml = ARGS.fdm
-    facenet_xml = ARGS.fnm
+    fd_xml = ARGS.fd_model
+    facenet_xml = ARGS.facenet_model
     device = ARGS.device
-    face_detection_threshold = ARGS.fdt
-    face_match_threshold = ARGS.fmt
+    face_detection_threshold = ARGS.face_detection_threshold
+    face_match_threshold = ARGS.face_match_threshold
     cam_width = ARGS.cam_width
     cam_height = ARGS.cam_height
     cam_index = ARGS.cam_source
+    cpu_ext_path = ARGS.l
 
     ie = IECore() # Inference Engine Core object
-    # get the network parameters for the face detection network    
-    my_fd_network = get_network_information(ie, fd_xml, device)
+    # get the network parameters for the face detection network 
+    my_fd_network = get_network_information(ie, fd_xml, device, cpu_ext_path)
     # get the network parameters for facenet
-    my_facenet_network = get_network_information(ie, facenet_xml, device)
+    my_facenet_network = get_network_information(ie, facenet_xml, device, cpu_ext_path)
 
     # Read all of the person images from the validated faces folder. 
     validated_person_images = read_all_validated_images(validated_images_dir)

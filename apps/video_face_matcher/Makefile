@@ -16,6 +16,8 @@ APP_RELATIVE_DIR = ../../apps/video_face_matcher
 
 APP_NAME = video_face_matcher
 
+CPU_EXT_PATH = ${INTEL_OPENVINO_DIR}/deployment_tools/inference_engine/lib/intel64/libcpu_extension_avx2.so
+
 .PHONY: all
 all: deps data
 
@@ -65,7 +67,7 @@ run: run_py
 
 .PHONY: run_py
 run_py: data deps
-	@echo $(YELLOW) '\n'${APP_NAME}": Running Python sample..." $(NOCOLOR)
+	@echo $(YELLOW) '\n'${APP_NAME}": Running Python sample for Myriad..." $(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
@@ -84,6 +86,28 @@ run_py: data deps
 	fi
 	python3 ${APP_NAME}.py
 
+
+.PHONY: run_cpu
+run_cpu: data deps
+	@echo $(YELLOW) '\n'${APP_NAME}": Running Python sample for CPU..." $(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
+	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+	then \
+		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
+		exit 1 ; \
+	else \
+		echo "Intel OpenVINO environment is already set!" ; \
+	fi
+	@echo "Checking tkinter..."
+	@if $(shell) ${CHECK_IMAGETK} 2> /dev/null; \
+	then \
+		echo " - tkinter is already installed.\n"; \
+	else \
+		echo $(YELLOW)" - tkinter is not installed. Please run 'make install-reqs' to install all required packages. "$(NOCOLOR); \
+		exit 1; \
+	fi
+	python3 ${APP_NAME}.py -d=CPU -l=${CPU_EXT_PATH}
+	
 
 .PHONY: install-reqs
 install-reqs: 

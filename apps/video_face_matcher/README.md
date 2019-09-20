@@ -25,8 +25,8 @@ To determine a match, the **FACE_MATCH_THRESHOLD** value is used.  You might wan
 
 The provided Makefile does the following:
 1. Makes the facenet IR file from the ncappzoo/networks/facenet example and copies it to the base directory of this project.
-1. Makes the face_detection_retail_0004 IR file from the ncappzoo/networks/face_detection_retail_0004 example and copies it to the base directory of this project.
-2. Runs the provided video_face_matcher.py program that creates a GUI window which shows the camera stream and match/not match status.
+2. Makes the face_detection_retail_0004 IR file from the ncappzoo/networks/face_detection_retail_0004 example and copies it to the base directory of this project.
+3. Runs the provided video_face_matcher.py program that creates a GUI window which shows the camera stream and match/not match status.
 
 ## Prerequisites
 This program requires:
@@ -35,6 +35,8 @@ This program requires:
 - OpenVINO 2019 R2 or greater
 - tkinter
 
+## How to run
+Open a terminal at the project root folder and run the command **make run**. The application uses the MYRIAD plugin as the default device. You can also run it on CPU by using the command **make run_cpu**.
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
