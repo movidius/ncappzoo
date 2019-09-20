@@ -8,6 +8,7 @@ import sys
 import numpy
 import cv2
 import os
+import argparse
 from tkinter import *
 
 from Face_detection_results import *
@@ -20,30 +21,82 @@ RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 YELLOW = '\033[1;33m'
 
-VALIDATED_IMAGES_DIR = './validated_faces/'
-
-facenet_xml = "20180408-102900.xml"
-fd_xml = "face-detection-retail-0004.xml"
-
-DEVICE = "MYRIAD"
-
+validated_images_dir = None
 # name of the opencv window
 CV_WINDOW_NAME = "video_face_matcher"
 
-CAMERA_INDEX = 0
-REQUEST_CAMERA_WIDTH = 640
-REQUEST_CAMERA_HEIGHT = 480
-
-# the same face will return 0.0
-# different faces return higher numbers
-# this is NOT between 0.0 and 1.0
-FACE_MATCH_THRESHOLD = 1.10
-FACE_DETECTION_THRESHOLD = 0.50
-
 FONT_SCALE = 1
 FONT_THICKNESS = 2
+CANVAS_HEIGHT = 100
+CANVAS_WIDTH = 400
+
 mouse_down = False
-entry = None
+user_input = None
+
+
+def parse_args():
+    '''
+    Parses arguments from the command line
+    '''
+
+    parser = argparse.ArgumentParser(description = 'Face recognition using \
+                         Intel® Neural Compute Stick 2.' )
+    parser.add_argument( '--fdm', metavar = 'face detection model IR',
+                        type=str, default = 'face-detection-retail-0004.xml', 
+                        help = 'Absolute path to the face detection neural network IR file.')
+    parser.add_argument( '--fnm', metavar = 'facenet model IR',
+                        type=str, default = '20180408-102900.xml', 
+                        help = 'Absolute path to the facenet neural network IR file.')
+    parser.add_argument( '--images_dir', '--id',  metavar = 'validated images folder', 
+                        type=str, default = './validated_faces/',
+                        help = 'Absolute path to the validated root images.')
+    parser.add_argument( '--fmt', '--face_match_threshold', metavar = 'face match threshold', 
+                        type=float, default = 1.10,
+                        help = 'Used when comparing face feature vectors. If the difference between all known feature vectors and a new face feature vector is greater than this number, the face is categorized as an unknown face.')
+    parser.add_argument( '--fdt', '--face_detection_threshold', metavar = 'face detection threshold', 
+                        type=float, default = 0.50,
+                        help = 'Used to filter out all face detection scores lowers than this number.')
+    parser.add_argument( '-d', '--device', metavar = 'Device', 
+                        type=str, default = 'MYRIAD',
+                        help = 'The hardware device plugin to use for inference.')
+    parser.add_argument( '--cam_width', metavar = 'cam resolution width', 
+                        type=int, default = 640,
+                        help = 'Camera capture resolution width. default=640.')
+    parser.add_argument( '--cam_height', metavar = 'cam resolution height', 
+                        type=int, default = 480,
+                        help = 'Camera capture resolution height. default=480.')
+    parser.add_argument( '--cam_source', metavar = 'cam source index v4linux', 
+                        type=int, default = 0,
+                        help = 'Camera source index. Default = 0.')
+    return parser
+
+
+
+def display_info(validated_processed_faces, fd_xml, facenet_xml, face_match_threshold, face_detection_threshold, req_cam_width, req_cam_height, device):
+    '''
+    Displays information about the model and faces
+    '''
+    num_faces = len(validated_processed_faces)
+    name_list = {}
+    for face in validated_processed_faces:
+        if face.name not in name_list:
+            name_list[face.name] = 1
+        else:
+            name_list[face.name] = name_list[face.name] + 1
+            
+    print("\n ------------------ " + YELLOW + "video_face_matcher" + NOCOLOR + " ------------------\n")
+    print(YELLOW + " - Device: " + NOCOLOR + device)
+    print(YELLOW + " - face detection XML: " + NOCOLOR + fd_xml)
+    print(YELLOW + " - facenet XML: " + NOCOLOR + facenet_xml)
+    print(YELLOW + " - Face Match Threshold: " + NOCOLOR + str(face_match_threshold))
+    print(YELLOW + " - Face Detection Threshold: " + NOCOLOR + str(face_detection_threshold))
+    print(YELLOW + " - Camera resolution: " + NOCOLOR + str(req_cam_width) + " x " + str(req_cam_height))
+    print("\n - Validated faces database info")
+    print(YELLOW + " - Number of validated faces: " + NOCOLOR + str(num_faces))
+    for name, image_count in name_list.items():
+        print(YELLOW + "   - Person name: " + NOCOLOR + name + YELLOW + "   image count: " + NOCOLOR + str(image_count))
+    print("\n --------------------------------------------------------\n")
+
 
 
 def run_inference(image_to_classify, exec_net, input_node_name, output_node_name):
@@ -54,6 +107,7 @@ def run_inference(image_to_classify, exec_net, input_node_name, output_node_name
     '''
     results = exec_net.infer({input_node_name: image_to_classify})
     return results[output_node_name]
+
 
 
 def overlay_on_image(display_image, matching, box_left, box_top, box_right, box_bottom, match_text):
@@ -84,6 +138,7 @@ def overlay_on_image(display_image, matching, box_left, box_top, box_right, box_
                       (0, 0, 255), rect_width)
 
 
+
 def preprocess_image(src, network_input_w, network_input_h):
     '''
     Preprocesses the image by resizing the image, doing a transpose and reshaping the tensor.
@@ -98,6 +153,7 @@ def preprocess_image(src, network_input_w, network_input_h):
     return preprocessed_image
 
 
+
 def face_match(face1_output, face2_output):
     ''' 
     Compares two feature vectors by taking the sum of the squared differences.
@@ -105,7 +161,7 @@ def face_match(face1_output, face2_output):
     Returns the total difference between the vectors or 99 if the length of the faces don't match.
     '''
     if (len(face1_output) != len(face2_output)):
-        print('length mismatch in face_match')
+        print(' length mismatch in face_match')
         return 99
     total_diff = 0
     # Sum of all the squared differences
@@ -115,8 +171,8 @@ def face_match(face1_output, face2_output):
 	# Now take the sqrt to get the L2 difference
     total_diff = numpy.sqrt(total_diff)
     #print(' Total Difference is: ' + str(total_diff))
-    
     return total_diff
+
 
 
 def check_key_exit_event(raw_key):
@@ -127,14 +183,13 @@ def check_key_exit_event(raw_key):
     return True
 
 
-def fd_post_processing(fd_results, frame, image_h, image_w):
+
+def fd_post_processing(fd_results, frame, image_h, image_w, detection_threshold):
     ''' 
     Performs face detection retail 0004 network post processing
     
     Returns a list of Face_detection_result objects that include the cropped face OpenCV Mat and bounding box coordinates.
     '''
-    global FACE_DETECTION_THRESHOLD
-    detection_threshold = FACE_DETECTION_THRESHOLD
     detected_faces = []
     
     for face_num, detection_result in enumerate(fd_results[0][0]):
@@ -152,17 +207,19 @@ def fd_post_processing(fd_results, frame, image_h, image_w):
     return detected_faces
 
 
-def read_all_validated_images():
+
+def read_all_validated_images(validated_images_dir):
     '''
     Reads in image files of people and saves the OpenCV Mat. Also saves their name.
     
     Returns a list of Face_profile objects that include the person's name, image path, and OpenCV Mat.
     '''
+    print("Reading validated images...")
     names_images_mats = []
-    for root, sub_dirs, files in os.walk(VALIDATED_IMAGES_DIR):
+    for root, sub_dirs, files in os.walk(validated_images_dir):
         if len(files) > 0:
             for images in files:
-                person_name = root[len(VALIDATED_IMAGES_DIR):]
+                person_name = root[len(validated_images_dir):]
                 file_name = str(root) + "/" + str(images)
                 image_mat = cv2.imread(file_name)
                 names_images_mats.append(Person_profile(name=person_name, image_path=file_name, image_mat=image_mat))
@@ -170,13 +227,15 @@ def read_all_validated_images():
     return names_images_mats
 
 
-def get_validated_faces(fd, fn, validated_person_images):
+
+def get_validated_faces(fd, fn, validated_person_images, face_detection_threshold):
     '''
     Runs inferences on images to crop out faces using the face_detection_retail_0004 network. Then using those faces as input, run inferences using the facenet network to get a feature vector for each face. 
     
     Returns a list of Face_profile(s) that include the person's name, image path, and a feature vector.
     '''
     # Preprocess all of the face mats, then run an inference on all of the faces, then save all of the feature vectors
+    print("Loading validated faces...")
     valid_processed_faces = []
     for person_image in validated_person_images:
         # Preprocess a person image
@@ -189,7 +248,7 @@ def get_validated_faces(fd, fn, validated_person_images):
         image_width = person_image.image_mat.shape[1]
         
         # Do post processing on the face detection results. This will return a face mat and bbox coords if faces were found.
-        detected_faces = fd_post_processing(fd_results, person_image.image_mat, image_height, image_width)
+        detected_faces = fd_post_processing(fd_results, person_image.image_mat, image_height, image_width, face_detection_threshold)
         
         # We may have found a face, so lets run facenet to get the feature vector
         if (len(detected_faces) > 0):
@@ -205,7 +264,8 @@ def get_validated_faces(fd, fn, validated_person_images):
     return valid_processed_faces
 
 
-def get_network_information(ie, xml):
+
+def get_network_information(ie, xml, device):
     ''' 
     Reads in xml and bin files and saves all relavent network information for later use.
     Returns a My_network object that includes the ExecutableNetwork object, the network input node name, the network output node name, the network input width, and the network input height.
@@ -217,7 +277,7 @@ def get_network_information(ie, xml):
     output_node_name = next(iter(net.outputs))
 
     # Load the network and get the network shape information
-    exec_net = ie.load_network(network = net, device_name = DEVICE)
+    exec_net = ie.load_network(network = net, device_name = device)
     n, c, input_h, input_w = net.inputs[input_node_name].shape
     # Save the network information that we need 
     my_network = My_network(exec_net = exec_net,
@@ -228,7 +288,8 @@ def get_network_information(ie, xml):
     return my_network
 
 
-def run_camera(valid_processed_faces, fd, fn):
+
+def run_camera(valid_processed_faces, fd, fn, face_detection_threshold, face_match_threshold, req_cam_width, req_cam_height, cam_index):
     '''
     Read frames from the camera and detect faces in the camera frame by running an inference on an image using a face detection network. Afterwards run an inference on the detected faces using facenet to get a feature vector for each face. Finally, compare the feature vector of all detected faces to the feature vectors of the valid faces to find the best match if it exists.
     
@@ -255,14 +316,10 @@ def run_camera(valid_processed_faces, fd, fn):
         
     Returns None
     '''
-    print("------------------ " + YELLOW + "video_face_matcher" + NOCOLOR + " ------------------\n")
-    print(" - Face Match Threshold: " + YELLOW + str(FACE_MATCH_THRESHOLD) + NOCOLOR)
-    print("\n---------------------------------------------\n")
-    
     # Camera set up
-    camera_device = cv2.VideoCapture(CAMERA_INDEX)
-    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, REQUEST_CAMERA_WIDTH)
-    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, REQUEST_CAMERA_HEIGHT)
+    camera_device = cv2.VideoCapture(cam_index)
+    camera_device.set(cv2.CAP_PROP_FRAME_WIDTH, req_cam_width)
+    camera_device.set(cv2.CAP_PROP_FRAME_HEIGHT, req_cam_height)
 
     actual_camera_width = camera_device.get(cv2.CAP_PROP_FRAME_WIDTH)
     actual_camera_height = camera_device.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -289,7 +346,7 @@ def run_camera(valid_processed_faces, fd, fn):
         image_width = vid_image.shape[1]
         frame_from_vid = vid_image.copy()
         # Post processing to get the cropped face OpenCV Mat and bounding box coordinates
-        detected_faces = fd_post_processing(fd_results, frame_from_vid, image_height, image_width)
+        detected_faces = fd_post_processing(fd_results, frame_from_vid, image_height, image_width, face_detection_threshold)
         
         # Run an inference on each cropped face mat and compare it with all known validated feature vectors
         if (len(detected_faces) > 0):
@@ -313,13 +370,13 @@ def run_camera(valid_processed_faces, fd, fn):
                     if (total_difference < best_score):
                         match_text = valid_face.name
                         best_score = total_difference
-                # Check to see if the best score was lower than the FACE_MATCH_THRESHOLD. lower is better.
-                if (best_score <= FACE_MATCH_THRESHOLD):
+                # Check to see if the best score was lower than the face match_threshold. lower is better.
+                if (best_score <= face_match_threshold):
                     matching = True
                     current_face.match = True
                     text_color = (0, 255, 0)
                         
-                if (best_score > FACE_MATCH_THRESHOLD):
+                if (best_score > face_match_threshold):
                     matching = False
                     match_text = "Unknown"
                     text_color = (0, 255, 0)
@@ -334,7 +391,7 @@ def run_camera(valid_processed_faces, fd, fn):
         # the window via the X button
         prop_val = cv2.getWindowProperty(CV_WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO)
         if (prop_val < 0.0):
-            print('window closed')
+            print(' Window closed')
             break
 
         # display the results and wait for user to hit a key
@@ -342,29 +399,31 @@ def run_camera(valid_processed_faces, fd, fn):
         raw_key = cv2.waitKey(1)
         if (raw_key != -1):
             if (check_key_exit_event(raw_key) == False):
-                print('user pressed Q')
+                print(' User pressed Q')
                 break
         # handles mouse click events
         cv2.setMouseCallback(CV_WINDOW_NAME, register_new_face, param=(detected_faces, valid_processed_faces))
 
 
-def get_name(textentry, tk_window):
+
+def save_name(textentry, tk_window):
     '''
     Gets the user input from the tkinter window.
     Returns None
     '''
-    global entry
-    # Save the user's entry
-    entry = textentry.get()
+    global user_input
+    # Save the user's input
+    user_input = textentry.get()
     # Close the window
     tk_window.destroy()
+
     
 
 def register_new_face(event, x, y, flags, param):
     '''
     Handles the mouse click event to add a face to the valid faces.
     '''
-    global mouse_down, entry
+    global mouse_down, user_input
     detected_faces=param[0]
     validated_faces=param[1]
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -375,62 +434,81 @@ def register_new_face(event, x, y, flags, param):
         mouse_down = False
         for face_num, current_face in enumerate(detected_faces):
             # Checks to see mouse click was within the bounding box of any of the detected faces
-            if x > current_face.box_left and x < current_face.box_right and y > current_face.box_top and y < current_face.box_bottom and current_face.match == False:
+            if x > current_face.box_left and x < current_face.box_right and y > current_face.box_top and y < current_face.box_bottom:
+                print(" Please enter the person's name in the new window.")
                 # tkinter window set up
                 tk_window = Tk()
-                HEIGHT = 100
-                WIDTH = 400
+                tk_window.title("video_face_matcher: Name Input")
+
                 # Creates the canvas for the window
-                canvas = Canvas(tk_window, height=HEIGHT, width=WIDTH)
+                canvas = Canvas(tk_window, height=CANVAS_HEIGHT, width=CANVAS_WIDTH)
                 canvas.pack()
                 # Creates the frame and places it in the canvas
                 frame = Frame(tk_window)
                 frame.place(relwidth=1.0, relheight=1.0)
                 # Creates the label and places it in the frame
-                label = Label(frame, text="Enter the person's name: ")
-                label.pack(side='left')
+                prompt_label = Label(frame, text="Enter the person's name: ")
+                prompt_label.pack(side='left')
                 # Creates the text entry box and places it in the frame
                 textentry = Entry(frame)
                 textentry.pack(side='left')
                 # Creates a button and places it in the frame
-                button = Button(frame, text="Submit", command=lambda: get_name(textentry, tk_window))
-                button.pack(side='right')
+                submit_button = Button(frame, text="Submit", command=lambda: save_name(textentry, tk_window))
+                submit_button.pack(side='right')
                 # Displays window
-                window.mainloop()
+                tk_window.mainloop()
                 
                 # Saves the image to disk and adds the feature vector to the valid faces
-                if entry is not None:
-                    os.system("mkdir -p validated_faces/" + entry)
+                if user_input is not None:
+                    os.system("mkdir -p " + validated_images_dir + "/" + user_input)
                     max_images_per_person = 100
                     for number in range(0, max_images_per_person):
-                        new_file_path = "validated_faces/" + entry + "/" + entry + str(number) + ".jpg"
+                        new_file_path = validated_images_dir + "/" + user_input + "/" + user_input + str(number) + ".jpg"
                         if not (os.path.exists(new_file_path)):
                             cv2.imwrite(new_file_path, current_face.face_mat)
-                            validated_faces.append(Face_profile(entry, new_file_path, current_face.feature_vector))
-                            print("New image file and valid face added for:", entry)
+                            validated_faces.append(Face_profile(user_input, new_file_path, current_face.feature_vector))
+                            print(" New image file and valid face added for: " + user_input + '\n')
                             break
+                else:
+                    print(" No name entered. Skipping registration of new face.\n")
         
+
 
 def main():
     ''' 
     Does all the work!
     '''
+    global validated_images_dir
     
+    ARGS = parse_args().parse_args()
+    validated_images_dir = ARGS.images_dir
+    fd_xml = ARGS.fdm
+    facenet_xml = ARGS.fnm
+    device = ARGS.device
+    face_detection_threshold = ARGS.fdt
+    face_match_threshold = ARGS.fmt
+    cam_width = ARGS.cam_width
+    cam_height = ARGS.cam_height
+    cam_index = ARGS.cam_source
+
     ie = IECore() # Inference Engine Core object
     # get the network parameters for the face detection network    
-    my_fd_network = get_network_information(ie, fd_xml)
+    my_fd_network = get_network_information(ie, fd_xml, device)
     # get the network parameters for facenet
-    my_facenet_network = get_network_information(ie, facenet_xml)
+    my_facenet_network = get_network_information(ie, facenet_xml, device)
 
     # Read all of the person images from the validated faces folder. 
-    validated_person_images = read_all_validated_images()
-    print("number of validated images: ", len(validated_person_images))
+    validated_person_images = read_all_validated_images(validated_images_dir)
     
     # Get all of the feature vectors from the valid person images
-    valid_processed_faces = get_validated_faces(my_fd_network, my_facenet_network, validated_person_images)
+    valid_processed_faces = get_validated_faces(my_fd_network, my_facenet_network, validated_person_images, face_detection_threshold)
 
+    # Displays information
+    display_info(valid_processed_faces, fd_xml, facenet_xml, face_detection_threshold, face_match_threshold, cam_width, cam_height, device)
+    
     # Run the inferences on frames from the camera and make comparisons vs valid feature vectors
-    run_camera(valid_processed_faces, my_fd_network, my_facenet_network)
+    run_camera(valid_processed_faces, my_fd_network, my_facenet_network, face_detection_threshold, face_match_threshold, cam_width, cam_height, cam_index)
+    
     print(" Finished.\n")
 
 
