@@ -7,7 +7,11 @@ The provided video_face_matcher.py python app starts a webcam and shows the came
 ![](screen_shot.png)
 
 ## Important Application details
-To make the program recognize your face or any face that you would like, add a sub-folder with images of the person you'd like to recognize to the validated_faces folder.  Make sure to name the sub-folder with the same name as the person you'd like to identify.  The application will use the folder's name when referring to the person. The names of the files inside of the named folder can be any name.  
+There are two ways to make the app recognize any face you'd like. 
+
+**Method one**: Run the app and use the mouse pointer to click on an unknown face. You will be prompted to enter the user's name. This will create an image on the disk in the validated_faces fodler and add the feature vector to the valid faces.
+
+**Method two**: Add a sub-folder with images of the person you'd like to recognize to the validated_faces folder.  Make sure to name the sub-folder with the same name as the person you'd like to identify.  The application will use the folder's name when referring to the person. The names of the files inside of the named folder can be any name.  
 
 **Note**: See the example inside of the validated_faces folder after running the command **make**. 
 
