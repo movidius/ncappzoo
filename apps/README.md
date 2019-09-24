@@ -29,7 +29,7 @@ Object detection applications make use of one of the [object detection networks]
 |[birds](birds/README.md) | Python<br>Caffe Tiny Yolo, GoogLeNet<br>Detects and identifies birds in photos by using Yolo Tiny to identify birds in general and then GoogLeNet to further classify them. Displays images with overlayed rectangles bird classification. |![](birds/screen_shot.jpg)|
 |[chef_ai](chef_ai/README.md) |Python / Flask<br>SSD Inception v2<br> Detects food items within an image or from the camera and suggests recipes for those items. |TBD    |
 |[realsense_object_distance_detection](realsense_object_distance_detection/README.md) | C++<br>Caffe SSD Mobilenet<br>Detects different classes of objects (including people and cars) and uses the Intel Realsense camera to detect the distance to that object. |![](realsense_object_distance_detection/screen_shot.jpg)|
-
+|[driving_pi](driving_pi/README.md) | Python<br>Multiple Networks<br>Autonomous LEGO car driving by detecting road and traffic light through a camera. car will stop once see the red light and moves forward on green. It also slowing speed on the yellow light. In this demo, it uses both networks, object detection for traffic lights and road classification for detecting road.|![](driving_pi/screen_shot.jpg)|
 ## Misc Applications
 Miscellaneous applications use the OpenVINO toolkit in various ways that don't fit into any of the above categories but can still be interesting.
 

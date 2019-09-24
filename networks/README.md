@@ -10,6 +10,7 @@ This directory should be a preferred location for neural networks rather than th
 |[alexnet](alexnet/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[googlenet_v1](googlenet_v1/README.md) |BAIR/BLVC GoogleNet is a network based on [googlenet_v1](https://arxiv.org/abs/1409.4842), the winner of ILSVRC 2014, that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[squeezenet_v1.0](squeezenet_v1.0/README.md) |Accuracy similar to AlexNet with many fewer parameters and small model size as described int the [squeezenet paper](https://arxiv.org/abs/1602.07360). Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
+|[ssd_inception_v2_traffic_light](ssd_inception_v2_traffic_light/README.md) |Single Shot Detector with inception v2 that was trained on 2 different labels on traffic light (green and red).  |
 
 # Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
