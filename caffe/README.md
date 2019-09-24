@@ -5,12 +5,11 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 |Image Classification Network| Description |
 |---------------------|-------------|
 |[ResNet-50](ResNet-50/README.md) |[Deep Residual network](https://arxiv.org/pdf/1512.03385.pdf)  with 50 layers that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
-|[SqueezeNet](SqueezeNet/README.md) |Accuracy similar to AlexNet with many fewer parameters and small model size as described int the [SqueezeNet paper](https://arxiv.org/abs/1602.07360). Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 
 # Caffe Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
 |---------------------|-------------|
-|[SSD_Mobilenet](SSD_Mobilenet/README.md)|MobileNet Single Shot Detector takes an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications. |
+
 
 # Caffe Misc Networks for Neural Compute devices
 |Network| Description |
