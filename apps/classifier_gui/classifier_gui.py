@@ -35,7 +35,7 @@ import simple_classifier_py.run as simple_classifier_py
 
 GOOGLENET_IR =  '../../networks/googlenet_v1/googlenet-v1.xml'
 ALEXNET_IR =  '../../networks/alexnet/alexnet.xml'
-SQUEEZENET_IR =  '../../caffe/SqueezeNet/squeezenet1.0.xml'
+SQUEEZENET_IR =  '../../networks/squeezenet_v1.0/squeezenet1.0.xml'
 
 LABELS_FILE = '../../data/ilsvrc12/synset_labels.txt'
 
