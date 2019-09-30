@@ -4,7 +4,7 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # Caffe Image Classification Networks for Neural Compute devices
 |Image Classification Network| Description |
 |---------------------|-------------|
-|[ResNet-50](ResNet-50/README.md) |[Deep Residual network](https://arxiv.org/pdf/1512.03385.pdf)  with 50 layers that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
+
 
 # Caffe Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
