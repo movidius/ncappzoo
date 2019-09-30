@@ -4,7 +4,6 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # TensorFlow Image Classification Networks for Neural Compute devices
 |Image Classification Network| Description |
 |---------------------|-------------|
-|[inception_v1](inception_v1/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[inception_v2](inception_v2/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[inception_v3](inception_v3/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[inception_v4](inception_v4/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
