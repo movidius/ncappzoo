@@ -31,4 +31,4 @@ This directory should be a preferred location for neural networks rather than th
 # Misc Networks for Neural Compute devices
 |Network| Description |
 |---------------------|-------------|
-|TBD |TBD |
+|[facenet](facenet/README.md) |FaceNet is a nework that is trained to find and quantify landmarks on faces in general.  By comparing the face landmark quantification values (network inference output) on two images, it is possible to determine how likely the two faces are of the same person.  This is based on [work by David Sandberg](https://github.com/davidsandberg/facenet).  |
