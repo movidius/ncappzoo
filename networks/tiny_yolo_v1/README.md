@@ -15,7 +15,7 @@ The provided Makefile does the following
 
 ## Model Information
 ### Inputs
- - name: 'data', shape: [1x3x448x448], Expected color order is BGR.
+ - name: 'data', shape: [1x3x448x448], Expected color order is BGR. Original network expects RGB, but for this sample, the IR is compiled with the --reverse_input_channels option to convert the IR to expect the BGR color order.
 ### Outputs 
  - name: 'prob', shape: [1, 1470].
 

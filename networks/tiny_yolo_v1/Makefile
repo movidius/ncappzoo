@@ -122,9 +122,9 @@ help:
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content\n"
 	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
-	@echo "  This network does image classification and is able to classify 1000 different items.";
+	@echo "  This network does object detection on 20 different classes.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
-	@echo "  name: 'data', shape: [1x3x448x448], Expected color order is BGR.";
+	@echo "  name: 'data', shape: [1x3x448x448], Expected color order is BGR after optimization.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
 	@echo "  name: 'fc9', shape: [1, 1470]. See README for more output information.\n"
 

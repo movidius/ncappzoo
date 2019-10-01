@@ -8,8 +8,7 @@ NOCOLOR = '\033[0m'
 MNIST_BIN_FILENAME = mnist_inference.bin
 MNIST_XML_FILENAME = mnist_inference.xml
 
-MODEL_RELATIVE_DIR = ../../tensorflow/mnist
-PROJECT_RELATIVE_DIR = ../../apps/mnist_calc
+MODEL_RELATIVE_DIR = ../../networks/mnist
 
 # name of the directory and the base name of the main python file (minus the .py extension)
 APP_NAME = mnist_calc
