@@ -4,7 +4,7 @@ This directory contains multiple subdirectories. Each subdirectory contains soft
 # TensorFlow Image Classification Networks for Neural Compute devices
 |Image Classification Network| Description |
 |---------------------|-------------|
-|[mobilenets](mobilenets/README.md) |The mobilenets ([as described in the MobileNets Paper](https://arxiv.org/abs/1704.04861)) are small, low-latency, low-power Convolutional Neural Networks for Mobile Vision Applications.  They are parameterized for a variety of different uses.  Multiple trained networks with different parmameter values are compiled in this directory. |
+|TBD|TBD|
 
 # TensorFlow Object Detection Networks for Neural Compute devices
 |Network| Description |
