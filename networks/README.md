@@ -15,6 +15,7 @@ This directory should be a preferred location for neural networks rather than th
 |[inception_v4](inception_v4/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[resnet_50](resnet_50/README.md) |[Deep Residual network](https://arxiv.org/pdf/1512.03385.pdf)  with 50 layers that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[mnist](mnist/README.md) |Network that classifies handwritten digits.  This network is based on  tensorflow mnist_deep.  This project also includes an option to train the network yourself.|
+|[mobilenets](mobilenets/README.md) |The mobilenets ([as described in the MobileNets Paper](https://arxiv.org/abs/1704.04861)) are small, low-latency, low-power Convolutional Neural Networks for Mobile Vision Applications.  They are parameterized for a variety of different uses.  Multiple trained networks with different parmameter values are compiled in this directory. |
 |[squeezenet_v1.0](squeezenet_v1.0/README.md) |Accuracy similar to AlexNet with many fewer parameters and small model size as described int the [squeezenet paper](https://arxiv.org/abs/1602.07360). Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 
 
