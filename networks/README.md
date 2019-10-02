@@ -10,6 +10,8 @@ This directory should be a preferred location for neural networks rather than th
 |[alexnet](alexnet/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[googlenet_v1](googlenet_v1/README.md) |BAIR/BLVC GoogleNet is a network based on [googlenet_v1](https://arxiv.org/abs/1409.4842), the winner of ILSVRC 2014, that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[inception_v1](inception_v1/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
+|[inception_v2](inception_v2/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
+|[inception_v3](inception_v3/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[inception_v4](inception_v4/README.md) |Network that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[resnet_50](resnet_50/README.md) |[Deep Residual network](https://arxiv.org/pdf/1512.03385.pdf)  with 50 layers that classifies images based on the 1000 categories described in [Large Scale Visual Recognition Challenge 2012 (ILSVRC2012)](http://www.image-net.org/challenges/LSVRC/2012/). |
 |[mnist](mnist/README.md) |Network that classifies handwritten digits.  This network is based on  tensorflow mnist_deep.  This project also includes an option to train the network yourself.|
@@ -19,7 +21,7 @@ This directory should be a preferred location for neural networks rather than th
 # Object Detection Networks for Neural Compute devices
 |Object Detection Network| Description |
 |---------------------|-------------|
-|[face-detection-retail-0004](face-detection-retail-0004/README.md) |This is a nework that is trained to find faces in general.  [More information specific to this network is available.](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) |
+|[face_detection_retail_0004](face_detection_retail_0004/README.md) |This is a nework that is trained to find faces in general.  [More information specific to this network is available.](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) |
 |[ssd_inception_v2_gesture](ssd_inception_v2_gesture/README.md) |Single Shot Detector with inception v2 that was trained on 7 different 7 different hand gestures.  |
 |[ssd_inception_v2_food](ssd_inception_v2_food/README.md) |Single Shot Detector with inception v2 that was trained on 10 different foods.  |
 |[ssd_mobilenet_v1_caffe](ssd_mobilenet_v1_caffe/README.md)|MobileNet Single Shot Detector takes an image, detects the 20 PASCAL object classes as specified in the ([Visual Object Classes Challenges](http://host.robots.ox.ac.uk/pascal/VOC/)), their bounding boxes, and classifications. |
