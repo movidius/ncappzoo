@@ -8,12 +8,16 @@ NOCOLOR = '\033[0m'
 IMAGE = image.jpg
 
 ZOO_RELATIVE_DIR = ../../omz
+FACE_RELATIVE_DIR = ../face_detection_retail_0004
 MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
 MODEL_DOWNLOADER_FILENAME = downloader.py
 EMOTION_MODEL_ZOO_DIR = Retail/object_attributes/emotions_recognition/0003/dldt/INT8
 MODEL_FILE_NAME_BASE = emotions-recognition-retail-0003
 
-NETWORK_NAME = emotions_detection_retail_0004
+
+NETWORK_NAME = emotions_recognition_retail_0003
+FACE_NETWORK_NAME = face_detection_retail_0004
+
 
 CROP = 
 CROPPED_EMOTIONS_DIR =
@@ -38,9 +42,13 @@ model_zoo:
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cloning model zoo..."$(NOCOLOR)
 	(cd ${ZOO_RELATIVE_DIR}; make all;) 
 
+.PHONY: model_face
+model_face:
+	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Cloning model face detection..."$(NOCOLOR)
+	(cd ${FACE_RELATIVE_DIR}; make all;)
 
 .PHONY: get_ir
-get_ir:	model_zoo
+get_ir:	model_zoo model_face
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading IRs..."$(NOCOLOR);
 	@if [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.xml ] || [ -e ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}/${EMOTION_MODEL_ZOO_DIR}/${MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
@@ -122,4 +130,3 @@ clean:
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
-
