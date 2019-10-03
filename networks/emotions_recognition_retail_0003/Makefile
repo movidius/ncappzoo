@@ -13,7 +13,7 @@ MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
 MODEL_DOWNLOADER_FILENAME = downloader.py
 EMOTION_MODEL_ZOO_DIR = Retail/object_attributes/emotions_recognition/0003/dldt/INT8
 MODEL_FILE_NAME_BASE = emotions-recognition-retail-0003
-
+FACE_MODEL_FILE_NAME_BASE = face-detection-retail-0004
 
 NETWORK_NAME = emotions_recognition_retail_0003
 FACE_NETWORK_NAME = face_detection_retail_0004
@@ -34,7 +34,6 @@ deps: get_ir
 .PHONY: data
 data:
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading required data..."$(NOCOLOR)
-	test -f ${IMAGE} || ${GET_TEST_IMAGE}
 
 
 .PHONY: model_zoo
@@ -46,6 +45,8 @@ model_zoo:
 model_face:
 	@echo $(YELLOW)'\n'${FACE_NETWORK_NAME}": Cloning model face detection..."$(NOCOLOR)
 	(cd ${FACE_RELATIVE_DIR}; make all;)
+	cp ${FACE_RELATIVE_DIR}/${FACE_MODEL_FILE_NAME_BASE}.xml .; \
+	cp ${FACE_RELATIVE_DIR}/${FACE_MODEL_FILE_NAME_BASE}.bin .; \
 
 .PHONY: get_ir
 get_ir:	model_zoo model_face
@@ -130,3 +131,5 @@ clean:
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
+	rm -f ${FACE_MODEL_FILE_NAME_BASE}.bin
+	rm -f ${FACE_MODEL_FILE_NAME_BASE}.xml
