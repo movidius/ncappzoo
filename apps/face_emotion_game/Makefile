@@ -14,7 +14,7 @@ EMOTION_FILE_NAME_BASE = emotions-recognition-retail-0003
 APP_NAME = face_emotion_game
 
 .PHONY: all
-all: deps data compile_cpp
+all: deps data
 
 
 .PHONY: data
@@ -44,10 +44,11 @@ get_ir:
 		echo " - Making Emotion Recognition IRs...";\
 		(cd ${EMOTION_RELATIVE_DIR}; make get_ir;);\
 		echo " - Copying Emotion Recognition IR files to current folder..." ;\
+		mkdir src/data ;\
+		mkdir src/data/emotions-recognition ;\
 		cp ${EMOTION_RELATIVE_DIR}/${EMOTION_FILE_NAME_BASE}.xml src/data/emotions-recognition/ ;\
 		cp ${EMOTION_RELATIVE_DIR}/${EMOTION_FILE_NAME_BASE}.bin src/data/emotions-recognition/ ;\
 	fi;\
-
 	@if [ -e ${FACE_GEN_MODEL_FILE_NAME_BASE}.xml ] && [ -e ${FACE_GEN_MODEL_FILE_NAME_BASE}.bin ] ;\
 	then \
 		echo " - Face detection model IR already exist in the project folder.";\
@@ -56,14 +57,21 @@ get_ir:
 		echo " - Making Face detection IRs...";\
 		(cd ${FACE_RELATIVE_DIR}; make get_ir;);\
 		echo " - Copying Face IR files to current folder..." ;\
+		mkdir src/data ;\
+		mkdir src/data/face-detection ;\
 		cp ${FACE_RELATIVE_DIR}/${FACE_FILE_NAME_BASE}.xml src/data/face-detection/ ;\
 		cp ${FACE_RELATIVE_DIR}/${FACE_FILE_NAME_BASE}.bin src/data/face-detection/ ;\
 	fi
 
 
-.PHONY:	compile_cpp
-compile_cpp:
-	@echo $(YELLOW)'\n'${APP_NAME}": Building the sample..."$(NOCOLOR)
+.PHONY: run
+run: run_py
+
+
+.PHONY: run_py
+run_py: deps data
+	@echo $(YELLOW)'\n'${NETWORK_NAME}": Running Python sample..."$(NOCOLOR)
+	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
 	then \
 		echo "Please initiate the Intel OpenVINO environment by going to the installation directory for openvino and running the setupvars.sh file in the bin folder." ; \
@@ -71,17 +79,7 @@ compile_cpp:
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
-	(mkdir -p build; cd build; cmake ..; make;)
-
-
-.PHONY: run
-run: run_cpp
-
-
-.PHONY: run_cpp
-run_cpp: deps data compile_cpp
-	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
-	(cd build; ./${APP_NAME}; cd ..;)
+	python3 ${APP_NAME}.py -m -fps;
 
 
 .PHONY: install-reqs
@@ -99,7 +97,7 @@ uninstall-reqs:
 .PHONY: help
 help:
 	@echo "\nPossible make targets: ";
-	@echo $(YELLOW)"  make run or run_cpp"$(NOCOLOR)"- runs the application";
+	@echo $(YELLOW)"  make run or run_py"$(NOCOLOR)"- runs the application";
 	@echo $(YELLOW)"  make help "$(NOCOLOR)"- shows this message";
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- makes everything needed to run but doesn't run";
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
@@ -114,9 +112,8 @@ help:
 
 clean:
 	@echo $(YELLOW)'\n'${APP_NAME}": Cleaning up files..."$(NOCOLOR);
-	rm -rf build
-	rm -f src/emotions-recognition/${EMOTION_RELATIVE_DIR}.xml;
-	rm -f src/emotions-recognition/${EMOTION_RELATIVE_DIR}.bin;
-	rm -f src/face-detection/${FACE_FILE_NAME_BASE}.xml;
-	rm -f src/face-detection/${FACE_FILE_NAME_BASE}.bin;
+	rm -f src/data/emotions-recognition/${EMOTION_FILE_NAME_BASE}.xml;
+	rm -f src/data/emotions-recognition/${EMOTION_FILE_NAME_BASE}.bin;
+	rm -f src/data/face-detection/${FACE_FILE_NAME_BASE}.xml;
+	rm -f src/data/face-detection/${FACE_FILE_NAME_BASE}.bin;
 
