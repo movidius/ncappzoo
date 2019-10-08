@@ -2,7 +2,7 @@
 ## Introduction
 The mnist network can be used for handwriting recognition for the digits 0-9.  
 
-This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R2 release.
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R3 release.
 
 The provided Makefile does the following
 
