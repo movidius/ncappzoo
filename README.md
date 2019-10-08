@@ -1,5 +1,5 @@
 # Neural Compute Application Zoo (ncappzoo) 
-[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R1)
+[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R2)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Welcome to the Neural Compute Application Zoo (ncappzoo). This repository is a place for any interested developers to share their projects (code and Neural Network content) that make use of the [Intel&reg; Neural Compute Stick 2 (Intel&reg; NCS 2)](https://software.intel.com/en-us/neural-compute-stick)  or the original [Intel&reg; Movidius&trade; Neural Compute Stick](https://software.intel.com/en-us/movidius-ncs) and the Deep Learning Deployment Toolkit (DLDT) portion of the [OpenVINO&trade; Toolkit](https://software.intel.com/en-us/openvino-toolkit).
