@@ -1,1 +1,1 @@
-This network has moved to [networks/mobilenet](../../networks/mobilenet).
+This network has moved to [networks/mobilenets](../../networks/mobilenets).
