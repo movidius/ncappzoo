@@ -1,1 +1,1 @@
-This network has moved to networks/mnist.
+This network has moved to [networks/inception_mnist](../../networks/mnist).
