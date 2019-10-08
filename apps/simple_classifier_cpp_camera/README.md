@@ -4,7 +4,7 @@ This application runs an inference on an image using [GoogLeNet](https://github.
 
 The provided Makefile does the following
 
-1. Downloads the Caffe prototxt file and makes few changes necessary to work with the Intel® Neural Compute Stick (NCS1/NCS2) and the OpenVINO toolkit (tested with version 2019 R2).
+1. Downloads the Caffe prototxt file and makes few changes necessary to work with the Intel® Neural Compute Stick (NCS1/NCS2) and the OpenVINO toolkit (tested with version 2019 R3).
 2. Downloads and generates the required ilsvrc12 data.
 3. Downloads the caffemodel weights file from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 3. Compiles the model to an IR (Intermediate Representation) format file using the Model Optimizer. An IR is a static representation of the model that is compatitible with the OpenVINO Inference Engine API. 
@@ -25,7 +25,7 @@ To run the example code do the following :
 ## Prerequisites
 This program requires:
 - 1 NCS device
-- OpenVINO 2019 R2 Toolkit
+- OpenVINO 2019 R3 Toolkit
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 - Web camera or USB camera.
 

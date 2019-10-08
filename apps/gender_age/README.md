@@ -23,7 +23,7 @@ When the application runs normally, another window should pop up and show the fe
 ## Prerequisites
 This program requires:
 - 1 NCS device
-- OpenVINO 2019 R2 Toolkit
+- OpenVINO 2019 R3 Toolkit
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 - A webcam (laptop or USB)
 

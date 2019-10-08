@@ -1,5 +1,5 @@
 # Neural Compute Application Zoo (ncappzoo) 
-[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R2-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R1)
+[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R1)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Welcome to the Neural Compute Application Zoo (ncappzoo). This repository is a place for any interested developers to share their projects (code and Neural Network content) that make use of the [Intel&reg; Neural Compute Stick 2 (Intel&reg; NCS 2)](https://software.intel.com/en-us/neural-compute-stick)  or the original [Intel&reg; Movidius&trade; Neural Compute Stick](https://software.intel.com/en-us/movidius-ncs) and the Deep Learning Deployment Toolkit (DLDT) portion of the [OpenVINO&trade; Toolkit](https://software.intel.com/en-us/openvino-toolkit).
@@ -61,7 +61,7 @@ The projects in the **master branch** depend on the Deep Learning Deployment Too
   - Python on all: https://software.intel.com/en-us/articles/python3-sbc-and-ncs2
 
 
-The projects in the ncappzoo work with both flavors of the OpenVINO&trade; Toolkit and unless oterwise specified in a project's README.md file all projects are based on the **OpenVINO Toolkit 2019 R2 release**.
+The projects in the ncappzoo work with both flavors of the OpenVINO&trade; Toolkit and unless oterwise specified in a project's README.md file all projects are based on the **OpenVINO Toolkit 2019 R3 release**.
 
 ### OpenCV Compatibility
 Some projects also rely on OpenCV, for these projects, the OpenCV from the OpenVINO release is the expected version.  Other versions may also work but are not tested an may require tweaks to get working.  

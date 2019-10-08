@@ -38,7 +38,7 @@ You should also see the image on which inference was performed.
 ## Prerequisites
 This program requires:
 - 1 NCS device
-- OpenVINO 2019 R2 Toolkit
+- OpenVINO 2019 R3 Toolkit
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 - Scikit-image
 - PIL (Python Imaging library) with Image and Imagetk modules
