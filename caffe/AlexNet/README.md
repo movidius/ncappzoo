@@ -1,1 +1,1 @@
-This network has moved to networks/alexnet.
+This network has moved to [networks/alexnet](../../networks/alexnet).

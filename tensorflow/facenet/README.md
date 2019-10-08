@@ -1,1 +1,1 @@
-This network has moved to networks/facenet
+This network has moved to [networks/facenet](../../networks/facenet).
