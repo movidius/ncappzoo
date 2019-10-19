@@ -10,12 +10,12 @@ APP_NAME = simple_classifier_py
 CLASSIFIER_RELATIVE_DIR = ../../apps/simple_classifier_py
 TEST_IMAGE_RELATIVE_DIR = ../../data/images
 LABELS_RELATIVE_DIR = ../../data/ilsvrc12
-MODEL_RELATIVE_DIR = ../../networks/googlenet_v1
+MODEL_RELATIVE_DIR = ../../networks/squeezenet_v1.0
 
 TEST_IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
 
-MODEL_FILE_NAME_BASE = googlenet-v1
+MODEL_FILE_NAME_BASE = squeezenet_v1.0
 
 
 .PHONY: all
@@ -38,9 +38,9 @@ compile_default_model:
 	@echo $(YELLOW)'\n'${APP_NAME}": Compiling the model to IR..."$(NOCOLOR)
 	@if [ -e ${MODEL_FILE_NAME_BASE}.bin ] && [ -e ${MODEL_FILE_NAME_BASE}.xml ]; \
 	then \
-		echo "- Googlenet IR files found. No need to compile."; \
+		echo "- squeezenet IR files found. No need to compile."; \
 	else \
-		echo "- Making googlenet IRs in googlenet project."; \
+		echo "- Making squeezenet IRs in squeezenet project."; \
 		(cd ${MODEL_RELATIVE_DIR}; make compile_model;); \
 		echo "- Copying IRs to project folder..."; \
 		(cd ${MODEL_RELATIVE_DIR}; cp ${MODEL_FILE_NAME_BASE}.bin ${CLASSIFIER_RELATIVE_DIR}; cp ${MODEL_FILE_NAME_BASE}.xml ${CLASSIFIER_RELATIVE_DIR};); \
