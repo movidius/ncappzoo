@@ -25,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description = 'Image classifier using \
                          Intel® Neural Compute Stick 2.' )
     parser.add_argument( '--ir', metavar = 'IR_File',
-                        type=str, default = '../../caffe/SqueezeNet/squeezenet_v1.0.xml', 
+                        type=str, default = '../../networks/squeezenet_v1.0/squeezenet_v1.0.xml', 
                         help = 'Absolute path to the neural network IR file.')
     parser.add_argument( '-l', '--labels', metavar = 'LABEL_FILE', 
                         type=str, default = '../../data/ilsvrc12/synset_labels.txt',
