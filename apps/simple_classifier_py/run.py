@@ -25,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description = 'Image classifier using \
                          Intel® Neural Compute Stick 2.' )
     parser.add_argument( '--ir', metavar = 'IR_File',
-                        type=str, default = '../../networks/squeezenet_v1.0/squeezenet_v1.0.xml', 
+                        type=str, default = '../../networks/squeezenet_v1.0/squeezenet1.0.xml', 
                         help = 'Absolute path to the neural network IR file.')
     parser.add_argument( '-l', '--labels', metavar = 'LABEL_FILE', 
                         type=str, default = '../../data/ilsvrc12/synset_labels.txt',
@@ -55,7 +55,7 @@ def display_info(input_shape, output_shape, image, ir, labels, mean):
 
     
 
-def infer(image = '../../data/images/nps_electric_guitar.png', ir = '../../caffe/SqueezeNet/squeezenet_v1.0.xml', labels = '../../data/ilsvrc12/synset_words.txt', mean = None, top = 1):
+def infer(image = '../../data/images/nps_electric_guitar.png', ir = '../../caffe/SqueezeNet/squeezenet1.0.xml', labels = '../../data/ilsvrc12/synset_words.txt', mean = None, top = 1):
 
     ####################### 1. Setup Plugin and Network #######################
     # Select the myriad plugin and IRs to be used
