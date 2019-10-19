@@ -15,7 +15,7 @@ MODEL_RELATIVE_DIR = ../../networks/squeezenet_v1.0
 TEST_IMAGE_FILENAME = nps_electric_guitar.png
 LABELS_FILENAME = synset_labels.txt
 
-MODEL_FILE_NAME_BASE = squeezenet_v1.0
+MODEL_FILE_NAME_BASE = squeezenet1.0
 
 
 .PHONY: all
