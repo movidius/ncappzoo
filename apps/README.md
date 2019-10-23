@@ -19,6 +19,7 @@ For a step by step tutorial on how to build an image classification network look
 |[simple_classifier_cpp](simple_classifier_cpp/README.md) | C++<br>Multiple Networks<br>Application reads a single image from the filesystem and does an image classification inference on that image. Takes the image, the network and a labels file on the commandline|![](simple_classifier_cpp/screen_shot.jpg)|
 |[simple_classifier_py](simple_classifier_py/README.md) | Python<br>Multiple Networks<br>Application reads a single image from the filesystem and does an image classification inference on that image. Takes the image, the network and a labels file on the commandline|![](simple_classifier_py/screen_shot.jpg)|
 |[simple_classifier_py_camera](simple_classifier_py_camera/README.md) | Python<br>Multiple Networks<br>Application reads a video stream from a camera and does image classification inference on the stream continually updating the top result.|![](simple_classifier_py_camera/screen_shot.jpg)|
+|[face_emotion_game](face_emotion_game/README.md) | Python<br>Multiple Networks<br>Application reads a video stream from a camera and does face detection and emotion recognition, the app presented as a game, and user can collect scores by his facial expressions.|![](face_emotion_game/screenshot.jpg)|
 
 
 ## Object Detection Applications
@@ -27,7 +28,7 @@ Object detection applications make use of one of the [object detection networks]
 |Object Detection Application| Description |+++++Thumbnail+++++ |
 |---------------------|-------------|-------|
 |[birds](birds/README.md) | Python<br>Caffe Tiny Yolo, GoogLeNet<br>Detects and identifies birds in photos by using Yolo Tiny to identify birds in general and then GoogLeNet to further classify them. Displays images with overlayed rectangles bird classification. |![](birds/screen_shot.jpg)|
-|TBD                  |TBD          |TBD    |
+|[chef_ai](chef_ai/README.md) |Python / Flask<br>SSD Inception v2<br> Detects food items within an image or from the camera and suggests recipes for those items. |TBD    |
 
 
 ## Misc Applications
@@ -35,5 +36,7 @@ Miscellaneous applications use the OpenVINO toolkit in various ways that don't f
 
 |Misc Application| Description |+++++Thumbnail+++++ |
 |---------------------|-------------|-------|
-|[benchmark_ncs](benchmark_ncs/README.md) | Python<br>Multiple Network<br>Outputs FPS numbers for networks in the repository that take images as input. The number of NCS devices to use for the FPS numbers can be specified on the commandline.|![](benchmark_ncs/screen_shot.jpg)|
+|[benchmark_ncs](benchmark_ncs/README.md) | Python<br>Multiple Networks<br>Outputs FPS numbers for networks in the repository that take images as input. The number of NCS devices to use for the FPS numbers can be specified on the commandline.|![](benchmark_ncs/screen_shot.jpg)|
+|[ncs_digital_sign](ncs_digital_sign/README.md) | C++<br>Multiple Networks<br>Application for a digital sign that displays advertisements targeted towards the demographic (gender and age) of the person viewing the sign|TBD|
+
 
