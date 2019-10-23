@@ -81,7 +81,7 @@ def main():
     if args.mirror:
         log.info("Using camera mirror")
 
-    log.info("Game is starting...")
+    log.info("emotions-recognition-retail sample is starting...")
     while cap.isOpened():
         t1 = time.time()
         ret_val, img = cap.read()
@@ -127,7 +127,7 @@ def main():
 
         cv2.putText(img, "Hit 'ESC' or 'q' to Exit", (FRAME_WIDTH - 150, FRAME_HEIGHT - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, YELLOW_COLOR, 1, cv2.LINE_AA)
 
-        cv2.imshow('Face Emotion Game', img)
+        cv2.imshow('emotions-recognition-retail sample', img)
 
         waitkey = cv2.waitKey(1)
         if waitkey & 0xFF == ord('q') or waitkey == 27:
