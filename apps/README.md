@@ -28,7 +28,7 @@ Object detection applications make use of one of the [object detection networks]
 |Object Detection Application| Description |+++++Thumbnail+++++ |
 |---------------------|-------------|-------|
 |[birds](birds/README.md) | Python<br>Caffe Tiny Yolo, GoogLeNet<br>Detects and identifies birds in photos by using Yolo Tiny to identify birds in general and then GoogLeNet to further classify them. Displays images with overlayed rectangles bird classification. |![](birds/screen_shot.jpg)|
-|TBD    |TBD    |TBD    |
+|TBD                  |TBD          |TBD    |
 
 
 ## Misc Applications
@@ -37,5 +37,4 @@ Miscellaneous applications use the OpenVINO toolkit in various ways that don't f
 |Misc Application| Description |+++++Thumbnail+++++ |
 |---------------------|-------------|-------|
 |[benchmark_ncs](benchmark_ncs/README.md) | Python<br>Multiple Network<br>Outputs FPS numbers for networks in the repository that take images as input. The number of NCS devices to use for the FPS numbers can be specified on the commandline.|![](benchmark_ncs/screen_shot.jpg)|
-
 
