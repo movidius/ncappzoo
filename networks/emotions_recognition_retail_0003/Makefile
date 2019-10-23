@@ -11,7 +11,7 @@ ZOO_RELATIVE_DIR = ../../omz
 FACE_RELATIVE_DIR = ../face_detection_retail_0004
 MODEL_DOWNLOADER_DIR = open_model_zoo/tools/downloader
 MODEL_DOWNLOADER_FILENAME = downloader.py
-EMOTION_MODEL_ZOO_DIR = Retail/object_attributes/emotions_recognition/0003/dldt/INT8
+EMOTION_MODEL_ZOO_DIR = Retail/object_attributes/emotions_recognition/0003/dldt/FP16
 MODEL_FILE_NAME_BASE = emotions-recognition-retail-0003
 FACE_MODEL_FILE_NAME_BASE = face-detection-retail-0004
 
