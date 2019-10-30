@@ -19,3 +19,4 @@ __pycache__
 
 #ignore Visual Studio Code generated folders
 .vs
+.vscode
