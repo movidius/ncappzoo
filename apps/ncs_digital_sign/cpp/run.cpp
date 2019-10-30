@@ -98,10 +98,8 @@ int calculateAgeAvg(std::vector<int> ageVector){
 }
 
 void showImg(int age, int gender) {
-	//Config config;
-	//config = loadConfig();
-	//cv::namedWindow("Advertisement", 0);
-	//cv::setWindowProperty("Advertisement", 0, 1);
+	cv::namedWindow("Advertisement", 0);
+	cv::setWindowProperty("Advertisement", 0, 1);
 	if (genCount > 50){
 	if (gender == 1) {
 		if (age < 17) {
@@ -157,17 +155,12 @@ void calculateAdvertisement(int maleTotal, int femaleTotal, int avgAge){
     double malePercent = (double)maleTotal/(double)total;
     std::cout << "MALE PERCENT: " << malePercent << std::endl;
     double femalePercent = (double)femaleTotal/(double)total;
-
-    //Config1 config;
-
-    //config = loadConfig1();
-
+	std::cout << "FEMALE PERCENT: " << femalePercent << std::endl;
 
     if (malePercent > 0.70){
         double mpercent = (double)malePercent * 100.00;
         std::cout << "Male Percentage : " << mpercent << "%" << std::endl << "MALE ADVERTISEMENT" << std::endl;
         showImg(avgAge,1);
-        //waitKey(0);
     } else if (femalePercent > 0.70){
         double fpercent = (double)femalePercent * 100.00;
         std::cout << "Female Percentage : " << fpercent << "%" << std::endl << "FEMALE ADVERTISEMENT" << std::endl;
