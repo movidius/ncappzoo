@@ -104,44 +104,60 @@ void showImg(int age, int gender) {
 	if (gender == 1) {
 		if (age < 17) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_young_boy.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 	}
 	else {
 		if (age < 17) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_young_girl.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 	}
@@ -188,8 +204,6 @@ int main (int argc, char** argv) {
     
     // Set up the camera
     capture.open(CAM_SOURCE);
-    capture.set(CAP_PROP_FRAME_WIDTH, WINDOW_WIDTH);
-    capture.set(CAP_PROP_FRAME_HEIGHT, WINDOW_HEIGHT);
     
 	const int width  = (int) capture.get(cv::CAP_PROP_FRAME_WIDTH);
 	const int height = (int) capture.get(cv::CAP_PROP_FRAME_HEIGHT);
