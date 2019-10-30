@@ -17,3 +17,5 @@ __pycache__
 #ignore python virtual environments
 .venv
 
+#ignore Visual Studio Code generated folders
+.vs
