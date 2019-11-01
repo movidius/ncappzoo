@@ -51,7 +51,7 @@ clone_tl_repo:
 	else \
 		echo " - cloning the traffic-light network repo"; \
 		${CLONE_TL_NET_REPO}; \
-		mv ${TL_NET_REPO_NAME}\public_networks\traffic-light ${TL_NET_DESTINATION_DIR}
+		mv ${TL_NET_REPO_NAME}/public_networks/traffic-light ${TL_NET_DESTINATION_DIR};\
 	fi
 
 
@@ -67,7 +67,7 @@ get_ir:	model_zoo
 		(cd ${ZOO_RELATIVE_DIR}/${MODEL_DOWNLOADER_DIR}; python3 ${MODEL_DOWNLOADER_FILENAME} --name ${ROAD_SEG_MODEL_FILE_NAME_BASE};); \
 	fi
 
-	@if [ -e ${ROAD_SEG_MODEL_FILE_NAME_BASE}.xml ] && [ -e ${ROAD_SEG_MODEL_FILE_NAME_BASE}.bin ]; \
+	@if [ -e ${ROAD_SEG_DESTINATION_DIR}/${ROAD_SEG_MODEL_FILE_NAME_BASE}.xml ] && [ -e ${ROAD_SEG_DESTINATION_DIR}/${ROAD_SEG_MODEL_FILE_NAME_BASE}.bin ]; \
 	then \
 		echo " - IR files already exist in project directory. No need to copy IRs."; \
 	else \
@@ -135,5 +135,7 @@ help:
 
 clean:
 	@echo $(YELLOW)'\n'${ROAD_SEG_NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)
-	rm -f ${ROAD_SEG_MODEL_FILE_NAME_BASE}.bin
-	rm -f ${ROAD_SEG_MODEL_FILE_NAME_BASE}.xml
+	rm -f ${ROAD_SEG_DESTINATION_DIR}/${ROAD_SEG_MODEL_FILE_NAME_BASE}.bin
+	rm -f ${ROAD_SEG_DESTINATION_DIR}/${ROAD_SEG_MODEL_FILE_NAME_BASE}.xml
+	rm -f -r ncappzoo_net
+	rm -f -r src/data/traffic-light
