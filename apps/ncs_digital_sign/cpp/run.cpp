@@ -1,7 +1,7 @@
 /*
  * NCS_Digital_Sign
  *
- * Contributing Authors: Christian Canales <christian.canales@intel.com>, Tome Vang <tome.vang@intel.com>, Neal Smith <neal.p.smith@intel.com>, Heather McCabe <heather.m.mccabe@intel.com>
+ * Contributing Authors: Christian Canales <christian.canales@intel.com>, Tome Vang <tome.vang@intel.com>, Neal Smith <neal.p.smith@intel.com>, Heather McCabe <heather.m.mccabe@intel.com>, Andrew Herrold <andrew.herrold@intel.com>
  *
  *
  *
