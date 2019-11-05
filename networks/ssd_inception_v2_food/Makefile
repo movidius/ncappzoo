@@ -41,6 +41,16 @@ TEST_IMG2 = test_images/test2.JPG
 TEST_IMG3 = test_images/test3.JPG
 TEST_LICENSE = test_images/license.txt
 
+MODEL_DIRNAME =
+JPEG_DIRNAME =
+ANNOTATIONS_DIRNAME =
+MODEL_PIPELINE_FILENAME =
+MODEL_CKPT_FILENAME = 
+PIPELINE_FILENAME =
+PBTXT_FILENAME =
+TRAIN_REC_FILENAME =
+TEST_REC_FILENAME =
+
 
 .PHONY: all
 all: deps data compile_model
@@ -122,11 +132,6 @@ get_model:
 	fi
 
 
-.PHONY: train
-train:
-	@echo $(YELLOW) "\nSSD Inception V2 Food: Training model... NOT YET IMPLEMENTED" $(NOCOLOR);
-
-
 .PHONY: compile_model
 compile_model: get_model
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
@@ -193,6 +198,56 @@ run: run_py
 
 .PHONY: run_py
 run_py: install-reqs deps data compile_model run_FP16
+
+
+.PHONY: train
+train:
+	@echo $(YELLOW) '\n'${NETWORK_NAME}": Training model..." $(NOCOLOR);
+	@echo "\nTo train the network the following steps will be taken:";
+	@echo "  - Download TensorFlow (CPU Version)";
+	@echo "  - Download the TF Object Detection API Repo"
+	@echo "  - Download dataset, annotations, config, record, checkpoint, and pbtxt files:";
+	@echo "      ${JPEG_DIRNAME}";
+	@echo "      ${ANNOTATIONS_DIRNAME}";
+	@echo "      ${MODEL_PIPELINE_FILENAME}";
+	@echo "      ${MODEL_CKPT_FILENAME}";
+	@echo "      ${PIPELINE_FILENAME}";
+	@echo "      ${PBTXT_FILENAME}";
+	@echo "      ${TRAIN_REC_FILENAME}";
+	@echo "      ${TEST_REC_FILENAME}";
+	@echo "  - Train the food model. It will save trained network in:";
+	@echo "      ${MODEL_DIRNAME}";
+	@echo "  "
+	@echo "After complete, you will be able to compile the network you just trained with:";
+	@echo "make compile_model";
+	@echo ""
+	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
+
+	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
+	then \
+		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
+	else \
+		echo "Downloading ${NETWORK_SCRIPT_FILENAME} file"; \
+		${GET_NETWORK_SCRIPT}; \
+		if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
+		then \
+			echo "download ${NETWORK_SCRIPT_FILENAME} done."; \
+		else \
+			echo "***\nError - Could not download ${NETWORK_SCRIPT_FILENAME}. Check network and proxy settings \n***\n"; \
+			exit 1; \
+		fi ; \
+	fi ;
+
+	@echo "patching example for the OpenVINO Toolkit";
+	patch ${NETWORK_SCRIPT_FILENAME} -i ${PATCH_FOR_NCS_FILENAME} -o ${MNIST_NCS_FILENAME};
+	patch ${MNIST_NCS_FILENAME} -i ${PATCH_FOR_INFERENCE_FILENAME} -o ${MNIST_INFERENCE_FILENAME};
+	@echo "Running patched code to start training";
+	python3 ./${MNIST_NCS_FILENAME}
+	@echo "Running code to save for the OpenVINO Toolkit";
+	python3 ./${MNIST_INFERENCE_FILENAME}
+	@echo $(YELLOW)"\nMnist model training complete."$(NOCOLOR)
+	@echo "Model name: "${MODEL_INFERENCE_META_FILENAME}
+	@echo $(NOCOLOR)"\nRun the command "$(YELLOW)"make compile_model"$(NOCOLOR)" to compile your model or "$(YELLOW)"make run"$(NOCOLOR)" to run the sample with your trained model.\n"
 
 
 .PHONY: help
