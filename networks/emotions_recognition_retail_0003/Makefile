@@ -123,9 +123,9 @@ help:
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
 	@echo "  This network does emotion recognition and can be used to align faces.";
 	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
-	@echo "  name: 'input', shape: [1x3x64x64], Expected color order is BGR.";
+	@echo "  name: 'data', shape: [1x3x64x64], Expected color order is BGR.";
 	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
-	@echo "  name: 'detection_out', shape: [1, 5, 1, 1]  - Softmax output across five emotions ('neutral', 'happy', 'sad', 'surprise', 'anger').\n";
+	@echo "  name: 'prob_emotion', shape: [1, 5, 1, 1]  - Softmax output across five emotions ('neutral', 'happy', 'sad', 'surprise', 'anger').\n";
 
 clean: 
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Cleaning up files..."$(NOCOLOR)

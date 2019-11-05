@@ -11,9 +11,9 @@ The sample can also be used to crop images and write them to file.
 
 ## Model Information
 ### Inputs
- - name: "input" , shape: [1x3x64x64] - An input image in [1xCxHxW] format. Expected color order is BGR.
+ - name: "data" , shape: [1x3x64x64] - An input image in [1xCxHxW] format. Expected color order is BGR.
 ### Outputs 
- - name: "prob", shape: [1, 5, 1, 1] - Softmax output across five emotions ('neutral', 'happy', 'sad', 'surprise', 'anger').
+ - name: "prob_emotion", shape: [1, 5, 1, 1] - Softmax output across five emotions ('neutral', 'happy', 'sad', 'surprise', 'anger').
 
 ## Running this Example
 ~~~
