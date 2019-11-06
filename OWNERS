@@ -4,6 +4,7 @@ apps/benchmark_ncs, Intel Corporation, neal.p.smith@intel.com
 apps/classifier_flash, Intel Corporation, neal.p.smith@intel.com
 apps/classifier_grid, Intel Corporation, neal.p.smith@intel.com
 apps/classifier_gui, Intel Corporation, tome.vang@intel.com
+apps/driving_pi, Intel Corporation, ayoob.nabwani@intel.com
 apps/gender_age,  Intel Corporation, tome.vang@intel.com
 apps/mnist_calc, Intel Corporation, neal.p.smith@intel.com
 apps/simple_classifier_cpp, Intel Corporation, neal.p.smith@intel.com
