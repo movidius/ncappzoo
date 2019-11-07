@@ -41,11 +41,27 @@ TEST_IMG2 = test_images/test2.JPG
 TEST_IMG3 = test_images/test3.JPG
 TEST_LICENSE = test_images/license.txt
 
+TRAIN_DIR = train_files
+TRAIN_CHKPT_DIR = ${TRAIN_DIR}/ssd_inception_v2_coco_2018_01_28
+PRE_TRAINED_MODEL = wget -c --no-cache -P ./${TRAIN_DIR} http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz
+
+TRAIN_RECORD_FILE = ./${TRAIN_DIR}/train.record
+TRAIN_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Qy8q9b4mC4PuStpAdw6Fq--ao7wY8Y-N' -O ${TRAIN_RECORD_FILE}
+TEST_RECORD_FILE = ./${TRAIN_DIR}/test.record
+TEST_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1zXzehC3S6WLTQbhVOhTOeH3U0xXYM8jb' -O ${TEST_RECORD_FILE}
+TRAIN_PBTXT_FILE = ./${TRAIN_DIR}/pascal_label_map.pbtxt
+TRAIN_PBTXT = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1NCcklA0Ya-KrSTQi8LHBJUYS5YkHQBKB' -O ${TRAIN_PBTXT_FILE}
+SSD_CONFIG_FILE = ./${TRAIN_DIR}/ssd_inception_v2_coco.config
+SSD_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1sgDaQgontvm7V9nSdEsF_z2eGJO7kBK5' -O ${SSD_CONFIG_FILE}
+TRAIN_PIPE_CONFIG_FILE = ./${TRAIN_DIR}/pipeline.config
+TRAIN_PIPE_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=15FDl27g5wUi4ro7MFIAuCsGxbH-XbSUc' -O ${TRAIN_PIPE_CONFIG_FILE}
+
+
 MODEL_DIRNAME =
 JPEG_DIRNAME =
 ANNOTATIONS_DIRNAME =
 MODEL_PIPELINE_FILENAME =
-MODEL_CKPT_FILENAME = 
+MODEL_CKPT_FILENAME =
 PIPELINE_FILENAME =
 PBTXT_FILENAME =
 TRAIN_REC_FILENAME =
@@ -248,6 +264,54 @@ train:
 	@echo $(YELLOW)"\nMnist model training complete."$(NOCOLOR)
 	@echo "Model name: "${MODEL_INFERENCE_META_FILENAME}
 	@echo $(NOCOLOR)"\nRun the command "$(YELLOW)"make compile_model"$(NOCOLOR)" to compile your model or "$(YELLOW)"make run"$(NOCOLOR)" to run the sample with your trained model.\n"
+
+.PHONY: download_train_files
+download_train_files:
+	@echo $(YELLOW)"Downloading train files from Github..."
+	@if [ -e ${TRAIN_CHKPT_DIR} ] ; \
+	then \
+		echo $(NOCOLOR)"Checkpoint files already exist, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing checkpoint files from Tensorflow..."; \
+		${PRE_TRAINED_MODEL} ;\
+		tar -xvzf ${TRAIN_CHKPT_DIR}.tar.gz ;\
+		mv ssd_inception_v2_coco_2018_01_28 ${TRAIN_CHKPT_DIR} ;\
+	fi
+	@if [ -e ${TEST_RECORD_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Test record file already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing test record file..."; \
+		${TEST_RECORD} ;\
+	fi
+	@if [ -e ${TRAIN_RECORD_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing train record filew..."; \
+		${TRAIN_RECORD} ;\
+	fi
+	@if [ -e ${TRAIN_PBTXT_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Pbtxt file already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing pbtxt file..."; \
+		${TRAIN_PBTXT} ;\
+	fi
+	@if [ -e ${SSD_CONFIG_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"SSD Inception v2 config already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing SSD Inception v2 config file..."; \
+		${SSD_CONFIG} ;\
+	fi
+	@if [ -e ${TRAIN_PIPE_CONFIG_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Pipeline config already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing pipeline config file..."; \
+		${TRAIN_PIPE_CONFIG} ;\
+	fi
 
 
 .PHONY: help
