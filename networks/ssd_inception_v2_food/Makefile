@@ -44,7 +44,6 @@ TEST_LICENSE = test_images/license.txt
 TRAIN_DIR = train_files
 TRAIN_CHKPT_DIR = ${TRAIN_DIR}/ssd_inception_v2_coco_2018_01_28
 PRE_TRAINED_MODEL = wget -c --no-cache -P ./${TRAIN_DIR} http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz
-
 TRAIN_RECORD_FILE = ./${TRAIN_DIR}/train.record
 TRAIN_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Qy8q9b4mC4PuStpAdw6Fq--ao7wY8Y-N' -O ${TRAIN_RECORD_FILE}
 TEST_RECORD_FILE = ./${TRAIN_DIR}/test.record
@@ -55,9 +54,16 @@ SSD_CONFIG_FILE = ./${TRAIN_DIR}/ssd_inception_v2_coco.config
 SSD_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1sgDaQgontvm7V9nSdEsF_z2eGJO7kBK5' -O ${SSD_CONFIG_FILE}
 TRAIN_PIPE_CONFIG_FILE = ./${TRAIN_DIR}/pipeline.config
 TRAIN_PIPE_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=15FDl27g5wUi4ro7MFIAuCsGxbH-XbSUc' -O ${TRAIN_PIPE_CONFIG_FILE}
+JPEG_ZIP_FILE = ./${TRAIN_DIR}/JPEGImages.zip
+JPEG_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=113g9NlQHmORnVWjohgnDPqW26-2Emvjz' -O ${JPEG_ZIP_FILE}
+ANNO_ZIP_FILE = ./${TRAIN_DIR}/Annotations.zip
+ANNO_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lYOLT8IuWJ-4osNXPiWeab4GkNg_qEDw' -O ${ANNO_ZIP_FILE}
 
+TF_MODEL_DIRNAME = models/
+TF_MODEL_REPO = git clone https://github.com/tensorflow/models.git
+PROTOC_FILE = models/research/protobuf.zip
+PROTOC_DOWNLOAD = wget -O ${PROTOC_FILE} https://github.com/google/protobuf/releases/download/v3.0.0/protoc-3.0.0-linux-x86_64.zip
 
-MODEL_DIRNAME =
 JPEG_DIRNAME =
 ANNOTATIONS_DIRNAME =
 MODEL_PIPELINE_FILENAME =
@@ -265,9 +271,57 @@ train:
 	@echo "Model name: "${MODEL_INFERENCE_META_FILENAME}
 	@echo $(NOCOLOR)"\nRun the command "$(YELLOW)"make compile_model"$(NOCOLOR)" to compile your model or "$(YELLOW)"make run"$(NOCOLOR)" to run the sample with your trained model.\n"
 
+.PHONY: set_up_training_api
+set_up_training_api:
+	@echo $(YELLOW)"Setting up training environment..."
+	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
+	then \
+		echo $(NOCOLOR)"Models repo exists, proceeding with setup."; \
+		echo $(NOCOLOR)"Setting up protobuf."; \
+		cd models/research/ ;\
+		unzip protobuf.zip ;\
+		./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
+	else \
+		echo $(NOCOLOR)"Please downloading training files before set up."; \
+	fi
+	@echo $(YELLOW)"Testing training environment..."
+	@if python3 -c 'import pkgutil; exit(not pkgutil.find_loader("tensorflow"))' ; \
+	then \
+		echo $(NOCOLOR)'Tensorflow found, proceeding with testing the training environment...' ; \
+		cd models/research/ ;\
+		./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
+		python3 object_detection/builders/model_builder_test.py ;\
+	else \
+		echo 'Tensorflow not found. Please install tensorflow (CPU version).' ; \
+		echo 'If you would like to install Tensorflow-gpu, please analyze your' ; \
+		echo 'your systems hardware and install the required drivers. Then, pip/pip3' ; \
+		echo 'install tensorflow-gpu (might need special permissions).' ; \
+	fi
+
+.PHONY: copy_training_files
+copy_training_files:
+	@echo $(YELLOW)"Moving training files..."
+	@echo $(NOCOLOR)"Checking models/research/object_detection if there exists training_files..."
+	@echo "Please check if there are training files within models/research/object_detection."
+	@read -p"Press ENTER to proceed or CTRL+C to exit..." variable_nps; echo;
+
+	@echo $(NOCOLOR)"Checking if training files directory exists in current directory..."
+	@if [ -e ${TRAIN_DIR} ] ;\
+	then \
+		echo $(NOCOLOR)"Training files exist, proceeding to copy them into object detection directory."; \
+		mkdir models/research/object_detection/training_food ;\
+		cp -a ${TRAIN_DIR}/. models/research/object_detection/training_food/. ;\
+		echo "Moved training files into models/research/object_detection" ;\
+	else \
+		echo $(NOCOLOR)"Please download training files."; \
+	fi
+
+
 .PHONY: download_train_files
 download_train_files:
-	@echo $(YELLOW)"Downloading train files from Github..."
+	@echo $(YELLOW)"Downloading train files..."
 	@if [ -e ${TRAIN_CHKPT_DIR} ] ; \
 	then \
 		echo $(NOCOLOR)"Checkpoint files already exist, skipping network request."; \
@@ -283,13 +337,6 @@ download_train_files:
 	else \
 		echo $(NOCOLOR)"Grabbing test record file..."; \
 		${TEST_RECORD} ;\
-	fi
-	@if [ -e ${TRAIN_RECORD_FILE} ] ; \
-	then \
-		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
-	else \
-		echo $(NOCOLOR)"Grabbing train record filew..."; \
-		${TRAIN_RECORD} ;\
 	fi
 	@if [ -e ${TRAIN_PBTXT_FILE} ] ; \
 	then \
@@ -311,6 +358,45 @@ download_train_files:
 	else \
 		echo $(NOCOLOR)"Grabbing pipeline config file..."; \
 		${TRAIN_PIPE_CONFIG} ;\
+	fi
+	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
+	then \
+		echo $(NOCOLOR)"Models repo already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Cloning models repo..."; \
+		${TF_MODEL_REPO} ;\
+	fi
+	@if [ -e ${PROTOC_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Protoc file already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing protoc file..."; \
+		${PROTOC_DOWNLOAD} ;\
+	fi
+	@if [ -e ${ANNO_ZIP_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Annotated zip file already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing annotated zip file..."; \
+		${ANNO_DOWNLOAD} ;\
+		unzip ${ANNO_ZIP_FILE} -d train_files/ ;\
+	fi
+	@echo "Downloading larger files using gdown, checking for installation"
+	pip3 install --user gdown
+	@if [ -e ${TRAIN_RECORD_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing train record file..."; \
+		gdown 'https://drive.google.com/uc?id=1Qy8q9b4mC4PuStpAdw6Fq--ao7wY8Y-N' -O train_files/train.record ;\
+	fi
+	@if [ -e ${JPEG_ZIP_FILE} ] ; \
+	then \
+		echo $(NOCOLOR)"JPEG zip file already exists, skipping network request."; \
+	else \
+		echo $(NOCOLOR)"Grabbing JPEG zip file..."; \
+		gdown 'https://drive.google.com/uc?id=113g9NlQHmORnVWjohgnDPqW26-2Emvjz' -O train_files/JPEGImages.zip ;\
+		unzip ${JPEG_ZIP_FILE} -d train_files/ ;\
 	fi
 
 
