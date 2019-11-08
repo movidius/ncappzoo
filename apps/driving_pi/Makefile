@@ -22,6 +22,8 @@ CROP =
 CROPPED_ROAD_SEG_DIR =
 SHOW = --show=yes
 
+arch := $(shell arch)
+
 .PHONY: all
 all: deps data clone_tl_repo
 
@@ -85,11 +87,11 @@ compile_model:
 
 
 .PHONY: run
-run: run_py
+run: arch run_py
 
 
 .PHONY: run_py
-run_py: deps data clone_tl_repo
+run_py: arch deps data clone_tl_repo
 	@echo $(YELLOW)'\n'${GAME_NAME}": Running Python sample..."$(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
@@ -111,6 +113,16 @@ install-reqs:
 uninstall-reqs:
 	@echo $(YELLOW)'\n'${ROAD_SEG_NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
+
+.PHONY: arch
+arch:
+	@echo $(YELLOW)"Checking processor architecture..."$(NOCOLOR)
+	@echo $(arch)
+	@if [ "$(arch)" = "x86_64" ] ;\
+	then \
+		echo $(RED)"This app is only compatible with the Raspberry Pi.";\
+		exit 1; \
+	fi
 
 .PHONY: help
 help:
