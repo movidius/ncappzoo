@@ -23,6 +23,7 @@ CROPPED_ROAD_SEG_DIR =
 SHOW = --show=yes
 
 arch := $(shell arch)
+CHECK_PI = python3 -c "from car_pi import DriveBrickPi3"
 
 .PHONY: all
 all: deps data clone_tl_repo
@@ -31,6 +32,13 @@ all: deps data clone_tl_repo
 .PHONY: deps
 deps: get_ir
 	@echo $(YELLOW)'\n'${ROAD_SEG_NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
+	@if ${shell} ${CHECK_PI} 2> /dev/null ;\
+	then \
+		echo "BrickPi installed."; \
+	else \
+		echo ${YELLOW}"Dexter Industries BrickPi libraries are not installed. Please go to https://github.com/DexterInd/BrickPi to install."; \
+		exit 1; \
+	fi;
 
 
 .PHONY: data
