@@ -22,6 +22,9 @@ CROP =
 CROPPED_ROAD_SEG_DIR =
 SHOW = --show=yes
 
+arch := $(shell arch)
+CHECK_PI = python3 -c "from car_pi import DriveBrickPi3"
+
 .PHONY: all
 all: deps data clone_tl_repo
 
@@ -29,6 +32,13 @@ all: deps data clone_tl_repo
 .PHONY: deps
 deps: get_ir
 	@echo $(YELLOW)'\n'${ROAD_SEG_NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
+	@if ${shell} ${CHECK_PI} 2> /dev/null ;\
+	then \
+		echo "BrickPi installed."; \
+	else \
+		echo ${YELLOW}"Dexter Industries BrickPi libraries are not installed. Please go to https://github.com/DexterInd/BrickPi to install."; \
+		exit 1; \
+	fi;
 
 
 .PHONY: data
@@ -85,11 +95,11 @@ compile_model:
 
 
 .PHONY: run
-run: run_py
+run: arch run_py
 
 
 .PHONY: run_py
-run_py: deps data clone_tl_repo
+run_py: arch deps data clone_tl_repo
 	@echo $(YELLOW)'\n'${GAME_NAME}": Running Python sample..."$(NOCOLOR)
 	@echo "Checking OpenVINO environment..."
 	@if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
@@ -111,6 +121,16 @@ install-reqs:
 uninstall-reqs:
 	@echo $(YELLOW)'\n'${ROAD_SEG_NETWORK_NAME}": Uninstalling requirements..."$(NOCOLOR)
 	@echo "Nothing to uninstall."
+
+.PHONY: arch
+arch:
+	@echo $(YELLOW)"Checking processor architecture..."$(NOCOLOR)
+	@echo $(arch)
+	@if [ "$(arch)" = "x86_64" ] ;\
+	then \
+		echo $(RED)"This app is only compatible with the Raspberry Pi.";\
+		exit 1; \
+	fi
 
 .PHONY: help
 help:
