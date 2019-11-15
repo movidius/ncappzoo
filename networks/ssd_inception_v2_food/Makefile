@@ -423,6 +423,11 @@ download_train_files:
 	fi
 	@echo ""
 
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nSSD Inception V2 Food: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
+
 .PHONY: help
 help:
 	@echo "\nPossible make targets"
