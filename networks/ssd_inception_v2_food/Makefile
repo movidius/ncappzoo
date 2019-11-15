@@ -258,7 +258,7 @@ train_model:
 	@echo "NOTE: If your system is running out of memory, please decrease batch size to 1.";
 	@echo "Work upwards to empirically test if your system can handle increased batch sizes.";
 	@echo "To edit batch size, edit the ssd_inception_v2_coco.config file in models/research/training_food by"
-	@echo "replacing the number on line 136 to any positive integer (ex. 1) instead of 12 after 'batch_size:'."
+	@echo "replacing the number on line 136 to any positive integer (ex. 1) after 'batch_size:'."
 	@echo ""
 	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
 	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
