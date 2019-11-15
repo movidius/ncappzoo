@@ -222,9 +222,26 @@ run: run_py
 .PHONY: run_py
 run_py: install-reqs deps data compile_model run_FP16
 
-
 .PHONY: train
-train:
+train: train_info download_train_files set_up_training_api copy_training_files train_model
+
+.PHONY: train_info
+train_info:
+	@echo $(YELLOW) '\n'${NETWORK_NAME}": Information disclosure before training model." $(NOCOLOR);
+	@echo "The following steps will be taken in order to train your own model that detects produce:"
+	@echo "  - Download training files"
+	@echo "  - Set up and locally install training environment and API"
+	@echo "  - Copy training files into desired location for training"
+	@echo "  - Train model using Tensorflow Object Detection API"
+	@echo ""
+	@echo "Throughout this whole process, files will be downloaded and repositories will be cloned."
+	@echo $(YELLOW)"Please pay attention to the prompts before proceeding as installation may error."
+	@echo "if not followed properly."$(NOCOLOR)
+	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
+
+
+.PHONY: train_model
+train_model:
 	@echo $(YELLOW) '\n'${NETWORK_NAME}": Training model..." $(NOCOLOR);
 	@echo "  - Trained network  will be saved in:";
 	@echo "      training_food";
@@ -238,8 +255,12 @@ train:
 	@echo "enter 'make export_and_optimize_model' to generate an optimized model";
 	@echo "from your Tensorflow model.";
 	@echo ""
+	@echo "NOTE: If your system is running out of memory, please decrease batch size to 1.";
+	@echo "Work upwards to empirically test if your system can handle increased batch sizes.";
+	@echo "To edit batch size, edit the ssd_inception_v2_coco.config file in models/research/training_food by"
+	@echo "replacing the number on line 136 to any positive integer (ex. 1) instead of 12 after 'batch_size:'."
+	@echo ""
 	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
-
 	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
 	then \
 		echo "Directory: ${TF_MODEL_DIRNAME}research/object_detection exists, setting up environment..."; \
@@ -249,32 +270,30 @@ train:
 		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
 		cd object_detection ;\
 		echo "Environment is setup, commencing with training..." ;\
-		python3 model_main.py --logtostderr --model_dir=training_food/ --pipeline_config_path=training_food/ssd_inception_v2_coco_2018_01_28.config ;\
+		python3 model_main.py \
+    --pipeline_config_path=training_food/ssd_inception_v2_coco.config \
+    --model_dir=training_food/ \
+    --num_train_steps=20000 \
+    --alsologtostderr ;\
 	else \
 		echo "Cannot locate the training files for TF Object Detection. Please download."; \
-	fi ;
-
-
-.PHONY: holder
-holder:
-	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
-	then \
-		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
-	else \
-		echo "Downloading ${NETWORK_SCRIPT_FILENAME} file"; \
-		${GET_NETWORK_SCRIPT}; \
-		if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
-		then \
-			echo "download ${NETWORK_SCRIPT_FILENAME} done."; \
-		else \
-			echo "***\nError - Could not download ${NETWORK_SCRIPT_FILENAME}. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
 	fi ;
 
 .PHONY: set_up_training_api
 set_up_training_api:
 	@echo $(YELLOW)"Setting up training environment..."
+	@if [ -e cocoapi/PythonAPI ] ; \
+	then \
+		echo $(YELLOW)"URGENT: PLEASE DO THE FOLLOWING BEFORE PROCEEDING:" ;\
+		echo "Replace 'python' with 'python3' in the Makefile within cocoapi/PythonAPI"$(NOCOLOR) ;\
+		read -p"Press ENTER to proceed or CTRL+C to exit..." variable_nps; echo ;\
+		echo $(NOCOLOR)"Installing COCO API..." ;\
+		cd cocoapi/PythonAPI ;\
+		make ;\
+		cp -r pycocotools ../../models/research/ ;\
+	else \
+		echo $(NOCOLOR)"Please downloading training files before set up."; \
+	fi
 	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
 	then \
 		echo $(NOCOLOR)"Models repo exists, proceeding with setup."; \
@@ -302,6 +321,7 @@ set_up_training_api:
 		echo 'your systems hardware and install the required drivers. Then, pip/pip3' ; \
 		echo 'install tensorflow-gpu (might need special permissions).' ; \
 	fi
+	@echo ""
 
 .PHONY: copy_training_files
 copy_training_files:
@@ -309,7 +329,6 @@ copy_training_files:
 	@echo $(NOCOLOR)"Will potentially overwrite training files in models/research/object_detection"
 	@echo "Please check if there are training files within models/research/object_detection."
 	@read -p"Press ENTER to proceed or CTRL+C to exit..." variable_nps; echo;
-
 	@echo $(NOCOLOR)"Checking if training files directory exists in current directory..."
 	@if [ -e ${TRAIN_DIR} ] ;\
 	then \
@@ -321,7 +340,7 @@ copy_training_files:
 	else \
 		echo $(NOCOLOR)"Please download training files."; \
 	fi
-
+	@echo ""
 
 .PHONY: download_train_files
 download_train_files:
@@ -355,13 +374,6 @@ download_train_files:
 	else \
 		echo $(NOCOLOR)"Grabbing SSD Inception v2 config file..."; \
 		${SSD_CONFIG} ;\
-	fi
-	@if [ -e ${TRAIN_PIPE_CONFIG_FILE} ] ; \
-	then \
-		echo $(NOCOLOR)"Pipeline config already exists, skipping network request."; \
-	else \
-		echo $(NOCOLOR)"Grabbing pipeline config file..."; \
-		${TRAIN_PIPE_CONFIG} ;\
 	fi
 	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
 	then \
@@ -402,7 +414,14 @@ download_train_files:
 		gdown 'https://drive.google.com/uc?id=113g9NlQHmORnVWjohgnDPqW26-2Emvjz' -O train_files/JPEGImages.zip ;\
 		unzip ${JPEG_ZIP_FILE} -d train_files/ ;\
 	fi
-
+	@if [ -e cocoapi/PythonAPI ] ;\
+	then \
+		echo $(NOCOLOR)"cocoapi repo already exists, skipping network request."; \
+	else \
+		echo "Cloning cocoapi repo for future installation..." ;\
+		git clone https://github.com/cocodataset/cocoapi.git ;\
+	fi
+	@echo ""
 
 .PHONY: help
 help:
@@ -424,3 +443,6 @@ clean: clean
 	rm -rf ${GRAPH_DIR_FP16}
 	rm -rf ${MODEL_DIR}
 	rm -rf ${TEST_IMG_DIR}
+	rm -rf ${TRAIN_DIR}
+	rm -rf models
+	rm -rf cocoapi
