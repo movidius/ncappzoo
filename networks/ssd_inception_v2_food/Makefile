@@ -59,6 +59,7 @@ JPEG_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=d
 ANNO_ZIP_FILE = ./${TRAIN_DIR}/Annotations.zip
 ANNO_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lYOLT8IuWJ-4osNXPiWeab4GkNg_qEDw' -O ${ANNO_ZIP_FILE}
 
+NETWORK_NAME = SSD Inception v2: Grocery Model
 TF_MODEL_DIRNAME = models/
 TF_MODEL_REPO = git clone https://github.com/tensorflow/models.git
 PROTOC_FILE = models/research/protobuf.zip
@@ -225,27 +226,38 @@ run_py: install-reqs deps data compile_model run_FP16
 .PHONY: train
 train:
 	@echo $(YELLOW) '\n'${NETWORK_NAME}": Training model..." $(NOCOLOR);
-	@echo "\nTo train the network the following steps will be taken:";
-	@echo "  - Download TensorFlow (CPU Version)";
-	@echo "  - Download the TF Object Detection API Repo"
-	@echo "  - Download dataset, annotations, config, record, checkpoint, and pbtxt files:";
-	@echo "      ${JPEG_DIRNAME}";
-	@echo "      ${ANNOTATIONS_DIRNAME}";
-	@echo "      ${MODEL_PIPELINE_FILENAME}";
-	@echo "      ${MODEL_CKPT_FILENAME}";
-	@echo "      ${PIPELINE_FILENAME}";
-	@echo "      ${PBTXT_FILENAME}";
-	@echo "      ${TRAIN_REC_FILENAME}";
-	@echo "      ${TEST_REC_FILENAME}";
-	@echo "  - Train the food model. It will save trained network in:";
-	@echo "      ${MODEL_DIRNAME}";
-	@echo "  "
-	@echo "After complete, you will be able to compile the network you just trained with:";
-	@echo "make compile_model";
+	@echo "  - Trained network  will be saved in:";
+	@echo "      training_food";
+	@echo ""
+	@echo $(YELLOW)"URGENT: PLEASE DO THE FOLLOWING INSTRUCTIONS BEFORE TRAINING:" ;
+	@echo "In order to have more verbose logging so you can verify that your model is" ;
+	@echo "actually training, please add the following to line 57 of model_main.py in" ;
+	@echo "models/research/object_detection: tf.logging.set_verbosity(tf.logging.INFO)" $(NOCOLOR);
+	@echo ""
+	@echo "NOTE: Training files are unfrozen. If would like to export a model,";
+	@echo "enter 'make export_and_optimize_model' to generate an optimized model";
+	@echo "from your Tensorflow model.";
 	@echo ""
 	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
 
-	@if [ -e ${NETWORK_SCRIPT_FILENAME} ] ; \
+	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
+	then \
+		echo "Directory: ${TF_MODEL_DIRNAME}research/object_detection exists, setting up environment..."; \
+		cd models/research/ ;\
+		./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
+		cd object_detection ;\
+		echo "Environment is setup, commencing with training..." ;\
+		python3 model_main.py --logtostderr --model_dir=training_food/ --pipeline_config_path=training_food/ssd_inception_v2_coco_2018_01_28.config ;\
+	else \
+		echo "Cannot locate the training files for TF Object Detection. Please download."; \
+	fi ;
+
+
+.PHONY: holder
+holder:
+	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
 	then \
 		echo "network script ${NETWORK_SCRIPT_FILENAME} already exists, skipping download"; \
 	else \
@@ -260,17 +272,6 @@ train:
 		fi ; \
 	fi ;
 
-	@echo "patching example for the OpenVINO Toolkit";
-	patch ${NETWORK_SCRIPT_FILENAME} -i ${PATCH_FOR_NCS_FILENAME} -o ${MNIST_NCS_FILENAME};
-	patch ${MNIST_NCS_FILENAME} -i ${PATCH_FOR_INFERENCE_FILENAME} -o ${MNIST_INFERENCE_FILENAME};
-	@echo "Running patched code to start training";
-	python3 ./${MNIST_NCS_FILENAME}
-	@echo "Running code to save for the OpenVINO Toolkit";
-	python3 ./${MNIST_INFERENCE_FILENAME}
-	@echo $(YELLOW)"\nMnist model training complete."$(NOCOLOR)
-	@echo "Model name: "${MODEL_INFERENCE_META_FILENAME}
-	@echo $(NOCOLOR)"\nRun the command "$(YELLOW)"make compile_model"$(NOCOLOR)" to compile your model or "$(YELLOW)"make run"$(NOCOLOR)" to run the sample with your trained model.\n"
-
 .PHONY: set_up_training_api
 set_up_training_api:
 	@echo $(YELLOW)"Setting up training environment..."
@@ -281,6 +282,7 @@ set_up_training_api:
 		cd models/research/ ;\
 		unzip protobuf.zip ;\
 		./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
 		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
 	else \
 		echo $(NOCOLOR)"Please downloading training files before set up."; \
@@ -291,6 +293,7 @@ set_up_training_api:
 		echo $(NOCOLOR)'Tensorflow found, proceeding with testing the training environment...' ; \
 		cd models/research/ ;\
 		./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+		export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
 		export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
 		python3 object_detection/builders/model_builder_test.py ;\
 	else \
@@ -303,7 +306,7 @@ set_up_training_api:
 .PHONY: copy_training_files
 copy_training_files:
 	@echo $(YELLOW)"Moving training files..."
-	@echo $(NOCOLOR)"Checking models/research/object_detection if there exists training_files..."
+	@echo $(NOCOLOR)"Will potentially overwrite training files in models/research/object_detection"
 	@echo "Please check if there are training files within models/research/object_detection."
 	@read -p"Press ENTER to proceed or CTRL+C to exit..." variable_nps; echo;
 
@@ -311,6 +314,7 @@ copy_training_files:
 	@if [ -e ${TRAIN_DIR} ] ;\
 	then \
 		echo $(NOCOLOR)"Training files exist, proceeding to copy them into object detection directory."; \
+		cp -a ${TRAIN_DIR}/ssd_inception_v2_coco_2018_01_28 models/research/object_detection/. ; \
 		mkdir models/research/object_detection/training_food ;\
 		cp -a ${TRAIN_DIR}/. models/research/object_detection/training_food/. ;\
 		echo "Moved training files into models/research/object_detection" ;\
