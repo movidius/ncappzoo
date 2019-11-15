@@ -49,6 +49,9 @@ The instructions below assume that you are using the model provided with the cod
 - In order to move the robot inwards, show two fists with the bottom of the palm exposed, making sure to not intersect the regions around the camera view.
 - In order to close the grip, show a single fist the bottom of the palm exposed.
 - In order to open the grip, show a single exposed palm.
+See below for demonstration of gesture control and arm movement.
+
+![Motion Demo](Arm_Motion_Demo.gif)
 
 ## Useful Instructions and References
 
