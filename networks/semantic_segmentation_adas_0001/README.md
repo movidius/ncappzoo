@@ -1,31 +1,41 @@
-# realsense_segmentation
+# semantic segmentation adas 0001
 ## Introduction
-This app does semantic segmentation using the [semantic-segmentation-adas-0001](https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R3](https://software.intel.com/en-us/openvino-toolkit) and the [Intel® RealSense™ depth camera](https://store.intelrealsense.com). The app takes color and depth frames from a a video stream from the Intel RealSense depth camera (tested with [Intel RealSense D415](https://www.intelrealsense.com/depth-camera-d415/)) and performs semantic segmentation on the color frames. The semantic segmentation inference results will colorize pixels and overlay them onto the color frame. These colorized pixels represent different objects. Based on where the mouse pointer is at, the app will tell you what object and the distance to that object on a pixel by pixel basis. 
+This app does semantic segmentation using the [semantic-segmentation-adas-0001](https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), and the [OpenVINO Toolkit R3](https://software.intel.com/en-us/openvino-toolkit). Each of the colors represents a class. The classes that this network can detect are:
 
+- road
+- sidewalk
+- building
+- wall
+- fence
+- pole
+- traffic light
+- traffic sign
+- vegetation
+- terrain
+- sky
+- person
+- rider
+- car
+- truck
+- bus
+- train
+- motorcycle
+- bicycle
+- ego-vehicle
 
 ## Prerequisites
 This program requires:
-- 1 [NCS2](https://store.intelrealsense.com/buy-intel-neural-compute-stick-2.html)/NCS1 device
+- 1 NCS2/NCS1 device
 - OpenVINO 2019 R3 Toolkit
-- [Intel RealSense SDK 2.0](https://github.com/IntelRealSense/librealsense)
-- Intel RealSense depth camera (tested with [Intel RealSense D415](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
-**Realsense SDK Note**:
-You can install the Intel RealSense SDK 2.0 packages by running the command: **'make install-reqs'**.
-This will install the following packages:
-- **librealsense2-dkms** - Deploys the librealsense2 udev rules, build and activate kernel modules, runtime library.
-- **librealsense2-dev** - Includes the header files and symbolic links for developers.
 
 ## Building the Example
 
 To run the example code do the following :
 1. Open a terminal and change directory to the sample base directory
-2. Connect your Intel RealSense depth camera and NCS device.
-3. Type the following command in the terminal: ```make all```
-
-**Note**: Make sure your Intel RealSense libraries are installed beforehand. 
+2. Type the following command in the terminal: ```make all```
 
 ## Running the Example
 
@@ -33,11 +43,16 @@ After building the example you can run the example code by doing the following :
 1. Open a terminal and change directory to the sample base directory
 2. Type the following command in the terminal: ```make run``` 
 
-When the application runs normally, another window should pop up and show the feed from the Intel RealSense depth camera. The program should perform inferences on frames taken from the Intel RealSense depth camera.
+When the application runs normally, another window should pop up and show the semantic segmentation colors overlayed onto the sample image.
 
 **Keybindings**:
 - q or Q - Quit the application
 
+## Model Information
+### Inputs
+ - name: 'data', shape: [1x3x1024x2048], Expected color order is BGR after optimization. 
+### Outputs 
+ - name: 'argmax', shape: [1x3x1024x2048] - Each value represents a pixel in an image and the index of a class.
 
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.

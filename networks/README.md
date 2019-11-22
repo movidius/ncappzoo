@@ -37,3 +37,4 @@ This directory should be a preferred location for neural networks rather than th
 |Network| Description |
 |---------------------|-------------|
 |[facenet](facenet/README.md) |FaceNet is a nework that is trained to find and quantify landmarks on faces in general.  By comparing the face landmark quantification values (network inference output) on two images, it is possible to determine how likely the two faces are of the same person.  This is based on [work by David Sandberg](https://github.com/davidsandberg/facenet).  |
+|[segmantic segmentation adas 0001](semantic_segmentation_adas_0001/README.md) | Semantic segmentation adas 0001 is a nework that is trained to do semantic segmentation on 20 different classes. [More information specific to this networkis avaialble.](https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html)  |

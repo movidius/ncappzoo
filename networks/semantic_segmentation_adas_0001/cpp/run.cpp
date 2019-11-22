@@ -8,17 +8,15 @@
 
 #include <iostream>
 #include <vector>
-#include <time.h>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 
-#include <librealsense2/rs.hpp>
 #include <inference_engine.hpp>
 
 // window name
-#define WINDOW_NAME "Realsense Segmentation - NCS2/OpenVINO - press q to quit"
+#define WINDOW_NAME "Semantic Segmentation Adas 0001 - press q to quit"
 // label file
 #define segmentationNetworkLabelsFile "../seg_labels.txt"
 
@@ -35,10 +33,8 @@ const unsigned int MAX_PATH = 256;
 
 using namespace InferenceEngine;
 
-
 const float alpha = 0.5; 
 const float beta =  1.0 - alpha;
-
 
 // Segmentation class color values. Each set of BGR values correspond to a class.
 // Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
@@ -65,7 +61,6 @@ std::vector<cv::Vec3b> colors = {
     {0,   74,  111},        // ego-vehicle
 };
        
-
 
 /*
  * read network labels from file
@@ -114,8 +109,6 @@ int main (int argc, char** argv)
 {
     char key; 
     std::vector <std::string> segmentationNetworkLabels;
-    
-
 
     // ----------------------------------Segmentation Network Setup----------------------------------
 
@@ -146,6 +139,8 @@ int main (int argc, char** argv)
     auto netOutputInfo = netOutputDataMap.begin()->second;
     netOutputInfo->setPrecision(Precision::FP32);
     std::string segmentationNetworkOutputLayerName = netOutputDataMap.begin()->first;
+    std::cout << "input: " << segmentationNetworkInputLayerName << '\n';
+    std::cout << "output: " << segmentationNetworkOutputLayerName << '\n';
 
     // ----------Create executable network object----------
     
@@ -229,7 +224,7 @@ int main (int argc, char** argv)
     // Blend both the segmentation color mat and the camera color mat together
     addWeighted(segmentationColorMat, alpha, originalImg, beta, 0.0, finalResultMat);
 
-
+    // ----------OpenCV window and display setup----------
     // Set up the openCV display window
     cv::namedWindow(WINDOW_NAME, cv::WINDOW_NORMAL);
     cv::resizeWindow(WINDOW_NAME, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -245,6 +240,7 @@ int main (int argc, char** argv)
         if (tolower(key) == 'q')
             break;
     }
+    // ----------Clean up----------
     // Close all windows
     cv::destroyAllWindows();
     std::cout << "\nFinished." << std::endl;

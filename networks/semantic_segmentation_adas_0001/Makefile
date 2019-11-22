@@ -11,12 +11,16 @@ MODEL_DOWNLOADER_FILENAME = downloader.py
 SEG_MODEL_ZOO_DIR = Transportation/segmentation/semantic_segmentation/icnet_icv/dldt/FP16
 MODEL_FILE_NAME_BASE = semantic-segmentation-adas-0001
 
+GET_PICTURES = wget -c --no-cache -P . https://raw.githubusercontent.com/tomepetty/media/master/pedestrian_pics/licenses.txt; \
+             wget -c --no-cache -P . https://raw.githubusercontent.com/tomepetty/media/master/pedestrian_pics/people-brasil-guys-avpaulista-109919.jpg
+
+
 .PHONY: all
 all: deps data compile_cpp
 
 
 .PHONY: data
-data: 
+data: pictures
 	@echo $(YELLOW)'\n'${APP_NAME}": No data required."$(NOCOLOR)
 
 
@@ -24,6 +28,12 @@ data:
 deps: get_ir
 	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 	
+
+.PHONY: pictures
+pictures:
+	@echo '\n'${NETWORK_NAME}": Downloading images..."
+	(${GET_PICTURES};)
+
 
 .PHONY: model_zoo
 model_zoo:
@@ -65,21 +75,6 @@ compile_cpp:
 	else \
 		echo "Intel OpenVINO environment is already set!" ; \
 	fi
-	@echo "Checking Realsense prerequisites..."
-	@if dpkg -l | grep librealsense2-dkms >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-dkms is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-dkms is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
-	@if dpkg -l | grep librealsense2-dev >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-dev is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-dev is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
 	(mkdir -p build; cd build; cmake ..; make;)
 
 
@@ -90,41 +85,19 @@ run: run_cpp
 .PHONY: run_cpp
 run_cpp: deps data compile_cpp
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)
-	@echo "Checking Realsense prerequisites..."
-	@if dpkg -l | grep librealsense2-dkms >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-dkms is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-dkms is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
-	@if dpkg -l | grep librealsense2-dev >> /dev/null ; \
-	then \
-	    echo "\nlibrealsense2-dev is installed." ; \
-	else \
-	    echo $(YELLOW)"\nlibrealsense2-dev is not installed. Please run the command 'make install-reqs' to install all sample requirements.\n"$(NOCOLOR); \
-	    exit 1; \
-	fi
-	(cd build; ./${APP_NAME} ../test2.jpg; cd ..;)
+	(cd build; ./${APP_NAME} ../people-brasil-guys-avpaulista-109919.jpg; cd ..;)
 
 
 .PHONY: install-reqs
 install-reqs: 
 	@echo $(YELLOW)"\n"$(APP_NAME)": Checking installation requirements..."$(NOCOLOR)
-	@echo "Installing Intel Realsense SDK 2 packages - dkms, dev..."
-	@echo 'deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo xenial main' | sudo tee /etc/apt/sources.list.d/realsense-public.list; \
-	sudo apt-key adv --keyserver keys.gnupg.net --recv-key 6F3EFCDE; \
-	sudo apt-get update; \
-	sudo apt-get install librealsense2-dkms; \
-	sudo apt-get install librealsense2-dev
+	@echo "No requirements needed."
 
 
 .PHONY: uninstall-reqs
 uninstall-reqs: 
 	@echo $(YELLOW)'\n'${APP_NAME}": Uninstalling requirements..."$(NOCOLOR)
-	sudo apt-get -y purge librealsense2-dkms; \
-	sudo apt-get -y purge librealsense2-dev
-		
+	@echo "Nothing to uninstall."
 
 .PHONY: help
 help:
@@ -135,12 +108,18 @@ help:
 	@echo $(YELLOW)"  make data "$(NOCOLOR)"- downloads data as needed";
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
-	@echo          "        - This command will install the Realsense SDK 2.0 dkms and dev packages."
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content\n"
+	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
+	@echo $(YELLOW)" Description: "$(NOCOLOR)
+	@echo "  This network does semantic segmentation on 20 different classes.";
+	@echo $(YELLOW)" Model inputs:"$(NOCOLOR)
+	@echo "  name: 'data', shape: [1x3x1024x2048], Expected color order is BGR after optimization.";
+	@echo $(YELLOW)" Model outputs:"$(NOCOLOR)
+	@echo "  name: 'argmax', shape: [1x3x1024x2048] - Each value represents a pixel in an image and the index of a class.\n";
 	@echo " ------ "$(YELLOW)"Keybindings"$(NOCOLOR)" -------"
-	@echo "  q or Q - quits the program"
+	@echo "  q or Q - quits the program\n"
 	
 
 clean: 
@@ -148,4 +127,6 @@ clean:
 	rm -rf build
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${MODEL_FILE_NAME_BASE}.xml
+	rm -rf people-brasil-guys-avpaulista-109919.jpg
+	rm -rf licenses.txt
 	
