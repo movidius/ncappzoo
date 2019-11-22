@@ -72,9 +72,6 @@ Gathers all of the required data need to run the sample.
 ### make deps
 Builds all of the dependencies needed to run the sample.
 
-### make default_model
-Compiles an IR file from a default model to be used when running the sample.
-
 ### make install-reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
 
