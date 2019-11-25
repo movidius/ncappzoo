@@ -2,6 +2,8 @@
 ## Introduction
 This app does semantic segmentation using the [semantic-segmentation-adas-0001](../../networks/semantic_segmentation_adas_0001/README.md), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R3](https://software.intel.com/en-us/openvino-toolkit) and the [Intel® RealSense™ depth camera](https://store.intelrealsense.com). The app takes color and depth frames from a a video stream from the Intel RealSense depth camera (tested with [Intel RealSense D415](https://www.intelrealsense.com/depth-camera-d415/)) and performs semantic segmentation on the color frames. The semantic segmentation inference results will colorize pixels and overlay them onto the color frame. These colorized pixels represent different objects. Based on where the mouse pointer is at, the app will tell you what object and the distance to that object on a pixel by pixel basis. 
 
+![](realsense_segmentation.gif)
+
 
 ## Prerequisites
 This program requires:
