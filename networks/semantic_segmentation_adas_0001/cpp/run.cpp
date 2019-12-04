@@ -17,8 +17,6 @@
 
 // window name
 #define WINDOW_NAME "Semantic Segmentation Adas 0001 - press q to quit"
-// label file
-#define segmentationNetworkLabelsFile "../seg_labels.txt"
 
 #define DEVICE "MYRIAD"
 // Location of the segmentation network xml file
@@ -29,8 +27,6 @@
 #define WINDOW_HEIGHT 480
 #define CAP_FPS 30
 
-const unsigned int MAX_PATH = 256;
-
 using namespace InferenceEngine;
 
 const float alpha = 0.5; 
@@ -39,51 +35,28 @@ const float beta =  1.0 - alpha;
 // Segmentation class color values. Each set of BGR values correspond to a class.
 // Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
 std::vector<cv::Vec3b> colors = {
-    {128, 64,  128},        // road
-    {232, 35,  244},        // sidewalk
-    {70,  70,  70},         // building
-    {156, 102, 102},        // wall
-    {153, 153, 190},        // fence
-    {153, 153, 153},        // pole
-    {30,  170, 250},        // traffic light
-    {0,   220, 220},        // traffic sign
-    {35,  142, 107},        // vegetation
-    {152, 251, 152},        // terrain
-    {180, 130, 70},         // sky
-    {60,  20,  220},        // person
-    {0,   0,   255},        // rider
-    {142, 0,   0},          // car
-    {70,  0,   0},          // truck
-    {100, 60,  0},          // bus
-    {90,  0,   0},          // train
-    {230, 0,   0},          // motorcycle
-    {32,  11,  119},        // bicycle
-    {0,   74,  111},        // ego-vehicle
+    {128, 64,  128},        
+    {232, 35,  244},        // road
+    {70,  70,  70},         // sidewalk
+    {156, 102, 102},        // building
+    {153, 153, 190},        // wall
+    {153, 153, 153},        // fence
+    {30,  170, 250},        // pole
+    {0,   220, 220},        // traffic light
+    {35,  142, 107},        // traffic sign
+    {152, 251, 152},        // vegetation
+    {180, 130, 70},         // terrain
+    {60,  20,  220},        // sky
+    {0,   0,   255},        // person
+    {142, 0,   0},          // rider
+    {70,  0,   0},          // car
+    {100, 60,  0},          // truck
+    {90,  0,   0},          // bus
+    {230, 0,   0},          // train
+    {32,  11,  119},        // motorcycle
+    {0,   74,  111},        // bicycle
+    {81,  0,   81}          // ego-vehicle
 };
-       
-
-/*
- * read network labels from file
- */
-void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVector)
-{
-    char filename[MAX_PATH];
-    strncpy(filename, labelsDir.c_str(), MAX_PATH);
-    FILE* catFile = fopen(filename, "r");
-    if (catFile == nullptr) {
-        std::cerr << "Could not find Category file." << std::endl;
-        exit(1);
-    }
-
-    char catLine[255];
-    
-    while (fgets(catLine , 255 , catFile) != NULL) {
-        if (catLine[strlen(catLine) - 1] == '\n')
-            catLine[strlen(catLine) - 1] = '\0';
-        labelsVector->push_back(std::string(catLine));
-    }
-    fclose (catFile);
-}
 
 
 
@@ -101,18 +74,13 @@ InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath)
 }
 
 
-
 /*
  * Start.
  */
 int main (int argc, char** argv) 
 {
     char key; 
-    std::vector <std::string> segmentationNetworkLabels;
-
     // ----------------------------------Segmentation Network Setup----------------------------------
-
-    getNetworkLabels(segmentationNetworkLabelsFile, &segmentationNetworkLabels);
     
     // ----------Create inference engine core object and network object----------
     
@@ -139,8 +107,6 @@ int main (int argc, char** argv)
     auto netOutputInfo = netOutputDataMap.begin()->second;
     netOutputInfo->setPrecision(Precision::FP32);
     std::string segmentationNetworkOutputLayerName = netOutputDataMap.begin()->first;
-    std::cout << "input: " << segmentationNetworkInputLayerName << '\n';
-    std::cout << "output: " << segmentationNetworkOutputLayerName << '\n';
 
     // ----------Create executable network object----------
     
