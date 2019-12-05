@@ -22,6 +22,10 @@ $(SUBDIRS):
 
 .PHONY: $(TOPTARGETS) $(SUBDIRS)
 
+.PHONY: install_deps
+install_deps:
+	./install_deps.sh
+
 .PHONY: help
 help:
 	@echo "\nPossible Make targets"
