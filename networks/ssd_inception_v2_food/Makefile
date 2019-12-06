@@ -222,8 +222,70 @@ run: run_py
 .PHONY: run_py
 run_py: install-reqs deps data compile_model run_FP16
 
+
+.PHONY: compile_from_training
+compile_from_training:
+	@echo $(YELLOW) '\n'${NETWORK_NAME}": Information disclosure before compiling model." $(NOCOLOR);
+	@echo "The following steps will be taken in order to compile your own model that detects produce:"
+	@echo "  - Freeze trained model"
+	@echo "  - Run frozen model through model optimizer"
+	@echo ""
+	@echo $(YELLOW)"Before proceeding, edit the compile_from_training script in the Makefile."
+	@echo "Specifically, edit the trained_checkpoin_prefix to reflect your true model checkpoint."$(NOCOLOR)
+	@read -p"Press ENTER to continue the steps or Ctrl-C to cancel" variable_nps; echo;
+	@if [ -e ${TF_MODEL_DIRNAME}research/object_detection/export_food_graph ] ;\
+	then \
+		echo "Exported graph exists. Skipping exporting graph..." ;\
+	else \
+		echo "Models directory for TF Object Detection was not found" ;\
+		echo "Please downloading training files using: make download_train_files" ;\
+                cd ${TF_MODEL_DIRNAME}research ;\
+                ./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+                export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
+                export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
+                cd object_detection ;\
+                mkdir export_food_graph ;\
+                python3 export_inference_graph.py \
+                --input_type=image_tensor \
+                --pipeline_config_path=training_food/ssd_inception_v2_coco.config \
+                --trained_checkpoint_prefix=training_food/model.ckpt-0 \
+                --output_directory=export_food_graph ;\
+	fi
+	@echo "Compiling model using model optimizer..."
+	@if [ -e ${TF_MODEL_DIRNAME}research/object_detection/export_food_graph ] ;\
+	then \
+                if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+                then \
+                        echo "Please initiate the OpenVINO environment before optimizing TF graph."; \
+                else \
+                        echo "OpenVINO environment set. Continuing with optimizing TF graph..." ;\
+			cd ${TF_MODEL_DIRNAME}research/object_detection/export_food_graph ;\
+			mkdir ssd_inception_v2_mo_fp32_train ;\
+			mkidr ssd_inception_v2_mo_fp16_train ;\
+			${NCCOMPILE} \
+			--data_type=FP32 --reverse_input_channels \
+			--input_model frozen_inference_graph.pb \
+			--tensorflow_object_detection_api_pipeline_config ../training_food/ssd_inception_v2_coco.config \
+			--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
+			--output_dir ssd_inception_v2_mo_fp32_train ;\
+			${NCCOMPILE} \
+			--data_type=FP16 --reverse_input_channels \
+			--input_model frozen_inference_graph.pb \
+			--tensorflow_object_detection_api_pipeline_config ../training_food/ssd_inception_v2_coco.config \
+			--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
+			--output_dir ssd_inception_v2_mo_fp16_train ;\
+			mv ssd_inception_v2_mo_fp16_train ../../../../ssd_inception_v2_mo_fp16_train ;\
+			mv ssd_inception_v2_mo_fp32_train ../../../../ssd_inception_v2_mo_fp32_train ;\
+			echo "Successfully exported and optimized training graphs!" ;\
+                fi ; \
+	else \
+		echo "No exported graph was made, so graph optimization could not be completed." ;\
+	fi
+
+
 .PHONY: train
 train: train_info download_train_files set_up_training_api copy_training_files train_model
+
 
 .PHONY: train_info
 train_info:
@@ -235,7 +297,7 @@ train_info:
 	@echo "  - Train model using Tensorflow Object Detection API"
 	@echo ""
 	@echo "Throughout this whole process, files will be downloaded and repositories will be cloned."
-	@echo $(YELLOW)"Please pay attention to the prompts before proceeding as installation may error."
+	@echo $(YELLOW)"Please pay attention to the prompts before proceeding as installation may error"
 	@echo "if not followed properly."$(NOCOLOR)
 	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
 
@@ -246,10 +308,11 @@ train_model:
 	@echo "  - Trained network  will be saved in:";
 	@echo "      training_food";
 	@echo ""
-	@echo $(YELLOW)"URGENT: PLEASE DO THE FOLLOWING INSTRUCTIONS BEFORE TRAINING:" ;
+	@echo $(YELLOW)"URGENT: READ THE FOLLOWING INSTRUCTIONS BEFORE TRAINING:" ;
 	@echo "In order to have more verbose logging so you can verify that your model is" ;
-	@echo "actually training, please add the following to line 57 of model_main.py in" ;
-	@echo "models/research/object_detection: tf.logging.set_verbosity(tf.logging.INFO)" $(NOCOLOR);
+	@echo "actually training, adding the following to line 57 of model_main.py in" ;
+	@echo "models/research/object_detection: tf.logging.set_verbosity(tf.logging.INFO)." 
+	@echo "A reference file will be made with the original file content: old_model_main.py" $(NOCOLOR);
 	@echo ""
 	@echo "NOTE: Training files are unfrozen. If would like to export a model,";
 	@echo "enter 'make export_and_optimize_model' to generate an optimized model";
@@ -261,6 +324,20 @@ train_model:
 	@echo "replacing the number on line 136 to any positive integer (ex. 1) after 'batch_size:'."
 	@echo ""
 	@read -p"Press ENTER to continue the steps above (this might take a long time) or Ctrl-C to cancel" variable_nps; echo;
+	
+	@if [ -e ${TF_MODEL_DIRNAME}/research/object_detection/old_model_main.py ] ;\
+	then \
+		echo "Changing model_main.py" ;\
+		cd models/research/object_detection ;\
+		rm -rf model_main.py ;\
+		cp old_model_main.py model_main.py ;\
+		sed -i -e '57itf.logging.set_verbosity(tf.logging.INFO)' model_main.py ;\
+	else \
+		echo "Changing model_main.py and adding a reference file" ;\
+		cd models/research/object_detection ;\
+		cp model_main.py old_model_main.py ;\
+		sed -i -e '57itf.logging.set_verbosity(tf.logging.INFO)' model_main.py ;\
+	fi
 	@if [ -e ${TF_MODEL_DIRNAME} ] ; \
 	then \
 		echo "Directory: ${TF_MODEL_DIRNAME}research/object_detection exists, setting up environment..."; \
@@ -284,11 +361,12 @@ set_up_training_api:
 	@echo $(YELLOW)"Setting up training environment..."
 	@if [ -e cocoapi/PythonAPI ] ; \
 	then \
-		echo $(YELLOW)"URGENT: PLEASE DO THE FOLLOWING BEFORE PROCEEDING:" ;\
-		echo "Replace 'python' with 'python3' in the Makefile within cocoapi/PythonAPI"$(NOCOLOR) ;\
+		echo $(YELLOW)"URGENT: READ FOLLOWING BEFORE PROCEEDING:" ;\
+		echo "Replacing 'python' with 'python3' in the Makefile within cocoapi/PythonAPI"$(NOCOLOR) ;\
 		read -p"Press ENTER to proceed or CTRL+C to exit..." variable_nps; echo ;\
 		echo $(NOCOLOR)"Installing COCO API..." ;\
 		cd cocoapi/PythonAPI ;\
+		sed -i 's/python/python3/g' Makefile ;\
 		make ;\
 		cp -r pycocotools ../../models/research/ ;\
 	else \
@@ -451,3 +529,5 @@ clean: clean
 	rm -rf ${TRAIN_DIR}
 	rm -rf models
 	rm -rf cocoapi
+	rm -rf ssd_inception_v2_mo_fp16_train
+	rm -rf ssd_inception_v2_mo_fp32_train
