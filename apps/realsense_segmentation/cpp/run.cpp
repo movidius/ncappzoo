@@ -71,26 +71,27 @@ cv::Mat segmentationColorMat;
 // Segmentation class color values. Each set of BGR values correspond to a class.
 // Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
 std::vector<cv::Vec3b> colors = {
-    {128, 64,  128},        // road
-    {232, 35,  244},        // sidewalk
-    {70,  70,  70},         // building
-    {156, 102, 102},        // wall
-    {153, 153, 190},        // fence
-    {153, 153, 153},        // pole
-    {30,  170, 250},        // traffic light
-    {0,   220, 220},        // traffic sign
-    {35,  142, 107},        // vegetation
-    {152, 251, 152},        // terrain
-    {180, 130, 70},         // sky
-    {60,  20,  220},        // person
-    {0,   0,   255},        // rider
-    {142, 0,   0},          // car
-    {70,  0,   0},          // truck
-    {100, 60,  0},          // bus
-    {90,  0,   0},          // train
-    {230, 0,   0},          // motorcycle
-    {32,  11,  119},        // bicycle
-    {0,   74,  111},        // ego-vehicle
+    {128, 64,  128},        // background
+    {232, 35,  244},        // road
+    {70,  70,  70},         // sidewalk
+    {156, 102, 102},        // building
+    {153, 153, 190},        // wall
+    {153, 153, 153},        // fence
+    {30,  170, 250},        // pole
+    {0,   220, 220},        // traffic light
+    {35,  142, 107},        // traffic sign
+    {152, 251, 152},        // vegetation
+    {180, 130, 70},         // terrain
+    {60,  20,  220},        // sky
+    {0,   0,   255},        // person
+    {142, 0,   0},          // rider
+    {70,  0,   0},          // car
+    {100, 60,  0},          // truck
+    {90,  0,   0},          // bus
+    {230, 0,   0},          // train
+    {32,  11,  119},        // motorcycle
+    {0,   74,  111},        // bicycle
+    {81,  0,   81}          // ego-vehicle
 };
        
 

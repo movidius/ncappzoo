@@ -1,3 +1,4 @@
+background
 road
 sidewalk
 building
