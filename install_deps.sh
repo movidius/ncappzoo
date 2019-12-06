@@ -17,19 +17,45 @@ if [[ -z "${INTEL_OPENVINO_DIR}" ]]; then
 fi
 
 if ! [[ -x "$(command -v python3)" ]]; then 
-    echo "Python3 is not installed, please install from your package manager (apt install python3)"
-    #install python3
-    exit 1;
+    echo "Python3 is not installed, please install from your package manager (apt install python3), or ensure your path variables are correct."
+    echo "Would you like to install python3 from apt? (Supported Distributions only) [y\n]\n"
+    read pythonAnswer
+    if [ pythonAnswer == y ]; then
+        sudo apt install python3 python3-dev python3-pip
+    else
+        echo "Installation skipped. Please install a compatible version of python to continue."
+        exit 1;
+    fi
 elif ! [[ -x "$(command -v pip3)" ]]; then
     echo "pip for Python3 is not installed. Please install from your package manager, or ensure your path variables are correct."
-    #install pip3
-    exit 1;
+    echo "Would you like to install pip3 from apt? (Supported Distributions only) [y\n]"
+    read pythonAnswer
+    if [ pythonAnswer == y ;] then
+        sudo apt install python3-pip
+    else
+        echo "Installation skipped. Please install a compatible version of python to continue."
+        exit 1;
+        fi
 elif ! [[ -x "$(command -v git)" ]]; then
     echo "git is not installed. Please install from your package manager."
-    exit 1;
+    echo "Would you like to install pip3 from apt? (Supported Distributions only) [y\n]"
+    read gitAnswer
+    if [ gitAnswer == y ]; then
+        sudo apt install git;
+    else
+        "Installation skipped. Please install a compatible version of python to continue."
+        exit 1;
+    fi
 elif ! [[ -x "$(command -v g++)" ]]; then
     echo "Necessary compilers may not be installed. Please install the build-essential package from your package manager."
-    exit 1;
+    echo "Would you like to install build-essential from apt? (Supported Distributions only) [y\n]"
+    read buildAnswer
+    if [ buildAnswer == y ]; then
+        sudo apt install build-essential
+    else
+        "Installation skipped. Please install compatbile C\C++ compilers to continue."
+        exit 1;
+    fi
 fi
 
 
