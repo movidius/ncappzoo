@@ -429,6 +429,9 @@ void initializationThenStartCamera(rs2::pipeline RSpipe)
         // Place some text in the canvas
         std::string playText = "Click anywhere to create snapshot.";
         placeText(playText, canvasTop, cameraColorMatWithCanvas);
+        // Place some text in the canvas
+        std::string quitText = "Press q to quit.";
+        placeText(quitText, canvasMidTop, cameraColorMatWithCanvas);
         
         // Handle mouse events (this is where the inferences will happen) 
         cv::setMouseCallback(WINDOW_NAME, mouseCallBackFunctionPlay, &cameraColorMat);
