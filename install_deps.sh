@@ -7,8 +7,8 @@ echo "Checking system dependencies...\n"
 if [[ -f /opt/intel/openvino/bin/setupvars.sh ]]; then
     echo "Intel Distribution of OpenVINO is installed."
 else
-    echo "The OpenVINO toolkit might not be installed. If you have built the open-source version of the toolkit and have properly set your environment variables, ignore this message. \
-    \n Otherwise, please install the Intel Distribution of OpenVINO toolkit from https://https://software.intel.com/en-us/openvino-toolkit"
+    printf "The OpenVINO toolkit might not be installed. If you have built the open-source version of the toolkit and have properly set your environment variables, ignore this message. \
+    Otherwise, please install the Intel Distribution of OpenVINO toolkit from https://https://software.intel.com/en-us/openvino-toolkit"
 fi
 
 if [[ -z "${INTEL_OPENVINO_DIR}" ]]; then
