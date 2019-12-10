@@ -80,3 +80,5 @@ else
         exit 1
     fi
 fi
+
+echo -e "\e[32mncappzoo is ready.\e[39m"
