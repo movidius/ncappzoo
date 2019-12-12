@@ -15,17 +15,31 @@ else
     if [[ $openvinoAnswer == y ]]; then
         echo "Fetching the Intel Distribution of OpenVINO..."
         if [[ ! -d ~/Downloads ]]; then
-            echo "Creating Downloads folder in $(whoami) home directory..."
+            echo "Creating Downloads folder in current user home directory..."
             mkdir ~/Downloads/
         fi
         cd ~/Downloads
-        if [[ ! -d ~/Downloads/l_openvino_toolkit_p_2019.3.376 ]]; then #if the download completes and extracted, but the installation failed
-            wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
-            tar -xvzf l_openvino_toolkit_p_2019.3.376.tgz
+        if [[ $(uname -m) == "x86_64" ]]; then
+            if [[ ! -d ~/Downloads/l_openvino_toolkit_p_2019.3.376 ]]; then #if the download completes and extracted, but the installation failed
+                wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
+                tar -xvzf l_openvino_toolkit_p_2019.3.376.tgz
+            fi
+            cd l_openvino_toolkit_p_2019.3.376
+            sudo ./install_openvino_dependencies.sh
+            sudo ./install.sh
+            source /opt/intel/openvino/install_dependencies/install_NCS_udev_rules.sh
+        else
+            if [[ ! -d /opt/intel/openvino ]]; then
+                sudo mkdir -p /opt/intel/openvino
+            fi
+            if [[ ! -f l_openvino_toolkit_runtime_raspbian_p_2019.3.334 ]]; then
+                wget https://download.01.org/opencv/2019/openvinotoolkit/R3/l_openvino_toolkit_runtime_raspbian_p_2019.3.334.tgz
+            fi
+            sudo tar -xvzf l_openvino_toolkit_runtime_raspbian_p_2019.3.334.tgz --strip 1 -C /opt/intel/openvino
+            sudo /opt/intel/openvino/install_all_dependencies.sh
+            sudo usermod -a -G users $(whoami)
+            echo -e "\e[36mYou must restart your device to continue.\e[39m"
         fi
-        cd l_openvino_toolkit_p_2019.3.376
-        sudo ./install_openvino_dependencies.sh
-        sudo ./install.sh
     fi
 fi
 
