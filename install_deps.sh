@@ -4,11 +4,21 @@
 # If any are missing, it will prompt to install or provide instructions on installing
 
 echo "Checking system dependencies...\n"
-if [[ -f /opt/intel/openvino/bin/setupvars.sh || -f ~/intel/openvino/bin/setupvar.sh ]]; then
+if [[ -f /opt/intel/openvino/bin/setupvars.sh || -f ~/intel/openvino/bin/setupvar.sh || -z "${INTEL_OPENVINO_DIR}" ]]; then
     echo "Intel Distribution of OpenVINO is installed."
 else
     echo -e "\e[33mThe OpenVINO toolkit might not be installed. If you have built the open-source version of the toolkit and have properly set your environment variables, ignore this message. \
+    \n\nIf you have not set your environment variables, please set the INTEL_OPENVINO_DIR variable to point to your OpenVINO build! \n
     \nOtherwise, please install the Intel Distribution of OpenVINO toolkit from https://https://software.intel.com/en-us/openvino-toolkit\e[39m"
+    echo -e "\e[35mWould you like this script to install the Intel Distribution of OpenVINO? [y\\n]\n"
+    read openvinoAnswer
+    if [[ $openvinoAnswer == y]]; then
+        echo "Fetching the Intel Distribution of OpenVINO..."
+        cd ~/Downloads
+        wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
+        tar -xvzf l_openvino_toolkit_p_2019.tar.gz
+        cd l_openvino_toolkit_p_2019
+        sudo ./install.sh
 fi
 
 if [[ -z "${INTEL_OPENVINO_DIR}" ]]; then
