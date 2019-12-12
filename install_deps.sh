@@ -4,25 +4,33 @@
 # If any are missing, it will prompt to install or provide instructions on installing
 
 echo "Checking system dependencies...\n"
-if [[ -f /opt/intel/openvino/bin/setupvars.sh || -f ~/intel/openvino/bin/setupvar.sh || -z "${INTEL_OPENVINO_DIR}" ]]; then
+if [[ -f /opt/intel/openvino/bin/setupvars.sh || -f ~/intel/openvino/bin/setupvar.sh || -n "${INTEL_OPENVINO_DIR}" ]]; then
     echo "Intel Distribution of OpenVINO is installed."
 else
     echo -e "\e[33mThe OpenVINO toolkit might not be installed. If you have built the open-source version of the toolkit and have properly set your environment variables, ignore this message. \
     \n\nIf you have not set your environment variables, please set the INTEL_OPENVINO_DIR variable to point to your OpenVINO build! \n
     \nOtherwise, please install the Intel Distribution of OpenVINO toolkit from https://https://software.intel.com/en-us/openvino-toolkit\e[39m"
-    echo -e "\e[35mWould you like this script to install the Intel Distribution of OpenVINO? [y\\n]\n"
+    echo -e "\n\e[35mWould you like this script to install the Intel Distribution of OpenVINO? [y\\\n]\n\e[39m"
     read openvinoAnswer
-    if [[ $openvinoAnswer == y]]; then
+    if [[ $openvinoAnswer == y ]]; then
         echo "Fetching the Intel Distribution of OpenVINO..."
+        if [[ ! -d ~/Downloads ]]; then
+            echo "Creating Downloads folder in $(whoami) home directory..."
+            mkdir ~/Downloads/
+        fi
         cd ~/Downloads
-        wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
-        tar -xvzf l_openvino_toolkit_p_2019.tar.gz
-        cd l_openvino_toolkit_p_2019
+        if [[ ! -d ~/Downloads/l_openvino_toolkit_p_2019.3.376 ]]; then #if the download completes and extracted, but the installation failed
+            wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
+            tar -xvzf l_openvino_toolkit_p_2019.3.376.tgz
+        fi
+        cd l_openvino_toolkit_p_2019.3.376
+        sudo ./install_openvino_dependencies.sh
         sudo ./install.sh
+    fi
 fi
 
 if [[ -z "${INTEL_OPENVINO_DIR}" ]]; then
-    echo "Please source the setupvars.sh script to set the environment variables for the current shell."
+    echo "\nPlease source the setupvars.sh script to set the environment variables for the current shell."
     exit 1
 fi
 
@@ -76,7 +84,7 @@ else
 fi
 
 #Python Packages: checks for networkx and tensorflow, the two basic packages needed by the Model Optimizer for most of the apps.
-if pip3 list --format=columns | grep -i 'networkx\|tensorflow\|numpy'; then
+if pip3 list --format=columns | grep -i 'networkx\|tensorflow'; then
     echo "Minimal Python packages installed"
 else   
     echo -e "Python packages not installed. Please install from pip or from the Model Optimzer in OpenVINO, or source the appropriate virutalenv.\n"
