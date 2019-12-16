@@ -46,7 +46,10 @@ Runs the `ssd_inception_v2_food.py` script with the FP32 network. Note that this
 Runs the `ssd_inception_v2_food.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make train
-**TO BE IMPLEMENTED.** Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
+Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
+
+### make compile_from_training
+Compiles model from trained SSD Inception V2 model. This is not the same as `make compile_model` since we are compiling the model from `make train` on your local computer.
 
 ### make help
 Shows makefile possible targets and brief descriptions.
