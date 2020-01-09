@@ -41,3 +41,13 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+# just-the-docs specific configuraitons
+
+color_scheme: "dark"
+
+aux_links:
+  "ncappzoo on GitHub":
+  - "//github.com/movidius/ncappzoo"
+
+footer_content: "ncappzoo &copy; 2020 Intel Corportation. Distributed under the <a href=\"https://github.com/movidius/ncappzoo/blob/master/LICENSE\">MIT License.</a> Individual applications and networks may retain individual copyrights. Other copyrights and trademarks may be property of others. All rights reserved."
