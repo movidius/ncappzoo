@@ -97,7 +97,9 @@ The ncappzoo contains the following top-level directories.  See the README file 
 The top-level directories above have subdirectories that hold project content. Each of these project subdirectories has one or more owners that assumes responsibility for it. The [OWNERS](OWNERS) file contains the mapping of subdirectory to owner. 
 
 ## Contributing to the ncappzoo
-The more contributions to the ncappzoo, the more successful the community will be! We always encourage everyone with Neural Compute Stick related content to share by contributing their applications and model related work to the ncappzoo. It's easy to do, and even when contributing new content, you will be the owner and maintainer of the content.
+The _ncappzoo_ is meant to explore and teach features available for the Intel&reg; Movidius&trade; Neural Compute Stick and Intel&reg; Neural Compute Stick 2 with the Intel&reg; OpenVINO&trade; toolkit. The more contributions to the ncappzoo, the more successful this community will be! We always encourage everyone with Neural Compute Stick related content to share by contributing their applications and model-related work to the ncappzoo. It's easy to do, and even when contributing new content you will be the owner and maintainer of the content.
+
+If your inclusion is an opportunity to explore a new idea in computer vision, add as much documentation about the functionality and your process in creating your app or network, including smartly commenting your code. This will give others - and you! - a chance to learn from your addition. Your addition will help grow our community and improve all of our AI and computer vision skills. Most importantly, the insights you get from releasing your app into the wild here will only help you down the line if you ever want to commercialize your idea. As always, your work in the _ncappzoo_ should be properly attributed so that its ownership will always be managed by you and those you grant additional rights to.
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) file for instructions and guidelines for contributing.
 
