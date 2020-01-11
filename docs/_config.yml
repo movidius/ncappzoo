@@ -29,6 +29,7 @@ markdown: kramdown
 theme: just-the-docs
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
@@ -51,3 +52,5 @@ aux_links:
   - "//github.com/movidius/ncappzoo"
 
 footer_content: "ncappzoo &copy; 2020 Intel Corportation. Distributed under the <a href=\"https://github.com/movidius/ncappzoo/blob/master/LICENSE\">MIT License.</a> Individual applications and networks may retain individual copyrights. Other copyrights and trademarks may be property of others. All rights reserved."
+
+search_enabled: true
