@@ -1,3 +1,8 @@
+---
+layout: default
+title: tiny_yolo_v3
+parent: Networks
+---
 # tiny yolo v3
 ## Introduction
 The tiny yolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
