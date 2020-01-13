@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: ncappzoo
-email: andrew.herrold@intel.com
+email: ncappzoo@intel.com
 description: >- # this means to ignore newlines until "baseurl:"
   The ncappzoo is a collection of apps, demos, and neural networks showcasing the
   Intel® Neural Compute Stick 2 and AI applications created with the
