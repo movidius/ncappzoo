@@ -9,7 +9,7 @@ The Neural Compute Stick Application Zoo (ncappzoo) is a project created by Inte
 
 For comments or concerns that cannot be handled in GitHub's public issue tracker or the public ncappzoo Wiki or other such public forums, such as major security issues or actions that go against the Community Code of Conduct, please contact [ncappzoo@intel.com](mailto:ncappzoo@intel.com)
 
-Code, content, and network information rights are retained by their original owners, unless otherwise noted in the individual application's license or README. Some code may not be licensed for commercial use or reuse - see the individual code's license for more information.
+Code, content, and network information rights are retained by their original owners, unless otherwise noted in the individual application's license or README. Some code may not be licensed for commercial use or reuse - see the individual code's license for more information. See an app or network's AUTHOR file for information on code authoring and copyright.
 
 ## Attribution
 

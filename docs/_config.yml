@@ -20,9 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Intel® Neural Compute Stick 2 and AI applications created with the
   Intel® OpenVINO™ toolkit.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+url: "http://ncappzoo.com" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 markdown: kramdown
@@ -51,6 +49,6 @@ aux_links:
   "ncappzoo on GitHub":
   - "//github.com/movidius/ncappzoo"
 
-footer_content: "ncappzoo &copy; 2020 Intel Corportation. Distributed under the <a href=\"https://github.com/movidius/ncappzoo/blob/master/LICENSE\">MIT License.</a> Individual applications and networks may retain individual copyrights. Other copyrights and trademarks may be property of others. All rights reserved."
+footer_content: "This repository is distributed under the <a href=\"https://github.com/movidius/ncappzoo/blob/master/LICENSE\">MIT License.</a> Individual applications and networks may retain individual copyrights. Other copyrights and trademarks may be property of others. All rights reserved."
 
 search_enabled: true
