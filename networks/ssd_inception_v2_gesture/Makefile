@@ -424,7 +424,7 @@ compile_model: get_model
 .PHONY: install-reqs
 install-reqs:
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Checking application requirements...\n"$(NOCOLOR)
-	pip3 uninstall gdown
+	pip3 install --user gdown
 
 
 .PHONY: run_FP16
@@ -445,12 +445,12 @@ run: run_py
 
 .PHONY: run_py
 run_py: install-reqs deps data compile_model run_FP16
-	
-	
+
+
 .PHONY: uninstall-reqs
-uninstall-reqs: 
+uninstall-reqs:
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Uninstalling requirements..."$(NOCOLOR)
-	@echo "Nothing to uninstall."
+	pip3 uninstall gdown
 
 
 .PHONY: help
