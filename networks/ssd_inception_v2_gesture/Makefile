@@ -424,7 +424,7 @@ compile_model: get_model
 .PHONY: install-reqs
 install-reqs:
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Checking application requirements...\n"$(NOCOLOR)
-	pip3 install --user gdown
+	@echo "Nothing to install..."
 
 
 .PHONY: run_FP16
