@@ -1,9 +1,10 @@
-# gender_age: 
+# gender_age
 ## Introduction
 This app does facial detection and age/gender inference using the Intel Movidius Neural Compute Stick 2. 
 
-The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
+The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. When running, the app shows the realtime camera preview while overlaying, a box around faces (color coded for gender), and an estimated age.  All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
 
+![](gender_age_3.gif)
 
 ## Building the Example
 
@@ -22,7 +23,7 @@ When the application runs normally, another window should pop up and show the fe
 ## Prerequisites
 This program requires:
 - 1 NCS device
-- OpenVINO 2019 R2 Toolkit
+- OpenVINO 2019 R3 Toolkit
 - OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
 - A webcam (laptop or USB)
 
@@ -34,7 +35,7 @@ Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 mac
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
 
-### make run
+### make run or make run_cpp
 Runs the sample application.
 
 ### make help
@@ -49,10 +50,15 @@ Gathers all of the required data need to run the sample.
 ### make deps
 Builds all of the dependencies needed to run the sample.
 
-### make install_reqs
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
+
+### make install-reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.
-
 

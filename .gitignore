@@ -11,5 +11,11 @@ CMakeLists.txt.user
 #ignore python cache
 __pycache__
 
+#ignore macOS specific files
+.DS_Store
 
+#ignore python virtual environments
+.venv
 
+#ignore VS Code generated directories
+.vscode

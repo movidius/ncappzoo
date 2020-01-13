@@ -2,7 +2,7 @@
 ## Introduction
 This application runs inferences on frames captured through a webcam using [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet).  Although the sample uses GoogLeNet as the default network, other classifier models can also be used (see [Options](#options-for-run.py) section).  The provided Makefile does the following
 
-1. Downloads the Caffe prototxt file and makes few changes necessary to work with the Intel® Neural Compute Stick (NCS1/NCS2) and the OpenVINO toolkit (tested with version 2019 R2).
+1. Downloads the Caffe prototxt file and makes few changes necessary to work with the Intel® Neural Compute Stick (NCS1/NCS2) and the OpenVINO toolkit (tested with version 2019 R3).
 2. Downloads and generates the required ilsvrc12 data.
 3. Downloads the caffemodel weights file from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 3. Compiles the model to an IR (Intermediate Representation) format file using the Model Optimizer. An IR is a static representation of the model that ia compatitible with the OpenVINO Inference Engine API. 
@@ -18,7 +18,7 @@ All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
 This program requires:
 - 1 Intel NCS device
-- OpenVINO 2019 R2 toolkit
+- OpenVINO 2019 R3 toolkit
 - A webcam (laptop or USB)
 
 ## Makefile
@@ -39,8 +39,14 @@ Gathers all of the required data need to run the sample.
 ### make deps
 Builds all of the dependencies needed to run the sample.
 
-### make install_reqs
+### make default_model
+Compiles an IR file from a default model to be used when running the sample.
+
+### make install-reqs
 Checks required packages that aren't installed as part of the OpenVINO installation. 
+
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
  
 ### make clean
 Removes all the temporary files that are created by the Makefile.

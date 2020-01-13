@@ -65,7 +65,6 @@ TF_MODEL_REPO = git clone https://github.com/tensorflow/models.git
 PROTOC_FILE = models/research/protobuf.zip
 PROTOC_DOWNLOAD = wget -O ${PROTOC_FILE} https://github.com/google/protobuf/releases/download/v3.0.0/protoc-3.0.0-linux-x86_64.zip
 
-
 .PHONY: all
 all: deps data compile_model
 
@@ -422,7 +421,6 @@ compile_model: get_model
 		${GET_MO_MODEL_FP16_LABELS} ;\
 	fi
 
-
 .PHONY: install-reqs
 install-reqs:
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Checking application requirements...\n"$(NOCOLOR)
@@ -447,14 +445,19 @@ run: run_py
 
 .PHONY: run_py
 run_py: install-reqs deps data compile_model run_FP16
+	
+	
+.PHONY: uninstall-reqs
+uninstall-reqs: 
+	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Uninstalling requirements..."$(NOCOLOR)
+	@echo "Nothing to uninstall."
 
 
 .PHONY: help
 help:
 	@echo "\nPossible make targets"
 	@echo $(YELLOW)"  make help " $(NOCOLOR) "- Shows this message.";
-	@echo $(YELLOW)"  make run " $(NOCOLOR) "- Runs the Python example.";
-	@echo $(YELLOW)"  make run_py " $(NOCOLOR) "- Runs the Python example.";
+	@echo $(YELLOW)"  make run or run_py " $(NOCOLOR) "- Runs the Python example.";
 	@echo $(YELLOW)"  make run_FP16 "  $(NOCOLOR) "- Runs the Python example with FP16 model.";
 	@echo $(YELLOW)"  make run_FP32 " $(NOCOLOR) "- Runs the Python example with FP32 model.";
 	@echo $(YELLOW)"  make all " $(NOCOLOR) "- Makes everything needed to run, but doesn't run the sample.";
@@ -462,6 +465,8 @@ help:
 	@echo $(YELLOW)"  make get_model " $(NOCOLOR) "- Downloads the model files.";
 	@echo $(YELLOW)"  make data " $(NOCOLOR) "- Downloads required data.";
 	@echo $(YELLOW)"  make deps " $(NOCOLOR) "- Makes dependencies for project, prepares model etc.";
+	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
+	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
 	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
 	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a SSD Inception V2  model.";
 

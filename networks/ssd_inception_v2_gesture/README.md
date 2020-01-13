@@ -1,4 +1,4 @@
-# SSD Inception V2
+# SSD Inception V2 Gesture Network
 
 ## Introduction
 The SSD Inception V2 network can be used to detect a number of objects specified by a particular training set. This model in particular can detect the following gestures:
@@ -9,6 +9,8 @@ The SSD Inception V2 network can be used to detect a number of objects specified
 - exposed palm
 - closed fist with exposed bottom palm
 - fist with exposed knuckles.
+
+![](hand_gesture_6.gif)
 
 The provided Makefile does the following:
 1. Downloads a trained model
@@ -43,7 +45,7 @@ Runs the `ssd_inception_v2_gesture.py` script with the FP32 network. Note that t
 Runs the `ssd_inception_v2_gesture.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make train
-**TO BE IMPLEMENTED.** Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
+Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
 
 ### make help
 Shows makefile possible targets and brief descriptions.
@@ -57,8 +59,14 @@ Compiles the trained model to generate a OpenVINO IR file.  This file can be loa
 ### make get_model
 Downloads the trained model.
 
-### deps
+### make deps
 Downloads and prepares a trained network for compilation with the OpenVINO toolkit.
+
+### make install-reqs
+Checks required packages that aren't installed as part of the OpenVINO installation.
+ 
+### make uninstall-reqs
+Uninstalls requirements that were installed by the sample program.
 
 ### make clean
 Removes all the temporary and target files that are created by the Makefile.

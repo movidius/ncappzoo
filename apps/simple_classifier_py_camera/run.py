@@ -32,8 +32,8 @@ def build_parser():
     parser = argparse.ArgumentParser(description = 'Image classifier using \
                          Intel® Movidius™ Neural Compute Stick.' )
     parser.add_argument( '--ir', metavar = 'IR_FILE', 
-                        type=str, default = '../../caffe/SqueezeNet/squeezenet_v1.0.xml',
-                         help = 'Absolute path to the neural network IR file. Default = ../../caffe/SqueezeNet/squeezenet_v1.0.xml.')
+                        type=str, default = '../../networks/squeezenet_v1.0/squeezenet1.0.xml',
+                         help = 'Absolute path to the neural network IR file. Default = ../../networks/squeezenet_v1.0/squeezenet1.0.xml.')
     parser.add_argument( '-l', '--labels', metavar = 'LABELS_FILE',
                         type=str, default = '../../data/ilsvrc12/synset_labels.txt',
                          help='Absolute path to labels file. Default = ../../data/ilsvrc12/synset_labels.txt.')
@@ -154,7 +154,7 @@ def main():
     input_shape, input_blob, output_blob, exec_net = setup_network() 
     
     # Set the camera capture properties
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(ARGS.source)
     CAM_W = ARGS.cap_res[0]
     CAM_H = ARGS.cap_res[1]
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_W);
