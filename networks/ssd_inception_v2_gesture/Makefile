@@ -43,7 +43,7 @@ TRAIN_RECORD_LINK = 'https://drive.google.com/uc?id=13uM9aoxrUvPjZTIkXv33av_Dx8C
 TEST_RECORD_FILE = ./${TRAIN_DIR}/test.record
 TEST_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=17TmM3Sm_dOmCpnZ9ZIIsPTH536PapIP9' -O ${TEST_RECORD_FILE}
 
-TRAIN_PBTXT_FILE = ./${TRAIN_DIR}/object_detection.pbtxt
+TRAIN_PBTXT_FILE = ./${TRAIN_DIR}/object-detection.pbtxt
 TRAIN_PBTXT = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lEq3PtqMTijw12tcOpPrNFplqTNgSCTp' -O ${TRAIN_PBTXT_FILE}
 
 SSD_CONFIG_FILE = ./${TRAIN_DIR}/ssd_inception_v2_coco.config
