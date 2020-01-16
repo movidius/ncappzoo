@@ -53,11 +53,12 @@ TRAIN_PIPE_CONFIG_FILE = ./${TRAIN_DIR}/pipeline.config
 TRAIN_PIPE_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1KBm4HpjdZFNHSbx-T8cIFExgcGaPV-Qs' -O ${TRAIN_PIPE_CONFIG_FILE}
 
 JPEG_ZIP_FILE = ./${TRAIN_DIR}/JPEGImages.zip
-JPEG_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=113g9NlQHmORnVWjohgnDPqW26-2Emvjz' -O ${JPEG_ZIP_FILE}
-JPEG_FOLDER_LINK = 'https://drive.google.com/uc?id=1NJVw3OFORHTYIB4vom4EztL7fKkYLcpA'
+JPEG_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1J5p63WjnkcWAyCQVbaW6qshsUBfX7aZ2' -O ${JPEG_ZIP_FILE}
+JPEG_FOLDER_LINK = 'https://drive.google.com/uc?id=1J5p63WjnkcWAyCQVbaW6qshsUBfX7aZ2'
 
 ANNO_ZIP_FILE = ./${TRAIN_DIR}/Annotations.zip
-ANNO_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1sqll56Naxeb3Wn5yQrw4JO62IxQ2AJ0F' -O ${ANNO_ZIP_FILE}
+ANNO_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=17ZmWWQFV5ljMWTX1HP-dZtD25xKXVCYU' -O ${ANNO_ZIP_FILE}
+ANNO_FOLDER_LINK = 'https://drive.google.com/uc?id=17ZmWWQFV5ljMWTX1HP-dZtD25xKXVCYU'
 
 NETWORK_NAME = SSD Inception v2: Gesture Model
 TF_MODEL_DIRNAME = models/
@@ -126,45 +127,45 @@ compile_from_training:
 	else \
 		echo "Models directory for TF Object Detection was not found" ;\
 		echo "Please downloading training files using: make download_train_files" ;\
-                cd ${TF_MODEL_DIRNAME}research ;\
-                ./bin/protoc object_detection/protos/*.proto --python_out=. ;\
-                export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
-                export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
-                cd object_detection ;\
-                mkdir export_gesture_graph ;\
-                python3 export_inference_graph.py \
-                --input_type=image_tensor \
-                --pipeline_config_path=training_gesture/ssd_inception_v2_coco.config \
-                --trained_checkpoint_prefix=training_gesture/model.ckpt-0 \
-                --output_directory=export_gesture_graph ;\
+    cd ${TF_MODEL_DIRNAME}research ;\
+    ./bin/protoc object_detection/protos/*.proto --python_out=. ;\
+    export PYTHONPATH=$PYTHONPATH:`pwd`/object_detection ;\
+    export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim ;\
+    cd object_detection ;\
+    mkdir export_gesture_graph ;\
+    python3 export_inference_graph.py \
+    --input_type=image_tensor \
+    --pipeline_config_path=training_gesture/ssd_inception_v2_coco.config \
+    --trained_checkpoint_prefix=training_gesture/model.ckpt-0 \
+    --output_directory=export_gesture_graph ;\
 	fi
 	@echo "Compiling model using model optimizer..."
 	@if [ -e ${TF_MODEL_DIRNAME}research/object_detection/export_gesture_graph ] ;\
 	then \
-                if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
-                then \
-                        echo "Please initiate the OpenVINO environment before optimizing TF graph."; \
-                else \
-                        echo "OpenVINO environment set. Continuing with optimizing TF graph..." ;\
-			cd ${TF_MODEL_DIRNAME}research/object_detection/export_gesture_graph ;\
-			mkdir ssd_inception_v2_mo_fp32_train ;\
-			mkidr ssd_inception_v2_mo_fp16_train ;\
-			${NCCOMPILE} \
-			--data_type=FP32 --reverse_input_channels \
-			--input_model frozen_inference_graph.pb \
-			--tensorflow_object_detection_api_pipeline_config ../training_gesture/ssd_inception_v2_coco.config \
-			--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
-			--output_dir ssd_inception_v2_mo_fp32_train ;\
-			${NCCOMPILE} \
-			--data_type=FP16 --reverse_input_channels \
-			--input_model frozen_inference_graph.pb \
-			--tensorflow_object_detection_api_pipeline_config ../training_gesture/ssd_inception_v2_coco.config \
-			--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
-			--output_dir ssd_inception_v2_mo_fp16_train ;\
-			mv ssd_inception_v2_mo_fp16_train ../../../../ssd_inception_v2_mo_fp16_train ;\
-			mv ssd_inception_v2_mo_fp32_train ../../../../ssd_inception_v2_mo_fp32_train ;\
-			echo "Successfully exported and optimized training graphs!" ;\
-                fi ; \
+    if [ -z "$(INTEL_OPENVINO_DIR)" ] ; \
+    then \
+            echo "Please initiate the OpenVINO environment before optimizing TF graph."; \
+    else \
+            echo "OpenVINO environment set. Continuing with optimizing TF graph..." ;\
+						cd ${TF_MODEL_DIRNAME}research/object_detection/export_gesture_graph ;\
+						mkdir ssd_inception_v2_mo_fp32_train ;\
+						mkidr ssd_inception_v2_mo_fp16_train ;\
+						${NCCOMPILE} \
+						--data_type=FP32 --reverse_input_channels \
+						--input_model frozen_inference_graph.pb \
+						--tensorflow_object_detection_api_pipeline_config ../training_gesture/ssd_inception_v2_coco.config \
+						--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
+						--output_dir ssd_inception_v2_mo_fp32_train ;\
+						${NCCOMPILE} \
+						--data_type=FP16 --reverse_input_channels \
+						--input_model frozen_inference_graph.pb \
+						--tensorflow_object_detection_api_pipeline_config ../training_gesture/ssd_inception_v2_coco.config \
+						--tensorflow_use_custom_operations_config ../../../../ssd_v2_support_inception_train.json \
+						--output_dir ssd_inception_v2_mo_fp16_train ;\
+						mv ssd_inception_v2_mo_fp16_train ../../../../ssd_inception_v2_mo_fp16_train ;\
+						mv ssd_inception_v2_mo_fp32_train ../../../../ssd_inception_v2_mo_fp32_train ;\
+						echo "Successfully exported and optimized training graphs!" ;\
+    fi ; \
 	else \
 		echo "No exported graph was made, so graph optimization could not be completed." ;\
 	fi
@@ -238,7 +239,7 @@ download_train_files:
 		echo $(NOCOLOR)"Annotated zip file already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing annotated zip file..."; \
-		${ANNO_DOWNLOAD} ;\
+		gdown ${ANNO_FOLDER_LINK} -O ${ANNO_ZIP_FILE} ;\ ;\
 		unzip ${ANNO_ZIP_FILE} -d train_files/ ;\
 	fi
 	@echo "Downloading larger files using gdown, checking for installation"
@@ -248,7 +249,7 @@ download_train_files:
 		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing train record file..."; \
-		gdown ${TRAIN_FOLDER_LINK} -O train_files/train.record ;\
+		gdown ${TRAIN_RECORD_LINK} -O train_files/train.record ;\
 	fi
 	@if [ -e ${JPEG_ZIP_FILE} ] ; \
 	then \
@@ -475,6 +476,7 @@ clean: clean
 	rm -rf ${GRAPH_DIR_FP32}
 	rm -rf ${GRAPH_DIR_FP16}
 	rm -rf ${MODEL_DIR}
+	rm -rf train_files
 	rm -rf models
 	rm -rf cocoapi
 	rm -rf ssd_inception_v2_mo_fp16_train
