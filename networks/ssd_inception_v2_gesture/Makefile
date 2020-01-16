@@ -234,6 +234,8 @@ download_train_files:
 		echo $(NOCOLOR)"Grabbing protoc file..."; \
 		${PROTOC_DOWNLOAD} ;\
 	fi
+	@echo "Downloading larger files using gdown, checking for installation"
+	pip3 install --user gdown
 	@if [ -e ${ANNO_ZIP_FILE} ] ; \
 	then \
 		echo $(NOCOLOR)"Annotated zip file already exists, skipping network request."; \
@@ -242,8 +244,6 @@ download_train_files:
 		gdown ${ANNO_FOLDER_LINK} -O ${ANNO_ZIP_FILE} ;\ ;\
 		unzip ${ANNO_ZIP_FILE} -d train_files/ ;\
 	fi
-	@echo "Downloading larger files using gdown, checking for installation"
-	pip3 install --user gdown
 	@if [ -e ${TRAIN_RECORD_FILE} ] ; \
 	then \
 		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
