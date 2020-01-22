@@ -20,7 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Intel® Neural Compute Stick 2 and AI applications created with the
   Intel® OpenVINO™ toolkit.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://ncappzoo.com" # the base hostname & protocol for your site, e.g. http://example.com
+#url: "http://ncappzoo.com" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Build settings
 markdown: kramdown
