@@ -1,6 +1,6 @@
 ---
 layout: default
-title: GoogLeNet_V1
+title: googlenet_v1
 parent: Networks
 ---
 # googlenet_v1

@@ -1,10 +1,9 @@
 ---
 layout: default
-title: AlexNet
-
+title: alexnet
 parent: Networks
 ---
-# AlexNet
+# alexnet
 ## Introduction
 The [AlexNet](https://github.com/opencv/open_model_zoo/blob/master/models/public/alexnet/alexnet.md) network can be used for image classification. The model was sourced from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 
