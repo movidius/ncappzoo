@@ -1,10 +1,23 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: home
+title: ncappzoo - Home
+nav_order: 1
+---
+
+
 # Neural Compute Application Zoo (ncappzoo) 
 [![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R3.1)
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) 
+
 
 Welcome to the Neural Compute Application Zoo (ncappzoo). This repository is a place for any interested developers to share their projects (code and Neural Network content) that make use of the [Intel&reg; Neural Compute Stick 2 (Intel&reg; NCS 2)](https://software.intel.com/en-us/neural-compute-stick)  or the original [Intel&reg; Movidius&trade; Neural Compute Stick](https://software.intel.com/en-us/movidius-ncs) and the Deep Learning Deployment Toolkit (DLDT) portion of the [OpenVINO&trade; Toolkit](https://software.intel.com/en-us/openvino-toolkit).
  
 The ncappzoo is a community repository with many content owners and maintainers. All ncappzoo content is open source and being made available in this central location for others to download, experiment with, modify, build upon, and learn from.
+
+Find the repository at [GitHub](https://github.com/movidius/ncappzoo).
 
 ## ncappzoo Quick Start
 If you have an  Intel&reg; NCS 2 (or the first generation Intel&reg; Movidus&trade; NCS) device and want to jump into the ncappzoo its easy!  There are only a few steps to get going with the ncappzoo projects fast.
@@ -88,24 +101,23 @@ To setup the open source version of OpenVINO&trade; with your Raspberry Pi, add 
 
 ## ncappzoo Repository Layout
 The ncappzoo contains the following top-level directories.  See the README file in each of these directories or just click on the links below to explore the contents of the ncappzoo.
-- **[apps](apps/README.md)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the ncappzoo!**
-- **[networks](networks/README.md)** : Scripts to download models and optimize neural networks based on any framework for use with the NCS and NCS 2.
-- **[caffe](caffe/README.md)** : Scripts to download caffe models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
-- **[tensorflow](tensorflow/README.md)** : Scripts to download TensorFlow&trade; models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
-- **[data](data/README.md)** : Data and scripts to download data for use with models and applications that use the NCS and NCS 2
+- **[apps](../apps/)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the ncappzoo!**
+- **[networks](../networks/)** : Scripts to download models and optimize neural networks based on any framework for use with the NCS and NCS 2.
+- **[caffe](https://github.com/movidius/ncappzoo/tree/master/caffe/README.md)** : Scripts to download caffe models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
+- **[tensorflow](https://github.com/movidius/ncappzoo/tree/master/tensorflow/README.md)** : Scripts to download TensorFlow&trade; models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
+- **[data](https://github.com/movidius/ncappzoo/tree/master/data/README.md)** : Data and scripts to download data for use with models and applications that use the NCS and NCS 2
 
-The top-level directories above have subdirectories that hold project content. Each of these project subdirectories has one or more owners that assumes responsibility for it. The [OWNERS](OWNERS) file contains the mapping of subdirectory to owner. 
+The top-level directories above have subdirectories that hold project content. Each of these project subdirectories has one or more owners that assumes responsibility for it. The [OWNERS](https://github.com/movidius/ncappzoo/tree/master/OWNERS) file contains the mapping of subdirectory to owner. 
 
 ## Contributing to the ncappzoo
 The _ncappzoo_ is meant to explore and teach features available for the Intel&reg; Movidius&trade; Neural Compute Stick and Intel&reg; Neural Compute Stick 2 with the Intel&reg; OpenVINO&trade; toolkit. The more contributions to the ncappzoo, the more successful this community will be! We always encourage everyone with Neural Compute Stick related content to share by contributing their applications and model-related work to the ncappzoo. It's easy to do, and even when contributing new content you will be the owner and maintainer of the content.
 
 If your inclusion is an opportunity to explore a new idea in computer vision, add as much documentation about the functionality and your process in creating your app or network, including smartly commenting your code. This will give others - and you! - a chance to learn from your addition. Your addition will help grow our community and improve all of our AI and computer vision skills. Most importantly, the insights you get from releasing your app into the wild here will only help you down the line if you ever want to commercialize your idea. As always, your work in the _ncappzoo_ should be properly attributed so that its ownership will always be managed by you and those you grant additional rights to.
 
-See the [CONTRIBUTING.md](CONTRIBUTING.md) file for instructions and guidelines for contributing.
+See the [CONTRIBUTING.md](https://github.com/movidius/ncappzoo/tree/master/CONTRIBUTING.md) file for instructions and guidelines for contributing.
 
 ## Licensing
 All content in the ncappzoo is licensed via the [MIT license](https://opensource.org/licenses/MIT) unless specifically stated otherwise in lower-level projects. Individual model and code owners maintain the copyrights for their content, but provide it to the community in accordance with the MIT License.
 
-See the [LICENSE](LICENSE) file in the top-level directory for all licensing details, including reuse and redistribution of content in the ncappzoo repository.
-
+See the [LICENSE](https://github.com/movidius/ncappzoo/tree/master/LICENSE) file in the top-level directory for all licensing details, including reuse and redistribution of content in the ncappzoo repository.
 

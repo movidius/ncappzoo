@@ -1,6 +1,6 @@
-# Applications for the Intel<sup><sup><sup>®</sup></sup></sup> NCS 2 (or original NCS) with OpenVINO<sup><sup><sup>™</sup></sup></sup> toolkit
+# Applications for the Intel&reg; NCS 2 (or original NCS) with OpenVINO&trade; toolkit
 
-This directory contains subdirectories for applications that use the Intel<sup><sup><sup>®</sup></sup></sup> NCS 2 via the OpenVINO<sup><sup><sup>™</sup></sup></sup> toolkit.  Typically the applications here make use of one or more of the neural networks in the repository.  They are also intended to be more involved and provide more of a real world application for the networks rather than simply serving as an example of the technology.
+This directory contains subdirectories for applications that use the Intel&reg; NCS 2 via the OpenVINO&trade; toolkit.  Typically the applications here make use of one or more of the neural networks in the repository.  They are also intended to be more involved and provide more of a real world application for the networks rather than simply serving as an example of the technology.
 The sections below are categorized by application type and present the currently available applications in the repository in succinct lists.
 
 Each application directory has a README that explains how to build and run it, as well as a Makefile that automates the steps for you.  The links in the tables below will take you to the README files for each application.

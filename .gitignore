@@ -19,3 +19,6 @@ __pycache__
 
 #ignore VS Code generated directories
 .vscode
+
+#jekyll generated directories
+_site
