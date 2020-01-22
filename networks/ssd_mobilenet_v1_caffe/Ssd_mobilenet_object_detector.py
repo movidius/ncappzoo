@@ -88,7 +88,8 @@ class Ssd_mobilenet_object_detector(Object_detector):
     def set_parameter(self, tag,   # str 
                             value  # Any
                      ):
-        """ Sets model parameters. """
+        """ Sets model parameters. 
+            Available parameters: detection_threshold """
         if tag == "detection_threshold":
             self.detection_threshold = value
         
