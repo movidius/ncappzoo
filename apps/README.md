@@ -1,6 +1,6 @@
-# Applications for the Intel<sup><sup><sup>®</sup></sup></sup> NCS 2 (or original NCS) with OpenVINO<sup><sup><sup>™</sup></sup></sup> toolkit
+# Applications for the Intel&reg; NCS 2 (or original NCS) with OpenVINO&trade; toolkit
 
-This directory contains subdirectories for applications that use the Intel<sup><sup><sup>®</sup></sup></sup> NCS 2 via the OpenVINO<sup><sup><sup>™</sup></sup></sup> toolkit.  Typically the applications here make use of one or more of the neural networks in the repository.  They are also intended to be more involved and provide more of a real world application for the networks rather than simply serving as an example of the technology.
+This directory contains subdirectories for applications that use the Intel&reg; NCS 2 via the OpenVINO&trade; toolkit.  Typically the applications here make use of one or more of the neural networks in the repository.  They are also intended to be more involved and provide more of a real world application for the networks rather than simply serving as an example of the technology.
 The sections below are categorized by application type and present the currently available applications in the repository in succinct lists.
 
 Each application directory has a README that explains how to build and run it, as well as a Makefile that automates the steps for you.  The links in the tables below will take you to the README files for each application.
@@ -30,6 +30,7 @@ Object detection applications make use of one of the [object detection networks]
 |[chef_ai](chef_ai/README.md) |Python / Flask<br>SSD Inception v2<br> Detects food items within an image or from the camera and suggests recipes for those items. |TBD    |
 |[driving_pi](driving_pi/README.md) | Python<br>Multiple Networks<br>Autonomous LEGO car driving by detecting road and traffic light through a camera. car will stop once see the red light and moves forward on green. It also slowing speed on the yellow light. In this demo, it uses both networks, object detection for traffic lights and road classification for detecting road.|![](driving_pi/screen_shot.jpg)|
 |[realsense_object_distance_detection](realsense_object_distance_detection/README.md) | C++<br>Caffe SSD Mobilenet<br>Detects different classes of objects (including people and cars) and uses the Intel Realsense camera to detect the distance to that object. |![](realsense_object_distance_detection/screen_shot.jpg)|
+|[realsense_segmentation](realsense_segmentation/README.md) | C++<br>Semantic Segmentation adas 0001<br>Colorize 20 different classes of objects (including people and cars) and uses the Intel Realsense camera to detect the distance to that object. | ![](realsense_segmentation/screen_shot.png)|
 |[video_face_matcher](video_face_matcher/README.md) | Python<br>TensorFlow FaceNet<br>Uses the networks/face_detection_retail_0004 network and the networks/facenet network to identify faces in a camera video stream.  A single face image is used as the key and when a face in the video stream matches a key(known face), a green frame is overlayed on the detected face.|![](video_face_matcher/screen_shot.png)|
 
 ## Misc Applications

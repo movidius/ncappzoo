@@ -1,5 +1,5 @@
-# Neural Compute Application Zoo (_ncappzoo_) 
-[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R2)
+# Neural Compute Application Zoo (ncappzoo) 
+[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R3.1)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Welcome to the Neural Compute Application Zoo (_ncappzoo_). This repository is a place for any interested developers to share their projects (code and Neural Network content) that make use of the [Intel&reg; Neural Compute Stick 2 (Intel&reg; NCS2)](https://software.intel.com/en-us/neural-compute-stick)  or the original [Intel&reg; Movidius&trade; Neural Compute Stick](https://software.intel.com/en-us/movidius-ncs) and the Deep Learning Deployment Toolkit (DLDT) portion of the [OpenVINO&trade; Toolkit](https://software.intel.com/en-us/openvino-toolkit).
@@ -106,8 +106,10 @@ The _ncappzoo_ contains the following top-level directories.  See the README fil
 
 The top-level directories above have subdirectories that hold project content. Each of these project subdirectories has one or more owners that assumes responsibility for it. The [OWNERS](OWNERS) file contains the mapping of subdirectory to owner. 
 
-## Contributing to the _ncappzoo_
-The more contributions to the _ncappzoo_, the more successful the community will be! We always encourage everyone with Neural Compute Stick related content to share by contributing their applications and model related work to the _ncappzoo_. It's easy to do, and even when contributing new content, you will be the owner and maintainer of the content.
+## Contributing to the ncappzoo
+The _ncappzoo_ is meant to explore and teach features available for the Intel&reg; Movidius&trade; Neural Compute Stick and Intel&reg; Neural Compute Stick 2 with the Intel&reg; OpenVINO&trade; toolkit. The more contributions to the ncappzoo, the more successful this community will be! We always encourage everyone with Neural Compute Stick related content to share by contributing their applications and model-related work to the ncappzoo. It's easy to do, and even when contributing new content you will be the owner and maintainer of the content.
+
+If your inclusion is an opportunity to explore a new idea in computer vision, add as much documentation about the functionality and your process in creating your app or network, including smartly commenting your code. This will give others - and you! - a chance to learn from your addition. Your addition will help grow our community and improve all of our AI and computer vision skills. Most importantly, the insights you get from releasing your app into the wild here will only help you down the line if you ever want to commercialize your idea. As always, your work in the _ncappzoo_ should be properly attributed so that its ownership will always be managed by you and those you grant additional rights to.
 
 See the [CONTRIBUTING.md](CONTRIBUTING.md) file for instructions and guidelines for contributing.
 
