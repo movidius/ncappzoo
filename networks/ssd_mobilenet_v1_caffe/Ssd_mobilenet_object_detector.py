@@ -6,7 +6,11 @@ sys.path.append('../../shared/Python/')
 from Object_detector import *
 
 class Ssd_mobilenet_object_detector(Object_detector):
-    def __init__(self, ie, net, device="MYRIAD"):
+    def __init__(self, ie,              # type: IECore 
+                       net,             # type: IENetwork
+                       device="MYRIAD"  # type: str
+                ):
+    	""" Constructor for Ssd_mobilenet_object_detector."""
         # Get the input and output node names
         self.input_blob = next(iter(net.inputs))
         self.output_blob = next(iter(net.outputs))
@@ -20,7 +24,9 @@ class Ssd_mobilenet_object_detector(Object_detector):
         self.detection_threshold=0.70
 
 
-    def __preprocess_image(self, src_image):
+    def __preprocess_image(self, src_image # type: OpenCV Mat
+                          ):
+        # type: (...) -> OpenCV Mat
         """ Perform image preprocessing: First resize the image, then transpose the image (HWC -> CHW). """
         image_to_preprocess = cv2.resize(src_image, (self.input_width, self.input_height))
         image_to_preprocess = numpy.transpose(image_to_preprocess, (2, 0, 1))
@@ -29,7 +35,9 @@ class Ssd_mobilenet_object_detector(Object_detector):
         return preprocessed_img
         
         
-    def run_inference_sync(self, original_image):
+    def run_inference_sync(self, original_image # type: OpenCV Mat
+                          ):
+        # type: (...) -> List
         """ Run an inference on the NCS, then perform postprocessing on the results and return them. """
         # send the image for preprocessing 
         preprocessed_image = self.__preprocess_image(original_image)
@@ -43,17 +51,29 @@ class Ssd_mobilenet_object_detector(Object_detector):
             return results_to_return
 
 
-    def __postprocess(self, request_handle, original_image):
-        """
-        
-        """
+    def __postprocess(self, request_handle, # OpenVINO InferRequest 
+                            original_image  # OpenCV Mat
+                     ):
+        # type: (...) -> List
+        """ Organizes the network inference results and then returns the results as a List. 
+            The results will be returned as a list of tuples in the following format: 
+            (Left side of bbox, Top side of bbox, Right side of bbox, Bottom of the bbox, Confidence score, Class id)
+            Pseudocode Example:
+                all_results = do_inference()
+                results_to_return = []
+                
+                for result in all_results:
+                    results_to_return.append((result.left_box, result.top_box, result.right_box, result.bottom_box, result.confidence_score, result.class_id))
+                
+                return results_to_return """
         source_image_width = float(original_image.shape[1])
         source_image_height = float(original_image.shape[0])
+        # Extract the inference data for the output node name
         inference_results = request_handle.outputs[self.output_blob]
-        # process the results
+        # Process the results
         detection_results_to_return = []
         for num, detection_result in enumerate(inference_results[0][0]):
-            # Draw only detection_resultects when probability more than specified threshold
+            # Save only detection_results when probability > than specified threshold
             if detection_result[2] > self.detection_threshold:
                 box_left = int(detection_result[3] * source_image_width)
                 box_top = int(detection_result[4] * source_image_height)
@@ -65,7 +85,10 @@ class Ssd_mobilenet_object_detector(Object_detector):
         return detection_results_to_return
         
         
-    def set_parameter(self, tag, value):
+    def set_parameter(self, tag,   # str 
+                            value  # Any
+                     ):
+        """ Sets model parameters. """
         if tag == "detection_threshold":
             self.detection_threshold = value
         
