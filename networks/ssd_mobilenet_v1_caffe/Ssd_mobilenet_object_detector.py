@@ -51,8 +51,8 @@ class Ssd_mobilenet_object_detector(Object_detector):
             return results_to_return
 
 
-    def __postprocess(self, request_handle, # OpenVINO InferRequest 
-                            original_image  # OpenCV Mat
+    def __postprocess(self, request_handle, # type: OpenVINO InferRequest 
+                            original_image  # type: OpenCV Mat
                      ):
         # type: (...) -> List
         """ Organizes the network inference results and then returns the results as a List. 
@@ -85,8 +85,8 @@ class Ssd_mobilenet_object_detector(Object_detector):
         return detection_results_to_return
         
         
-    def set_parameter(self, tag,   # str 
-                            value  # Any
+    def set_parameter(self, tag,   # type: str 
+                            value  # type: Any
                      ):
         """ Sets model parameters. 
             Available parameters: detection_threshold """
