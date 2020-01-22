@@ -8,5 +8,5 @@ The shared code is separated into C++ and Python folders within the ncappzoo's s
 
 | File name | Language | Description |
 |---------------------|-------------|-------|
-|[Object_detector](Python/Object_detector) | Python | Interface that can be used for object detectors. |
+|[Object_detector.py](Python/Object_detector.py) | Python | Interface that can be used for various object detectors. |
 
