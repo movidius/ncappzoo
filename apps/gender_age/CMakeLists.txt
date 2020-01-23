@@ -15,12 +15,12 @@ add_executable(gender_age ${SOURCES})
 
 link_directories($ENV{INTEL_CVSDK_DIR}/deployment_tools/inference_engine/lib/intel64 /usr/lib/x86_64-linux-gnu/)
 
-find_library(INFERENCE_ENGINE_LIB inference_engine $ENV{INTEL_CVSDK_DIR}/deployment_tools/inference_engine/lib/intel64)
-find_library(OPENCV_CORE opencv_core $ENV{INTEL_CVSDK_DIR}/opencv/lib)
-find_library(OPENCV_HIGHGUI opencv_highgui $ENV{INTEL_CVSDK_DIR}/opencv/lib)
-find_library(OPENCV_IMGPROC opencv_imgproc $ENV{INTEL_CVSDK_DIR}/opencv/lib)
-find_library(OPENCV_CODECS opencv_imgcodecs $ENV{INTEL_CVSDK_DIR}/opencv/lib)
-find_library(OPENCV_VIDEOIO opencv_videoio $ENV{INTEL_CVSDK_DIR}/opencv/lib)
+find_library(INFERENCE_ENGINE_LIB inference_engine HINT $ENV{INTEL_CVSDK_DIR}/deployment_tools/inference_engine/lib/intel64)
+find_library(OPENCV_CORE opencv_core HINT $ENV{INTEL_CVSDK_DIR}/opencv/lib)
+find_library(OPENCV_HIGHGUI opencv_highgui HINT $ENV{INTEL_CVSDK_DIR}/opencv/lib)
+find_library(OPENCV_IMGPROC opencv_imgproc HINT $ENV{INTEL_CVSDK_DIR}/opencv/lib)
+find_library(OPENCV_CODECS opencv_imgcodecs HINT $ENV{INTEL_CVSDK_DIR}/opencv/lib)
+find_library(OPENCV_VIDEOIO opencv_videoio HINT $ENV{INTEL_CVSDK_DIR}/opencv/lib)
 
 target_link_libraries(gender_age ${INFERENCE_ENGINE_LIB} ${OPENCV_CORE} ${OPENCV_HIGHGUI} ${OPENCV_IMGPROC} ${OPENCV_CODECS} ${OPENCV_VIDEOIO})
 
