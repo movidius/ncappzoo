@@ -36,7 +36,7 @@ all: deps data compile_model compile_cpp
 .PHONY: deps
 deps: download_model_files
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
-	
+
 	
 .PHONY: data
 data:
