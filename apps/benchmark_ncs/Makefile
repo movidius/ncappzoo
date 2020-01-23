@@ -43,12 +43,8 @@ data:
 
 
 .PHONY: deps
-deps: install_deps default_model
+deps: default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
-
-.PHONY: install_deps
-install_deps:
-	../../install_deps.sh
 
 .PHONY: run_py
 run_py: data deps
@@ -89,7 +85,6 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- makes/prepares dependencies";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make install_deps "$(NOCOLOR)"- Checks for and installs software dependencies.";
 	@echo $(YELLOW)"  make default_model "$(NOCOLOR)"- compiles a default model to use when running";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content";
 	@echo ""

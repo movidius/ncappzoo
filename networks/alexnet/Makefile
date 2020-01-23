@@ -34,12 +34,9 @@ all: deps data compile_model compile_cpp
 
 
 .PHONY: deps
-deps: install_deps download_model_files
+deps: download_model_files
 	@echo $(YELLOW)'\n'${NETWORK_NAME}": Making dependencies..."$(NOCOLOR)
-	
-.PHONY: install_deps
-install_deps:
-	../.././install_deps.sh
+
 	
 .PHONY: data
 data:
@@ -139,7 +136,6 @@ help:
 	@echo $(YELLOW)"  make deps "$(NOCOLOR)"- Makes dependencies for project, downloads and prepares model etc.";
 	@echo $(YELLOW)"  make install-reqs "$(NOCOLOR)"- Installs requirements needed to run this sample on your system.";
 	@echo $(YELLOW)"  make uninstall-reqs "$(NOCOLOR)"- Uninstalls requirements that were installed by the sample program.";
-	@echo $(YELLOW)"  make install_deps "$(NOCOLOR)"- Checks for and installs software dependencies.";
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temporary files that are created by the Makefile.\n";
 	@echo " ----- "$(YELLOW)"Model information"$(NOCOLOR)" -----"
 	@echo $(YELLOW)" Description: "$(NOCOLOR)
