@@ -47,6 +47,37 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
     fclose (cat_file);
 }
 
+
+void getTopResults(unsigned int numberOfResultsToReturn, InferenceEngine::Blob& input, std::vector<unsigned> &output) {
+    auto scores = input.buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
+ 
+    
+    if (numberOfResultsToReturn > input.size())
+    {
+        std::cout << "The number of desired results is greater than total number of results." << '\n';
+        std::cout << "Setting number of desired results equal to total number of results." << '\n';
+        numberOfResultsToReturn = input.size();
+    }
+    else if (numberOfResultsToReturn <= 0)
+    {
+        std::cout << "The number of desired results is less than or equal to zero." << '\n';
+        std::cout << "Setting number of desired results to 1." << '\n';
+    }
+    // Create a vector of indexes
+    std::vector<unsigned> classIndexes(input.size());
+    std::iota(std::begin(classIndexes), std::end(classIndexes), 0);
+    std::partial_sort(std::begin(classIndexes), std::end(classIndexes), std::end(classIndexes), 
+            [&scores](unsigned left, unsigned right){
+                return scores[left] > scores[right];});
+    output.resize(numberOfResultsToReturn);
+    for (unsigned int j = 0; j < numberOfResultsToReturn; j++) 
+    {
+        output.at(j) = classIndexes.at(j);
+    }
+       
+}
+
+
 // *************************************************************************
 // Entrypoint for the application
 // *************************************************************************
@@ -84,10 +115,7 @@ int main(int argc, char *argv[]) {
     // Create the inference engine core object
     Core ie_core;
     // Create a network reader and read in the network and weights
-    CNNNetReader networkReader;
-    networkReader.ReadNetwork(XML);
-    networkReader.ReadWeights(BIN);
-    auto network = networkReader.getNetwork();
+    CNNNetwork network = ie_core.ReadNetwork(XML, BIN);
     
     // ----------------------- Set up the network input ----------------------- //
     InputsDataMap inputDataMap(network.getInputsInfo());
@@ -157,7 +185,7 @@ int main(int argc, char *argv[]) {
             // Sort the results and get the number of desired top results
             std::vector<unsigned> sortedResults; // This vector will hold all of the top sorted results
             unsigned int resultsToDisplay = 1;   // How many results should return?
-            TopResults(resultsToDisplay, *inferenceResults, sortedResults);
+            getTopResults(resultsToDisplay, *inferenceResults, sortedResults);
 
             // Get the top result
             auto topScore = scores[sortedResults[0]] * 100;
