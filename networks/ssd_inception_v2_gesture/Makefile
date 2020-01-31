@@ -28,7 +28,8 @@ MODEL_INFERENCE_PB = frozen_inference_graph.pb
 GET_MODEL_PIPELINE = wget -c --no-cache -P ./tensorflow_model https://raw.githubusercontent.com/fcr3/gesture_detection/master/tensorflow_model/${MODEL_INFERENCE_PIPELINE_CONFIG}
 GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp32/${MO_LABELS}
 GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp16/${MO_LABELS}
-GET_MODEL_PB = python3 download_weights.py
+GET_MODEL_PB = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/model/frozen_inference_graph.pb -O ${MODEL_DIR}/${MODEL_INFERENCE_PB}
+# if above doesn't work: python3 download_weights.py
 
 RUN_PY_RELATIVE_DIR = ssd_inception_v2_gesture.py
 
@@ -37,28 +38,28 @@ TRAIN_CHKPT_DIR = ${TRAIN_DIR}/ssd_inception_v2_coco_2018_01_28
 PRE_TRAINED_MODEL = wget -c --no-cache -P ./${TRAIN_DIR} http://download.tensorflow.org/models/object_detection/ssd_inception_v2_coco_2018_01_28.tar.gz
 
 TRAIN_RECORD_FILE = ./${TRAIN_DIR}/train.record
-TRAIN_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=13uM9aoxrUvPjZTIkXv33av_Dx8CYhg7S' -O ${TRAIN_RECORD_FILE}
-TRAIN_RECORD_LINK = 'https://drive.google.com/uc?id=13uM9aoxrUvPjZTIkXv33av_Dx8CYhg7S'
+TRAIN_RECORD = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/train.record -O ${TRAIN_RECORD_FILE}
+# TRAIN_RECORD_LINK = 'https://drive.google.com/uc?id=13uM9aoxrUvPjZTIkXv33av_Dx8CYhg7S'
 
 TEST_RECORD_FILE = ./${TRAIN_DIR}/test.record
-TEST_RECORD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=17TmM3Sm_dOmCpnZ9ZIIsPTH536PapIP9' -O ${TEST_RECORD_FILE}
+TEST_RECORD = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/test.record -O ${TEST_RECORD_FILE}
 
 TRAIN_PBTXT_FILE = ./${TRAIN_DIR}/object-detection.pbtxt
-TRAIN_PBTXT = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1lEq3PtqMTijw12tcOpPrNFplqTNgSCTp' -O ${TRAIN_PBTXT_FILE}
+TRAIN_PBTXT = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/object-detection.pbtxt -O ${TRAIN_PBTXT_FILE}
 
 SSD_CONFIG_FILE = ./${TRAIN_DIR}/ssd_inception_v2_coco.config
-SSD_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1fHnVpxyXvwdEJyuQmeI3dOERCzBytPUl' -O ${SSD_CONFIG_FILE}
+SSD_CONFIG = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/ssd_inception_v2_coco.config -O ${SSD_CONFIG_FILE}
 
 TRAIN_PIPE_CONFIG_FILE = ./${TRAIN_DIR}/pipeline.config
-TRAIN_PIPE_CONFIG = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1KBm4HpjdZFNHSbx-T8cIFExgcGaPV-Qs' -O ${TRAIN_PIPE_CONFIG_FILE}
+TRAIN_PIPE_CONFIG = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/pipeline.config -O ${TRAIN_PIPE_CONFIG_FILE}
 
 JPEG_ZIP_FILE = ./${TRAIN_DIR}/JPEGImages.zip
-JPEG_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1J5p63WjnkcWAyCQVbaW6qshsUBfX7aZ2' -O ${JPEG_ZIP_FILE}
-JPEG_FOLDER_LINK = 'https://drive.google.com/uc?id=1J5p63WjnkcWAyCQVbaW6qshsUBfX7aZ2'
+JPEG_DOWNLOAD = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/JPEGImages-20200116T001612Z-001.zip -O ${JPEG_ZIP_FILE}
+# JPEG_FOLDER_LINK = 'https://drive.google.com/uc?id=1J5p63WjnkcWAyCQVbaW6qshsUBfX7aZ2'
 
 ANNO_ZIP_FILE = ./${TRAIN_DIR}/Annotations.zip
-ANNO_DOWNLOAD = wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=17ZmWWQFV5ljMWTX1HP-dZtD25xKXVCYU' -O ${ANNO_ZIP_FILE}
-ANNO_FOLDER_LINK = 'https://drive.google.com/uc?id=17ZmWWQFV5ljMWTX1HP-dZtD25xKXVCYU'
+ANNO_DOWNLOAD = wget http://dp2f0iayzbweh.cloudfront.net/ncappzoo/gesture_detection/training/Annotations-20200115T233047Z-001.zip -O ${ANNO_ZIP_FILE}
+# ANNO_FOLDER_LINK = 'https://drive.google.com/uc?id=17ZmWWQFV5ljMWTX1HP-dZtD25xKXVCYU'
 
 NETWORK_NAME = SSD Inception v2: Gesture Model
 TF_MODEL_DIRNAME = models/
@@ -235,13 +236,12 @@ download_train_files:
 		${PROTOC_DOWNLOAD} ;\
 	fi
 	@echo "Downloading larger files using gdown, checking for installation"
-	pip3 install --user gdown
 	@if [ -e ${ANNO_ZIP_FILE} ] ; \
 	then \
 		echo $(NOCOLOR)"Annotated zip file already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing annotated zip file..."; \
-		gdown ${ANNO_FOLDER_LINK} -O ${ANNO_ZIP_FILE} ;\ ;\
+		${ANNO_DOWNLOAD} ; \ # gdown ${ANNO_FOLDER_LINK} -O ${ANNO_ZIP_FILE} ;\ ;\
 		unzip ${ANNO_ZIP_FILE} -d train_files/ ;\
 	fi
 	@if [ -e ${TRAIN_RECORD_FILE} ] ; \
@@ -249,14 +249,14 @@ download_train_files:
 		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing train record file..."; \
-		gdown ${TRAIN_RECORD_LINK} -O train_files/train.record ;\
+		${TRAIN_RECORD} ; \ # gdown ${TRAIN_RECORD_LINK} -O train_files/train.recor ;\
 	fi
 	@if [ -e ${JPEG_ZIP_FILE} ] ; \
 	then \
 		echo $(NOCOLOR)"JPEG zip file already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing JPEG zip file..."; \
-		gdown ${JPEG_FOLDER_LINK} -O train_files/JPEGImages.zip ;\
+		${JPEG_DOWNLOAD} ; \ # gdown ${JPEG_FOLDER_LINK} -O train_files/JPEGImages.zi ;\
 		unzip ${JPEG_ZIP_FILE} -d train_files/ ;\
 	fi
 	@if [ -e cocoapi/PythonAPI ] ;\
@@ -451,7 +451,7 @@ run_py: install-reqs deps data compile_model run_FP16
 .PHONY: uninstall-reqs
 uninstall-reqs:
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Uninstalling requirements..."$(NOCOLOR)
-	pip3 uninstall gdown
+	@echo "\nNo requirements to install..."
 
 
 .PHONY: help
