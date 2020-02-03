@@ -3,7 +3,6 @@ name: Feature request
 about: Suggest an improvement or addition to the ncappzoo
 title: FEATURE REQUEST
 labels: enhancement
-assignees: DrewBearly
 
 ---
 
