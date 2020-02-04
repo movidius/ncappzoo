@@ -10,7 +10,7 @@ This sample displays a visual representation of simultaneous inferences being pe
 
 The sample starts by loading several images and displaying them in a grid pattern. As the NCS device completes an inference on an image in the grid, the image will light up to signal that the inference on that image is complete as seen in the animation below
 
-![](../../images/classifier_grid.gif)
+![](classifier_grid.gif)
 
 By default, the example uses 3 threads per NCS device and creates 6 async inference requests per thread. Also by default, the sample will run 500 inferences using the [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet) network.
 
@@ -37,8 +37,7 @@ To get a list of commandline options type the following command: ```python3 clas
 ## Prerequisites
 This program requires:
 - 1 or more NCS devices
-- OpenVINO 2019 R3 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- OpenVINO 2020.1 Toolkit
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 

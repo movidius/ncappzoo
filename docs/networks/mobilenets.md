@@ -14,7 +14,7 @@ TensorFlow™ provides a set of pre-trained models trained on <a href="http://ww
 
 This code example requires that the following components are available:
 1. <a href="https://software.intel.com/en-us/neural-compute-stick/where-to-buy" target="_blank">Intel Neural Compute Stick 2</a>
-2. <a href="https://software.intel.com/en-us/openvino-toolkit" target="_blank">OpenVINO R3 toolkit</a>
+2. <a href="https://software.intel.com/en-us/openvino-toolkit" target="_blank">OpenVINO 2020.1 toolkit</a>
 3. <a href="https://github.com/tensorflow/tensorflow" target="_blank">TensorFlow source repo</a>
 4. <a href="https://github.com/tensorflow/models" target="_blank">TensorFlow models repo</a>
 

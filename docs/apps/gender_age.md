@@ -6,11 +6,11 @@ parent: Apps
 ---
 # gender_age
 ## Introduction
-This app does facial detection and age/gender inference using the Intel Movidius Neural Compute Stick 2. 
+This app does facial detection and age/gender inference using the Intel Neural Compute Stick 2. 
 
 The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. When running, the app shows the realtime camera preview while overlaying, a box around faces (color coded for gender), and an estimated age.  All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
 
-![](../../images/gender_age_3.gif)
+![](gender_age_3.gif)
 
 ## Building the Example
 
@@ -28,9 +28,8 @@ When the application runs normally, another window should pop up and show the fe
 
 ## Prerequisites
 This program requires:
-- 1 NCS device
-- OpenVINO 2019 R3 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- 1 NCS1/NCS2 device
+- OpenVINO 2020.1 Toolkit
 - A webcam (laptop or USB)
 
 

@@ -8,7 +8,7 @@ parent: Apps
 ## Introduction
 This project uses the TensorFlow mnist_deep network trained on the MNIST dataset to do digit classification for a handwriting-input calculator.  The digits are drawn with the mouse or a touchscreen.  Then when the user clicks '=' the digits are recognized and the equation is evaluated.
 
-![](../../images/mnist_calc_600x234.gif)
+![](mnist_calc_600x234.gif)
 
 The provided Makefile does the following:
 1. Builds tensorflow MNIST graph file from the tensorflow/mnist directory in the repository.
@@ -25,7 +25,7 @@ All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
 This program requires:
 - 1 Intel NCS device
-- OpenVINO 2019 R3 toolkit
+- OpenVINO 2020.1 toolkit
 - OpenCV with associated Python bindings*. 
 
 ## Makefile

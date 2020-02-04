@@ -8,7 +8,7 @@ parent: Networks
 ## Introduction
 The [face_detection_retail_0004](https://github.com/opencv/open_model_zoo/blob/master/intel_models/face-detection-retail-0004/description/face-detection-retail-0004.md) network can be used for face detection. This model can be used to align faces for use with face recognition.
 
-This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R3 release.
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2020.1 release.
 
 The provided Makefile does the following
 

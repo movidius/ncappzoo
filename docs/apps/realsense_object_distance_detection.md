@@ -4,18 +4,17 @@ title: realsense_object_distance_detection
 
 parent: Apps
 ---
-
 # realsense_object_distance_detection
 ## Introduction
-This app does object detection using the [SSD Mobilenet Caffe model](../../networks/ssd_mobilenet_caffe/README.md), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit R3](https://software.intel.com/en-us/openvino-toolkit) and the [Intel® RealSense™ depth camera](https://store.intelrealsense.com). It first detects an object in the video frame and then uses the depth stream to detect how far the object is using the Intel RealSense depth camera (tested with [Intel RealSense D415](https://www.intelrealsense.com/depth-camera-d415/)). The default model used in this sample uses the PASCAL Voc dataset and detects up to 20 classes. Please see the networks/ssd_mobilenet_caffe sample for more information.
+This app does object detection using the [SSD Mobilenet Caffe model](../../networks/ssd_mobilenet_caffe/README.md), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), [OpenVINO Toolkit 2020.1](https://software.intel.com/en-us/openvino-toolkit) and the [Intel® RealSense™ depth camera](https://store.intelrealsense.com). It first detects an object in the video frame and then uses the depth stream to detect how far the object is using the Intel RealSense depth camera (tested with [Intel RealSense D415](https://www.intelrealsense.com/depth-camera-d415/)). The default model used in this sample uses the PASCAL Voc dataset and detects up to 20 classes. Please see the networks/ssd_mobilenet_caffe sample for more information.
 
 
-![](../../images/realsense_object_distance_detection.gif)
+![](realsense_object_distance_detection.gif)
 
 ## Prerequisites
 This program requires:
 - 1 [NCS2](https://store.intelrealsense.com/buy-intel-neural-compute-stick-2.html)/NCS1 device
-- OpenVINO 2019 R3 Toolkit
+- OpenVINO 2020.1 Toolkit
 - [Intel RealSense SDK 2.0](https://github.com/IntelRealSense/librealsense)
 - Intel RealSense depth camera (tested with [Intel RealSense D415](https://store.intelrealsense.com/buy-intel-realsense-depth-camera-d415.html))
 

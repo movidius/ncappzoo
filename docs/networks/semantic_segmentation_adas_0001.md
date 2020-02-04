@@ -5,7 +5,7 @@ parent: Networks
 ---
 # semantic segmentation adas 0001
 ## Introduction
-This app does semantic segmentation using the [semantic-segmentation-adas-0001](https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), and the [OpenVINO Toolkit R3](https://software.intel.com/en-us/openvino-toolkit). Each of the colors represents a class. The classes that this network can detect are:
+This app does semantic segmentation using the [semantic-segmentation-adas-0001](https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html), the [Intel Movidius Neural Compute Stick 2](https://software.intel.com/en-us/neural-compute-stick), and the [OpenVINO Toolkit 2020.1](https://software.intel.com/en-us/openvino-toolkit). Each of the colors represents a class. The classes that this network can detect are:
 
 - road
 - sidewalk
@@ -31,7 +31,7 @@ This app does semantic segmentation using the [semantic-segmentation-adas-0001](
 ## Prerequisites
 This program requires:
 - 1 NCS2/NCS1 device
-- OpenVINO 2019 R3 Toolkit
+- OpenVINO 2020.1 Toolkit
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 

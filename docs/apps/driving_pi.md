@@ -19,15 +19,15 @@ The app requires the following hardware:
 6. BrickStuff (for traffic light)
 7. LEGO Roads set
 
-## Setup
-First, setup the Raspberry Pi3 and the BrickPi3: [Get started](https://www.dexterindustries.com/BrickPi/brickpi-tutorials-documentation/getting-started/)<br> After installing the boards, start building the LEGO car using LEGO MINDSTORMS EV3 KIT: [step-by-step](https://le-www-live-s.legocdn.com/sc/media/lessons/mindstorms-ev3/building-instructions/ev3-rem-driving-base-79bebfc16bd491186ea9c9069842155e.pdf) <br>
-Instead of using the LEGO Mindstorm Controller, attach the Pi+BrickPi to the car. <br>
-Build your LEGO road, and setup the traffic light on it.<br>
-___<br>
-![](../../images/driving_pi/pic1.jpg)<br>
-![](../../images/driving_pi/pic2.jpg)<br>
-![](../../images/driving_pi/pic3.jpg)<br>
-___
+ ## Setup
+ First, setup the Raspberry Pi3 and the BrickPi3: [Get started](https://www.dexterindustries.com/BrickPi/brickpi-tutorials-documentation/getting-started/)<br> After installing the boards, start building the LEGO car using LEGO MINDSTORMS EV3 KIT: [step-by-step](https://le-www-live-s.legocdn.com/sc/media/lessons/mindstorms-ev3/building-instructions/ev3-rem-driving-base-79bebfc16bd491186ea9c9069842155e.pdf) <br>
+ Instead of using the LEGO Mindstorm Controller, attach the Pi+BrickPi to the car. <br>
+ Build your LEGO road, and setup the traffic light on it.
+ ___
+ ![](src/docs/pic1.jpg)
+ ![](src/docs/pic2.jpg)
+ ![](src/docs/pic3.jpg)
+ ___
 
 ## How to run the sample
 To run the sample, change directory to the birds application folder and use the command: 
@@ -40,7 +40,7 @@ Alternatively, run the Python script directly for more options:
 python3 driving_pi.py -h
 ```
 ___
-![](../../images/driving_pi/pic4.gif)
+![](src/docs/pic4.gif)
 ___
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.

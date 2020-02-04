@@ -6,11 +6,11 @@ parent: Apps
 ---
 # ncs_digital_sign: 
 ## Introduction
-This digital signage app dynamically outputs advertisements based on facial detection and age/gender inference using the Intel Movidius Neural Compute Stick 2. 
+This digital signage app dynamically outputs advertisements based on facial detection and age/gender inference using the Intel Neural Compute Stick 2. 
 
 The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. The example outputs different advertisements based on user's demographics using the age-gender-recognition model. All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
 
-![](../../images/ncs_digital_sign.gif)
+![](updated_gif.gif)
 
 Images in the advertisement_images directory are subject to the licenses.txt file within the directory.
 
@@ -30,13 +30,10 @@ When the application runs normally, another window should pop up and show the fe
 
 ## Prerequisites
 This program requires:
-- 1 NCS device
-- OpenVINO 2019 R4 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- 1 NCS1/NCS2 device
+- OpenVINO 2020.1 Toolkit
 - A webcam (laptop or USB)
 
-
-*It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
 Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine. ARM devices may be supported, but has not been verified.
 
