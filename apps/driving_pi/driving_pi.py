@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# Copyright(c) 2019 Intel Corporation.
+# Copyright(c) 2020.1 Intel Corporation.
 # License: MIT See LICENSE file in root directory.
 
 from __future__ import print_function

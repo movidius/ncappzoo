@@ -31,8 +31,7 @@ To get a list of commandline options type the following command: ```python3 clas
 ## Prerequisites
 This program requires:
 - 1 or more NCS devices
-- OpenVINO 2019 R3 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- OpenVINO 2020.1 Toolkit
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
