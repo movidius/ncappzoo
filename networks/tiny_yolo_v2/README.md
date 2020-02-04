@@ -7,12 +7,12 @@ The provided Makefile does the following
 2. Downloads the Tiny Yolo v2 cfg and weights files.
 3. Converts the cfg and weights files to a Tensorflow pb file.
 4. Converts the Tensorflow pb file to an OpenVINO IR file.
-5. Loads the IR file and runs the provided tiny_yolo_v2.py program that does a single inference on a provided image as an example on how to use the network using the OpenVINO R3 2019 Inference Engine
+5. Loads the IR file and runs the provided tiny_yolo_v2.py program that does a single inference on a provided image as an example on how to use the network using the OpenVINO Inference Engine
 
 
 ## Prerequisites
 1. NCS2 device
-2. OpenVINO R3 2019
+2. OpenVINO 2020.1
 3. Cython (can be installed via the command 'make install-reqs')
 4. Darkflow (can be installed via the command 'make install-reqs')
 

@@ -2,7 +2,7 @@
 ## Introduction
 The [Tiny Yolo v1](https://pjreddie.com/darknet/yolov1/) network can be used for object recognition and classification. This model was trained with the Pasval VOC data set and can detect up to 20 classes. See [https://pjreddie.com/darknet/yolov1/](https://pjreddie.com/darknet/yolov1/) for more information on this network. 
 
-This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R3 release.
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2020.1 release.
 
 The provided Makefile does the following
 

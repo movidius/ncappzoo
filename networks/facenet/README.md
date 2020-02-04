@@ -11,7 +11,7 @@ To determine a match the FACE_MATCH_THRESHOLD value is used.  You might want to 
 
 As the program cycles through the test images in the base directory it will display each image in a GUI window along with a green frame for a match or a red frame indicating no match.  While this window is in focus press any key to advance to the next image.  After all the images have been compared for matches and displayed the program will exit.
 
-This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R3 release.
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2020.1 release.
 
 The provided Makefile does the following:
 1. Downloads test images.
@@ -23,7 +23,7 @@ The provided Makefile does the following:
 ## Prerequisites
 This program requires:
 - 1 NCS2/NCS1 device
-- OpenVINO 2019 R3
+- OpenVINO 2020.1
 - The 20170512-110547.zip file from https://github.com/davidsandberg/facenet must be downloaded and copied to the base facenet directory.  Direct google drive link is: https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk .
 
 **Note**: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
