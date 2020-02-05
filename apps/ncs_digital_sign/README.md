@@ -32,7 +32,7 @@ This program requires:
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 
-Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
+Note: All development and testing has been done on Ubuntu 16.04 on an x86-64 machine. ARM devices may be supported, but has not been verified.
 
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.

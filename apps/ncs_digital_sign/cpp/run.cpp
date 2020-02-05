@@ -1,7 +1,7 @@
 /*
  * NCS_Digital_Sign
  *
- * Contributing Authors: Christian Canales <christian.canales@intel.com>, Tome Vang <tome.vang@intel.com>, Neal Smith <neal.p.smith@intel.com>, Heather McCabe <heather.m.mccabe@intel.com>
+ * Contributing Authors: Christian Canales <christian.canales@intel.com>, Tome Vang <tome.vang@intel.com>, Neal Smith <neal.p.smith@intel.com>, Heather McCabe <heather.m.mccabe@intel.com>, Andrew Herrold <andrew.herrold@intel.com>
  *
  *
  *
@@ -98,52 +98,66 @@ int calculateAgeAvg(std::vector<int> ageVector){
 }
 
 void showImg(int age, int gender) {
-	//Config config;
-	//config = loadConfig();
-	//cv::namedWindow("Advertisement", 0);
-	//cv::setWindowProperty("Advertisement", 0, 1);
+	cv::namedWindow("Advertisement", 0);
+	cv::setWindowProperty("Advertisement", 0, 1);
 	if (genCount > 50){
 	if (gender == 1) {
 		if (age < 17) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_young_boy.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else {
 			cv::Mat image = cv::imread("../advertisement_images/AD_male.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 	}
 	else {
 		if (age < 17) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_young_girl.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 17 && age < 35) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else if (age > 35 && age < 50) {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 		else {
 			cv::Mat image = cv::imread("../advertisement_images/AD_woman.jpg");
-			cv::imshow("Advertisement", image);
+			cv::Mat resizeImg;
+			cv::resize(image, resizeImg, cv::Size(1280, 720));
+			cv::imshow("Advertisement", resizeImg);
 			cv::waitKey(1);
 		}
 	}
@@ -157,17 +171,12 @@ void calculateAdvertisement(int maleTotal, int femaleTotal, int avgAge){
     double malePercent = (double)maleTotal/(double)total;
     std::cout << "MALE PERCENT: " << malePercent << std::endl;
     double femalePercent = (double)femaleTotal/(double)total;
-
-    //Config1 config;
-
-    //config = loadConfig1();
-
+	std::cout << "FEMALE PERCENT: " << femalePercent << std::endl;
 
     if (malePercent > 0.70){
         double mpercent = (double)malePercent * 100.00;
         std::cout << "Male Percentage : " << mpercent << "%" << std::endl << "MALE ADVERTISEMENT" << std::endl;
         showImg(avgAge,1);
-        //waitKey(0);
     } else if (femalePercent > 0.70){
         double fpercent = (double)femalePercent * 100.00;
         std::cout << "Female Percentage : " << fpercent << "%" << std::endl << "FEMALE ADVERTISEMENT" << std::endl;
@@ -195,8 +204,6 @@ int main (int argc, char** argv) {
     
     // Set up the camera
     capture.open(CAM_SOURCE);
-    capture.set(CAP_PROP_FRAME_WIDTH, WINDOW_WIDTH);
-    capture.set(CAP_PROP_FRAME_HEIGHT, WINDOW_HEIGHT);
     
 	const int width  = (int) capture.get(cv::CAP_PROP_FRAME_WIDTH);
 	const int height = (int) capture.get(cv::CAP_PROP_FRAME_HEIGHT);

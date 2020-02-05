@@ -17,3 +17,8 @@ __pycache__
 #ignore python virtual environments
 .venv
 
+#ignore VS Code generated directories
+.vscode
+
+#jekyll generated directories
+_site

@@ -46,7 +46,6 @@ data:
 deps: default_model
 	@echo $(YELLOW)'\n'${APP_NAME}": Making dependencies..."$(NOCOLOR)
 
-
 .PHONY: run_py
 run_py: data deps
 	@echo $(YELLOW)'\n'${APP_NAME}": Running the sample..."$(NOCOLOR)

@@ -22,6 +22,10 @@ $(SUBDIRS):
 
 .PHONY: $(TOPTARGETS) $(SUBDIRS)
 
+.PHONY: install_deps
+install_deps:
+	./install_deps.sh
+
 .PHONY: help
 help:
 	@echo "\nPossible Make targets"
@@ -29,4 +33,5 @@ help:
 	@echo $(YELLOW)"  make all "$(NOCOLOR)"- Makes all targets"
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- Removes all temp files from all directories"
 	@echo $(YELLOW)"  make compile_model "$(NOCOLOR)"- Runs compile on all caffe/tensorflow models"
+	@echo $(YELLOW)"  make install_deps "$(NOCOLOR)"- checks and installs software dependencies"
 
