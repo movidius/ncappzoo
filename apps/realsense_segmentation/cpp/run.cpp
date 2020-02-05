@@ -23,8 +23,6 @@
 #define segmentationNetworkLabelsFile "../seg_labels.txt"
 
 #define DEVICE "MYRIAD"
-// Location of the segmentation network xml file
-#define SEG_NETWORK_PATH "../semantic-segmentation-adas-0001.xml"
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 640
@@ -32,6 +30,9 @@
 #define CAP_FPS 30
 
 const unsigned int MAX_PATH = 256;
+// Location of the segmentation network xml/bin file
+const String SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
+const String SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 using namespace InferenceEngine;
 
@@ -118,22 +119,6 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
     }
     fclose (catFile);
 }
-
-
-
-/*
- * read a network from file and return a network object
- */
-InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath) 
-{
-    CNNNetReader network_reader;
-    network_reader.ReadNetwork(inputNetworkPath);
-    network_reader.ReadWeights(inputNetworkPath.substr(0, inputNetworkPath.size() - 4) + ".bin");
-    network_reader.getNetwork().setBatchSize(1);
-    CNNNetwork network = network_reader.getNetwork();
-    return network;
-}
-
 
 
 /*
@@ -368,9 +353,8 @@ void initializationThenStartCamera(rs2::pipeline RSpipe)
     // Create the inference engine object
     Core ie;
             
-    CNNNetwork networkObj;
-    // Read the network from the xml file and create a network object
-    networkObj = readNetwork(SEG_NETWORK_PATH);
+    // Create a network object by reading the XML and BIN files
+    CNNNetwork networkObj = ie.ReadNetwork(SEG_XML_PATH, SEG_BIN_PATH);
 
     // Get the input layer nodes and check to see if there are multiple inputs and outputs.
     // This sample only supports networks with 1 input and 1 output

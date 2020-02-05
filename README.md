@@ -71,7 +71,7 @@ The projects in the **master branch** depend on the Deep Learning Deployment Too
 
 **Note:** When using the open source distribution of the OpenVINO&trade; toolkit, you may need to modify your shell's path and environment variables to point to the toolkit's directories.
 
-The projects in the _ncappzoo_ work with both flavors of the OpenVINO&trade; Toolkit and unless otherwise specified in a project's README.md file all projects are targeted for the **OpenVINO&trade; Toolkit 2019 R3 release**.
+The projects in the _ncappzoo_ work with both flavors of the OpenVINO&trade; Toolkit and unless otherwise specified in a project's README.md file all projects are targeted for the **OpenVINO&trade; Toolkit 2020.1 release**.
 
 ### OpenCV Compatibility
 Some projects also rely on OpenCV. For these projects, OpenCV distributed with the OpenVINO&trade; release is the recommended version.  Other versions may also work but are not tested an may require tweaks to get working.  

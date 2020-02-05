@@ -33,8 +33,11 @@ using namespace InferenceEngine;
 
 
 // Location of age and gender networks
-const String FACE_NETWORK_PATH = "../face-detection-retail-0004.xml";
-const String AGEGEN_NETWORK_PATH = "../age-gender-recognition-retail-0013.xml";
+const String FACE_XML_PATH = "../face-detection-retail-0004.xml";
+const String FACE_BIN_PATH = "../face-detection-retail-0004.bin";
+const String AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
+const String AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.bin";
+
 
 // text colors and font
 const int FONT = cv::FONT_HERSHEY_PLAIN;
@@ -133,9 +136,9 @@ int main (int argc, char** argv) {
     Core ie;
 
     // -------------------------Read network and check network inputs-----------------------------------------------------------
-    // Declare Network objects and read the network from the xml file
-    CNNNetwork faceNetwork = ie.ReadNetwork(FACE_NETWORK_PATH, FACE_NETWORK_PATH.substr(0, FACE_NETWORK_PATH.size() - 4) + ".bin");
-    CNNNetwork ageGenNetwork = ie.ReadNetwork(AGEGEN_NETWORK_PATH, AGEGEN_NETWORK_PATH.substr(0, AGEGEN_NETWORK_PATH.size() - 4) + ".bin");
+    // Declare Network objects and read the network from the xml and bin file
+    CNNNetwork faceNetwork = ie.ReadNetwork(FACE_XML_PATH, FACE_BIN_PATH);
+    CNNNetwork ageGenNetwork = ie.ReadNetwork(AGEGEN_XML_PATH, AGEGEN_BIN_PATH);
     
     // Check network input for face detection
     InputsDataMap faceInputDataMap(faceNetwork.getInputsInfo());
