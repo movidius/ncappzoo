@@ -8,7 +8,7 @@ parent: Apps
 ## Introduction
 This project uses the TensorFlow mnist_deep network trained on the MNIST dataset to do digit classification for a handwriting-input calculator.  The digits are drawn with the mouse or a touchscreen.  Then when the user clicks '=' the digits are recognized and the equation is evaluated.
 
-![](mnist_calc_600x234.gif)
+![](../images/mnist_calc_600x234.gif)
 
 The provided Makefile does the following:
 1. Builds tensorflow MNIST graph file from the tensorflow/mnist directory in the repository.

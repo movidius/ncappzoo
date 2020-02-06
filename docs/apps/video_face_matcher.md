@@ -10,7 +10,7 @@ The video_face_matcher example app uses the TensorFlow [ncappzoo/networks/facene
 
 The provided video_face_matcher.py python app starts a webcam and shows the camera preview in a GUI window.  When the camera preview shows a face that matches the known valid face (video_face_matcher/validated_images/valid.jpg) a green frame is displayed around the person's face to indicate a match was found.  
 
-![](screen_shot.png)
+![](../images/video_face_matcher.png)
 
 ## Important Application details
 There are two ways to make the app recognize any face you'd like. 

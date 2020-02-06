@@ -10,7 +10,7 @@ This digital signage app dynamically outputs advertisements based on facial dete
 
 The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. The example outputs different advertisements based on user's demographics using the age-gender-recognition model. All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
 
-![](updated_gif.gif)
+![](../images/ncs_digital_sign.gif)
 
 Images in the advertisement_images directory are subject to the licenses.txt file within the directory.
 

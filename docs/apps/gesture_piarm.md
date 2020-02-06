@@ -9,7 +9,7 @@ parent: Apps
 ## Introduction
 This project uses an optimized model for gesture recognition in order to control a robot without a physical interface. At the current stage of this project, the model utilized below is a pre-trained COCO SSD Inception V2 model trained further on a custom dataset of created and annotated gesture images. Gestures and hand placement relative to the camera view dictate the action of the MeArm Pi V3, the robot shown below.
 
-![Gesture Pi Arm Demo](Gesture_Pi_Arm_Demo_Short.gif)
+![Gesture Pi Arm Demo]((../images/Gesture_Pi_Arm_Demo_Short.gif)
 
 The provided code does the following:
 1. Provides a python library to control the MeArm V3.

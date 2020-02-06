@@ -8,7 +8,7 @@ parent: Apps
 ## Introduction
 This app repeated does classification inferences on images from the filesystem and shows each image along with the classification and current FPS.  It makes use of the OpenVINO async api and is a good example of both how to scale and thread an OpenVINO application.  It looks like the following while running.
 
-![](classifier_flash.gif)
+![](../images/classifier_flash.gif)
 
 The FPS number shown will vary depending on the host system's ability to update the graphical window as well as other variables such as the display image size (window size).  This application shouldn't be used to benchmark the NCS performance for this reason.  
 

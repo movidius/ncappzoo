@@ -4,7 +4,7 @@ title: classifier_gui
 
 parent: Apps
 ---
-# classifier GUI: Image classification using DNNs on the Intel Neural Compute Stick 2 (NCS/NCS2)
+# classifier gui: Image classification using DNNs on the Intel Neural Compute Stick 2 (NCS/NCS2)
 
 This directory contains a python3 example that shows how to classify images using deep neural networks on the Intel Neural Compute Stick 2 using a simple GUI. This sample can be used with [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet), [SqueezeNet V1.0](https://github.com/DeepScale/SqueezeNet), and [AlexNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet). All models are sourced from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 

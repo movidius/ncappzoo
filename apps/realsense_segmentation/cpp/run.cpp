@@ -71,7 +71,7 @@ cv::Mat finalResultMat;
 cv::Mat segmentationColorMat;
 
 // Segmentation class color values. Each set of BGR values correspond to a class.
-// Visit https://docs.openvinotoolkit.org/2020.1_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
+// Visit https://docs.openvinotoolkit.org/latest/_models_intel_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
 std::vector<cv::Vec3b> colors = {
     {128, 64,  128},        // background
     {232, 35,  244},        // road

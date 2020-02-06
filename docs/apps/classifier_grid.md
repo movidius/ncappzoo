@@ -10,7 +10,7 @@ This sample displays a visual representation of simultaneous inferences being pe
 
 The sample starts by loading several images and displaying them in a grid pattern. As the NCS device completes an inference on an image in the grid, the image will light up to signal that the inference on that image is complete as seen in the animation below
 
-![](classifier_grid.gif)
+![](../images/classifier_grid.gif)
 
 By default, the example uses 3 threads per NCS device and creates 6 async inference requests per thread. Also by default, the sample will run 500 inferences using the [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet) network.
 

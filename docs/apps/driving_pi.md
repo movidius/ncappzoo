@@ -24,9 +24,9 @@ The app requires the following hardware:
  Instead of using the LEGO Mindstorm Controller, attach the Pi+BrickPi to the car. <br>
  Build your LEGO road, and setup the traffic light on it.
  ___
- ![](src/docs/pic1.jpg)
- ![](src/docs/pic2.jpg)
- ![](src/docs/pic3.jpg)
+ ![](../images/driving_pi/pic1.jpg)<br>
+ ![](../images/driving_pi/pic2.jpg)<br>
+ ![](../images/driving_pi/pic3.jpg)<br>
  ___
 
 ## How to run the sample
@@ -40,7 +40,7 @@ Alternatively, run the Python script directly for more options:
 python3 driving_pi.py -h
 ```
 ___
-![](src/docs/pic4.gif)
+![]((../images/driving_pi/pic4.gif)
 ___
 ## Makefile
 Provided Makefile has various targets that help with the above mentioned tasks.
