@@ -31,8 +31,8 @@ const float alpha = 0.5;
 const float beta =  1.0 - alpha;
 
 // Location of the segmentation network xml/bin file
-const String SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
-const String SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
+const std::string SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
+const std::string SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 // Segmentation class color values. Each set of BGR values correspond to a class.
 // Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.

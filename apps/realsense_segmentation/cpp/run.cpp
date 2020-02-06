@@ -30,11 +30,12 @@
 #define CAP_FPS 30
 
 const unsigned int MAX_PATH = 256;
-// Location of the segmentation network xml/bin file
-const String SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
-const String SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 using namespace InferenceEngine;
+
+// Location of the segmentation network xml/bin file
+const std::string SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
+const std::string SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 // OpenCV display constants
 const int FONT = cv::FONT_HERSHEY_PLAIN;

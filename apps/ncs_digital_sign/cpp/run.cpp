@@ -30,10 +30,10 @@ using namespace cv;
 using namespace InferenceEngine;
 
 // Location of age and gender networks
-const String FACE_XML_PATH = "../face-detection-retail-0004.xml";
-const String FACE_BIN_PATH = "../face-detection-retail-0004.bin";
-const String AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
-const String AGEGEN_BIN_PATH = "../age-gender-recognition-retail-0013.bin";
+const std::string FACE_XML_PATH = "../face-detection-retail-0004.xml";
+const std::string FACE_BIN_PATH = "../face-detection-retail-0004.bin";
+const std::string AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
+const std::string AGEGEN_BIN_PATH = "../age-gender-recognition-retail-0013.bin";
 
 bool flag = true;
 bool full = false; 

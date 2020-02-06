@@ -33,10 +33,10 @@ using namespace InferenceEngine;
 
 
 // Location of age and gender networks
-const String FACE_XML_PATH = "../face-detection-retail-0004.xml";
-const String FACE_BIN_PATH = "../face-detection-retail-0004.bin";
-const String AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
-const String AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.bin";
+const std::string FACE_XML_PATH = "../face-detection-retail-0004.xml";
+const std::string FACE_BIN_PATH = "../face-detection-retail-0004.bin";
+const std::string AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
+const std::string AGEGEN_BIN_PATH = "../age-gender-recognition-retail-0013.bin";
 
 
 // text colors and font
@@ -358,7 +358,7 @@ int main (int argc, char** argv) {
                 
                 // Determine which color the displayed text will be. 
                 // PINK = Female. Blue = Male. Green = Unknown.
-                String resultString;
+                std::string resultString;
                 if (genConf > GENDER_CONF_THRESHOLD && genResults.at(0) == FEMALE_LABEL)
                 {
                     resultColor.push_back(PINK);

@@ -155,6 +155,6 @@ clean:
 	rm -f ${MODEL_FILE_NAME_BASE}.bin
 	rm -f ${FD_MODEL_FILE_NAME_BASE}.xml
 	rm -f ${FD_MODEL_FILE_NAME_BASE}.bin
-	rm -rf validated_faces/Trump
+	rm -rf validated_faces
 	
 	

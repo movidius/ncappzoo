@@ -25,8 +25,8 @@
 #define DEVICE "MYRIAD"
 // Location of ssd mobilenet network
 #define SSD_NETWORK_PATH "../mobilenet-ssd.xml"
-const String SSD_XML_PATH = "../mobilenet-ssd.xml";
-const String SSD_BIN_PATH = "../mobilenet-ssd.bin";
+const std::string SSD_XML_PATH = "../mobilenet-ssd.xml";
+const std::string SSD_BIN_PATH = "../mobilenet-ssd.bin";
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 640
