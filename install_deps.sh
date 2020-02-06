@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright Intel Corporation 2019
+# Copyright Intel Corporation 2020
 # This script will check the current system for required dependencies
 # If any are missing, it will prompt to install or provide instructions on installing
 
@@ -20,11 +20,11 @@ else
         fi
         cd ~/Downloads
         if [[ $(uname -m) == "x86_64" ]]; then
-            if [[ ! -d ~/Downloads/l_openvino_toolkit_p_2019.3.376 ]]; then #if the download completes and extracted, but the installation failed
-                wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16057/l_openvino_toolkit_p_2019.3.376.tgz
-                tar -xvzf l_openvino_toolkit_p_2019.3.376.tgz
+            if [[ ! -d ~/Downloads/l_openvino_toolkit_p_2020.1.023 ]]; then #if the download completes and extracted, but the installation failed
+                wget http://registrationcenter-download.intel.com/akdlm/irc_nas/16345/l_openvino_toolkit_p_2020.1.023.tgz
+                tar -xvzf l_openvino_toolkit_p_2020.1.023.tgz
             fi
-            cd l_openvino_toolkit_p_2019.3.376
+            cd l_openvino_toolkit_p_2020.1.023
             sudo ./install_openvino_dependencies.sh
             sudo ./install.sh
             source /opt/intel/openvino/install_dependencies/install_NCS_udev_rules.sh
