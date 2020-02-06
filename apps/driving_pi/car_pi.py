@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# Copyright(c) 2020.1 Intel Corporation.
+# Copyright(c) 2020 Intel Corporation.
 # License: MIT See LICENSE file in root directory.
 
 import brickpi3
