@@ -32,10 +32,10 @@ else
             if [[ ! -d /opt/intel/openvino ]]; then
                 sudo mkdir -p /opt/intel/openvino
             fi
-            if [[ ! -f l_openvino_toolkit_runtime_raspbian_p_2019.3.334 ]]; then
-                wget https://download.01.org/opencv/2019/openvinotoolkit/R3/l_openvino_toolkit_runtime_raspbian_p_2019.3.334.tgz
+            if [[ ! -f l_openvino_toolkit_runtime_raspbian_p_2020.1.023 ]]; then
+                wget https://download.01.org/opencv/2020/openvinotoolkit/2020.1/l_openvino_toolkit_runtime_raspbian_p_2020.1.023.tgz
             fi
-            sudo tar -xvzf l_openvino_toolkit_runtime_raspbian_p_2019.3.334.tgz --strip 1 -C /opt/intel/openvino
+            sudo tar -xvzf l_openvino_toolkit_runtime_raspbian_p_2020.1.023.tgz --strip 1 -C /opt/intel/openvino
             sudo /opt/intel/openvino/install_all_dependencies.sh
             sudo usermod -a -G users $(whoami)
             echo -e "\e[36mYou must restart your device to continue.\e[39m"
