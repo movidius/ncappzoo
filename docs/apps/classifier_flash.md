@@ -8,7 +8,7 @@ parent: Apps
 ## Introduction
 This app repeated does classification inferences on images from the filesystem and shows each image along with the classification and current FPS.  It makes use of the OpenVINO async api and is a good example of both how to scale and thread an OpenVINO application.  It looks like the following while running.
 
-![](../../images/classifier_flash.gif)
+![](../images/classifier_flash.gif)
 
 The FPS number shown will vary depending on the host system's ability to update the graphical window as well as other variables such as the display image size (window size).  This application shouldn't be used to benchmark the NCS performance for this reason.  
 
@@ -37,8 +37,7 @@ To get a list of commandline options type the following command: ```python3 clas
 ## Prerequisites
 This program requires:
 - 1 or more NCS devices
-- OpenVINO 2019 R3 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- OpenVINO 2020.1 Toolkit
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 

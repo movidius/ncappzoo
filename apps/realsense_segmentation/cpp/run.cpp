@@ -23,8 +23,6 @@
 #define segmentationNetworkLabelsFile "../seg_labels.txt"
 
 #define DEVICE "MYRIAD"
-// Location of the segmentation network xml file
-#define SEG_NETWORK_PATH "../semantic-segmentation-adas-0001.xml"
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 640
@@ -34,6 +32,10 @@
 const unsigned int MAX_PATH = 256;
 
 using namespace InferenceEngine;
+
+// Location of the segmentation network xml/bin file
+const std::string SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
+const std::string SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 // OpenCV display constants
 const int FONT = cv::FONT_HERSHEY_PLAIN;
@@ -69,7 +71,7 @@ cv::Mat finalResultMat;
 cv::Mat segmentationColorMat;
 
 // Segmentation class color values. Each set of BGR values correspond to a class.
-// Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
+// Visit https://docs.openvinotoolkit.org/latest/_models_intel_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
 std::vector<cv::Vec3b> colors = {
     {128, 64,  128},        // background
     {232, 35,  244},        // road
@@ -118,22 +120,6 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
     }
     fclose (catFile);
 }
-
-
-
-/*
- * read a network from file and return a network object
- */
-InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath) 
-{
-    CNNNetReader network_reader;
-    network_reader.ReadNetwork(inputNetworkPath);
-    network_reader.ReadWeights(inputNetworkPath.substr(0, inputNetworkPath.size() - 4) + ".bin");
-    network_reader.getNetwork().setBatchSize(1);
-    CNNNetwork network = network_reader.getNetwork();
-    return network;
-}
-
 
 
 /*
@@ -368,9 +354,8 @@ void initializationThenStartCamera(rs2::pipeline RSpipe)
     // Create the inference engine object
     Core ie;
             
-    CNNNetwork networkObj;
-    // Read the network from the xml file and create a network object
-    networkObj = readNetwork(SEG_NETWORK_PATH);
+    // Create a network object by reading the XML and BIN files
+    CNNNetwork networkObj = ie.ReadNetwork(SEG_XML_PATH, SEG_BIN_PATH);
 
     // Get the input layer nodes and check to see if there are multiple inputs and outputs.
     // This sample only supports networks with 1 input and 1 output

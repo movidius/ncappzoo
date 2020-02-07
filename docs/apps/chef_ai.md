@@ -9,7 +9,7 @@ parent: Apps
 ## Demos
 
 ### Chef.ai Webapp with Flask Templates/Vanilla JS
-![Chef.ai in action!](../../images/chef_ai.gif)
+![Chef.ai in action!](../images/chef_ai.gif)
 
 The original [Chef.ai](https://github.com/fcr3/chef_devmesh) webapp with React.js
 as the frontend can in the link provided.
@@ -65,7 +65,7 @@ $ make run
   - numpy
   - base64
   - openCV
-  - OpenVINO 2019 R3
+  - OpenVINO 2020.1
 - Fronend:
   - Vanilla Js (whatever Javascript comes with the browser)
   - Regular HTML/CSS

@@ -25,6 +25,8 @@
 #define DEVICE "MYRIAD"
 // Location of ssd mobilenet network
 #define SSD_NETWORK_PATH "../mobilenet-ssd.xml"
+const std::string SSD_XML_PATH = "../mobilenet-ssd.xml";
+const std::string SSD_BIN_PATH = "../mobilenet-ssd.bin";
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 640
@@ -88,21 +90,6 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
         labelsVector->push_back(std::string(catLine));
     }
     fclose (catFile);
-}
-
-
-
-/*
- * read a network
- */
-InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath) 
-{
-    CNNNetReader network_reader;
-    network_reader.ReadNetwork(inputNetworkPath);
-    network_reader.ReadWeights(inputNetworkPath.substr(0, inputNetworkPath.size() - 4) + ".bin");
-    network_reader.getNetwork().setBatchSize(1);
-    CNNNetwork network = network_reader.getNetwork();
-    return network;
 }
 
 
@@ -188,9 +175,8 @@ int main (int argc, char** argv)
 
     // ----------------------------------Read network and check network inputs----------------------------------
     
-    CNNNetwork ssdNetwork;
-    // Read the network from the xml file
-    ssdNetwork = readNetwork(SSD_NETWORK_PATH);
+    // Read the network from the xml and bin file
+    CNNNetwork ssdNetwork = ie.ReadNetwork(SSD_XML_PATH, SSD_BIN_PATH);
 
     // Check network input and output size 
     InputsDataMap ssdInputDataMap(ssdNetwork.getInputsInfo());

@@ -7,7 +7,7 @@ parent: Networks
 ## Introduction
 The tiny yolo v3 network can be used for object recognition and classification. This model was trained with the Coco data set and can detect up to 80 classes. See [https://pjreddie.com/darknet/yolo/](https://pjreddie.com/darknet/yolo/) for more information on this network. 
 
-This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2019 R3 release.
+This sample utilizes the OpenVINO Inference Engine from the [OpenVINO Deep Learning Development Toolkit](https://software.intel.com/en-us/openvino-toolkit) and was tested with the 2020.1 release.
 
 The provided Makefile does the following:
 1. Clones a [Tensorflow yolo repo](https://github.com/mystic123/tensorflow-yolo-v3) that will help to convert the darknet weights to tensorflow.

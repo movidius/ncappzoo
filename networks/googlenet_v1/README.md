@@ -2,11 +2,11 @@
 ## Introduction
 The [googlenet_v1](https://github.com/opencv/open_model_zoo/blob/master/models/public/googlenet-v1/googlenet-v1.md) network can be used for image classification. 
 
-This sample utilizes the OpenVINO Inference Engine from the OpenVINO Deep Learning Development Toolkit and was tested with the 2019 R3 release.
+This sample utilizes the OpenVINO Inference Engine from the OpenVINO Deep Learning Development Toolkit and was tested with the 2020.1 release.
 
 The provided Makefile does the following
 
-1. Downloads the Caffe prototxt file and makes any changes necessary to work with OpenVINO (tested with 2019 R3) and the Intel Neural Compute Stick (NCS1/NCS2). 
+1. Downloads the Caffe prototxt file and makes any changes necessary to work with OpenVINO (tested with 2020.1) and the Intel Neural Compute Stick (NCS1/NCS2). 
 2. Downloads and generates the required ilsvrc12 data.
 3. Downloads the .caffemodel file from [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 4. Compiles the network into an IR (intermediate representation) format file (.xml) using the OpenVINO Model Optimizer. 

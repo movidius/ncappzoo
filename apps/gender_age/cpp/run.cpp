@@ -22,9 +22,6 @@
 #define CAM_SOURCE 0
 
 
-// Location of age and gender networks
-#define FACE_NETWORK_PATH "../face-detection-retail-0004.xml"
-#define AGEGEN_NETWORK_PATH "../age-gender-recognition-retail-0013.xml"
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 1280
@@ -33,6 +30,14 @@
 
 using namespace cv;
 using namespace InferenceEngine;
+
+
+// Location of age and gender networks
+const std::string FACE_XML_PATH = "../face-detection-retail-0004.xml";
+const std::string FACE_BIN_PATH = "../face-detection-retail-0004.bin";
+const std::string AGEGEN_XML_PATH = "../age-gender-recognition-retail-0013.xml";
+const std::string AGEGEN_BIN_PATH = "../age-gender-recognition-retail-0013.bin";
+
 
 // text colors and font
 const int FONT = cv::FONT_HERSHEY_PLAIN;
@@ -66,16 +71,34 @@ struct detectionResults{
 };
 
 
-/*
- * read a network
- */
-InferenceEngine::CNNNetwork readNetwork(String inputNetworkPath) {
-    CNNNetReader network_reader;
-    network_reader.ReadNetwork(inputNetworkPath);
-    network_reader.ReadWeights(inputNetworkPath.substr(0, inputNetworkPath.size() - 4) + ".bin");
-    network_reader.getNetwork().setBatchSize(1);
-    CNNNetwork network = network_reader.getNetwork();
-    return network;
+
+void getTopResults(unsigned int numberOfResultsToReturn, InferenceEngine::Blob& input, std::vector<unsigned> &output) {
+    auto scores = input.buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
+ 
+    
+    if (numberOfResultsToReturn > input.size())
+    {
+        std::cout << "The number of desired results is greater than total number of results." << '\n';
+        std::cout << "Setting number of desired results equal to total number of results." << '\n';
+        numberOfResultsToReturn = input.size();
+    }
+    else if (numberOfResultsToReturn <= 0)
+    {
+        std::cout << "The number of desired results is less than or equal to zero." << '\n';
+        std::cout << "Setting number of desired results to 1." << '\n';
+    }
+    // Create a vector of indexes
+    std::vector<unsigned> classIndexes(input.size());
+    std::iota(std::begin(classIndexes), std::end(classIndexes), 0);
+    std::partial_sort(std::begin(classIndexes), std::end(classIndexes), std::end(classIndexes), 
+            [&scores](unsigned left, unsigned right){
+                return scores[left] > scores[right];});
+    output.resize(numberOfResultsToReturn);
+    for (unsigned int j = 0; j < numberOfResultsToReturn; j++) 
+    {
+        output.at(j) = classIndexes.at(j);
+    }
+       
 }
 
 
@@ -113,13 +136,9 @@ int main (int argc, char** argv) {
     Core ie;
 
     // -------------------------Read network and check network inputs-----------------------------------------------------------
-    // Declare the networks
-    CNNNetwork faceNetwork;
-    CNNNetwork ageGenNetwork;
-
-    // Read the network from the xml file
-    faceNetwork = readNetwork(FACE_NETWORK_PATH);
-    ageGenNetwork = readNetwork(AGEGEN_NETWORK_PATH);
+    // Declare Network objects and read the network from the xml and bin file
+    CNNNetwork faceNetwork = ie.ReadNetwork(FACE_XML_PATH, FACE_BIN_PATH);
+    CNNNetwork ageGenNetwork = ie.ReadNetwork(AGEGEN_XML_PATH, AGEGEN_BIN_PATH);
     
     // Check network input for face detection
     InputsDataMap faceInputDataMap(faceNetwork.getInputsInfo());
@@ -183,8 +202,8 @@ int main (int argc, char** argv) {
 
     // Skip a frame after this many frames. adjust this if getting laggy camera 
     const int SKIP_AFTER = 3;
-    printf("\nStarting gender_age app...\n");
-    printf("\nPress any key to quit.\n");
+    std::cout << "\nStarting gender_age app... \n";
+    std::cout << "\nPress any key to quit.\n";
     
     // -------------------------Running the inferences----------------------------------
     // Get the current time; inferences will only be performed periodically
@@ -297,7 +316,7 @@ int main (int argc, char** argv) {
             int numInferAgeGen = detectedFaces.size();
             // Get the age gender input dimensions
             auto ageGenInputDims = ageGenInferRequest->GetBlob(ageGenInputLayerName)->getTensorDesc().getDims();
-            unsigned int ageGenChannelsNumber = ageGenInputDims.at(1);
+            unsigned int ageGenInputChannelsNumber = ageGenInputDims.at(1);
             unsigned int ageGenInputHeight = ageGenInputDims.at(2);
             unsigned int ageGenInputWidth = ageGenInputDims.at(3);
             
@@ -311,7 +330,7 @@ int main (int argc, char** argv) {
                 // Set the input data for the gender network. Fill the buffer with the input data.
                 for (size_t pid = 0; pid < ageGenImageSize; ++pid) 
                 {
-                    for (size_t ch = 0; ch < ageGenChannelsNumber; ++ch) 
+                    for (size_t ch = 0; ch < ageGenInputChannelsNumber; ++ch) 
                     {
                         ageGenInputData[ch * ageGenImageSize + pid] = detectedFaces.at(i).croppedMat.at<cv::Vec3b>(pid)[ch];
                     }
@@ -324,14 +343,14 @@ int main (int argc, char** argv) {
                 // Get the result for gender
                 auto genOutput = ageGenInferRequest->GetBlob(genOutputLayerName);
                 auto genOutputData = genOutput->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
-                
+      
                 // Age-gender output processing //
                 // Find the top result for age and gender
                 unsigned int results_to_display = 1;
                 std::vector<unsigned> ageResults;
                 std::vector<unsigned> genResults;
-                TopResults(results_to_display, *ageOutput, ageResults);
-                TopResults(results_to_display, *genOutput, genResults);
+                getTopResults(results_to_display, *ageOutput, ageResults);
+                getTopResults(results_to_display, *genOutput, genResults);
                 
                 // Calculate the confidence scores for age gender
                 auto ageConf = ageOutputData[ageResults[0]]*100; // for age, the confidence score is the age. ex: if the age confidence = 19.01, the age is 19.
@@ -339,20 +358,25 @@ int main (int argc, char** argv) {
                 
                 // Determine which color the displayed text will be. 
                 // PINK = Female. Blue = Male. Green = Unknown.
+                std::string resultString;
                 if (genConf > GENDER_CONF_THRESHOLD && genResults.at(0) == FEMALE_LABEL)
                 {
                     resultColor.push_back(PINK);
+                    resultString = "Female";
                 }
                 else if (genConf > GENDER_CONF_THRESHOLD && genResults.at(0) == MALE_LABEL)
                 {
                     resultColor.push_back(BLUE);
+                    resultString = "Male";
                 }
                 else 
                 {
                     resultColor.push_back(GREEN);
+                    resultString = "";
                 }
                 // Add the age confidence to the results text vector
-                resultText.push_back("Age: " + std::to_string((int)(ageConf)));
+                resultText.push_back(resultString + " Age: " + std::to_string((int)(ageConf)));
+                
                 elapsed_time = clock() - start_time;
 
             }
@@ -361,6 +385,7 @@ int main (int argc, char** argv) {
         
         // -----------------Display the results ---------------
         // Go through all of the faces that we detected and set up the display text and bounding boxes to display gender and age
+        
         for (unsigned int i = 0; i < detectedFaces.size(); i++)
         {
             cv::putText(imgIn, resultText.at(i), cv::Point2f(detectedFaces.at(i).xmin, detectedFaces.at(i).ymin) , FONT, FONT_SIZE, resultColor.at(i), 2);

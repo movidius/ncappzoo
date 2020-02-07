@@ -32,7 +32,7 @@ The provided Makefile does the following:
 This program requires:
 - 1 NCS1/NCS2 device
 - A webcam
-- OpenVINO 2019 R3 or greater
+- OpenVINO 2020.1
 - tkinter
 
 ## How to run

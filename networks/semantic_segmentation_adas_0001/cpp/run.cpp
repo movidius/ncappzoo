@@ -19,8 +19,6 @@
 #define WINDOW_NAME "Semantic Segmentation Adas 0001 - press q to quit"
 
 #define DEVICE "MYRIAD"
-// Location of the segmentation network xml file
-#define SEG_NETWORK_PATH "../semantic-segmentation-adas-0001.xml"
 
 // window height and width 4:3 ratio
 #define WINDOW_WIDTH 640
@@ -31,6 +29,10 @@ using namespace InferenceEngine;
 
 const float alpha = 0.5; 
 const float beta =  1.0 - alpha;
+
+// Location of the segmentation network xml/bin file
+const std::string SEG_XML_PATH = "../semantic-segmentation-adas-0001.xml";
+const std::string SEG_BIN_PATH = "../semantic-segmentation-adas-0001.bin";
 
 // Segmentation class color values. Each set of BGR values correspond to a class.
 // Visit https://docs.openvinotoolkit.org/2019_R1/_semantic_segmentation_adas_0001_description_semantic_segmentation_adas_0001.html for more information.
@@ -61,20 +63,6 @@ std::vector<cv::Vec3b> colors = {
 
 
 /*
- * read a network from file and return a network object
- */
-InferenceEngine::CNNNetwork readNetwork(std::string inputNetworkPath) 
-{
-    CNNNetReader network_reader;
-    network_reader.ReadNetwork(inputNetworkPath);
-    network_reader.ReadWeights(inputNetworkPath.substr(0, inputNetworkPath.size() - 4) + ".bin");
-    network_reader.getNetwork().setBatchSize(1);
-    CNNNetwork network = network_reader.getNetwork();
-    return network;
-}
-
-
-/*
  * Start.
  */
 int main (int argc, char** argv) 
@@ -85,7 +73,7 @@ int main (int argc, char** argv)
     // ----------Create inference engine core object and network object----------
     
     Core ie;
-    CNNNetwork networkObj = readNetwork(SEG_NETWORK_PATH);
+    CNNNetwork networkObj = ie.ReadNetwork(SEG_XML_PATH, SEG_BIN_PATH);
 
     // Get the input layer nodes and check to see if there are multiple inputs and outputs.
     // This sample only supports networks with 1 input and 1 output

@@ -19,7 +19,7 @@ All development and testing has been done on Ubuntu 16.04 on an x86-64 machine.
 
 This program requires:
 - 1 Intel NCS device
-- OpenVINO 2019 R3 toolkit
+- OpenVINO 2020.1 toolkit
 - OpenCV with associated Python bindings*. 
 
 ## Makefile

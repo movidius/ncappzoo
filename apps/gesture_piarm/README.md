@@ -14,7 +14,7 @@ The provided code does the following:
 
 ### Prerequisites:
 - One Intel NCS 2 Device
-- OpenVINO 2019 R2 (Python API)
+- OpenVINO 2020.1 (Python API)
 - OpenCV with associated Python bindings*.
 - a Raspberry Pi 3 B+
 - Pigpio (a Python API for controlling the GPIO of the Raspberry Pi)

@@ -4,7 +4,6 @@ title: benchmark_ncs
 
 parent: Apps
 ---
-
 # benchmark_ncs 
 ## Introduction
 This example program that shows how to determine the fps (frames per second or inferences per second) that you are achieving with your current configuration for a specified network and image set. 
@@ -32,7 +31,7 @@ The benchmark_ncs.py program itself has some options that aren't accessible via 
 ## Prerequisites
 This code example requires that the following components are available:
 1. 1 or more NCS devices
-2. OpenVINO 2019 R3 Toolkit
+2. OpenVINO 2020.1 Toolkit
 
 *It may run with older versions but you may see some glitches such as the GUI Window not closing when you click the X in the title bar, and other key binding issues.
 

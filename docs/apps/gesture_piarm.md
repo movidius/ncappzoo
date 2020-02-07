@@ -9,7 +9,7 @@ parent: Apps
 ## Introduction
 This project uses an optimized model for gesture recognition in order to control a robot without a physical interface. At the current stage of this project, the model utilized below is a pre-trained COCO SSD Inception V2 model trained further on a custom dataset of created and annotated gesture images. Gestures and hand placement relative to the camera view dictate the action of the MeArm Pi V3, the robot shown below.
 
-![Gesture Pi Arm Demo](../images/Gesture_Pi_Arm_Demo_Short.gif)
+![Gesture Pi Arm Demo]((../images/Gesture_Pi_Arm_Demo_Short.gif)
 
 The provided code does the following:
 1. Provides a python library to control the MeArm V3.
@@ -20,7 +20,7 @@ The provided code does the following:
 
 ### Prerequisites:
 - One Intel NCS 2 Device
-- OpenVINO 2019 R2 (Python API)
+- OpenVINO 2020.1 R2 (Python API)
 - OpenCV with associated Python bindings*.
 - a Raspberry Pi 3 B+
 - Pigpio (a Python API for controlling the GPIO of the Raspberry Pi)
@@ -57,7 +57,7 @@ The instructions below assume that you are using the model provided with the cod
 - In order to open the grip, show a single exposed palm.
 See below for demonstration of gesture control and arm movement.
 
-![Motion Demo](../images/Arm_Motion_Demo.gif)
+![Motion Demo](Arm_Motion_Demo.gif)
 
 ## Useful Instructions and References
 

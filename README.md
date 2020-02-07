@@ -39,8 +39,8 @@ make help
 There are main three branches in the repository; their descriptions are below.  **The master branch is the one most developers will want.**  The others are provided for legacy compatibility.
 
 - **master** branch: This is the most current branch, and the content relies on the DLDT from the OpenVINO&trade; Toolkit.  This is the only branch that is compatible with the Intel&reg; NCS2 however, it is also compatible with the original Intel&reg; Movidius&trade; NCS device.
-- **ncsdk2** branch: This branch is a legacy branch and the content relies on the NCSDK 2.x tools and APIs rather than the OpenVINO&trade; toolkit. This branch is only compatible with the original Intel&reg; Movidius&trade; NCS device and is **NOT** compatile with the Intel&reg; NCS2 device.
-- **ncsdk1** branch: This branch is a legacy branch and the content relies on the NCSDK 1.x tools and APIs rather than OpenVINO&trade; toolkit.  This branch is only compatible with the original Intel&reg; Movidius&trade; Neural Compute Stick and is **NOT** compatile with the Intel&reg; NCS2 device.
+- **ncsdk2** branch: This branch is a legacy branch and the content relies on the NCSDK 2.x tools and APIs rather than the OpenVINO&trade; toolkit. This branch is only compatible with the original Intel&reg; Movidius&trade; NCS device and is **NOT** compatible with the Intel&reg; NCS2 device.
+- **ncsdk1** branch: This branch is a legacy branch and the content relies on the NCSDK 1.x tools and APIs rather than OpenVINO&trade; toolkit.  This branch is only compatible with the original Intel&reg; Movidius&trade; Neural Compute Stick and is **NOT** compatible with the Intel&reg; NCS2 device.
 
 You can use the following git command to use the master branch of the repo:
 ```bash
@@ -55,7 +55,7 @@ The projects in the _ncappzoo_ work on both the Intel&reg; NCS2 and the original
 
 
 ### Operating System Compatibility
-The projects in the _ncappzoo_ are tested and known to work on the **Ubuntu 18.04**.  These projects will likely work on other Linux based operating systems as well but they aren't tested on those unless explicitly stated in the project's README.md file and there may be some tweaks required as well.  If any specific issues are found for other OSes please submit a pull request as broad compatibility is desirable.
+The projects in the _ncappzoo_ are tested and known to work on the **Ubuntu 18.04** OS.  These projects will likely work on other Linux based operating systems as well but they aren't tested on those unless explicitly stated in the project's README.md file and there may be some tweaks required as well.  If any specific issues are found for other OSes please submit a pull request as broad compatibility is desirable.
 
 ### OpenVINO and DLDT Compatibility
 The projects in the **master branch** depend on the Deep Learning Deployment Toolkit (DLDT) portion of the OpenVINO&trade; toolkit.  There are two flavors of the the OpenVINO&trade; toolkit's DLDT:  
@@ -71,7 +71,7 @@ The projects in the **master branch** depend on the Deep Learning Deployment Too
 
 **Note:** When using the open source distribution of the OpenVINO&trade; toolkit, you may need to modify your shell's path and environment variables to point to the toolkit's directories.
 
-The projects in the _ncappzoo_ work with both flavors of the OpenVINO&trade; Toolkit and unless otherwise specified in a project's README.md file all projects are targeted for the **OpenVINO&trade; Toolkit 2019 R3 release**.
+The projects in the _ncappzoo_ work with both flavors of the OpenVINO&trade; Toolkit and unless otherwise specified in a project's README.md file all projects are targeted for the **OpenVINO&trade; Toolkit 2020.1 release**.
 
 ### OpenCV Compatibility
 Some projects also rely on OpenCV. For these projects, OpenCV distributed with the OpenVINO&trade; release is the recommended version.  Other versions may also work but are not tested an may require tweaks to get working.  
