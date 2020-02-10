@@ -10,7 +10,7 @@ This app does facial detection and age/gender inference using the Intel Neural C
 
 The example does face detection on a camera frame using face-detection-retail.0004, crops the detected faces, then does age and gender inference using the age-gender network. When running, the app shows the realtime camera preview while overlaying, a box around faces (color coded for gender), and an estimated age.  All models can be found on the [Open Model Zoo](https://github.com/opencv/open_model_zoo). This sample uses pre-compiled IRs, so the model optimizer is not utilized.
 
-![]((../images/gender_age_3.gif)
+![](../images/gender_age_3.gif)
 
 ## Building the Example
 
