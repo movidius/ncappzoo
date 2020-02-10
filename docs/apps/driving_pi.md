@@ -22,7 +22,7 @@ The app requires the following hardware:
  ## Setup
  First, setup the Raspberry Pi3 and the BrickPi3: [Get started](https://www.dexterindustries.com/BrickPi/brickpi-tutorials-documentation/getting-started/)<br> After installing the boards, start building the LEGO car using LEGO MINDSTORMS EV3 KIT: [step-by-step](https://le-www-live-s.legocdn.com/sc/media/lessons/mindstorms-ev3/building-instructions/ev3-rem-driving-base-79bebfc16bd491186ea9c9069842155e.pdf) <br>
  Instead of using the LEGO Mindstorm Controller, attach the Pi+BrickPi to the car. <br>
- Build your LEGO road, and setup the traffic light on it.
+ Build your LEGO road, and setup the traffic light on it. <br>
  ___
  ![](../images/driving_pi/pic1.jpg)<br>
  ![](../images/driving_pi/pic2.jpg)<br>
