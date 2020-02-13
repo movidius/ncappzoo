@@ -4,7 +4,7 @@ title: classifier_gui
 
 parent: Apps
 ---
-# classifier_gui: Image classification using DNNs on the Intel Neural Compute Stick 2 (NCS/NCS2)
+# classifier gui: Image classification using DNNs on the Intel Neural Compute Stick 2 (NCS/NCS2)
 
 This directory contains a python3 example that shows how to classify images using deep neural networks on the Intel Neural Compute Stick 2 using a simple GUI. This sample can be used with [GoogLeNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_googlenet), [SqueezeNet V1.0](https://github.com/DeepScale/SqueezeNet), and [AlexNet](https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet). All models are sourced from the [Open Model Zoo](https://github.com/opencv/open_model_zoo).
 
@@ -44,8 +44,7 @@ You should also see the image on which inference was performed.
 ## Prerequisites
 This program requires:
 - 1 NCS device
-- OpenVINO 2019 R3 Toolkit
-- OpenCV 3.3 with Video for Linux (V4L) support and associated Python bindings*.
+- OpenVINO 2020.1 Toolkit
 - Scikit-image
 - PIL (Python Imaging library) with Image and Imagetk modules
 

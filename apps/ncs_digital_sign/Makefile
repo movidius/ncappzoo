@@ -102,7 +102,7 @@ help:
 	@echo $(YELLOW)"  make clean "$(NOCOLOR)"- removes all created content and temporary files";
 
 
-clean: clean
+clean: 
 	@echo $(YELLOW)"\nncs_digital_sign: Cleaning up files..."$(NOCOLOR);
 	rm -rf build
 	rm -f ${AGE_GEN_FILE_NAME_BASE}.xml;

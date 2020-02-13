@@ -9,7 +9,7 @@ nav_order: 1
 
 
 # Neural Compute Application Zoo (ncappzoo) 
-[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2019.R3-green.svg)](https://github.com/opencv/dldt/releases/tag/2019_R3.1)
+[![Stable release](https://img.shields.io/badge/For_OpenVINO™_Version-2020.1-green.svg)](https://github.com/opencv/dldt/releases/tag/2020.1)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) 
 
 
@@ -101,8 +101,8 @@ To setup the open source version of OpenVINO&trade; with your Raspberry Pi, add 
 
 ## ncappzoo Repository Layout
 The ncappzoo contains the following top-level directories.  See the README file in each of these directories or just click on the links below to explore the contents of the ncappzoo.
-- **[apps](../apps/)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the ncappzoo!**
-- **[networks](../networks/)** : Scripts to download models and optimize neural networks based on any framework for use with the NCS and NCS 2.
+- **[apps](./apps/)** : Applications built to use the Intel Movidius NCS.  **This is a great place to start in the ncappzoo!**
+- **[networks](./networks/)** : Scripts to download models and optimize neural networks based on any framework for use with the NCS and NCS 2.
 - **[caffe](https://github.com/movidius/ncappzoo/tree/master/caffe/README.md)** : Scripts to download caffe models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
 - **[tensorflow](https://github.com/movidius/ncappzoo/tree/master/tensorflow/README.md)** : Scripts to download TensorFlow&trade; models and optimize neural networks for use with the NCS and NCS 2.  Note: this is a legacy directory and new networks will be in the _networks_ directory.
 - **[data](https://github.com/movidius/ncappzoo/tree/master/data/README.md)** : Data and scripts to download data for use with models and applications that use the NCS and NCS 2

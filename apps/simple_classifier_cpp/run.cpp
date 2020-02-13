@@ -3,7 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <inference_engine.hpp>
 #include <vector>
-
+#include <algorithm>
 using namespace InferenceEngine;
 
 #define DEVICE "MYRIAD"
@@ -33,6 +33,37 @@ void getNetworkLabels(std::string labelsDir, std::vector<std::string>* labelsVec
     fclose (cat_file);
 }
 
+
+void getTopResults(unsigned int numberOfResultsToReturn, InferenceEngine::Blob& input, std::vector<unsigned> &output) {
+    auto scores = input.buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
+ 
+    
+    if (numberOfResultsToReturn > input.size())
+    {
+        std::cout << "The number of desired results is greater than total number of results." << '\n';
+        std::cout << "Setting number of desired results equal to total number of results." << '\n';
+        numberOfResultsToReturn = input.size();
+    }
+    else if (numberOfResultsToReturn <= 0)
+    {
+        std::cout << "The number of desired results is less than or equal to zero." << '\n';
+        std::cout << "Setting number of desired results to 1." << '\n';
+    }
+    // Create a vector of indexes
+    std::vector<unsigned> classIndexes(input.size());
+    std::iota(std::begin(classIndexes), std::end(classIndexes), 0);
+    std::partial_sort(std::begin(classIndexes), std::end(classIndexes), std::end(classIndexes), 
+            [&scores](unsigned left, unsigned right){
+                return scores[left] > scores[right];});
+    output.resize(numberOfResultsToReturn);
+    for (unsigned int j = 0; j < numberOfResultsToReturn; j++) 
+    {
+        output.at(j) = classIndexes.at(j);
+    }
+       
+}
+
+
 // *************************************************************************
 // Entrypoint for the application
 // *************************************************************************
@@ -56,11 +87,8 @@ int main(int argc, char *argv[]) {
     // ----------------------- Create IE core object and read the network ----------------------- //
     // Create the inference engine core object
     Core ie_core;
-    // Create a network reader and read in the network and weights
-    CNNNetReader networkReader;
-    networkReader.ReadNetwork(XML);
-    networkReader.ReadWeights(BIN);
-    auto network = networkReader.getNetwork();
+    // Create a network object by reading in the network and weights
+    CNNNetwork network = ie_core.ReadNetwork(XML, BIN);
     
     // ----------------------- Set up the network input ----------------------- //
     InputsDataMap inputDataMap(network.getInputsInfo());
@@ -94,7 +122,9 @@ int main(int argc, char *argv[]) {
     unsigned int inputNumberOfChannels = inputDims.at(1);
     unsigned int inputHeight = inputDims.at(2);
     unsigned int inputWidth = inputDims.at(3);
-    
+        
+    auto outputDims = inferenceRequest->GetBlob(outputLayerName)->getTensorDesc().getDims();
+   
     // Use OpenCV to read in an image
     imgIn = cv::imread(IMAGE);
 
@@ -118,12 +148,12 @@ int main(int argc, char *argv[]) {
     auto inferenceResults = inferenceRequest->GetBlob(outputLayerName);
     // Get all of the confidence scores. 
     auto scores = inferenceResults->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>(); 
-
+    
     // Sort the results and get the number of desired top results
     std::vector<unsigned> sortedResults; // This vector will hold all of the top sorted results
     unsigned int resultsToDisplay = 5;   // How many results should return?
-    TopResults(resultsToDisplay, *inferenceResults, sortedResults);
-
+    getTopResults(resultsToDisplay, *inferenceResults, sortedResults);
+    
     // ----------------------- 8. Display the results ----------------------- //  
     std::cout << std::endl << "\033[1;33m **********  Results  ***********\033[0m"<< std::endl << std::endl;
     for (size_t resultIndex = 0; resultIndex < resultsToDisplay; ++resultIndex) {

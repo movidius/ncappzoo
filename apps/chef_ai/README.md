@@ -59,7 +59,7 @@ $ make run
   - numpy
   - base64
   - openCV
-  - OpenVINO 2019 R3
+  - OpenVINO 2020.1
 - Fronend:
   - Vanilla Js (whatever Javascript comes with the browser)
   - Regular HTML/CSS
