@@ -45,7 +45,7 @@ Runs the `ssd_inception_v2_gesture.py` script with the FP32 network. Note that t
 Runs the `ssd_inception_v2_gesture.py` script with the FP16 network. Users must plug in their Intel Neural Compute Stick 2 in order to successfully run this application.
 
 ### make train
-**TO BE IMPLEMENTED.** Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
+Trains a SSD Inception V2 model using the Tensorflow Object Detection API given an `Annotations` and `JPEGImages` folder containing .xml and .jpg images, respectively, for training. Training is not necessary since the sample will download a pre-trained model. This option allows for the user to further refine the SSD Inception V2 model if they so desire.
 
 ### make help
 Shows makefile possible targets and brief descriptions.
