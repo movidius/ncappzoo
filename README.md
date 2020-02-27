@@ -14,18 +14,18 @@ Clone the repo with the following command:
 git clone https://github.com/movidius/ncappzoo.git
 ```
 
-Run this command to check your system software dependencies:
+Run this command inside of any app/network folder to check your system software dependencies for that particular sample:
 ```bash
-make install_deps
+make install_reqs
 ```
-If the script returns successfully, you're ready to run apps and networks!
+If the script returns successfully, you're ready to run the app or network sample!
 
 ## _ncappzoo_ Apps and Networks
 Explore apps by opening a terminal window navigating to any directory under **_ncappzoo_/apps** and execute this command:
 ```bash
 make run
 ```
-Explore the neural networks by navigating to any network directory under **_ncappzoo_/networks**, **_ncappzoo_/caffe**, or **_ncappzoo_/tensorflow** and execute the same command:
+Explore the neural networks by navigating to any network directory under **_ncappzoo_/networks** and execute the same command:
 ```bash
 make run
 ```
