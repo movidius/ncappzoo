@@ -32,6 +32,8 @@ Object detection applications make use of one of the [object detection networks]
 |[realsense_object_distance_detection](realsense_object_distance_detection/README.md) | C++<br>Caffe SSD Mobilenet<br>Detects different classes of objects (including people and cars) and uses the Intel Realsense camera to detect the distance to that object. |![](realsense_object_distance_detection/screen_shot.jpg)|
 |[realsense_segmentation](realsense_segmentation/README.md) | C++<br>Semantic Segmentation adas 0001<br>Colorize 20 different classes of objects (including people and cars) and uses the Intel Realsense camera to detect the distance to that object. | ![](realsense_segmentation/screen_shot.png)|
 |[video_face_matcher](video_face_matcher/README.md) | Python<br>TensorFlow FaceNet<br>Uses the networks/face_detection_retail_0004 network and the networks/facenet network to identify faces in a camera video stream.  A single face image is used as the key and when a face in the video stream matches a key(known face), a green frame is overlayed on the detected face.|![](video_face_matcher/screen_shot.png)|
+|[gesture_piarm](gesture_piarm/README.md) | Uses a COCO SSD Inception V2 model trained on a custom dataset of gestures to control a Raspberry Pi robotic arm. A camera looks at the operator and infers hand signals to directly control the arm movement.|![](gesture_piarm/screen_shot.jpg)|
+
 
 ## Misc Applications
 Miscellaneous applications use the OpenVINO toolkit in various ways that don't fit into any of the above categories but can still be interesting.
