@@ -488,14 +488,14 @@ download_train_files:
 		echo $(NOCOLOR)"Train record already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing train record file..."; \
-		gdown 'https://drive.google.com/uc?id=1Qy8q9b4mC4PuStpAdw6Fq--ao7wY8Y-N' -O train_files/train.record ;\
+		wget -O train_files/train.record 'https://downloadmirror.intel.com/29611/eng/food_detection_training_files.zip' ;\
 	fi
 	@if [ -e ${JPEG_ZIP_FILE} ] ; \
 	then \
 		echo $(NOCOLOR)"JPEG zip file already exists, skipping network request."; \
 	else \
 		echo $(NOCOLOR)"Grabbing JPEG zip file..."; \
-		gdown 'https://drive.google.com/uc?id=113g9NlQHmORnVWjohgnDPqW26-2Emvjz' -O train_files/JPEGImages.zip ;\
+		wget -O train_files/JPEGImages.zip 'https://downloadmirror.intel.com/29611/eng/food_detection_model_labels.zip' ;\
 		unzip ${JPEG_ZIP_FILE} -d train_files/ ;\
 	fi
 	@if [ -e cocoapi/PythonAPI ] ;\

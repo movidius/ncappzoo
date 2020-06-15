@@ -9,10 +9,10 @@ NOCOLOR = '\033[0m'
 MODEL_BASE_NAME = tiny-yolo-v1_53000
 
 PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
-GET_PROTOTXT = wget --no-cache -P . http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${PROTOTXT_FILENAME}
+GET_PROTOTXT = wget --no-cache -P . https://downloadmirror.intel.com/29611/eng/tiny_yolo_v1_caffe.zip${PROTOTXT_FILENAME}
 
 CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
-GET_CAFFEMODEL = wget --no-cache -P . -N http://ncs-forum-uploads.s3.amazonaws.com/ncappzoo/tiny_yolo/${CAFFEMODEL_FILENAME}
+GET_CAFFEMODEL = wget --no-cache -P . -N https://downloadmirror.intel.com/29611/eng/tiny_yolo_v1_caffe.zip${CAFFEMODEL_FILENAME}
 
 IR = tiny-yolo-v1_53000.xml
 IMG = ../../data/images/nps_chair.png
