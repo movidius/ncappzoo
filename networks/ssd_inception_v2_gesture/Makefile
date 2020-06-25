@@ -26,8 +26,7 @@ MODEL_INFERENCE_PIPELINE_CONFIG = pipeline.config
 MODEL_INFERENCE_PB = frozen_inference_graph.pb
 
 GET_MODEL_PIPELINE = wget -c --no-cache -P ./tensorflow_model https://raw.githubusercontent.com/fcr3/gesture_detection/master/tensorflow_model/${MODEL_INFERENCE_PIPELINE_CONFIG}
-GET_MO_MODEL_FP32_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp32 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp32/${MO_LABELS}
-GET_MO_MODEL_FP16_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo_fp16 https://raw.githubusercontent.com/fcr3/gesture_detection/master/model_optimized_fp16/${MO_LABELS}
+GET_MO_MODEL_LABELS = wget -c --no-cache -P ./ssd_inception_v2_mo https://downloadmirror.intel.com/29611/eng/gesture_detection_model_labels.zip${MO_LABELS}
 GET_MODEL_PB = python3 download_weights.py
 
 RUN_PY_RELATIVE_DIR = ssd_inception_v2_gesture.py
@@ -105,17 +104,17 @@ compile_model: get_model
 	fi
 	@if [ -e ${MO_LABELS_IN_DIR_FP32} ] ; \
 	then \
-		echo "compiled FP32 model labels already exist, skipping network request."; \
+		echo "compiled model labels already exist, skipping network request."; \
 	else \
-		echo "Grabbing labels for FP32 model..."; \
-		${GET_MO_MODEL_FP32_LABELS}; \
+		echo "Grabbing model labels..."; \
+		${GET_MO_MODEL_LABELS}; \
 	fi
 	@if [ -e ${MO_LABELS_IN_DIR_FP16} ] ; \
 	then \
 		echo "compiled FP16 model labels already exist, skipping network request."; \
 	else \
-		echo "Grabbing labels for FP16 model..."; \
-		${GET_MO_MODEL_FP16_LABELS} ;\
+		echo "Grabbing model labels..."; \
+		${GET_MO_MODEL_LABELS} ;\
 	fi
 
 
