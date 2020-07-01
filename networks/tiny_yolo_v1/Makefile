@@ -7,12 +7,11 @@ RED = '\033[1;31m'
 NOCOLOR = '\033[0m'
 
 MODEL_BASE_NAME = tiny-yolo-v1_53000
+MODEL_ZIPPED = tiny_yolo_v1_caffe.zip
+PROTOTXT_FILENAME = MODEL_UNZIPPED/tiny-yolo-v1.prototxt
+CAFFEMODEL_FILENAME = MODEL_UNZIPPED/tiny-yolo-v1_53000.caffemodel
 
-PROTOTXT_FILENAME= tiny-yolo-v1.prototxt
-GET_PROTOTXT = wget --no-cache -P . https://downloadmirror.intel.com/29611/eng/tiny_yolo_v1_caffe.zip${PROTOTXT_FILENAME}
-
-CAFFEMODEL_FILENAME = tiny-yolo-v1_53000.caffemodel
-GET_CAFFEMODEL = wget --no-cache -P . -N https://downloadmirror.intel.com/29611/eng/tiny_yolo_v1_caffe.zip${CAFFEMODEL_FILENAME}
+GET_MODEL = wget --no-cache -P . -N https://downloadmirror.intel.com/29611/eng/tiny_yolo_v1_caffe.zip${MODEL_UNZIPPED}
 
 IR = tiny-yolo-v1_53000.xml
 IMG = ../../data/images/nps_chair.png
@@ -33,22 +32,8 @@ data:
 
 
 .PHONY: prototxt
-prototxt: 
-	@echo $(YELLOW)'\n'${NETWORK_NAME}": Downloading prototxt file..."$(NOCOLOR)
-	@if [ -e ${PROTOTXT_FILENAME} ] ; \
-	then \
-		echo " - Prototxt file already exists"; \
-	else \
-		echo "Downloading Prototxt file"; \
-		${GET_PROTOTXT}; \
-		if [ -e ${PROTOTXT_FILENAME} ] ; \
-		then \
-			echo " - Got prototext file." ; \
-		else \
-			echo "***\nError - Could not download prototxt file. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi 
+prototxt: caffemodel
+
 
 .PHONY: caffemodel
 caffemodel: 
@@ -58,7 +43,8 @@ caffemodel:
 		echo " - Caffemodel file already exists"; \
 	else \
 		echo " - Downloading caffemodel file"; \
-		${GET_CAFFEMODEL}; \
+		${GET_MODEL}; \
+		unzip ${MODEL_ZIPPED} -d MODEL_UNZIPPED; \
 		if ! [ -e ${CAFFEMODEL_FILENAME} ] ; \
 		then \
 			echo "***\nError - Could not download caffemodel file. Check network and proxy settings \n***\n"; \
@@ -141,4 +127,3 @@ clean: clean_caffe_model
 	rm -f ${MODEL_BASE_NAME}.bin
 	rm -f ${MODEL_BASE_NAME}.mapping
 	
-
