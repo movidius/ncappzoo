@@ -126,4 +126,5 @@ clean: clean_caffe_model
 	rm -f ${MODEL_BASE_NAME}.xml
 	rm -f ${MODEL_BASE_NAME}.bin
 	rm -f ${MODEL_BASE_NAME}.mapping
+	rm -f ${MODEL_UNZIPPED}
 	
