@@ -5,17 +5,15 @@ YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 RED = '\033[1;31m'
 
+
 GRAPH_FILENAME_BASE_IN_DIR_FP16 = frozen_inference_graph.xml
 MO_LABELS = frozen_inference_graph.labels
 MO_LABELS_IN_DIR_FP16 = frozen_inference_graph.labels
 MO_INPUT_GRAPH_ARG = --input_model frozen_inference_graph.pb
-MO_INPUT_PIPELINE = --tensorflow_object_detection_api_pipeline_config tensorflow_model/pipeline.config
+MO_INPUT_PIPELINE = --tensorflow_object_detection_api_pipeline_config pipeline.config
 MO_INPUT_CUSTOM_OPS = --tensorflow_use_custom_operations_config ssd_v2_support_inception.json
 ZIPPED_LABELS = gesture_detection_model_labels.zip
 MODEL_PB = frozen_inference_graph.pb
-MODEL_DIR = tensorflow_model
-MODEL_PIPELINE_CONFIG = ${MODEL_DIR}/pipeline.config
-GET_MODEL_PIPELINE = wget -c --no-cache -P ./tensorflow_model https://raw.githubusercontent.com/fcr3/gesture_detection/master/tensorflow_model/${MODEL_INFERENCE_PIPELINE_CONFIG}
 GET_MO_MODEL_LABELS = wget -c --no-cache https://downloadmirror.intel.com/29611/eng/gesture_detection_model_labels.zip
 RUN_PY_RELATIVE_DIR = ssd_inception_v2_gesture.py
 
@@ -30,26 +28,10 @@ deps: get_model
 
 .PHONY: data
 data:
-	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading required data... No data needed."$(NOCOLOR)
 
 
 .PHONY: get_model
 get_model:
-	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Downloading model files..."$(NOCOLOR)
-	@if [ -e ${MODEL_PIPELINE_CONFIG} ] ; \
-	then \
-		echo "model file ${MODEL_PIPELINE_CONFIG} already exists, skipping download"; \
-	else \
-		echo "Downloading ${MODEL_INFERENCE_PIPELINE_CONFIG} file"; \
-		${GET_MODEL_PIPELINE}; \
-		if [ -e ${MODEL_PIPELINE_CONFIG} ] ; \
-		then \
-			echo "download ${MODEL_INFERENCE_PIPELINE_CONFIG} done. Downloaded to /tensorflow_model."; \
-		else \
-			echo "***\nError - Could not download ${MODEL_INFERENCE_PIPELINE_CONFIG}. Check network and proxy settings \n***\n"; \
-			exit 1; \
-		fi ; \
-	fi
 	@if [ -e ${MODEL_PB} ] ; \
 	then \
 		echo "model file ${MODEL_PB} already exists, skipping download"; \
@@ -80,7 +62,6 @@ compile_model: get_model
 		echo "compiled FP16 model file already exists, skipping compile."; \
 	else \
 		echo "Compiling FP16 model..."; \
-		mkdir ssd_inception_v2_mo_fp16 ; \
 		${NCCOMPILE} --data_type=FP16 --reverse_input_channels ${MO_INPUT_GRAPH_ARG} ${MO_INPUT_PIPELINE} ${MO_INPUT_CUSTOM_OPS} || (echo $(RED)"Make sure to set the OpenVINO environment variables using the "$(YELLOW)"setupvars.sh"$(RED)" script found in <your OpenVINO install location>/bin/ folder."$(NOCOLOR);  exit 1;); \
 	fi
 
@@ -127,10 +108,12 @@ help:
 	@echo $(YELLOW)"  make clean " $(NOCOLOR) "- Removes all the temporary files that are created by the Makefile.";
 	@echo $(YELLOW)"  make train " $(NOCOLOR) "- Train a SSD Inception V2  model.";
 
-clean: clean
+clean: 
 	@echo $(YELLOW)"\nSSD Inception V2 Gesture: Cleaning up files..."$(NOCOLOR)
 	rm -f ${MO_LABELS_IN_DIR_FP16}
 	rm -f ${MODEL_PB}
 	rm -f ${GRAPH_FILENAME_BASE_IN_DIR_FP16}
 	rm -f frozen_inference_graph.bin
 	rm -f ${ZIPPED_LABELS}
+	rm -f pipeline.config
+	rm -f frozen_inference_graph.mapping
