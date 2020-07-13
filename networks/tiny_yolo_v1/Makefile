@@ -127,5 +127,5 @@ clean: clean_caffe_model
 	rm -f ${MODEL_BASE_NAME}.bin
 	rm -f ${MODEL_BASE_NAME}.mapping
 	rm -rf MODEL_UNZIPPED
-	rm -rf tiny_yolo_v1_caffe.zip
+	rm -f tiny_yolo_v1_caffe.zip
 	
