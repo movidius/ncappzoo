@@ -7,7 +7,7 @@ include_directories(
 )
 
 set(SOURCES
-    run.cpp
+    cpp/run.cpp
 )
 
         
