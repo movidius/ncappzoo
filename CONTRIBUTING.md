@@ -3,7 +3,7 @@
 We are glad you want to contribute with a model and/or application for the ncappzoo. This is a great way to help the developer community. We encourage submissions from any and all developers interested in the  Intel&reg; NCS 2 or the original Intel&reg; Movidius&trade; NCS.
 
 ## Submitting a Pull Request
-To contribute a new app or neural network for the ncappzoo, fork the repository and add (commit) any of the following new subdirectories containing your content (your content could contain any or all of the following):
+To contribute a new app or neural network for the ncappzoo, fork the repository and add (commit) to any of the following new subdirectories containing your content (your content could contain any or all of the following):
 - apps/(new app name)
 - networks/(new network name)
 
