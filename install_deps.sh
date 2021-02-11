@@ -107,6 +107,7 @@ else
     if [ $pipAnswer == 'y' ]; then
         echo -e "\e[36mpip3 install -r /opt/intel/openvino/deployment_tools/model_optimizer/requirements.txt\e[39m"
         pip3 install -r /opt/intel/openvino/deployment_tools/model_optimizer/requirements.txt
+        pip3 install coverage m2r pyenchant pylint Sphinx safety test-generator
     else
         echo -e "Please install necessary packages from pip. \nYou can find a list of the necessary packages in the Model Optimizer directory."
         exit 1
