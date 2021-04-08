@@ -1,0 +1,13 @@
+** Face Emotion Game **
+The purpos of the game is to reach the highest score by using your facial expressions.
+
+Game instruction:
+-----------------
+1- Match your facial expressions to the emoji.
+2- Hold your emotion during the countdown time.
+3- In every emotion match, your score will be increased with 10 points.
+4- Countdown is started with 5 to 0, on 0 countdown will reset and start again with 5 sec.
+5- There is a delay between each emoji switch (2 seconds).
+6- High score will be saved once it broke.
+
+Have Fun :)
