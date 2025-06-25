@@ -22,3 +22,24 @@ __pycache__
 
 #jekyll generated directories
 _site
+
+# Testing related
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.pyc
+.hypothesis/
+
+# Poetry
+dist/
+*.egg-info/
+
+# Claude
+.claude/*
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.*.swp
